@@ -40,7 +40,8 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          position: 'relative'
+          position: 'relative',
+          flexShrink: 0
         }}>
           <div style={{ textAlign: 'center', flex: 1 }}>
             <div style={{ marginBottom: '10px' }}>
@@ -92,14 +93,16 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          minHeight: '400px'
+          minHeight: '300px',
+          overflow: 'hidden'
         }}>
           {pdfUrl ? (
             <iframe
               src={pdfUrl}
               style={{
                 width: '100%',
-                height: 'calc(70vh - 100px)',
+                height: 'calc(100vh - 300px)',
+                maxHeight: '500px',
                 border: 'none',
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
@@ -119,14 +122,16 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer - Always Visible */}
         <div style={{
           padding: '20px 30px',
           borderTop: '1px solid #eee',
           backgroundColor: '#f8f9fa',
           display: 'flex',
           gap: '15px',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          flexShrink: 0,
+          position: 'relative'
         }}>
           {pdfUrl && (
             <a
@@ -146,12 +151,11 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
                 transition: 'background-color 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                justifyContent: 'center'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
             >
-              <span>📥</span>
               Download PDF
             </a>
           )}
@@ -170,12 +174,11 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
               transition: 'background-color 0.2s ease',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              justifyContent: 'center'
             }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
           >
-            <span>✕</span>
             Close
           </button>
         </div>

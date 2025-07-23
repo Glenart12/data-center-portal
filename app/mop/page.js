@@ -230,7 +230,7 @@ function MopPage() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  👁️ Preview
+                  Preview
                 </button>
                 <a 
                   href={`/mops/${filename}`} 
@@ -250,8 +250,7 @@ function MopPage() {
                     textAlign: 'center',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
+                    justifyContent: 'center'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#218838';
@@ -262,7 +261,7 @@ function MopPage() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  📥 Download
+                  Download
                 </a>
               </div>
             </div>
