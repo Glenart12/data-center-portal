@@ -90,32 +90,6 @@ export default function Header() {
           >
             Home
           </a>
-
-          <a 
-            href="/dashboard"
-            style={{
-              padding: '8px 16px',
-              backgroundColor: pathname === '/dashboard' ? '#0070f3' : 'transparent',
-              color: pathname === '/dashboard' ? 'white' : '#333',
-              textDecoration: 'none',
-              borderRadius: '4px',
-              fontSize: '14px',
-              border: pathname === '/dashboard' ? 'none' : '1px solid #ddd',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              if (pathname !== '/dashboard') {
-                e.currentTarget.style.backgroundColor = '#f0f0f0';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (pathname !== '/dashboard') {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }
-            }}
-          >
-            Dashboard
-          </a>
           
           <a 
             href="/mop"
