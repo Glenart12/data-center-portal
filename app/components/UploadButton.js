@@ -36,7 +36,6 @@ export default function UploadButton({ type, onUploadSuccess }) {
         setShowModal(false);
         setSelectedFile(null);
         
-        // Refresh the page to show the new file
         if (onUploadSuccess) {
           onUploadSuccess();
         } else {
@@ -68,17 +67,9 @@ export default function UploadButton({ type, onUploadSuccess }) {
           fontSize: '16px',
           fontWeight: '600',
           cursor: 'pointer',
-          marginBottom: '25px',
           transition: 'all 0.3s ease',
-          boxShadow: '0 2px 10px rgba(40, 167, 69, 0.3)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#218838';
-          e.currentTarget.style.transform = 'translateY(-1px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#28a745';
-          e.currentTarget.style.transform = 'translateY(0)';
+          boxShadow: '0 2px 10px rgba(40, 167, 69, 0.3)',
+          width: '100%'
         }}
       >
         <span style={{ fontSize: '18px' }}>📁</span>
