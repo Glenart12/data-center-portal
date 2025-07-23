@@ -1,0 +1,146 @@
+METHOD OF PROCEDURE (MOP)
+========================
+
+SECTION 01 - MOP SCHEDULE INFORMATION
+-------------------------------------
+MOP Title: sdfg
+MOP Information: sdfgsdf
+MOP Author: sdfgsdf
+MOP Creation Date: 1212-12-12
+MOP Revision Date: 1121-12-12
+Document Number: 12312123
+Revision Number: 123123123
+Author CET Level: 1
+
+SECTION 02 - SITE INFORMATION
+-----------------------------
+Data Center Location:
+  Street: 1212 sdffdfsd
+  City: sdfsdfsd
+  State: tx
+  ZIP: 45635
+Service Ticket/Project Number: 3456345
+Level of Risk: 2
+MBM Required?: Yes
+
+SECTION 03 - MOP OVERVIEW
+-------------------------
+MOP Description: swfgsfdgsfdgs
+Work Area: sdfgsdfg
+Affected Systems: sdfgsdfgsdfg
+Equipment Information: sdfgsdfgs
+Manufacturer: sdfgsdf
+Equipment ID: 123541234
+Model #: 12341234
+Serial #: 1341234
+Personnel Required: aadsfasdfasff
+Min. # of Facilities Personnel: 2345234
+# of Contractors #1: 23452
+# of Contractors #2: 2435243
+Personnel from other departments: sdfgsfdg
+Qualifications Required: sdfgsdfgs
+Tools Required: dfgsdfg
+Advance notifications required: sdfgsdfg
+Post notifications required: sdfgsdf
+
+SECTION 04 - EFFECT OF MOP ON CRITICAL FACILITY
+-----------------------------------------------
+Electrical Utility Equipment: Yes
+Emergency Generator System: No
+Critical Cooling System: N/A - sdfgs
+Ventilation System: No
+Mechanical System: No
+Uninterruptible Power Supply (UPS): Yes
+Critical Power Distribution System: N/A - sdfgsd
+Emergency Power Off (EPO): Yes
+Fire Detection Systems: N/A
+Fire Suppression System: No
+Disable Fire System: Yes
+Monitoring System: N/A
+Control System: No
+Security System: No
+General Power and Lighting System: Yes - zsdfg
+Lockout/Tagout Required?: Yes
+Work to be performed "hot"?: N/A
+Radio interference potential?: Yes
+
+SECTION 05 - MOP SUPPORTING DOCUMENTATION
+-----------------------------------------
+sdfgsdfgsdfg
+
+SECTION 06 - SAFETY REQUIREMENTS
+--------------------------------
+sdfgsdfgsdfgs
+
+SECTION 07 - MOP RISKS & ASSUMPTIONS
+------------------------------------
+sdfgsdfg
+
+SECTION 08 - MOP DETAILS
+------------------------
+Date Performed: 1111-12-12
+Time Begun: 11:11
+Time Completed: 
+Facilities personnel performing work: 1asedfas
+Contractor/Vendor personnel performing work: asdfasd
+
+Chiller Operations Log:
+Row 1: Chiller: asdfasdfas, Initials: fd, Time: 11:11
+Row 2: Chiller: asdfa, Initials: fd, Time: 11:11
+Row 3: Chiller: sdfasd, Initials: fd, Time: 11:11
+Row 4: Chiller: asdfasdf, Initials: fd, Time: 11:11
+Row 5: Chiller: asdfadsf, Initials: df, Time: 11:11
+Row 6: Chiller: asdfasd, Initials: fdf, Time: 11:11
+Row 7: Chiller: asdfasdf, Initials: fd, Time: 11:11
+
+SECTION 09 - BACK-OUT PROCEDURES
+--------------------------------
+IMPORTANT NOTES:
+1. Back-out procedures will commence immediately if any problem/failure occurs that affects the critical load.
+2. Any Issues Encountered, at any of the listed verification steps, will signal a STOP of work. Issues will be immediately identified for Root Cause. Corrections will be made. The system(s) will be returned to normal operating condition and allowed to stabilize. Evaluation will be conducted before a decision is to continue or stop work. The Emergency will be immediately notified and work will STOP.
+
+Back-out Procedures Log:
+Row 1: Procedure: zxcvz, Initials: XCV, Time: 11:11
+Row 2: Procedure: xcvzxcv, Initials: CV, Time: 11:11
+Row 3: Procedure: zxcvzxc, Initials: Vg, Time: 11:11
+Row 4: Procedure: vzxcvzxcv, Initials: xcv, Time: 11:11
+Row 5: Procedure: zxcvzx, Initials: xc, Time: 11:11
+Row 6: Procedure: zxcvzxc, Initials: xcxc, Time: 11:11
+Row 7: Procedure: zxcvzxcv, Initials: xc, Time: 11:11
+Row 8: Procedure: zxcvzxcv, Initials: cx, Time: 03:45
+
+SECTION 10 - MOP APPROVAL
+-------------------------
+Tested for clarity:
+  Reviewer's Name: asdfas
+  Reviewer's Title: fasdf
+  Date: 1111-11-11
+  Approved: Yes
+
+Technical review:
+  Reviewer's Name: asdf
+  Reviewer's Title: asdf
+  Date: 1111-11-11
+  Approved: No
+
+JLL Chief Engineer approval:
+  Reviewer's Name: sdfa
+  Reviewer's Title: afas
+  Date: 1111-11-11
+  Approved: N/A
+
+Contractor Review (if applicable):
+  Reviewer's Name: asdf
+  Reviewer's Title: asdfa
+  Date: 1111-11-11
+  Approved: Yes
+
+Capital One approval:
+  Reviewer's Name: fasd
+  Reviewer's Title: xdfaf
+  Date: 1111-11-11
+  Approved: Yes
+
+SECTION 11 - MOP COMMENTS
+-------------------------
+sfghfghfghsfghsfgh
