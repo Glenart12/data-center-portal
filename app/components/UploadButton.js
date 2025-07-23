@@ -31,21 +31,25 @@ export default function UploadButton({ type, onUploadSuccess }) {
         body: formData
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        alert('File uploaded successfully!');
+        alert(`PDF uploaded successfully to ${type.toUpperCase()}!`);
         setShowModal(false);
         setSelectedFile(null);
         
+        // Refresh the page to show the new file
         if (onUploadSuccess) {
           onUploadSuccess();
         } else {
           window.location.reload();
         }
       } else {
-        alert('Upload failed. Please try again.');
+        alert(`Upload failed: ${data.error || 'Please try again.'}`);
       }
     } catch (error) {
-      alert('Upload failed. Please try again.');
+      console.error('Upload error:', error);
+      alert('Upload failed. Please check your connection and try again.');
     } finally {
       setIsUploading(false);
     }
@@ -163,7 +167,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
                   color: '#666',
                   fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
                 }}>
-                  Select a PDF file to upload
+                  Select a PDF file to upload to {type.toUpperCase()}
                 </p>
               </div>
             </div>
@@ -185,6 +189,9 @@ export default function UploadButton({ type, onUploadSuccess }) {
                 </p>
                 <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '14px' }}>
                   {selectedFile.name}
+                </p>
+                <p style={{ margin: '10px 0 0 0', color: '#28a745', fontSize: '12px' }}>
+                  Ready to upload to {type.toUpperCase()}
                 </p>
               </div>
             )}
@@ -245,7 +252,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
                   }
                 }}
               >
-                {isUploading ? 'Uploading...' : 'Upload PDF'}
+                {isUploading ? `Uploading to ${type.toUpperCase()}...` : `Upload to ${type.toUpperCase()}`}
               </button>
             </div>
           </div>
