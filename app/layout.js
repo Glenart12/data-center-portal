@@ -1,5 +1,5 @@
-import { UserProvider } from '@auth0/nextjs-auth0/client';
-import Header from './components/Header';
+// import { UserProvider } from '@auth0/nextjs-auth0/client';
+// import Header from './components/Header';
 
 export default function RootLayout({ children }) {
   return (
@@ -31,15 +31,13 @@ export default function RootLayout({ children }) {
           zIndex: -1
         }} />
         
-        <UserProvider>
-          <Header />
-          <main style={{
-            position: 'relative',
-            zIndex: 1
-          }}>
-            {children}
-          </main>
-        </UserProvider>
+        {/* Temporarily disabled UserProvider and Header */}
+        <main style={{
+          position: 'relative',
+          zIndex: 1
+        }}>
+          {children}
+        </main>
       </body>
     </html>
   );
