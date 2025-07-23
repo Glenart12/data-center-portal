@@ -42,11 +42,12 @@ function MopPage() {
     setIsTemplateModalOpen(false);
   };
 
-  // Standardized button style
+  // Fixed button style with proper emoji and text alignment
   const buttonStyle = {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    justifyContent: 'center',
+    gap: '10px',
     padding: '12px 24px',
     border: 'none',
     borderRadius: '8px',
@@ -54,20 +55,35 @@ function MopPage() {
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    minWidth: '160px',
-    justifyContent: 'center'
+    minWidth: '180px',
+    height: '48px',
+    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+  };
+
+  const emojiStyle = {
+    fontSize: '18px',
+    lineHeight: '1',
+    display: 'flex',
+    alignItems: 'center'
   };
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h1>Methods of Procedure (MOPs)</h1>
+      <h1 style={{ 
+        marginBottom: '30px',
+        color: '#0f3456',
+        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+      }}>
+        Methods of Procedure (MOPs)
+      </h1>
       
-      {/* Action Buttons - All Same Size */}
+      {/* Fixed Action Buttons */}
       <div style={{ 
         display: 'flex', 
         gap: '15px', 
         marginBottom: '30px', 
-        flexWrap: 'wrap' 
+        flexWrap: 'wrap',
+        alignItems: 'stretch'
       }}>
         <button
           onClick={() => setIsGenerateModalOpen(true)}
@@ -77,9 +93,11 @@ function MopPage() {
             color: 'white',
             boxShadow: '0 2px 10px rgba(15, 52, 86, 0.3)'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          <span style={{ fontSize: '18px' }}>✨</span>
-          Generate MOP
+          <span style={emojiStyle}>✨</span>
+          <span>Generate MOP</span>
         </button>
 
         <button
@@ -90,18 +108,14 @@ function MopPage() {
             color: 'white',
             boxShadow: '0 2px 10px rgba(111, 66, 193, 0.3)'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          <span style={{ fontSize: '18px' }}>📋</span>
-          MOP Template
+          <span style={emojiStyle}>📋</span>
+          <span>MOP Template</span>
         </button>
 
-        <div style={{
-          ...buttonStyle,
-          backgroundColor: '#28a745',
-          color: 'white',
-          boxShadow: '0 2px 10px rgba(40, 167, 69, 0.3)',
-          padding: '0'
-        }}>
+        <div style={{ minWidth: '180px', height: '48px' }}>
           <UploadButton type="mops" />
         </div>
       </div>
@@ -114,7 +128,15 @@ function MopPage() {
         marginTop: '20px' 
       }}>
         {files.length === 0 ? (
-          <p>No MOP files found. Upload some PDFs to get started.</p>
+          <p style={{ 
+            textAlign: 'center', 
+            color: '#666', 
+            fontSize: '18px',
+            gridColumn: '1 / -1',
+            padding: '40px'
+          }}>
+            No MOP files found. Upload some PDFs to get started.
+          </p>
         ) : (
           files.map((filename) => (
             <div key={filename} style={{ 
@@ -127,8 +149,16 @@ function MopPage() {
               transition: 'transform 0.2s ease, box-shadow 0.2s ease'
             }}
             onClick={() => handlePDFClick(filename)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
             >
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>
+              <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#0f3456' }}>
                 {filename.replace('.pdf', '').replace('.txt', '')}
               </h3>
               <div style={{ display: 'flex', gap: '10px' }}>
@@ -144,8 +174,11 @@ function MopPage() {
                     border: 'none',
                     borderRadius: '4px',
                     fontSize: '14px',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0051cc'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0070f3'}
                 >
                   Preview
                 </button>
@@ -159,8 +192,11 @@ function MopPage() {
                     color: 'white',
                     textDecoration: 'none',
                     borderRadius: '4px',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    transition: 'background-color 0.2s ease'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
                 >
                   Download
                 </a>

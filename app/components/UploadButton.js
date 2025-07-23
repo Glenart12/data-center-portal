@@ -51,6 +51,13 @@ export default function UploadButton({ type, onUploadSuccess }) {
     }
   };
 
+  const emojiStyle = {
+    fontSize: '18px',
+    lineHeight: '1',
+    display: 'flex',
+    alignItems: 'center'
+  };
+
   return (
     <>
       <button
@@ -58,7 +65,8 @@ export default function UploadButton({ type, onUploadSuccess }) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          justifyContent: 'center',
+          gap: '10px',
           padding: '12px 24px',
           backgroundColor: '#28a745',
           color: 'white',
@@ -69,11 +77,21 @@ export default function UploadButton({ type, onUploadSuccess }) {
           cursor: 'pointer',
           transition: 'all 0.3s ease',
           boxShadow: '0 2px 10px rgba(40, 167, 69, 0.3)',
-          width: '100%'
+          width: '100%',
+          height: '48px',
+          fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#218838';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#28a745';
+          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        <span style={{ fontSize: '18px' }}>📁</span>
-        Upload PDF
+        <span style={emojiStyle}>📁</span>
+        <span>Upload PDF</span>
       </button>
 
       {showModal && (
@@ -83,12 +101,13 @@ export default function UploadButton({ type, onUploadSuccess }) {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 2000,
-          backdropFilter: 'blur(4px)'
+          backdropFilter: 'blur(5px)',
+          padding: '20px'
         }}>
           <div style={{
             backgroundColor: 'white',
@@ -96,51 +115,82 @@ export default function UploadButton({ type, onUploadSuccess }) {
             borderRadius: '15px',
             width: '90%',
             maxWidth: '500px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            textAlign: 'center'
           }}>
             <h2 style={{ 
-              marginBottom: '25px',
+              marginBottom: '30px',
               color: '#0f3456',
-              textAlign: 'center',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+              fontSize: '1.5em',
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              textAlign: 'center'
             }}>
               Upload PDF to {type.toUpperCase()}
             </h2>
             
-            <div style={{ marginBottom: '25px' }}>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileSelect}
-                style={{
-                  width: '100%',
-                  padding: '15px',
-                  border: '2px dashed #28a745',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
+            <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+              <div style={{
+                border: '2px dashed #28a745',
+                borderRadius: '12px',
+                padding: '30px 20px',
+                backgroundColor: '#f8f9fa',
+                margin: '0 auto',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{ marginBottom: '15px' }}>
+                  <span style={{ fontSize: '48px', color: '#28a745' }}>📁</span>
+                </div>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileSelect}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+                  }}
+                />
+                <p style={{
+                  margin: '15px 0 0 0',
                   fontSize: '14px',
-                  backgroundColor: '#f8f9fa'
-                }}
-              />
+                  color: '#666',
+                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+                }}>
+                  Select a PDF file to upload
+                </p>
+              </div>
             </div>
 
             {selectedFile && (
               <div style={{
-                marginBottom: '25px',
-                padding: '15px',
+                marginBottom: '30px',
+                padding: '20px',
                 backgroundColor: '#e8f5e8',
-                borderRadius: '8px',
-                border: '1px solid #28a745'
+                borderRadius: '12px',
+                border: '1px solid #28a745',
+                textAlign: 'center'
               }}>
-                <strong style={{ color: '#0f3456' }}>Selected file:</strong> 
-                <span style={{ marginLeft: '8px', color: '#666' }}>{selectedFile.name}</span>
+                <div style={{ marginBottom: '10px' }}>
+                  <span style={{ fontSize: '24px' }}>✅</span>
+                </div>
+                <p style={{ margin: 0, color: '#0f3456', fontWeight: 'bold' }}>
+                  Selected file:
+                </p>
+                <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '14px' }}>
+                  {selectedFile.name}
+                </p>
               </div>
             )}
 
             <div style={{ 
               display: 'flex', 
               gap: '15px', 
-              justifyContent: 'flex-end' 
+              justifyContent: 'center',
+              marginTop: '30px'
             }}>
               <button
                 onClick={() => {
@@ -155,9 +205,13 @@ export default function UploadButton({ type, onUploadSuccess }) {
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                  transition: 'background-color 0.2s ease'
                 }}
                 disabled={isUploading}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
               >
                 Cancel
               </button>
@@ -173,7 +227,19 @@ export default function UploadButton({ type, onUploadSuccess }) {
                   fontSize: '14px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  opacity: isUploading || !selectedFile ? 0.6 : 1
+                  opacity: isUploading || !selectedFile ? 0.6 : 1,
+                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isUploading && selectedFile) {
+                    e.currentTarget.style.backgroundColor = '#218838';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isUploading && selectedFile) {
+                    e.currentTarget.style.backgroundColor = '#28a745';
+                  }
                 }}
               >
                 {isUploading ? 'Uploading...' : 'Upload PDF'}
