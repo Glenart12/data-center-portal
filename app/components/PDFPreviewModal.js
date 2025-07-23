@@ -17,6 +17,7 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
       zIndex: 9999,
       padding: '20px',
       paddingTop: '90px',
+      paddingBottom: '20px',
       backdropFilter: 'blur(5px)',
       overflowY: 'auto'
     }}>
@@ -25,16 +26,16 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
         borderRadius: '15px',
         width: '95%',
         maxWidth: '1000px',
-        maxHeight: 'calc(100vh - 140px)',
+        height: 'calc(100vh - 180px)',
+        maxHeight: 'calc(100vh - 180px)',
         overflow: 'hidden',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         display: 'flex',
-        flexDirection: 'column',
-        marginBottom: '40px'
+        flexDirection: 'column'
       }}>
-        {/* Header */}
+        {/* Header - Fixed Height */}
         <div style={{
-          padding: '25px 30px',
+          padding: '20px 30px',
           borderBottom: '1px solid #eee',
           backgroundColor: '#f8f9fa',
           display: 'flex',
@@ -42,27 +43,22 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           alignItems: 'center',
           position: 'relative',
           flexShrink: 0,
-          textAlign: 'center'
+          textAlign: 'center',
+          minHeight: '100px'
         }}>
           <div style={{ textAlign: 'center', flex: 1 }}>
-            <div style={{ marginBottom: '15px' }}>
-              <span style={{ fontSize: '48px' }}>📄</span>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontSize: '36px' }}>📄</span>
             </div>
             <h2 style={{
               margin: 0,
               color: '#0f3456',
-              fontSize: '1.6em',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+              fontSize: '1.4em',
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              lineHeight: '1.2'
             }}>
               {pdfName || 'PDF Preview'}
             </h2>
-            <p style={{
-              margin: '10px 0 0 0',
-              color: '#666',
-              fontSize: '14px'
-            }}>
-              Document preview
-            </p>
           </div>
           <button
             onClick={onClose}
@@ -72,10 +68,10 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
               right: '15px',
               background: '#f8f9fa',
               border: '1px solid #ddd',
-              fontSize: '18px',
+              fontSize: '16px',
               cursor: 'pointer',
               color: '#666',
-              padding: '8px 12px',
+              padding: '6px 10px',
               borderRadius: '6px',
               transition: 'all 0.2s ease',
               fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
@@ -94,38 +90,29 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           </button>
         </div>
 
-        {/* PDF Content - Responsive */}
+        {/* PDF Content - Flexible Height */}
         <div style={{
           flex: 1,
-          padding: '30px',
+          padding: '20px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           overflow: 'hidden',
-          minHeight: '400px'
+          minHeight: '200px'
         }}>
           {pdfUrl ? (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <iframe
-                src={pdfUrl}
-                style={{
-                  width: '100%',
-                  height: 'calc(100vh - 320px)',
-                  minHeight: '400px',
-                  maxHeight: '600px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-                }}
-                title={pdfName}
-              />
-            </div>
+            <iframe
+              src={pdfUrl}
+              style={{
+                width: '100%',
+                height: '100%',
+                minHeight: '200px',
+                border: 'none',
+                borderRadius: '8px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+              }}
+              title={pdfName}
+            />
           ) : (
             <div style={{
               textAlign: 'center',
@@ -133,33 +120,34 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
               fontSize: '18px',
               fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
             }}>
-              <span style={{ fontSize: '64px', display: 'block', marginBottom: '20px' }}>📄</span>
+              <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>📄</span>
               <p style={{ margin: 0 }}>No PDF selected for preview</p>
             </div>
           )}
         </div>
 
-        {/* Footer - Always Visible */}
+        {/* Footer - Fixed Height, Always Visible */}
         <div style={{
-          padding: '25px 30px',
+          padding: '20px 30px',
           borderTop: '1px solid #eee',
           backgroundColor: '#f8f9fa',
           display: 'flex',
           gap: '15px',
           justifyContent: 'center',
-          flexShrink: 0
+          flexShrink: 0,
+          minHeight: '60px'
         }}>
           {pdfUrl && (
             <a
               href={pdfUrl}
               download
               style={{
-                padding: '12px 30px',
+                padding: '10px 20px',
                 backgroundColor: '#28a745',
                 color: 'white',
                 textDecoration: 'none',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '6px',
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -167,7 +155,8 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                whiteSpace: 'nowrap'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#218838';
@@ -184,11 +173,11 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           <button
             onClick={onClose}
             style={{
-              padding: '12px 30px',
+              padding: '10px 20px',
               backgroundColor: '#6c757d',
               color: 'white',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '6px',
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
@@ -196,7 +185,8 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              whiteSpace: 'nowrap'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#5a6268';
