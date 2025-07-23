@@ -314,7 +314,6 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
       });
 
       if (response.ok) {
-        const data = await response.json();
         alert('MOP Template created successfully!');
         onClose();
         // Refresh the page to show the new file
@@ -381,7 +380,8 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
     border: '1px solid #ddd',
     borderRadius: '6px',
     fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-    marginBottom: '15px'
+    marginBottom: '15px',
+    boxSizing: 'border-box'
   };
 
   const textAreaStyle = {
@@ -411,7 +411,8 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
     fontSize: '16px',
     fontWeight: 'bold',
     marginBottom: '20px',
-    borderRadius: '6px'
+    borderRadius: '6px',
+    textAlign: 'center'
   };
 
   const tableStyle = {
@@ -469,38 +470,51 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
       bottom: 0,
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'center',
-      zIndex: 2000,
+      zIndex: 9999,
       padding: '20px',
-      backdropFilter: 'blur(5px)'
+      paddingTop: '90px',
+      backdropFilter: 'blur(5px)',
+      overflowY: 'auto'
     }}>
       <div style={{
         backgroundColor: 'white',
         borderRadius: '15px',
         width: '95%',
         maxWidth: '1000px',
-        height: '90vh',
+        maxHeight: 'calc(100vh - 140px)',
         overflow: 'hidden',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        marginBottom: '40px'
       }}>
         {/* Header */}
         <div style={{
-          padding: '20px 30px',
+          padding: '25px 30px',
           borderBottom: '1px solid #eee',
-          backgroundColor: '#f8f9fa'
+          backgroundColor: '#f8f9fa',
+          textAlign: 'center'
         }}>
+          <div style={{ marginBottom: '15px' }}>
+            <span style={{ fontSize: '48px' }}>📋</span>
+          </div>
           <h2 style={{
             margin: 0,
             color: '#0f3456',
-            fontSize: '1.5em',
-            fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-            textAlign: 'center'
+            fontSize: '1.6em',
+            fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
           }}>
             MOP Template Generator
           </h2>
+          <p style={{
+            margin: '15px 0 0 0',
+            color: '#666',
+            fontSize: '14px'
+          }}>
+            Create a comprehensive Method of Procedure document
+          </p>
         </div>
 
         {/* Form Content - Scrollable */}
@@ -509,574 +523,576 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
           overflowY: 'auto',
           flex: 1
         }}>
-          {/* Section 01 - MOP Schedule Information */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 01 - MOP Schedule Information</div>
-            
-            <label style={labelStyle}>MOP Title:</label>
-            <input type="text" value={formData.mopTitle} onChange={(e) => handleInputChange('mopTitle', e.target.value)} style={inputStyle} />
-            
-            <label style={labelStyle}>MOP Information:</label>
-            <textarea value={formData.mopInformation} onChange={(e) => handleInputChange('mopInformation', e.target.value)} style={textAreaStyle} />
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>MOP Author:</label>
-                <input type="text" value={formData.mopAuthor} onChange={(e) => handleInputChange('mopAuthor', e.target.value)} style={inputStyle} />
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            {/* Section 01 - MOP Schedule Information */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 01 - MOP Schedule Information</div>
+              
+              <label style={labelStyle}>MOP Title:</label>
+              <input type="text" value={formData.mopTitle} onChange={(e) => handleInputChange('mopTitle', e.target.value)} style={inputStyle} placeholder="Enter MOP title" />
+              
+              <label style={labelStyle}>MOP Information:</label>
+              <textarea value={formData.mopInformation} onChange={(e) => handleInputChange('mopInformation', e.target.value)} style={textAreaStyle} placeholder="Enter MOP information" />
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>MOP Author:</label>
+                  <input type="text" value={formData.mopAuthor} onChange={(e) => handleInputChange('mopAuthor', e.target.value)} style={inputStyle} placeholder="Enter author name" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Author CET Level:</label>
+                  <select value={formData.authorCETLevel} onChange={(e) => handleInputChange('authorCETLevel', e.target.value)} style={inputStyle}>
+                    <option value="">Select Level</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label style={labelStyle}>Author CET Level:</label>
-                <select value={formData.authorCETLevel} onChange={(e) => handleInputChange('authorCETLevel', e.target.value)} style={inputStyle}>
-                  <option value="">Select Level</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>MOP Creation Date:</label>
+                  <input type="date" value={formData.mopCreationDate} onChange={(e) => handleInputChange('mopCreationDate', e.target.value)} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>MOP Revision Date:</label>
+                  <input type="date" value={formData.mopRevisionDate} onChange={(e) => handleInputChange('mopRevisionDate', e.target.value)} style={inputStyle} />
+                </div>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>Document Number:</label>
+                  <input type="text" value={formData.documentNumber} onChange={(e) => handleInputChange('documentNumber', e.target.value)} style={inputStyle} placeholder="Enter document number" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Revision Number:</label>
+                  <input type="text" value={formData.revisionNumber} onChange={(e) => handleInputChange('revisionNumber', e.target.value)} style={inputStyle} placeholder="Enter revision number" />
+                </div>
               </div>
             </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>MOP Creation Date:</label>
-                <input type="date" value={formData.mopCreationDate} onChange={(e) => handleInputChange('mopCreationDate', e.target.value)} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>MOP Revision Date:</label>
-                <input type="date" value={formData.mopRevisionDate} onChange={(e) => handleInputChange('mopRevisionDate', e.target.value)} style={inputStyle} />
-              </div>
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>Document Number:</label>
-                <input type="text" value={formData.documentNumber} onChange={(e) => handleInputChange('documentNumber', e.target.value)} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Revision Number:</label>
-                <input type="text" value={formData.revisionNumber} onChange={(e) => handleInputChange('revisionNumber', e.target.value)} style={inputStyle} />
-              </div>
-            </div>
-          </div>
 
-          {/* Section 02 - Site Information */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 02 - Site Information</div>
-            
-            <label style={labelStyle}>Data Center Location:</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
-              <input
-                type="text"
-                value={formData.dataCenterStreet}
-                onChange={(e) => handleInputChange('dataCenterStreet', e.target.value)}
-                style={{ ...inputStyle, marginBottom: '0' }}
-                placeholder="Street Address"
-              />
-              <input
-                type="text"
-                value={formData.dataCenterCity}
-                onChange={(e) => handleInputChange('dataCenterCity', e.target.value)}
-                style={{ ...inputStyle, marginBottom: '0' }}
-                placeholder="City"
-              />
-              <input
-                type="text"
-                value={formData.dataCenterState}
-                onChange={(e) => handleInputChange('dataCenterState', e.target.value)}
-                style={{ ...inputStyle, marginBottom: '0' }}
-                placeholder="State"
-              />
-              <input
-                type="text"
-                value={formData.dataCenterZip}
-                onChange={(e) => handleInputChange('dataCenterZip', e.target.value)}
-                style={{ ...inputStyle, marginBottom: '0' }}
-                placeholder="ZIP Code"
-              />
-            </div>
-            
-            <label style={labelStyle}>Service Ticket/Project Number:</label>
-            <input type="text" value={formData.serviceTicket} onChange={(e) => handleInputChange('serviceTicket', e.target.value)} style={inputStyle} />
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>Level of Risk:</label>
-                <select value={formData.levelOfRisk} onChange={(e) => handleInputChange('levelOfRisk', e.target.value)} style={inputStyle}>
-                  <option value="">Select Risk Level</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
+            {/* Section 02 - Site Information */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 02 - Site Information</div>
+              
+              <label style={labelStyle}>Data Center Location:</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+                <input
+                  type="text"
+                  value={formData.dataCenterStreet}
+                  onChange={(e) => handleInputChange('dataCenterStreet', e.target.value)}
+                  style={{ ...inputStyle, marginBottom: '0' }}
+                  placeholder="Street Address"
+                />
+                <input
+                  type="text"
+                  value={formData.dataCenterCity}
+                  onChange={(e) => handleInputChange('dataCenterCity', e.target.value)}
+                  style={{ ...inputStyle, marginBottom: '0' }}
+                  placeholder="City"
+                />
+                <input
+                  type="text"
+                  value={formData.dataCenterState}
+                  onChange={(e) => handleInputChange('dataCenterState', e.target.value)}
+                  style={{ ...inputStyle, marginBottom: '0' }}
+                  placeholder="State"
+                />
+                <input
+                  type="text"
+                  value={formData.dataCenterZip}
+                  onChange={(e) => handleInputChange('dataCenterZip', e.target.value)}
+                  style={{ ...inputStyle, marginBottom: '0' }}
+                  placeholder="ZIP Code"
+                />
               </div>
-              <div>
-                <label style={labelStyle}>MBM Required?</label>
-                <select value={formData.mbmRequired} onChange={(e) => handleInputChange('mbmRequired', e.target.value)} style={inputStyle}>
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="N/A">N/A</option>
-                </select>
+              
+              <label style={labelStyle}>Service Ticket/Project Number:</label>
+              <input type="text" value={formData.serviceTicket} onChange={(e) => handleInputChange('serviceTicket', e.target.value)} style={inputStyle} placeholder="Enter ticket/project number" />
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>Level of Risk:</label>
+                  <select value={formData.levelOfRisk} onChange={(e) => handleInputChange('levelOfRisk', e.target.value)} style={inputStyle}>
+                    <option value="">Select Risk Level</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>MBM Required?</label>
+                  <select value={formData.mbmRequired} onChange={(e) => handleInputChange('mbmRequired', e.target.value)} style={inputStyle}>
+                    <option value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Section 03 - MOP Overview */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 03 - MOP Overview</div>
-            
-            <label style={labelStyle}>MOP Description:</label>
-            <textarea value={formData.mopDescription} onChange={(e) => handleInputChange('mopDescription', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Work Area:</label>
-            <input type="text" value={formData.workArea} onChange={(e) => handleInputChange('workArea', e.target.value)} style={inputStyle} />
-            
-            <label style={labelStyle}>Affected Systems:</label>
-            <textarea value={formData.affectedSystems} onChange={(e) => handleInputChange('affectedSystems', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Equipment Information:</label>
-            <textarea value={formData.equipmentInformation} onChange={(e) => handleInputChange('equipmentInformation', e.target.value)} style={textAreaStyle} />
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>Manufacturer:</label>
-                <input type="text" value={formData.manufacturer} onChange={(e) => handleInputChange('manufacturer', e.target.value)} style={inputStyle} />
+            {/* Section 03 - MOP Overview */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 03 - MOP Overview</div>
+              
+              <label style={labelStyle}>MOP Description:</label>
+              <textarea value={formData.mopDescription} onChange={(e) => handleInputChange('mopDescription', e.target.value)} style={textAreaStyle} placeholder="Enter MOP description" />
+              
+              <label style={labelStyle}>Work Area:</label>
+              <input type="text" value={formData.workArea} onChange={(e) => handleInputChange('workArea', e.target.value)} style={inputStyle} placeholder="Enter work area" />
+              
+              <label style={labelStyle}>Affected Systems:</label>
+              <textarea value={formData.affectedSystems} onChange={(e) => handleInputChange('affectedSystems', e.target.value)} style={textAreaStyle} placeholder="Enter affected systems" />
+              
+              <label style={labelStyle}>Equipment Information:</label>
+              <textarea value={formData.equipmentInformation} onChange={(e) => handleInputChange('equipmentInformation', e.target.value)} style={textAreaStyle} placeholder="Enter equipment information" />
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>Manufacturer:</label>
+                  <input type="text" value={formData.manufacturer} onChange={(e) => handleInputChange('manufacturer', e.target.value)} style={inputStyle} placeholder="Enter manufacturer" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Equipment ID:</label>
+                  <input type="text" value={formData.equipmentId} onChange={(e) => handleInputChange('equipmentId', e.target.value)} style={inputStyle} placeholder="Enter equipment ID" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Model #:</label>
+                  <input type="text" value={formData.modelNumber} onChange={(e) => handleInputChange('modelNumber', e.target.value)} style={inputStyle} placeholder="Enter model number" />
+                </div>
               </div>
-              <div>
-                <label style={labelStyle}>Equipment ID:</label>
-                <input type="text" value={formData.equipmentId} onChange={(e) => handleInputChange('equipmentId', e.target.value)} style={inputStyle} />
+              
+              <label style={labelStyle}>Serial #:</label>
+              <input type="text" value={formData.serialNumber} onChange={(e) => handleInputChange('serialNumber', e.target.value)} style={inputStyle} placeholder="Enter serial number" />
+              
+              <label style={labelStyle}>Personnel Required:</label>
+              <textarea value={formData.personnelRequired} onChange={(e) => handleInputChange('personnelRequired', e.target.value)} style={textAreaStyle} placeholder="Enter personnel requirements" />
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>Min. # of Facilities Personnel:</label>
+                  <input type="text" value={formData.minFacilitiesPersonnel} onChange={(e) => handleInputChange('minFacilitiesPersonnel', e.target.value)} style={inputStyle} placeholder="Enter minimum number" />
+                </div>
+                <div>
+                  <label style={labelStyle}># of Contractors #1:</label>
+                  <input type="text" value={formData.contractors1} onChange={(e) => handleInputChange('contractors1', e.target.value)} style={inputStyle} placeholder="Enter number" />
+                </div>
+                <div>
+                  <label style={labelStyle}># of Contractors #2:</label>
+                  <input type="text" value={formData.contractors2} onChange={(e) => handleInputChange('contractors2', e.target.value)} style={inputStyle} placeholder="Enter number" />
+                </div>
               </div>
-              <div>
-                <label style={labelStyle}>Model #:</label>
-                <input type="text" value={formData.modelNumber} onChange={(e) => handleInputChange('modelNumber', e.target.value)} style={inputStyle} />
-              </div>
+              
+              <label style={labelStyle}>Personnel from other departments:</label>
+              <textarea value={formData.personnelOtherDepts} onChange={(e) => handleInputChange('personnelOtherDepts', e.target.value)} style={textAreaStyle} placeholder="Enter personnel from other departments" />
+              
+              <label style={labelStyle}>Qualifications Required:</label>
+              <textarea value={formData.qualificationsRequired} onChange={(e) => handleInputChange('qualificationsRequired', e.target.value)} style={textAreaStyle} placeholder="Enter required qualifications" />
+              
+              <label style={labelStyle}>Tools Required:</label>
+              <textarea value={formData.toolsRequired} onChange={(e) => handleInputChange('toolsRequired', e.target.value)} style={textAreaStyle} placeholder="Enter required tools" />
+              
+              <label style={labelStyle}>Advance notifications required:</label>
+              <textarea value={formData.advanceNotifications} onChange={(e) => handleInputChange('advanceNotifications', e.target.value)} style={textAreaStyle} placeholder="Enter advance notification requirements" />
+              
+              <label style={labelStyle}>Post notifications required:</label>
+              <textarea value={formData.postNotifications} onChange={(e) => handleInputChange('postNotifications', e.target.value)} style={textAreaStyle} placeholder="Enter post notification requirements" />
             </div>
-            
-            <label style={labelStyle}>Serial #:</label>
-            <input type="text" value={formData.serialNumber} onChange={(e) => handleInputChange('serialNumber', e.target.value)} style={inputStyle} />
-            
-            <label style={labelStyle}>Personnel Required:</label>
-            <textarea value={formData.personnelRequired} onChange={(e) => handleInputChange('personnelRequired', e.target.value)} style={textAreaStyle} />
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>Min. # of Facilities Personnel:</label>
-                <input type="text" value={formData.minFacilitiesPersonnel} onChange={(e) => handleInputChange('minFacilitiesPersonnel', e.target.value)} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}># of Contractors #1:</label>
-                <input type="text" value={formData.contractors1} onChange={(e) => handleInputChange('contractors1', e.target.value)} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}># of Contractors #2:</label>
-                <input type="text" value={formData.contractors2} onChange={(e) => handleInputChange('contractors2', e.target.value)} style={inputStyle} />
-              </div>
-            </div>
-            
-            <label style={labelStyle}>Personnel from other departments:</label>
-            <textarea value={formData.personnelOtherDepts} onChange={(e) => handleInputChange('personnelOtherDepts', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Qualifications Required:</label>
-            <textarea value={formData.qualificationsRequired} onChange={(e) => handleInputChange('qualificationsRequired', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Tools Required:</label>
-            <textarea value={formData.toolsRequired} onChange={(e) => handleInputChange('toolsRequired', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Advance notifications required:</label>
-            <textarea value={formData.advanceNotifications} onChange={(e) => handleInputChange('advanceNotifications', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Post notifications required:</label>
-            <textarea value={formData.postNotifications} onChange={(e) => handleInputChange('postNotifications', e.target.value)} style={textAreaStyle} />
-          </div>
 
-          {/* Section 04 - Effect of MOP on Critical Facility (Table) */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 04 - Effect of MOP on Critical Facility</div>
-            
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Facility Equipment or System</th>
-                  <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>Yes</th>
-                  <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>No</th>
-                  <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>N/A</th>
-                  <th style={thStyle}>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {facilityOptions.map(({ key, label }) => (
-                  <tr key={key}>
-                    <td style={tdStyle}>{label}</td>
-                    <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
-                        checked={formData.facilityEffects[key].yes}
-                        onChange={(e) => {
-                          handleFacilityEffectChange(key, 'yes', e.target.checked);
-                          if (e.target.checked) {
-                            handleFacilityEffectChange(key, 'no', false);
-                            handleFacilityEffectChange(key, 'na', false);
-                          }
-                        }}
-                        style={checkboxStyle}
-                      />
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
-                        checked={formData.facilityEffects[key].no}
-                        onChange={(e) => {
-                          handleFacilityEffectChange(key, 'no', e.target.checked);
-                          if (e.target.checked) {
-                            handleFacilityEffectChange(key, 'yes', false);
-                            handleFacilityEffectChange(key, 'na', false);
-                          }
-                        }}
-                        style={checkboxStyle}
-                      />
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
-                        checked={formData.facilityEffects[key].na}
-                        onChange={(e) => {
-                          handleFacilityEffectChange(key, 'na', e.target.checked);
-                          if (e.target.checked) {
-                            handleFacilityEffectChange(key, 'yes', false);
-                            handleFacilityEffectChange(key, 'no', false);
-                          }
-                        }}
-                        style={checkboxStyle}
-                      />
-                    </td>
-                    <td style={tdStyle}>
-                      <input
-                        type="text"
-                        value={formData.facilityEffects[key].details}
-                        onChange={(e) => handleFacilityEffectChange(key, 'details', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                        placeholder="Enter details"
-                      />
-                    </td>
+            {/* Section 04 - Effect of MOP on Critical Facility (Table) */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 04 - Effect of MOP on Critical Facility</div>
+              
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Facility Equipment or System</th>
+                    <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>Yes</th>
+                    <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>No</th>
+                    <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>N/A</th>
+                    <th style={thStyle}>Details</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Section 05 - MOP Supporting Documentation (Updated to text field) */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 05 - MOP Supporting Documentation</div>
-            
-            <label style={labelStyle}>MOP Supporting Documentation:</label>
-            <textarea 
-              value={formData.supportingDocumentation} 
-              onChange={(e) => handleInputChange('supportingDocumentation', e.target.value)} 
-              style={{ ...textAreaStyle, minHeight: '120px' }}
-              placeholder="Enter supporting documentation details"
-            />
-          </div>
-
-          {/* Section 06 - Safety Requirements */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 06 - Safety Requirements</div>
-            
-            <label style={labelStyle}>Pre Work Conditions / Safety Requirements:</label>
-            <textarea value={formData.safetyRequirements} onChange={(e) => handleInputChange('safetyRequirements', e.target.value)} style={textAreaStyle} />
-          </div>
-
-          {/* Section 07 - MOP Risks & Assumptions */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 07 - MOP Risks & Assumptions</div>
-            
-            <label style={labelStyle}>MOP Risks and Assumptions:</label>
-            <textarea value={formData.risksAssumptions} onChange={(e) => handleInputChange('risksAssumptions', e.target.value)} style={textAreaStyle} />
-          </div>
-
-          {/* Section 08 - MOP Details */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 08 - MOP Details</div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={labelStyle}>Date Performed:</label>
-                <input type="date" value={formData.datePerformed} onChange={(e) => handleInputChange('datePerformed', e.target.value)} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Time Begun:</label>
-                <input type="time" value={formData.timeBegun} onChange={(e) => handleInputChange('timeBegun', e.target.value)} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Time Completed:</label>
-                <input type="time" value={formData.timeCompleted} onChange={(e) => handleInputChange('timeCompleted', e.target.value)} style={inputStyle} />
-              </div>
+                </thead>
+                <tbody>
+                  {facilityOptions.map(({ key, label }) => (
+                    <tr key={key}>
+                      <td style={tdStyle}>{label}</td>
+                      <td style={{ ...tdStyle, textAlign: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={formData.facilityEffects[key].yes}
+                          onChange={(e) => {
+                            handleFacilityEffectChange(key, 'yes', e.target.checked);
+                            if (e.target.checked) {
+                              handleFacilityEffectChange(key, 'no', false);
+                              handleFacilityEffectChange(key, 'na', false);
+                            }
+                          }}
+                          style={checkboxStyle}
+                        />
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={formData.facilityEffects[key].no}
+                          onChange={(e) => {
+                            handleFacilityEffectChange(key, 'no', e.target.checked);
+                            if (e.target.checked) {
+                              handleFacilityEffectChange(key, 'yes', false);
+                              handleFacilityEffectChange(key, 'na', false);
+                            }
+                          }}
+                          style={checkboxStyle}
+                        />
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={formData.facilityEffects[key].na}
+                          onChange={(e) => {
+                            handleFacilityEffectChange(key, 'na', e.target.checked);
+                            if (e.target.checked) {
+                              handleFacilityEffectChange(key, 'yes', false);
+                              handleFacilityEffectChange(key, 'no', false);
+                            }
+                          }}
+                          style={checkboxStyle}
+                        />
+                      </td>
+                      <td style={tdStyle}>
+                        <input
+                          type="text"
+                          value={formData.facilityEffects[key].details}
+                          onChange={(e) => handleFacilityEffectChange(key, 'details', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                          placeholder="Enter details"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            
-            <label style={labelStyle}>Facilities personnel performing work:</label>
-            <textarea value={formData.facilitiesPersonnel} onChange={(e) => handleInputChange('facilitiesPersonnel', e.target.value)} style={textAreaStyle} />
-            
-            <label style={labelStyle}>Contractor/Vendor personnel performing work:</label>
-            <textarea value={formData.contractorPersonnel} onChange={(e) => handleInputChange('contractorPersonnel', e.target.value)} style={textAreaStyle} />
 
-            {/* Chiller Table */}
-            <h4 style={{ marginTop: '30px', marginBottom: '10px' }}>Chiller Operations Log</h4>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Chiller, Variable Speed Drive (VSD), Low Voltage, &gt;790 HP Comprehensive</th>
-                  <th style={thStyle}>Initials</th>
-                  <th style={thStyle}>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.chillerTable.map((row, index) => (
-                  <tr key={index}>
-                    <td style={tdStyle}>
-                      <input
-                        type="text"
-                        value={row.chiller}
-                        onChange={(e) => handleTableChange('chillerTable', index, 'chiller', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                      />
-                    </td>
-                    <td style={tdStyle}>
-                      <input
-                        type="text"
-                        value={row.initials}
-                        onChange={(e) => handleTableChange('chillerTable', index, 'initials', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                      />
-                    </td>
-                    <td style={tdStyle}>
-                      <input
-                        type="time"
-                        value={row.time}
-                        onChange={(e) => handleTableChange('chillerTable', index, 'time', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                      />
-                    </td>
+            {/* Section 05 - MOP Supporting Documentation */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 05 - MOP Supporting Documentation</div>
+              
+              <label style={labelStyle}>MOP Supporting Documentation:</label>
+              <textarea 
+                value={formData.supportingDocumentation} 
+                onChange={(e) => handleInputChange('supportingDocumentation', e.target.value)} 
+                style={{ ...textAreaStyle, minHeight: '120px' }}
+                placeholder="Enter supporting documentation details"
+              />
+            </div>
+
+            {/* Section 06 - Safety Requirements */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 06 - Safety Requirements</div>
+              
+              <label style={labelStyle}>Pre Work Conditions / Safety Requirements:</label>
+              <textarea value={formData.safetyRequirements} onChange={(e) => handleInputChange('safetyRequirements', e.target.value)} style={textAreaStyle} placeholder="Enter safety requirements" />
+            </div>
+
+            {/* Section 07 - MOP Risks & Assumptions */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 07 - MOP Risks & Assumptions</div>
+              
+              <label style={labelStyle}>MOP Risks and Assumptions:</label>
+              <textarea value={formData.risksAssumptions} onChange={(e) => handleInputChange('risksAssumptions', e.target.value)} style={textAreaStyle} placeholder="Enter risks and assumptions" />
+            </div>
+
+            {/* Section 08 - MOP Details */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 08 - MOP Details</div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={labelStyle}>Date Performed:</label>
+                  <input type="date" value={formData.datePerformed} onChange={(e) => handleInputChange('datePerformed', e.target.value)} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Time Begun:</label>
+                  <input type="time" value={formData.timeBegun} onChange={(e) => handleInputChange('timeBegun', e.target.value)} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Time Completed:</label>
+                  <input type="time" value={formData.timeCompleted} onChange={(e) => handleInputChange('timeCompleted', e.target.value)} style={inputStyle} />
+                </div>
+              </div>
+              
+              <label style={labelStyle}>Facilities personnel performing work:</label>
+              <textarea value={formData.facilitiesPersonnel} onChange={(e) => handleInputChange('facilitiesPersonnel', e.target.value)} style={textAreaStyle} placeholder="Enter personnel names" />
+              
+              <label style={labelStyle}>Contractor/Vendor personnel performing work:</label>
+              <textarea value={formData.contractorPersonnel} onChange={(e) => handleInputChange('contractorPersonnel', e.target.value)} style={textAreaStyle} placeholder="Enter contractor/vendor names" />
+
+              {/* Chiller Table */}
+              <h4 style={{ marginTop: '30px', marginBottom: '10px' }}>Chiller Operations Log</h4>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Chiller, Variable Speed Drive (VSD), Low Voltage, &gt;790 HP Comprehensive</th>
+                    <th style={thStyle}>Initials</th>
+                    <th style={thStyle}>Time</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Section 09 - Back-out Procedures */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 09 - Back-out Procedures</div>
-            
-            <div style={{ 
-              backgroundColor: '#fff3cd', 
-              border: '1px solid #ffeaa7',
-              borderRadius: '4px',
-              padding: '15px',
-              marginBottom: '20px'
-            }}>
-              <p style={{ marginBottom: '10px', fontWeight: 'bold' }}>⚠️ IMPORTANT NOTES:</p>
-              <ol style={{ marginLeft: '20px', lineHeight: '1.8' }}>
-                <li>Back-out procedures will commence immediately if any problem/failure occurs that affects the critical load.</li>
-                <li>Any Issues Encountered, at any of the listed verification steps, will signal a STOP of work. Issues will be immediately identified for Root Cause. Corrections will be made. The system(s) will be returned to normal operating condition and allowed to stabilize. Evaluation will be conducted before a decision is to continue or stop work. The Emergency will be immediately notified and work will STOP.</li>
-              </ol>
+                </thead>
+                <tbody>
+                  {formData.chillerTable.map((row, index) => (
+                    <tr key={index}>
+                      <td style={tdStyle}>
+                        <input
+                          type="text"
+                          value={row.chiller}
+                          onChange={(e) => handleTableChange('chillerTable', index, 'chiller', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                        />
+                      </td>
+                      <td style={tdStyle}>
+                        <input
+                          type="text"
+                          value={row.initials}
+                          onChange={(e) => handleTableChange('chillerTable', index, 'initials', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                        />
+                      </td>
+                      <td style={tdStyle}>
+                        <input
+                          type="time"
+                          value={row.time}
+                          onChange={(e) => handleTableChange('chillerTable', index, 'time', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Back-out Procedures</th>
-                  <th style={thStyle}>Initials</th>
-                  <th style={thStyle}>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.backoutTable.map((row, index) => (
-                  <tr key={index}>
-                    <td style={tdStyle}>
-                      <input
-                        type="text"
-                        value={row.procedure}
-                        onChange={(e) => handleTableChange('backoutTable', index, 'procedure', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                      />
-                    </td>
-                    <td style={tdStyle}>
-                      <input
-                        type="text"
-                        value={row.initials}
-                        onChange={(e) => handleTableChange('backoutTable', index, 'initials', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                      />
-                    </td>
-                    <td style={tdStyle}>
-                      <input
-                        type="time"
-                        value={row.time}
-                        onChange={(e) => handleTableChange('backoutTable', index, 'time', e.target.value)}
-                        style={{ width: '100%', border: 'none', padding: '4px' }}
-                      />
-                    </td>
+            {/* Section 09 - Back-out Procedures */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 09 - Back-out Procedures</div>
+              
+              <div style={{ 
+                backgroundColor: '#fff3cd', 
+                border: '1px solid #ffeaa7',
+                borderRadius: '4px',
+                padding: '15px',
+                marginBottom: '20px'
+              }}>
+                <p style={{ marginBottom: '10px', fontWeight: 'bold' }}>⚠️ IMPORTANT NOTES:</p>
+                <ol style={{ marginLeft: '20px', lineHeight: '1.8' }}>
+                  <li>Back-out procedures will commence immediately if any problem/failure occurs that affects the critical load.</li>
+                  <li>Any Issues Encountered, at any of the listed verification steps, will signal a STOP of work. Issues will be immediately identified for Root Cause. Corrections will be made. The system(s) will be returned to normal operating condition and allowed to stabilize. Evaluation will be conducted before a decision is to continue or stop work. The Emergency will be immediately notified and work will STOP.</li>
+                </ol>
+              </div>
+
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Back-out Procedures</th>
+                    <th style={thStyle}>Initials</th>
+                    <th style={thStyle}>Time</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {formData.backoutTable.map((row, index) => (
+                    <tr key={index}>
+                      <td style={tdStyle}>
+                        <input
+                          type="text"
+                          value={row.procedure}
+                          onChange={(e) => handleTableChange('backoutTable', index, 'procedure', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                        />
+                      </td>
+                      <td style={tdStyle}>
+                        <input
+                          type="text"
+                          value={row.initials}
+                          onChange={(e) => handleTableChange('backoutTable', index, 'initials', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                        />
+                      </td>
+                      <td style={tdStyle}>
+                        <input
+                          type="time"
+                          value={row.time}
+                          onChange={(e) => handleTableChange('backoutTable', index, 'time', e.target.value)}
+                          style={{ width: '100%', border: 'none', padding: '4px' }}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          {/* Section 10 - MOP Approval */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 10 - MOP Approval</div>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ marginBottom: '10px' }}>Tested for clarity:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
-                <div>
-                  <label style={labelStyle}>Reviewer's Name:</label>
-                  <input type="text" value={formData.clarityReviewerName} onChange={(e) => handleInputChange('clarityReviewerName', e.target.value)} style={inputStyle} />
+            {/* Section 10 - MOP Approval */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 10 - MOP Approval</div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ marginBottom: '10px' }}>Tested for clarity:</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Name:</label>
+                    <input type="text" value={formData.clarityReviewerName} onChange={(e) => handleInputChange('clarityReviewerName', e.target.value)} style={inputStyle} placeholder="Enter reviewer name" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Title:</label>
+                    <input type="text" value={formData.clarityReviewerTitle} onChange={(e) => handleInputChange('clarityReviewerTitle', e.target.value)} style={inputStyle} placeholder="Enter reviewer title" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date:</label>
+                    <input type="date" value={formData.clarityDate} onChange={(e) => handleInputChange('clarityDate', e.target.value)} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Approved:</label>
+                    <select value={formData.clarityApproved} onChange={(e) => handleInputChange('clarityApproved', e.target.value)} style={inputStyle}>
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label style={labelStyle}>Reviewer's Title:</label>
-                  <input type="text" value={formData.clarityReviewerTitle} onChange={(e) => handleInputChange('clarityReviewerTitle', e.target.value)} style={inputStyle} />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ marginBottom: '10px' }}>Technical review:</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Name:</label>
+                    <input type="text" value={formData.technicalReviewerName} onChange={(e) => handleInputChange('technicalReviewerName', e.target.value)} style={inputStyle} placeholder="Enter reviewer name" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Title:</label>
+                    <input type="text" value={formData.technicalReviewerTitle} onChange={(e) => handleInputChange('technicalReviewerTitle', e.target.value)} style={inputStyle} placeholder="Enter reviewer title" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date:</label>
+                    <input type="date" value={formData.technicalDate} onChange={(e) => handleInputChange('technicalDate', e.target.value)} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Approved:</label>
+                    <select value={formData.technicalApproved} onChange={(e) => handleInputChange('technicalApproved', e.target.value)} style={inputStyle}>
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label style={labelStyle}>Date:</label>
-                  <input type="date" value={formData.clarityDate} onChange={(e) => handleInputChange('clarityDate', e.target.value)} style={inputStyle} />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ marginBottom: '10px' }}>JLL Chief Engineer approval:</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Name:</label>
+                    <input type="text" value={formData.chiefReviewerName} onChange={(e) => handleInputChange('chiefReviewerName', e.target.value)} style={inputStyle} placeholder="Enter reviewer name" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Title:</label>
+                    <input type="text" value={formData.chiefReviewerTitle} onChange={(e) => handleInputChange('chiefReviewerTitle', e.target.value)} style={inputStyle} placeholder="Enter reviewer title" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date:</label>
+                    <input type="date" value={formData.chiefDate} onChange={(e) => handleInputChange('chiefDate', e.target.value)} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Approved:</label>
+                    <select value={formData.chiefApproved} onChange={(e) => handleInputChange('chiefApproved', e.target.value)} style={inputStyle}>
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label style={labelStyle}>Approved:</label>
-                  <select value={formData.clarityApproved} onChange={(e) => handleInputChange('clarityApproved', e.target.value)} style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="N/A">N/A</option>
-                  </select>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ marginBottom: '10px' }}>Contractor Review (if applicable):</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Name:</label>
+                    <input type="text" value={formData.contractorReviewerName} onChange={(e) => handleInputChange('contractorReviewerName', e.target.value)} style={inputStyle} placeholder="Enter reviewer name" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Title:</label>
+                    <input type="text" value={formData.contractorReviewerTitle} onChange={(e) => handleInputChange('contractorReviewerTitle', e.target.value)} style={inputStyle} placeholder="Enter reviewer title" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date:</label>
+                    <input type="date" value={formData.contractorDate} onChange={(e) => handleInputChange('contractorDate', e.target.value)} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Approved:</label>
+                    <select value={formData.contractorApproved} onChange={(e) => handleInputChange('contractorApproved', e.target.value)} style={inputStyle}>
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ marginBottom: '10px' }}>Capital One approval:</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Name:</label>
+                    <input type="text" value={formData.capitalOneReviewerName} onChange={(e) => handleInputChange('capitalOneReviewerName', e.target.value)} style={inputStyle} placeholder="Enter reviewer name" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Reviewer's Title:</label>
+                    <input type="text" value={formData.capitalOneReviewerTitle} onChange={(e) => handleInputChange('capitalOneReviewerTitle', e.target.value)} style={inputStyle} placeholder="Enter reviewer title" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date:</label>
+                    <input type="date" value={formData.capitalOneDate} onChange={(e) => handleInputChange('capitalOneDate', e.target.value)} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Approved:</label>
+                    <select value={formData.capitalOneApproved} onChange={(e) => handleInputChange('capitalOneApproved', e.target.value)} style={inputStyle}>
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ marginBottom: '10px' }}>Technical review:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
-                <div>
-                  <label style={labelStyle}>Reviewer's Name:</label>
-                  <input type="text" value={formData.technicalReviewerName} onChange={(e) => handleInputChange('technicalReviewerName', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Reviewer's Title:</label>
-                  <input type="text" value={formData.technicalReviewerTitle} onChange={(e) => handleInputChange('technicalReviewerTitle', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Date:</label>
-                  <input type="date" value={formData.technicalDate} onChange={(e) => handleInputChange('technicalDate', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Approved:</label>
-                  <select value={formData.technicalApproved} onChange={(e) => handleInputChange('technicalApproved', e.target.value)} style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="N/A">N/A</option>
-                  </select>
-                </div>
-              </div>
+            {/* Section 11 - MOP Comments */}
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>Section 11 - MOP Comments</div>
+              
+              <label style={labelStyle}>MOP Comments:</label>
+              <textarea value={formData.mopComments} onChange={(e) => handleInputChange('mopComments', e.target.value)} style={{ ...textAreaStyle, minHeight: '120px' }} placeholder="Enter any additional comments" />
             </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ marginBottom: '10px' }}>JLL Chief Engineer approval:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
-                <div>
-                  <label style={labelStyle}>Reviewer's Name:</label>
-                  <input type="text" value={formData.chiefReviewerName} onChange={(e) => handleInputChange('chiefReviewerName', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Reviewer's Title:</label>
-                  <input type="text" value={formData.chiefReviewerTitle} onChange={(e) => handleInputChange('chiefReviewerTitle', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Date:</label>
-                  <input type="date" value={formData.chiefDate} onChange={(e) => handleInputChange('chiefDate', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Approved:</label>
-                  <select value={formData.chiefApproved} onChange={(e) => handleInputChange('chiefApproved', e.target.value)} style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="N/A">N/A</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ marginBottom: '10px' }}>Contractor Review (if applicable):</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
-                <div>
-                  <label style={labelStyle}>Reviewer's Name:</label>
-                  <input type="text" value={formData.contractorReviewerName} onChange={(e) => handleInputChange('contractorReviewerName', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Reviewer's Title:</label>
-                  <input type="text" value={formData.contractorReviewerTitle} onChange={(e) => handleInputChange('contractorReviewerTitle', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Date:</label>
-                  <input type="date" value={formData.contractorDate} onChange={(e) => handleInputChange('contractorDate', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Approved:</label>
-                  <select value={formData.contractorApproved} onChange={(e) => handleInputChange('contractorApproved', e.target.value)} style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="N/A">N/A</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ marginBottom: '10px' }}>Capital One approval:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 120px', gap: '15px' }}>
-                <div>
-                  <label style={labelStyle}>Reviewer's Name:</label>
-                  <input type="text" value={formData.capitalOneReviewerName} onChange={(e) => handleInputChange('capitalOneReviewerName', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Reviewer's Title:</label>
-                  <input type="text" value={formData.capitalOneReviewerTitle} onChange={(e) => handleInputChange('capitalOneReviewerTitle', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Date:</label>
-                  <input type="date" value={formData.capitalOneDate} onChange={(e) => handleInputChange('capitalOneDate', e.target.value)} style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Approved:</label>
-                  <select value={formData.capitalOneApproved} onChange={(e) => handleInputChange('capitalOneApproved', e.target.value)} style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="N/A">N/A</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 11 - MOP Comments */}
-          <div style={sectionStyle}>
-            <div style={sectionHeaderStyle}>Section 11 - MOP Comments</div>
-            
-            <label style={labelStyle}>MOP Comments:</label>
-            <textarea value={formData.mopComments} onChange={(e) => handleInputChange('mopComments', e.target.value)} style={{ ...textAreaStyle, minHeight: '120px' }} />
           </div>
         </div>
 
         {/* Footer Buttons */}
         <div style={{
-          padding: '20px 30px',
+          padding: '25px 30px',
           borderTop: '1px solid #eee',
           backgroundColor: '#f8f9fa',
           display: 'flex',
           gap: '15px',
-          justifyContent: 'flex-end'
+          justifyContent: 'center'
         }}>
           <button
             onClick={() => {
@@ -1084,16 +1100,20 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
               onClose();
             }}
             style={{
-              padding: '12px 24px',
+              padding: '12px 30px',
               backgroundColor: '#6c757d',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              transition: 'background-color 0.2s ease'
             }}
             disabled={isSaving}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
           >
             Cancel
           </button>
@@ -1102,16 +1122,28 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
             onClick={handleCreateTemplate}
             disabled={isSaving || !formData.mopTitle.trim()}
             style={{
-              padding: '12px 24px',
-              background: 'linear-gradient(135deg, #0f3456 0%, #1e5f8b 100%)',
+              padding: '12px 30px',
+              background: 'linear-gradient(135deg, #6f42c1 0%, #8e4ec6 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              boxShadow: '0 3px 15px rgba(15, 52, 86, 0.3)',
-              opacity: isSaving || !formData.mopTitle.trim() ? 0.6 : 1
+              boxShadow: '0 3px 15px rgba(111, 66, 193, 0.3)',
+              opacity: isSaving || !formData.mopTitle.trim() ? 0.6 : 1,
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              transition: 'transform 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSaving && formData.mopTitle.trim()) {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSaving && formData.mopTitle.trim()) {
+                e.currentTarget.style.transform = 'translateY(0)';
+              }
             }}
           >
             {isSaving ? 'Creating MOP...' : 'Create MOP Template'}

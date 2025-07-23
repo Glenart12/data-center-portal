@@ -27,7 +27,6 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   };
 
   const handleCreateMOP = () => {
-    // For now, just show an alert - you can implement actual functionality later
     alert('MOP Generation would happen here!\n\nForm data:\n' + 
           `Manufacturer: ${formData.manufacturer}\n` +
           `Equipment ID: ${formData.equipmentId}\n` +
@@ -82,8 +81,9 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 2000,
+      zIndex: 9999,
       padding: '20px',
+      paddingTop: '90px',
       backdropFilter: 'blur(5px)'
     }}>
       <div style={{
@@ -91,7 +91,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         borderRadius: '15px',
         width: '90%',
         maxWidth: '700px',
-        maxHeight: '90vh',
+        maxHeight: 'calc(100vh - 140px)',
         overflow: 'hidden',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         display: 'flex',

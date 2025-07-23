@@ -34,7 +34,7 @@ export default function Header() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {/* Logo placeholder - replace src with your actual logo */}
           <img 
-            src="/logo.png" 
+            src="/Cream_LogoWordMark-1 (1)-cropped.svg" 
             alt="Glenart Group Logo" 
             style={{ 
               height: '40px',

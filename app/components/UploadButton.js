@@ -105,9 +105,10 @@ export default function UploadButton({ type, onUploadSuccess }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 2000,
+          zIndex: 9999,
           backdropFilter: 'blur(5px)',
-          padding: '20px'
+          padding: '20px',
+          paddingTop: '90px'
         }}>
           <div style={{
             backgroundColor: 'white',
@@ -115,6 +116,8 @@ export default function UploadButton({ type, onUploadSuccess }) {
             borderRadius: '15px',
             width: '90%',
             maxWidth: '500px',
+            maxHeight: 'calc(100vh - 140px)',
+            overflowY: 'auto',
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
             textAlign: 'center'
           }}>
