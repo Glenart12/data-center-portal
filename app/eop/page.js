@@ -61,7 +61,31 @@ function EopPage() {
       minHeight: '100vh',
       fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
     }}>
-      {/* Main Container with Off-White Background */}
+      {/* Page Header - OUTSIDE the container */}
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '40px',
+        maxWidth: '1200px',
+        margin: '0 auto 40px auto'
+      }}>
+        <h1 style={{
+          fontSize: '2.5em',
+          color: '#0f3456',
+          marginBottom: '10px',
+          fontWeight: 'bold'
+        }}>
+          Emergency Operating Procedures (EOPs)
+        </h1>
+        <p style={{
+          fontSize: '18px',
+          color: '#666',
+          margin: '0'
+        }}>
+          Access and manage your emergency operational procedures
+        </p>
+      </div>
+
+      {/* Main Container with Off-White Background - ONLY around search, buttons, and grid */}
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
@@ -71,29 +95,7 @@ function EopPage() {
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         border: '1px solid #e8e8e8'
       }}>
-        {/* Page Header */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '40px'
-        }}>
-          <h1 style={{
-            fontSize: '2.5em',
-            color: '#0f3456',
-            marginBottom: '10px',
-            fontWeight: 'bold'
-          }}>
-            Emergency Operating Procedures (EOPs)
-          </h1>
-          <p style={{
-            fontSize: '18px',
-            color: '#666',
-            margin: '0'
-          }}>
-            Access and manage your emergency operational procedures
-          </p>
-        </div>
-
-        {/* Search Bar */}
+        {/* Search Bar - Wider and Thinner */}
         <div style={{
           marginBottom: '30px',
           display: 'flex',
@@ -102,7 +104,7 @@ function EopPage() {
           <div style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '500px'
+            maxWidth: '700px'
           }}>
             <input
               type="text"
@@ -111,7 +113,7 @@ function EopPage() {
               onChange={handleSearchChange}
               style={{
                 width: '100%',
-                padding: '15px 20px',
+                padding: '12px 20px',
                 fontSize: '16px',
                 border: '2px solid #ddd',
                 borderRadius: '25px',
