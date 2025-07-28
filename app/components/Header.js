@@ -3,23 +3,6 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { usePathname } from 'next/navigation';
 
-// Consistent color scheme for the entire site
-export const SITE_COLORS = {
-  primary: '#0f3456', // Main dark blue from header
-  primaryLight: '#1e4a72', // Lighter version for hover states
-  accent: '#00d4ff', // Bright blue accent
-  accentDark: '#0070f3', // Darker accent blue
-  gradient: 'linear-gradient(135deg, #0f3456 0%, #1e4a72 100%)',
-  accentGradient: 'linear-gradient(135deg, #00d4ff 0%, #0070f3 100%)',
-  success: '#28a745',
-  warning: '#ffc107',
-  danger: '#dc3545',
-  white: '#ffffff',
-  lightGray: 'rgba(255, 255, 255, 0.1)',
-  mediumGray: 'rgba(255, 255, 255, 0.2)',
-  darkGray: 'rgba(0, 0, 0, 0.1)'
-};
-
 export default function Header() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
@@ -39,14 +22,14 @@ export default function Header() {
 
   return (
     <header style={{
-      background: SITE_COLORS.gradient,
+      background: 'linear-gradient(135deg, #0f3456 0%, #1e4a72 100%)',
       backdropFilter: 'blur(20px)',
-      borderBottom: `1px solid ${SITE_COLORS.lightGray}`,
+      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
       padding: '16px 24px',
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      boxShadow: `0 8px 32px ${SITE_COLORS.primary}4D`, // 4D = 30% opacity
+      boxShadow: '0 8px 32px rgba(15, 52, 86, 0.3)',
       transition: 'all 0.3s ease'
     }}>
       <div style={{
@@ -68,12 +51,12 @@ export default function Header() {
           <div style={{
             width: '48px',
             height: '48px',
-            background: SITE_COLORS.accentGradient,
+            background: 'linear-gradient(135deg, #00d4ff 0%, #0070f3 100%)',
             borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 4px 12px ${SITE_COLORS.accentDark}4D`,
+            boxShadow: '0 4px 12px rgba(0, 112, 243, 0.3)',
             position: 'relative',
             overflow: 'hidden'
           }}>
@@ -110,7 +93,7 @@ export default function Header() {
               margin: 0, 
               fontSize: '22px',
               fontWeight: '700',
-              color: SITE_COLORS.white,
+              color: 'white',
               letterSpacing: '-0.5px',
               textShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }}>
@@ -131,12 +114,8 @@ export default function Header() {
         {/* Center - Navigation */}
         <nav style={{ 
           display: 'flex', 
-          gap: '8px',
-          background: SITE_COLORS.lightGray,
-          padding: '6px',
-          borderRadius: '12px',
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${SITE_COLORS.lightGray}`
+          gap: '12px',
+          alignItems: 'center'
         }}>
           {[
             { href: '/', label: 'Home' },
@@ -151,50 +130,53 @@ export default function Header() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '10px 20px',
-                backgroundColor: isActivePage(href) ? SITE_COLORS.mediumGray : 'transparent',
-                color: isActivePage(href) ? SITE_COLORS.white : 'rgba(255, 255, 255, 0.9)',
+                padding: '12px 24px',
+                backgroundColor: isActivePage(href) ? 'white' : 'rgba(255, 255, 255, 0.9)',
+                color: isActivePage(href) ? '#0f3456' : '#2c3e50',
                 textDecoration: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: isActivePage(href) ? '600' : '500',
-                border: isActivePage(href) ? `1px solid ${SITE_COLORS.mediumGray}` : '1px solid transparent',
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontWeight: isActivePage(href) ? '700' : '600',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                minWidth: '90px',
+                boxShadow: isActivePage(href) 
+                  ? '0 4px 16px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1)' 
+                  : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                border: isActivePage(href) ? '2px solid #0070f3' : '2px solid transparent',
+                transform: isActivePage(href) ? 'translateY(-1px)' : 'translateY(0)',
                 position: 'relative',
-                overflow: 'hidden',
-                minWidth: '80px',
-                backdropFilter: 'blur(5px)'
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
                 if (!isActivePage(href)) {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
-                  e.currentTarget.style.border = `1px solid ${SITE_COLORS.mediumGray}`;
-                  e.currentTarget.style.color = SITE_COLORS.white;
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  e.currentTarget.style.backgroundColor = 'white';
+                  e.currentTarget.style.color = '#0f3456';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15)';
+                  e.currentTarget.style.border = '2px solid rgba(0, 112, 243, 0.3)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActivePage(href)) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.border = '1px solid transparent';
-                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                  e.currentTarget.style.color = '#2c3e50';
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                  e.currentTarget.style.border = '2px solid transparent';
                 }
               }}
             >
               {label}
               {isActivePage(href) && (
-                <span style={{
+                <div style={{
                   position: 'absolute',
-                  bottom: '2px',
+                  bottom: '4px',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: '20px',
-                  height: '2px',
-                  background: SITE_COLORS.accentGradient,
-                  borderRadius: '1px'
+                  width: '24px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #00d4ff, #0070f3)',
+                  borderRadius: '2px'
                 }} />
               )}
             </a>
@@ -214,29 +196,29 @@ export default function Header() {
             alignItems: 'center',
             gap: '12px',
             padding: '8px 12px',
-            background: SITE_COLORS.lightGray,
+            background: 'rgba(255, 255, 255, 0.1)',
             borderRadius: '8px',
-            border: `1px solid ${SITE_COLORS.lightGray}`,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(10px)'
           }}>
             <div style={{
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              background: SITE_COLORS.accentGradient,
+              background: 'linear-gradient(135deg, #00d4ff 0%, #0070f3 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: SITE_COLORS.white,
+              color: 'white',
               fontSize: '14px',
               fontWeight: 'bold',
-              boxShadow: `0 2px 8px ${SITE_COLORS.accentDark}4D`
+              boxShadow: '0 2px 8px rgba(0, 112, 243, 0.3)'
             }}>
               {user.email ? user.email.charAt(0).toUpperCase() : 'U'}
             </div>
             <div>
               <div style={{ 
-                color: SITE_COLORS.white, 
+                color: 'white', 
                 fontSize: '14px',
                 fontWeight: '500',
                 lineHeight: '1.2'
@@ -261,27 +243,27 @@ export default function Header() {
               alignItems: 'center',
               gap: '8px',
               padding: '10px 18px',
-              background: `linear-gradient(135deg, ${SITE_COLORS.danger} 0%, #ff3742 100%)`,
-              color: SITE_COLORS.white,
+              background: 'linear-gradient(135deg, #dc3545 0%, #ff3742 100%)',
+              color: 'white',
               textDecoration: 'none',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '600',
-              border: `1px solid ${SITE_COLORS.lightGray}`,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: `0 2px 8px ${SITE_COLORS.danger}4D`,
+              boxShadow: '0 2px 8px rgba(220, 53, 69, 0.3)',
               position: 'relative',
               overflow: 'hidden'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'linear-gradient(135deg, #ff3742 0%, #ff2730 100%)';
               e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = `0 4px 12px ${SITE_COLORS.danger}66`;
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = `linear-gradient(135deg, ${SITE_COLORS.danger} 0%, #ff3742 100%)`;
+              e.currentTarget.style.background = 'linear-gradient(135deg, #dc3545 0%, #ff3742 100%)';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = `0 2px 8px ${SITE_COLORS.danger}4D`;
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.3)';
             }}
           >
             🚪 Logout
@@ -305,9 +287,9 @@ export default function Header() {
         
         @media (max-width: 1024px) {
           nav a {
-            min-width: 60px !important;
-            padding: 8px 12px !important;
-            font-size: 13px !important;
+            min-width: 70px !important;
+            padding: 10px 18px !important;
+            font-size: 14px !important;
           }
         }
       `}</style>
