@@ -5,14 +5,10 @@ import { useState } from 'react';
 export default function MOPGenerationModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     manufacturer: '',
-    equipmentId: '',
     modelNumber: '',
     serialNumber: '',
-    description: '',
-    workType: 'maintenance',
-    riskLevel: '1',
     location: '',
-    affectedSystems: ''
+    description: ''
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -63,8 +59,9 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   };
 
   const handleGenerate = async () => {
+    // Only require Manufacturer, Model Number, and Description
     if (!formData.manufacturer || !formData.modelNumber || !formData.description) {
-      alert('Please fill in at least Manufacturer, Model Number, and Description');
+      alert('Please fill in Manufacturer, Model Number, and Work Description');
       return;
     }
 
@@ -126,7 +123,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         padding: '40px',
         borderRadius: '8px',
         width: '95%',
-        maxWidth: '800px',
+        maxWidth: '700px',
         maxHeight: 'calc(100vh - 140px)',
         overflowY: 'auto',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -137,7 +134,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           <div style={{ fontSize: '48px', marginBottom: '10px' }}>🤖</div>
           <h2 style={{ marginBottom: '5px', fontSize: '24px' }}>Generate MOP with AI</h2>
           <p style={{ color: '#666', fontSize: '14px' }}>
-            Powered by Google Gemini AI
+            Fill in the basic equipment information and let AI create a comprehensive MOP
           </p>
         </div>
 
@@ -145,7 +142,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment Information</h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Manufacturer *
@@ -184,24 +181,6 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Equipment ID
-              </label>
-              <input
-                type="text"
-                value={formData.equipmentId}
-                onChange={(e) => handleInputChange('equipmentId', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., CH-01"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Serial Number
               </label>
               <input
@@ -217,93 +196,24 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 placeholder="e.g., SN123456789"
               />
             </div>
-          </div>
-        </div>
 
-        {/* Work Details */}
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#333' }}>Work Details</h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Work Type
+                Location
               </label>
-              <select
-                value={formData.workType}
-                onChange={(e) => handleInputChange('workType', e.target.value)}
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-              >
-                <option value="maintenance">Maintenance</option>
-                <option value="installation">Installation</option>
-                <option value="replacement">Replacement</option>
-                <option value="repair">Repair</option>
-                <option value="inspection">Inspection</option>
-                <option value="upgrade">Upgrade</option>
-              </select>
+                placeholder="e.g., Data Hall 1"
+              />
             </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Risk Level
-              </label>
-              <select
-                value={formData.riskLevel}
-                onChange={(e) => handleInputChange('riskLevel', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-              >
-                <option value="1">1 - Low Risk</option>
-                <option value="2">2 - Medium Risk</option>
-                <option value="3">3 - High Risk</option>
-                <option value="4">4 - Critical Risk</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Location
-            </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-              placeholder="e.g., Data Hall 1, Mechanical Room 2"
-            />
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Affected Systems
-            </label>
-            <input
-              type="text"
-              value={formData.affectedSystems}
-              onChange={(e) => handleInputChange('affectedSystems', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-              placeholder="e.g., Cooling, Power Distribution, BMS"
-            />
           </div>
 
           <div>
@@ -318,10 +228,10 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 padding: '10px',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
-                minHeight: '100px',
+                minHeight: '120px',
                 resize: 'vertical'
               }}
-              placeholder="Describe the work to be performed in detail..."
+              placeholder="Describe the work to be performed (e.g., quarterly preventive maintenance, filter replacement, bearing inspection)..."
             />
           </div>
         </div>
@@ -330,7 +240,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ marginBottom: '15px', color: '#333' }}>Supporting Documents</h3>
           <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
-            Upload manuals, specifications, or previous MOPs for better AI context
+            Upload equipment manuals, specifications, or reference documents to help the AI generate a more accurate MOP
           </p>
           
           <input
@@ -351,8 +261,11 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
               color: 'white',
               borderRadius: '4px',
               cursor: 'pointer',
-              marginBottom: '15px'
+              marginBottom: '15px',
+              transition: 'background-color 0.2s'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0051cc'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0070f3'}
           >
             📎 Add Documents
           </label>
@@ -379,7 +292,8 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                       border: 'none',
                       color: '#dc3545',
                       cursor: 'pointer',
-                      fontSize: '16px'
+                      fontSize: '16px',
+                      padding: '5px'
                     }}
                   >
                     ✕
@@ -414,6 +328,19 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           </div>
         )}
 
+        {/* Note about AI capabilities */}
+        <div style={{
+          padding: '15px',
+          backgroundColor: '#f0f7ff',
+          borderRadius: '4px',
+          marginBottom: '20px',
+          fontSize: '14px',
+          color: '#555'
+        }}>
+          <strong>Note:</strong> The AI will automatically generate all necessary MOP sections including safety requirements, 
+          tools needed, detailed procedures, and back-out plans based on the equipment information you provide.
+        </div>
+
         {/* Action Buttons */}
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
           <button
@@ -425,8 +352,11 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
               border: 'none',
               borderRadius: '4px',
               fontSize: '16px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
             disabled={isGenerating}
           >
             Cancel
@@ -442,8 +372,11 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
               borderRadius: '4px',
               fontSize: '16px',
               cursor: isGenerating ? 'not-allowed' : 'pointer',
-              opacity: isGenerating ? 0.6 : 1
+              opacity: isGenerating ? 0.6 : 1,
+              transition: 'background-color 0.2s'
             }}
+            onMouseEnter={(e) => !isGenerating && (e.currentTarget.style.backgroundColor = '#218838')}
+            onMouseLeave={(e) => !isGenerating && (e.currentTarget.style.backgroundColor = '#28a745')}
             disabled={isGenerating}
           >
             {isGenerating ? 'Generating...' : '🤖 Generate MOP'}
