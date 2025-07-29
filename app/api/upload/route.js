@@ -1,7 +1,5 @@
-import { writeFile, mkdir } from 'fs/promises';
+import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
-import path from 'path';
-import { existsSync } from 'fs';
 
 export async function POST(request) {
   try {
@@ -29,29 +27,28 @@ export async function POST(request) {
     const buffer = Buffer.from(bytes);
     console.log('File buffer created, size:', buffer.length);
 
-    // Define the directory and file paths
-    const uploadDir = path.join(process.cwd(), 'public', type);
-    const filename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_'); // Sanitize filename
-    const filepath = path.join(uploadDir, filename);
+    // Sanitize filename
+    const filename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    console.log('Sanitized filename:', filename);
 
-    console.log('Upload directory:', uploadDir);
-    console.log('File path:', filepath);
-
-    // Create directory if it doesn't exist
-    if (!existsSync(uploadDir)) {
-      console.log('Creating directory:', uploadDir);
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // Write the file
-    console.log('Writing file...');
-    await writeFile(filepath, buffer);
-    console.log('File written successfully');
+    // Upload to Vercel Blob Storage
+    console.log(`Uploading to Blob storage: ${type}/${filename}`);
+    
+    const blob = await put(filename, buffer, {
+      access: 'public',
+      contentType: file.type,
+      // Store in appropriate folder
+      pathname: `${type}/${filename}`
+    });
+    
+    console.log('File uploaded successfully to Blob storage');
+    console.log('Blob URL:', blob.url);
 
     return NextResponse.json({ 
       message: 'File uploaded successfully',
       filename: filename,
-      path: `/${type}/${filename}`
+      path: `/${type}/${filename}`,
+      url: blob.url
     });
   } catch (error) {
     console.error('Upload error details:', error);

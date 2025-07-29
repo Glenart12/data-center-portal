@@ -10,6 +10,7 @@ import MOPTemplateModal from '../components/MOPTemplateModal';
 function MopPage() {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
+  const [filesData, setFilesData] = useState({}); // Store file URLs and metadata
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,14 +18,30 @@ function MopPage() {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/api/files/mops')
-      .then(res => res.json())
-      .then(data => {
-        setFiles(data.files || []);
-        setFilteredFiles(data.files || []);
-      })
-      .catch(err => console.error('Error fetching files:', err));
+    fetchFiles();
   }, []);
+
+  const fetchFiles = async () => {
+    try {
+      const response = await fetch('/api/files/mops');
+      const data = await response.json();
+      
+      // Store both the filenames array and the detailed data
+      setFiles(data.files || []);
+      setFilteredFiles(data.files || []);
+      
+      // Create a lookup object for file data
+      const fileDataMap = {};
+      if (data.filesWithUrls) {
+        data.filesWithUrls.forEach(file => {
+          fileDataMap[file.filename] = file;
+        });
+      }
+      setFilesData(fileDataMap);
+    } catch (err) {
+      console.error('Error fetching files:', err);
+    }
+  };
 
   // Filter files when search term changes
   useEffect(() => {
@@ -39,8 +56,9 @@ function MopPage() {
   }, [files, searchTerm]);
 
   const handlePDFClick = (filename) => {
+    const fileData = filesData[filename];
     setSelectedPDF({
-      url: `/mops/${filename}`,
+      url: fileData?.url || `/mops/${filename}`, // Use Blob URL if available, fallback to local
       name: filename.replace('.pdf', '').replace('.txt', '')
     });
     setIsModalOpen(true);
@@ -53,6 +71,8 @@ function MopPage() {
 
   const closeGenerateModal = () => {
     setIsGenerateModalOpen(false);
+    // Refresh files after closing generate modal
+    fetchFiles();
   };
 
   const closeTemplateModal = () => {
@@ -258,7 +278,7 @@ function MopPage() {
           </button>
 
           <div style={{ minWidth: '180px', height: '48px' }}>
-            <UploadButton type="mops" />
+            <UploadButton type="mops" onUploadSuccess={fetchFiles} />
           </div>
         </div>
 
@@ -287,130 +307,135 @@ function MopPage() {
               <p style={{ margin: 0, fontSize: '16px' }}>Upload PDFs or create new MOPs to get started</p>
             </div>
           ) : (
-            filteredFiles.map((filename) => (
-              <div key={filename} style={{ 
-                border: '1px solid #e0e0e0', 
-                padding: '25px', 
-                borderRadius: '12px',
-                backgroundColor: 'white',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                position: 'relative'
-              }}
-              onClick={() => handlePDFClick(filename)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
-                e.currentTarget.style.borderColor = '#0f3456';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
-                e.currentTarget.style.borderColor = '#e0e0e0';
-              }}
-              >
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  marginBottom: '15px',
-                  gap: '10px'
-                }}>
-                  <span style={{ fontSize: '32px', color: '#0f3456' }}>⚙️</span>
-                  <h3 style={{ 
-                    margin: 0, 
-                    fontSize: '18px', 
-                    color: '#333',
-                    lineHeight: '1.4',
-                    flex: 1
+            filteredFiles.map((filename) => {
+              const fileData = filesData[filename];
+              const downloadUrl = fileData?.url || `/mops/${filename}`;
+              
+              return (
+                <div key={filename} style={{ 
+                  border: '1px solid #e0e0e0', 
+                  padding: '25px', 
+                  borderRadius: '12px',
+                  backgroundColor: 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
+                }}
+                onClick={() => handlePDFClick(filename)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
+                  e.currentTarget.style.borderColor = '#0f3456';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                  e.currentTarget.style.borderColor = '#e0e0e0';
+                }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    marginBottom: '15px',
+                    gap: '10px'
                   }}>
-                    {filename.replace('.pdf', '').replace('.txt', '')}
-                  </h3>
-                </div>
-                
-                <div style={{ 
-                  display: 'flex', 
-                  gap: '10px',
-                  marginTop: '15px'
-                }}>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePDFClick(filename);
-                    }}
-                    style={{
-                      padding: '10px 15px',
-                      backgroundColor: '#0070f3',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-                      fontWeight: '500',
+                    <span style={{ fontSize: '32px', color: '#0f3456' }}>⚙️</span>
+                    <h3 style={{ 
+                      margin: 0, 
+                      fontSize: '18px', 
+                      color: '#333',
+                      lineHeight: '1.4',
                       flex: 1
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0051cc';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0070f3';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    Preview
-                  </button>
-                  <a 
-                    href={`/mops/${filename}`} 
-                    download
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      padding: '10px 15px',
-                      backgroundColor: '#28a745',
-                      color: 'white',
-                      textDecoration: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      transition: 'all 0.2s ease',
-                      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-                      fontWeight: '500',
-                      flex: 1,
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#218838';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#28a745';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    Download
-                  </a>
-                </div>
+                    }}>
+                      {filename.replace('.pdf', '').replace('.txt', '')}
+                    </h3>
+                  </div>
+                  
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '10px',
+                    marginTop: '15px'
+                  }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePDFClick(filename);
+                      }}
+                      style={{
+                        padding: '10px 15px',
+                        backgroundColor: '#0070f3',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                        fontWeight: '500',
+                        flex: 1
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0051cc';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0070f3';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      Preview
+                    </button>
+                    <a 
+                      href={downloadUrl}
+                      download={filename}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        padding: '10px 15px',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        textDecoration: 'none',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease',
+                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                        fontWeight: '500',
+                        flex: 1,
+                        textAlign: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#218838';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#28a745';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      Download
+                    </a>
+                  </div>
 
-                {/* File Type Badge */}
-                <div style={{
-                  position: 'absolute',
-                  top: '15px',
-                  right: '15px',
-                  backgroundColor: filename.toLowerCase().endsWith('.pdf') ? '#dc3545' : '#6c757d',
-                  color: 'white',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: 'bold'
-                }}>
-                  {filename.split('.').pop().toUpperCase()}
+                  {/* File Type Badge */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '15px',
+                    right: '15px',
+                    backgroundColor: filename.toLowerCase().endsWith('.pdf') ? '#dc3545' : '#6c757d',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    {filename.split('.').pop().toUpperCase()}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

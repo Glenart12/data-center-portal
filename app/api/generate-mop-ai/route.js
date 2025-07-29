@@ -1,7 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 // Initialize Gemini with your API key
@@ -281,7 +279,7 @@ MOP Risk Level to CET Level Mapping:
 [FULL MOP TEMPLATE AND REQUIREMENTS CONTINUE...]
 `;
 
-// Equipment database (you can expand this)
+// Equipment database
 const EQUIPMENT_DATABASE = {
   'Trane': {
     'CVHF1000': {
@@ -310,6 +308,20 @@ const EQUIPMENT_DATABASE = {
       type: 'CRAC Unit',
       coolingCapacity: '30 tons',
       powerRequirements: '460V/3PH/60Hz'
+    }
+  },
+  'Caterpillar': {
+    '3516B': {
+      type: 'Diesel Generator',
+      powerOutput: '2000 kW',
+      voltage: '480V/3PH/60Hz',
+      fuel: 'Diesel #2'
+    },
+    '3516C': {
+      type: 'Diesel Generator',
+      powerOutput: '2500 kW',
+      voltage: '480V/3PH/60Hz',
+      fuel: 'Diesel #2'
     }
   }
 };
@@ -395,9 +407,9 @@ Generate a complete, professional Method of Procedure (MOP) following ALL requir
 
     console.log('Calling Gemini AI...');
     
-    // Generate content with Gemini - UPDATED MODEL NAME
+    // Generate content with Gemini
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',  // Fixed model name
+      model: 'gemini-1.5-flash',
       generationConfig: {
         temperature: 0.7,
         topK: 40,
@@ -410,30 +422,29 @@ Generate a complete, professional Method of Procedure (MOP) following ALL requir
     const response = await result.response;
     const mopContent = response.text();
     
-    console.log('AI generation successful');
+    console.log('AI generation successful, uploading to Blob storage...');
 
     // Create filename
     const timestamp = new Date().toISOString().split('T')[0];
     const safeManufacturer = formData.manufacturer.replace(/[^a-zA-Z0-9]/g, '_');
     const safeModel = formData.modelNumber.replace(/[^a-zA-Z0-9]/g, '_');
-    const filename = `MOP_${safeManufacturer}_${safeModel}_${timestamp}`;
+    const filename = `MOP_${safeManufacturer}_${safeModel}_${timestamp}.txt`;
 
-    // Ensure directory exists
-    const mopsDir = path.join(process.cwd(), 'public', 'mops');
-    if (!existsSync(mopsDir)) {
-      await mkdir(mopsDir, { recursive: true });
-    }
-
-    // Save the generated MOP
-    const filePath = path.join(mopsDir, `${filename}.txt`);
-    await writeFile(filePath, mopContent, 'utf8');
+    // Upload to Vercel Blob Storage
+    const blob = await put(filename, mopContent, {
+      access: 'public',
+      contentType: 'text/plain',
+      // Store in a 'mops' folder structure
+      pathname: `mops/${filename}`
+    });
     
-    console.log(`MOP saved to: ${filePath}`);
+    console.log(`MOP saved to Blob storage: ${blob.url}`);
 
     return NextResponse.json({ 
       message: 'MOP generated successfully with AI',
-      filename: `${filename}.txt`,
-      preview: mopContent.substring(0, 500) + '...' // Send preview
+      filename: filename,
+      url: blob.url,
+      preview: mopContent.substring(0, 500) + '...'
     });
 
   } catch (error) {
