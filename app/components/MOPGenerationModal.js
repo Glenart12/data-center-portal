@@ -8,6 +8,8 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     modelNumber: '',
     serialNumber: '',
     location: '',
+    system: '',
+    category: '',
     description: ''
   });
   
@@ -59,9 +61,10 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   };
 
   const handleGenerate = async () => {
-    // Only require Manufacturer, Model Number, and Description
-    if (!formData.manufacturer || !formData.modelNumber || !formData.description) {
-      alert('Please fill in Manufacturer, Model Number, and Work Description');
+    // Check all required fields
+    if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
+        !formData.category || !formData.description) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Category\n• Work Description');
       return;
     }
 
@@ -102,6 +105,40 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
       setUploadProgress('');
     }
   };
+
+  // Common system options for data centers
+  const systemOptions = [
+    'Cooling System',
+    'Power Distribution',
+    'UPS System',
+    'Generator System',
+    'Fire Suppression',
+    'BMS/EPMS',
+    'Security System',
+    'Network Infrastructure',
+    'HVAC',
+    'Electrical System',
+    'Mechanical System',
+    'Emergency Power',
+    'Other'
+  ];
+
+  // Common category options
+  const categoryOptions = [
+    'Preventive Maintenance',
+    'Corrective Maintenance',
+    'Emergency Repair',
+    'Installation',
+    'Replacement',
+    'Upgrade',
+    'Inspection',
+    'Testing',
+    'Commissioning',
+    'Decommissioning',
+    'Troubleshooting',
+    'Calibration',
+    'Other'
+  ];
 
   return (
     <div style={{
@@ -213,6 +250,52 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 }}
                 placeholder="e.g., Data Hall 1"
               />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                System *
+              </label>
+              <select
+                value={formData.system}
+                onChange={(e) => handleInputChange('system', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="">Select System</option>
+                {systemOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Category *
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="">Select Category</option>
+                {categoryOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </div>
           </div>
 
