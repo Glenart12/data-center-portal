@@ -16,6 +16,7 @@ function MopPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [deletingFile, setDeletingFile] = useState(null);
 
   useEffect(() => {
     fetchFiles();
@@ -85,6 +86,44 @@ function MopPage() {
 
   const clearSearch = () => {
     setSearchTerm('');
+  };
+
+  const handleDelete = async (filename, e) => {
+    e.stopPropagation(); // Prevent card click
+    
+    // Confirmation dialog
+    if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+      return;
+    }
+
+    setDeletingFile(filename);
+
+    try {
+      const response = await fetch('/api/delete-file', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename,
+          type: 'mops'
+        })
+      });
+
+      if (response.ok) {
+        // Refresh the file list
+        await fetchFiles();
+        alert('File deleted successfully');
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete file: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete file');
+    } finally {
+      setDeletingFile(null);
+    }
   };
 
   // Fixed button style with proper emoji and text alignment
@@ -310,6 +349,7 @@ function MopPage() {
             filteredFiles.map((filename) => {
               const fileData = filesData[filename];
               const downloadUrl = fileData?.url || `/mops/${filename}`;
+              const displayName = filename.replace('.pdf', '').replace('.txt', '');
               
               return (
                 <div key={filename} style={{ 
@@ -334,21 +374,67 @@ function MopPage() {
                   e.currentTarget.style.borderColor = '#e0e0e0';
                 }}
                 >
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => handleDelete(filename, e)}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: '#dc3545',
+                      cursor: 'pointer',
+                      fontSize: '20px',
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease',
+                      opacity: 0.7,
+                      zIndex: 10
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dc3545';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#dc3545';
+                      e.currentTarget.style.opacity = '0.7';
+                    }}
+                    disabled={deletingFile === filename}
+                    title="Delete file"
+                  >
+                    {deletingFile === filename ? '⟳' : '×'}
+                  </button>
+
                   <div style={{ 
                     display: 'flex', 
-                    alignItems: 'center', 
+                    alignItems: 'flex-start', 
                     marginBottom: '15px',
-                    gap: '10px'
+                    gap: '10px',
+                    paddingRight: '40px' // Make room for delete button
                   }}>
-                    <span style={{ fontSize: '32px', color: '#0f3456' }}>⚙️</span>
+                    <span style={{ fontSize: '32px', color: '#0f3456', flexShrink: 0 }}>⚙️</span>
                     <h3 style={{ 
                       margin: 0, 
                       fontSize: '18px', 
                       color: '#333',
                       lineHeight: '1.4',
-                      flex: 1
-                    }}>
-                      {filename.replace('.pdf', '').replace('.txt', '')}
+                      flex: 1,
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      wordBreak: 'break-word'
+                    }}
+                    title={displayName} // Show full name on hover
+                    >
+                      {displayName}
                     </h3>
                   </div>
                   
@@ -422,7 +508,7 @@ function MopPage() {
                   {/* File Type Badge */}
                   <div style={{
                     position: 'absolute',
-                    top: '15px',
+                    bottom: '15px',
                     right: '15px',
                     backgroundColor: filename.toLowerCase().endsWith('.pdf') ? '#dc3545' : '#6c757d',
                     color: 'white',
