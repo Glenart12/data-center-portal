@@ -1,5 +1,7 @@
 import { list } from '@vercel/blob';
 import { NextResponse } from 'next/server';
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function GET(request, { params }) {
   try {
@@ -9,42 +11,88 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    console.log(`Listing files from Blob storage for type: ${type}`);
+    console.log(`Listing files for type: ${type}`);
 
-    // List all blobs in the specified folder
-    const { blobs } = await list({
-      prefix: `${type}/`,
+    // Try to list from Blob storage first
+    let blobFiles = [];
+    try {
+      const { blobs } = await list({
+        prefix: `${type}/`,
+      });
+      
+      console.log(`Found ${blobs.length} blobs in storage`);
+      
+      blobFiles = blobs
+        .filter(blob => {
+          const filename = blob.pathname.split('/').pop();
+          return filename.endsWith('.pdf') || filename.endsWith('.txt');
+        })
+        .map(blob => {
+          const filename = blob.pathname.split('/').pop();
+          return {
+            filename: filename,
+            url: blob.url,
+            size: blob.size,
+            uploadedAt: blob.uploadedAt,
+            source: 'blob'
+          };
+        });
+    } catch (blobError) {
+      console.error('Error accessing Blob storage:', blobError);
+    }
+
+    // Also check local files as fallback (for existing files)
+    let localFiles = [];
+    try {
+      const directory = path.join(process.cwd(), 'public', type);
+      const filenames = await fs.readdir(directory);
+      
+      localFiles = filenames
+        .filter(name => name.endsWith('.pdf') || name.endsWith('.txt'))
+        .map(filename => ({
+          filename: filename,
+          url: `/${type}/${filename}`,
+          size: 0,
+          uploadedAt: new Date().toISOString(),
+          source: 'local'
+        }));
+      
+      console.log(`Found ${localFiles.length} local files`);
+    } catch (localError) {
+      console.log('No local files found:', localError.message);
+    }
+
+    // Combine both sources, preferring blob files
+    const allFiles = [...blobFiles];
+    const blobFilenames = new Set(blobFiles.map(f => f.filename));
+    
+    // Add local files that aren't in blob storage
+    localFiles.forEach(localFile => {
+      if (!blobFilenames.has(localFile.filename)) {
+        allFiles.push(localFile);
+      }
     });
 
-    console.log(`Found ${blobs.length} blobs`);
+    console.log(`Total files found: ${allFiles.length}`);
 
-    // Create an object with both filenames and URLs
-    const filesWithUrls = blobs
-      .filter(blob => {
-        const filename = blob.pathname.split('/').pop();
-        return filename.endsWith('.pdf') || filename.endsWith('.txt');
-      })
-      .map(blob => {
-        const filename = blob.pathname.split('/').pop();
-        return {
-          filename: filename,
-          url: blob.url,
-          size: blob.size,
-          uploadedAt: blob.uploadedAt
-        };
-      });
-
-    // Also return just the filenames array for backward compatibility
-    const files = filesWithUrls.map(f => f.filename);
-
-    console.log(`Returning ${files.length} files`);
-
+    // Return in the expected format
+    const files = allFiles.map(f => f.filename);
+    
     return NextResponse.json({ 
       files: files,
-      filesWithUrls: filesWithUrls 
+      filesWithUrls: allFiles,
+      debug: {
+        blobCount: blobFiles.length,
+        localCount: localFiles.length,
+        totalCount: allFiles.length
+      }
     });
   } catch (error) {
-    console.log('Error listing files from Blob storage:', error);
-    return NextResponse.json({ files: [], filesWithUrls: [] });
+    console.error('Error in files API:', error);
+    return NextResponse.json({ 
+      files: [], 
+      filesWithUrls: [],
+      error: error.message 
+    });
   }
 }
