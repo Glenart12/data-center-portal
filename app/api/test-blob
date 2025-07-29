@@ -1,0 +1,31 @@
+import { list } from '@vercel/blob';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    console.log('BLOB_READ_WRITE_TOKEN exists:', !!process.env.BLOB_READ_WRITE_TOKEN);
+    
+    // Try to list all blobs
+    const { blobs } = await list();
+    
+    return NextResponse.json({
+      success: true,
+      tokenExists: !!process.env.BLOB_READ_WRITE_TOKEN,
+      totalBlobs: blobs.length,
+      blobs: blobs.map(b => ({
+        pathname: b.pathname,
+        url: b.url,
+        size: b.size,
+        uploadedAt: b.uploadedAt
+      }))
+    });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      tokenExists: !!process.env.BLOB_READ_WRITE_TOKEN,
+      error: error.message,
+      errorName: error.name,
+      stack: error.stack
+    }, { status: 500 });
+  }
+}
