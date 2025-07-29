@@ -12,61 +12,23 @@ export async function GET(request, { params }) {
     }
 
     console.log(`Listing files for type: ${type}`);
-    console.log('BLOB_READ_WRITE_TOKEN exists:', !!process.env.BLOB_READ_WRITE_TOKEN);
 
-    // Try to list from Blob storage
+    // Get files from Blob storage
     let blobFiles = [];
-    let blobError = null;
-    
     try {
-      // List with more specific options
-      const listResult = await list({
-        prefix: `${type}/`,
-        limit: 1000,
-        token: process.env.BLOB_READ_WRITE_TOKEN // Explicitly pass token
-      });
+      const result = await list({ limit: 1000 });
+      const blobs = result.blobs || [];
       
-      const blobs = listResult.blobs || [];
-      console.log(`Found ${blobs.length} blobs in storage for ${type}`);
+      console.log(`Found ${blobs.length} total blobs`);
       
-      blobFiles = blobs
-        .filter(blob => {
-          const filename = blob.pathname.split('/').pop();
-          return filename.endsWith('.pdf') || filename.endsWith('.txt');
-        })
-        .map(blob => {
-          const filename = blob.pathname.split('/').pop();
-          return {
-            filename: filename,
-            url: blob.url,
-            size: blob.size,
-            uploadedAt: blob.uploadedAt,
-            source: 'blob'
-          };
-        });
-        
-      console.log(`Filtered to ${blobFiles.length} PDF/TXT files from blob`);
-    } catch (error) {
-      blobError = error;
-      console.error('Error accessing Blob storage:', error.message);
-      console.error('Error details:', error);
-      
-      // Try alternate list method without prefix
-      try {
-        console.log('Trying to list all blobs without prefix...');
-        const allBlobsResult = await list({
-          token: process.env.BLOB_READ_WRITE_TOKEN
-        });
-        
-        const allBlobs = allBlobsResult.blobs || [];
-        console.log(`Found ${allBlobs.length} total blobs`);
-        
-        // Manually filter by type
-        blobFiles = allBlobs
-          .filter(blob => blob.pathname.startsWith(`${type}/`))
+      // For MOPs, also include files that start with MOP_ (since they're in root)
+      if (type === 'mops') {
+        blobFiles = blobs
           .filter(blob => {
             const filename = blob.pathname.split('/').pop();
-            return filename.endsWith('.pdf') || filename.endsWith('.txt');
+            // Include files that start with MOP_ or are in mops/ folder
+            return (filename.startsWith('MOP_') || blob.pathname.startsWith('mops/')) && 
+                   (filename.endsWith('.pdf') || filename.endsWith('.txt'));
           })
           .map(blob => {
             const filename = blob.pathname.split('/').pop();
@@ -78,14 +40,33 @@ export async function GET(request, { params }) {
               source: 'blob'
             };
           });
-          
-        console.log(`Filtered to ${blobFiles.length} ${type} files from all blobs`);
-      } catch (fallbackError) {
-        console.error('Fallback list also failed:', fallbackError.message);
+      } else {
+        // For SOPs and EOPs, look for files in their folders or with their prefixes
+        const prefix = type.toUpperCase().slice(0, -1); // SOP or EOP
+        blobFiles = blobs
+          .filter(blob => {
+            const filename = blob.pathname.split('/').pop();
+            return (filename.startsWith(`${prefix}_`) || blob.pathname.startsWith(`${type}/`)) && 
+                   (filename.endsWith('.pdf') || filename.endsWith('.txt'));
+          })
+          .map(blob => {
+            const filename = blob.pathname.split('/').pop();
+            return {
+              filename: filename,
+              url: blob.url,
+              size: blob.size,
+              uploadedAt: blob.uploadedAt,
+              source: 'blob'
+            };
+          });
       }
+      
+      console.log(`Found ${blobFiles.length} blob files for ${type}`);
+    } catch (error) {
+      console.error('Error accessing Blob storage:', error);
     }
 
-    // Also check local files as fallback
+    // Get local files
     let localFiles = [];
     try {
       const directory = path.join(process.cwd(), 'public', type);
@@ -102,44 +83,36 @@ export async function GET(request, { params }) {
         }));
       
       console.log(`Found ${localFiles.length} local files`);
-    } catch (localError) {
-      console.log('No local files found:', localError.message);
+    } catch (error) {
+      console.log('No local files found');
     }
 
     // Combine both sources
     const allFiles = [...blobFiles];
     const blobFilenames = new Set(blobFiles.map(f => f.filename));
     
-    // Add local files that aren't in blob storage
     localFiles.forEach(localFile => {
       if (!blobFilenames.has(localFile.filename)) {
         allFiles.push(localFile);
       }
     });
 
-    console.log(`Total files found: ${allFiles.length}`);
+    // Sort by upload date (newest first)
+    allFiles.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
 
-    // Return in the expected format
-    const files = allFiles.map(f => f.filename);
-    
+    console.log(`Total files: ${allFiles.length}`);
+
     return NextResponse.json({ 
-      files: files,
+      files: allFiles.map(f => f.filename),
       filesWithUrls: allFiles,
       debug: {
         blobCount: blobFiles.length,
         localCount: localFiles.length,
-        totalCount: allFiles.length,
-        tokenExists: !!process.env.BLOB_READ_WRITE_TOKEN,
-        blobError: blobError ? blobError.message : null
+        totalCount: allFiles.length
       }
     });
   } catch (error) {
     console.error('Error in files API:', error);
-    return NextResponse.json({ 
-      files: [], 
-      filesWithUrls: [],
-      error: error.message,
-      tokenExists: !!process.env.BLOB_READ_WRITE_TOKEN
-    });
+    return NextResponse.json({ files: [], filesWithUrls: [] });
   }
 }

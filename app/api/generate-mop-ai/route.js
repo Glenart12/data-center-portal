@@ -430,12 +430,10 @@ Generate a complete, professional Method of Procedure (MOP) following ALL requir
     const safeModel = formData.modelNumber.replace(/[^a-zA-Z0-9]/g, '_');
     const filename = `MOP_${safeManufacturer}_${safeModel}_${timestamp}.txt`;
 
-    // Upload to Vercel Blob Storage
-    const blob = await put(filename, mopContent, {
+    // Upload to Vercel Blob Storage - FIXED PATH
+    const blob = await put(`mops/${filename}`, mopContent, {
       access: 'public',
-      contentType: 'text/plain',
-      // Store in a 'mops' folder structure
-      pathname: `mops/${filename}`
+      contentType: 'text/plain'
     });
     
     console.log(`MOP saved to Blob storage: ${blob.url}`);
