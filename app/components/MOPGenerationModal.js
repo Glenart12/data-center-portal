@@ -8,8 +8,18 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     equipmentId: '',
     modelNumber: '',
     serialNumber: '',
-    supportingDoc: null
+    description: '',
+    workType: 'maintenance',
+    riskLevel: '1',
+    location: '',
+    affectedSystems: ''
   });
+  
+  const [supportingDocs, setSupportingDocs] = useState([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
+
+  if (!isOpen) return null;
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -18,56 +28,82 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData(prev => ({
-      ...prev,
-      supportingDoc: file
-    }));
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    setUploadProgress('Reading files...');
+    
+    const newDocs = [];
+    
+    for (const file of files) {
+      if (file.type === 'application/pdf' || file.type === 'text/plain' || 
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        
+        // Convert file to base64 for sending to API
+        const reader = new FileReader();
+        const base64 = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+        
+        newDocs.push({
+          name: file.name,
+          type: file.type,
+          content: base64,
+          size: file.size
+        });
+      }
+    }
+    
+    setSupportingDocs(prev => [...prev, ...newDocs]);
+    setUploadProgress('');
   };
 
-  const handleCreateMOP = () => {
-    alert('MOP Generation would happen here!\n\nForm data:\n' + 
-          `Manufacturer: ${formData.manufacturer}\n` +
-          `Equipment ID: ${formData.equipmentId}\n` +
-          `Model #: ${formData.modelNumber}\n` +
-          `Serial #: ${formData.serialNumber}\n` +
-          `Supporting Doc: ${formData.supportingDoc?.name || 'None'}`);
-    onClose();
+  const removeDoc = (index) => {
+    setSupportingDocs(prev => prev.filter((_, i) => i !== index));
   };
 
-  const resetForm = () => {
-    setFormData({
-      manufacturer: '',
-      equipmentId: '',
-      modelNumber: '',
-      serialNumber: '',
-      supportingDoc: null
-    });
-  };
+  const handleGenerate = async () => {
+    if (!formData.manufacturer || !formData.modelNumber || !formData.description) {
+      alert('Please fill in at least Manufacturer, Model Number, and Description');
+      return;
+    }
 
-  if (!isOpen) return null;
+    setIsGenerating(true);
+    setUploadProgress('Generating MOP with AI...');
 
-  const inputStyle = {
-    width: '100%',
-    padding: '12px',
-    fontSize: '14px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-    marginBottom: '20px',
-    transition: 'border-color 0.3s ease',
-    boxSizing: 'border-box'
-  };
+    try {
+      const response = await fetch('/api/generate-mop-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData,
+          supportingDocs: supportingDocs.map(doc => ({
+            name: doc.name,
+            type: doc.type,
+            content: doc.content
+          }))
+        })
+      });
 
-  const labelStyle = {
-    display: 'block',
-    marginBottom: '8px',
-    fontWeight: 'bold',
-    color: '#0f3456',
-    fontSize: '14px',
-    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-    textAlign: 'left'
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate MOP');
+      }
+
+      const data = await response.json();
+      
+      alert('MOP generated successfully! Check the MOP gallery.');
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error('Generation error:', error);
+      alert(`Failed to generate MOP: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+      setUploadProgress('');
+    }
   };
 
   return (
@@ -77,228 +113,350 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'center',
       zIndex: 9999,
-      padding: '20px',
       paddingTop: '90px',
-      backdropFilter: 'blur(5px)'
+      overflowY: 'auto'
     }}>
       <div style={{
         backgroundColor: 'white',
-        borderRadius: '15px',
-        width: '90%',
-        maxWidth: '700px',
+        padding: '40px',
+        borderRadius: '8px',
+        width: '95%',
+        maxWidth: '800px',
         maxHeight: 'calc(100vh - 140px)',
-        overflow: 'hidden',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-        display: 'flex',
-        flexDirection: 'column'
+        overflowY: 'auto',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        marginBottom: '40px'
       }}>
         {/* Header */}
-        <div style={{
-          padding: '30px',
-          borderBottom: '1px solid #eee',
-          backgroundColor: '#f8f9fa',
-          textAlign: 'center'
-        }}>
-          <div style={{ marginBottom: '15px' }}>
-            <span style={{ fontSize: '48px' }}>✨</span>
-          </div>
-          <h2 style={{
-            margin: 0,
-            color: '#0f3456',
-            fontSize: '1.6em',
-            fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
-          }}>
-            Generate New MOP
-          </h2>
-          <p style={{
-            margin: '15px 0 0 0',
-            color: '#666',
-            fontSize: '16px',
-            lineHeight: '1.5'
-          }}>
-            Fill out the required information to generate a Method of Procedure
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '10px' }}>🤖</div>
+          <h2 style={{ marginBottom: '5px', fontSize: '24px' }}>Generate MOP with AI</h2>
+          <p style={{ color: '#666', fontSize: '14px' }}>
+            Powered by Google Gemini AI
           </p>
         </div>
 
-        {/* Form Content */}
-        <div style={{
-          padding: '40px',
-          overflowY: 'auto',
-          flex: 1
-        }}>
-          <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'left', marginBottom: '25px' }}>
-              <label style={labelStyle}>Manufacturer:</label>
+        {/* Equipment Information */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment Information</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Manufacturer *
+              </label>
               <input
                 type="text"
                 value={formData.manufacturer}
                 onChange={(e) => handleInputChange('manufacturer', e.target.value)}
-                style={inputStyle}
-                placeholder="Enter equipment manufacturer"
-                onFocus={(e) => e.target.style.borderColor = '#0f3456'}
-                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Trane, Carrier, York"
               />
             </div>
 
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr 1fr 1fr', 
-              gap: '20px',
-              marginBottom: '25px'
-            }}>
-              <div style={{ textAlign: 'left' }}>
-                <label style={labelStyle}>Equipment ID:</label>
-                <input
-                  type="text"
-                  value={formData.equipmentId}
-                  onChange={(e) => handleInputChange('equipmentId', e.target.value)}
-                  style={inputStyle}
-                  placeholder="Equipment ID"
-                  onFocus={(e) => e.target.style.borderColor = '#0f3456'}
-                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
-                />
-              </div>
-
-              <div style={{ textAlign: 'left' }}>
-                <label style={labelStyle}>Model #:</label>
-                <input
-                  type="text"
-                  value={formData.modelNumber}
-                  onChange={(e) => handleInputChange('modelNumber', e.target.value)}
-                  style={inputStyle}
-                  placeholder="Model Number"
-                  onFocus={(e) => e.target.style.borderColor = '#0f3456'}
-                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
-                />
-              </div>
-
-              <div style={{ textAlign: 'left' }}>
-                <label style={labelStyle}>Serial #:</label>
-                <input
-                  type="text"
-                  value={formData.serialNumber}
-                  onChange={(e) => handleInputChange('serialNumber', e.target.value)}
-                  style={inputStyle}
-                  placeholder="Serial Number"
-                  onFocus={(e) => e.target.style.borderColor = '#0f3456'}
-                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
-                />
-              </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Model Number *
+              </label>
+              <input
+                type="text"
+                value={formData.modelNumber}
+                onChange={(e) => handleInputChange('modelNumber', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., CVHF1000"
+              />
             </div>
 
-            <div style={{ textAlign: 'left' }}>
-              <label style={labelStyle}>MOP Supporting Documentation:</label>
-              <div style={{
-                border: '2px dashed #0f3456',
-                borderRadius: '12px',
-                padding: '30px 20px',
-                textAlign: 'center',
-                backgroundColor: '#f8f9fa',
-                marginBottom: '20px',
-                transition: 'all 0.3s ease'
-              }}>
-                <div style={{ marginBottom: '15px' }}>
-                  <span style={{ fontSize: '48px', color: '#0f3456' }}>📄</span>
-                </div>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
-                  }}
-                  accept=".pdf,.doc,.docx,.txt"
-                />
-                {formData.supportingDoc && (
-                  <div style={{ marginTop: '15px' }}>
-                    <span style={{ fontSize: '24px' }}>✅</span>
-                    <p style={{
-                      marginTop: '10px',
-                      color: '#0f3456',
-                      fontWeight: 'bold',
-                      fontSize: '14px'
-                    }}>
-                      Selected: {formData.supportingDoc.name}
-                    </p>
-                  </div>
-                )}
-                <p style={{
-                  margin: '15px 0 0 0',
-                  fontSize: '14px',
-                  color: '#666',
-                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
-                }}>
-                  Supports PDF, DOC, DOCX, and TXT files
-                </p>
-              </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Equipment ID
+              </label>
+              <input
+                type="text"
+                value={formData.equipmentId}
+                onChange={(e) => handleInputChange('equipmentId', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., CH-01"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Serial Number
+              </label>
+              <input
+                type="text"
+                value={formData.serialNumber}
+                onChange={(e) => handleInputChange('serialNumber', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., SN123456789"
+              />
             </div>
           </div>
         </div>
 
-        {/* Footer Buttons */}
-        <div style={{
-          padding: '25px 40px',
-          borderTop: '1px solid #eee',
-          backgroundColor: '#f8f9fa',
-          display: 'flex',
-          gap: '15px',
-          justifyContent: 'center'
-        }}>
-          <button
-            onClick={() => {
-              resetForm();
-              onClose();
+        {/* Work Details */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Work Details</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Work Type
+              </label>
+              <select
+                value={formData.workType}
+                onChange={(e) => handleInputChange('workType', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              >
+                <option value="maintenance">Maintenance</option>
+                <option value="installation">Installation</option>
+                <option value="replacement">Replacement</option>
+                <option value="repair">Repair</option>
+                <option value="inspection">Inspection</option>
+                <option value="upgrade">Upgrade</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Risk Level
+              </label>
+              <select
+                value={formData.riskLevel}
+                onChange={(e) => handleInputChange('riskLevel', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              >
+                <option value="1">1 - Low Risk</option>
+                <option value="2">2 - Medium Risk</option>
+                <option value="3">3 - High Risk</option>
+                <option value="4">4 - Critical Risk</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Location
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px'
+              }}
+              placeholder="e.g., Data Hall 1, Mechanical Room 2"
+            />
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Affected Systems
+            </label>
+            <input
+              type="text"
+              value={formData.affectedSystems}
+              onChange={(e) => handleInputChange('affectedSystems', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px'
+              }}
+              placeholder="e.g., Cooling, Power Distribution, BMS"
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Work Description *
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                minHeight: '100px',
+                resize: 'vertical'
+              }}
+              placeholder="Describe the work to be performed in detail..."
+            />
+          </div>
+        </div>
+
+        {/* Supporting Documents */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Supporting Documents</h3>
+          <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
+            Upload manuals, specifications, or previous MOPs for better AI context
+          </p>
+          
+          <input
+            type="file"
+            multiple
+            accept=".pdf,.txt,.doc,.docx"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+            id="doc-upload"
+          />
+          
+          <label
+            htmlFor="doc-upload"
+            style={{
+              display: 'inline-block',
+              padding: '10px 20px',
+              backgroundColor: '#0070f3',
+              color: 'white',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginBottom: '15px'
             }}
+          >
+            📎 Add Documents
+          </label>
+
+          {supportingDocs.length > 0 && (
+            <div style={{ marginTop: '15px' }}>
+              {supportingDocs.map((doc, index) => (
+                <div key={index} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '4px',
+                  marginBottom: '8px'
+                }}>
+                  <span style={{ fontSize: '14px' }}>
+                    📄 {doc.name} ({(doc.size / 1024).toFixed(1)} KB)
+                  </span>
+                  <button
+                    onClick={() => removeDoc(index)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#dc3545',
+                      cursor: 'pointer',
+                      fontSize: '16px'
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Progress Message */}
+        {uploadProgress && (
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#e3f2fd',
+            borderRadius: '4px',
+            marginBottom: '20px',
+            textAlign: 'center',
+            color: '#1976d2'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              <div style={{
+                width: '20px',
+                height: '20px',
+                border: '3px solid #1976d2',
+                borderTopColor: 'transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }} />
+              {uploadProgress}
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
             style={{
               padding: '12px 30px',
               backgroundColor: '#6c757d',
               color: 'white',
               border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-              transition: 'background-color 0.2s ease'
+              borderRadius: '4px',
+              fontSize: '16px',
+              cursor: 'pointer'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+            disabled={isGenerating}
           >
             Cancel
           </button>
           
           <button
-            onClick={handleCreateMOP}
+            onClick={handleGenerate}
             style={{
               padding: '12px 30px',
-              background: 'linear-gradient(135deg, #0f3456 0%, #1e5f8b 100%)',
+              backgroundColor: '#28a745',
               color: 'white',
               border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-              boxShadow: '0 3px 15px rgba(15, 52, 86, 0.3)',
-              transition: 'transform 0.2s ease'
+              borderRadius: '4px',
+              fontSize: '16px',
+              cursor: isGenerating ? 'not-allowed' : 'pointer',
+              opacity: isGenerating ? 0.6 : 1
             }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            disabled={isGenerating}
           >
-            Create MOP
+            {isGenerating ? 'Generating...' : '🤖 Generate MOP'}
           </button>
         </div>
       </div>
+
+      {/* Add spinning animation */}
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
