@@ -12,15 +12,22 @@ export async function GET(request, { params }) {
     }
 
     console.log(`Listing files for type: ${type}`);
+    console.log('BLOB_READ_WRITE_TOKEN exists:', !!process.env.BLOB_READ_WRITE_TOKEN);
 
-    // Try to list from Blob storage first
+    // Try to list from Blob storage
     let blobFiles = [];
+    let blobError = null;
+    
     try {
-      const { blobs } = await list({
+      // List with more specific options
+      const listResult = await list({
         prefix: `${type}/`,
+        limit: 1000,
+        token: process.env.BLOB_READ_WRITE_TOKEN // Explicitly pass token
       });
       
-      console.log(`Found ${blobs.length} blobs in storage`);
+      const blobs = listResult.blobs || [];
+      console.log(`Found ${blobs.length} blobs in storage for ${type}`);
       
       blobFiles = blobs
         .filter(blob => {
@@ -37,11 +44,48 @@ export async function GET(request, { params }) {
             source: 'blob'
           };
         });
-    } catch (blobError) {
-      console.error('Error accessing Blob storage:', blobError);
+        
+      console.log(`Filtered to ${blobFiles.length} PDF/TXT files from blob`);
+    } catch (error) {
+      blobError = error;
+      console.error('Error accessing Blob storage:', error.message);
+      console.error('Error details:', error);
+      
+      // Try alternate list method without prefix
+      try {
+        console.log('Trying to list all blobs without prefix...');
+        const allBlobsResult = await list({
+          token: process.env.BLOB_READ_WRITE_TOKEN
+        });
+        
+        const allBlobs = allBlobsResult.blobs || [];
+        console.log(`Found ${allBlobs.length} total blobs`);
+        
+        // Manually filter by type
+        blobFiles = allBlobs
+          .filter(blob => blob.pathname.startsWith(`${type}/`))
+          .filter(blob => {
+            const filename = blob.pathname.split('/').pop();
+            return filename.endsWith('.pdf') || filename.endsWith('.txt');
+          })
+          .map(blob => {
+            const filename = blob.pathname.split('/').pop();
+            return {
+              filename: filename,
+              url: blob.url,
+              size: blob.size,
+              uploadedAt: blob.uploadedAt,
+              source: 'blob'
+            };
+          });
+          
+        console.log(`Filtered to ${blobFiles.length} ${type} files from all blobs`);
+      } catch (fallbackError) {
+        console.error('Fallback list also failed:', fallbackError.message);
+      }
     }
 
-    // Also check local files as fallback (for existing files)
+    // Also check local files as fallback
     let localFiles = [];
     try {
       const directory = path.join(process.cwd(), 'public', type);
@@ -62,7 +106,7 @@ export async function GET(request, { params }) {
       console.log('No local files found:', localError.message);
     }
 
-    // Combine both sources, preferring blob files
+    // Combine both sources
     const allFiles = [...blobFiles];
     const blobFilenames = new Set(blobFiles.map(f => f.filename));
     
@@ -84,7 +128,9 @@ export async function GET(request, { params }) {
       debug: {
         blobCount: blobFiles.length,
         localCount: localFiles.length,
-        totalCount: allFiles.length
+        totalCount: allFiles.length,
+        tokenExists: !!process.env.BLOB_READ_WRITE_TOKEN,
+        blobError: blobError ? blobError.message : null
       }
     });
   } catch (error) {
@@ -92,7 +138,8 @@ export async function GET(request, { params }) {
     return NextResponse.json({ 
       files: [], 
       filesWithUrls: [],
-      error: error.message 
+      error: error.message,
+      tokenExists: !!process.env.BLOB_READ_WRITE_TOKEN
     });
   }
 }
