@@ -3,7 +3,7 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
-import PDFPreviewModal from '../components/PDFPreviewModal';
+import DocumentPreviewModal from '../components/DocumentPreviewModal';
 
 function EopPage() {
   const [files, setFiles] = useState([]);
@@ -37,7 +37,7 @@ function EopPage() {
   const handlePDFClick = (filename) => {
     setSelectedPDF({
       url: `/eops/${filename}`,
-      name: filename.replace('.pdf', '').replace('.txt', '')
+      name: filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
     });
     setIsModalOpen(true);
   };
@@ -53,6 +53,20 @@ function EopPage() {
 
   const clearSearch = () => {
     setSearchTerm('');
+  };
+
+  const getFileTypeColor = (filename) => {
+    if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
+    if (filename.toLowerCase().endsWith('.html')) return '#17a2b8';
+    return '#6c757d'; // Default for .txt and others
+  };
+
+  const getFileTypeLabel = (filename) => {
+    const extension = filename.split('.').pop().toUpperCase();
+    if (extension === 'HTML') return 'HTML';
+    if (extension === 'PDF') return 'PDF';
+    if (extension === 'TXT') return 'TXT';
+    return extension;
   };
 
   return (
@@ -245,7 +259,7 @@ function EopPage() {
                     lineHeight: '1.4',
                     flex: 1
                   }}>
-                    {filename.replace('.pdf', '').replace('.txt', '')}
+                    {filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')}
                   </h3>
                 </div>
                 
@@ -321,14 +335,14 @@ function EopPage() {
                   position: 'absolute',
                   top: '15px',
                   right: '15px',
-                  backgroundColor: filename.toLowerCase().endsWith('.pdf') ? '#dc3545' : '#6c757d',
+                  backgroundColor: getFileTypeColor(filename),
                   color: 'white',
                   padding: '4px 8px',
                   borderRadius: '4px',
                   fontSize: '12px',
                   fontWeight: 'bold'
                 }}>
-                  {filename.split('.').pop().toUpperCase()}
+                  {getFileTypeLabel(filename)}
                 </div>
               </div>
             ))
@@ -336,8 +350,8 @@ function EopPage() {
         </div>
       </div>
 
-      {/* PDF Preview Modal */}
-      <PDFPreviewModal
+      {/* Document Preview Modal */}
+      <DocumentPreviewModal
         isOpen={isModalOpen}
         onClose={closeModal}
         pdfUrl={selectedPDF?.url}

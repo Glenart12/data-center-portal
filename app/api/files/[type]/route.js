@@ -28,7 +28,7 @@ export async function GET(request, { params }) {
             const filename = blob.pathname.split('/').pop();
             // Include files that start with MOP_ or are in mops/ folder
             return (filename.startsWith('MOP_') || blob.pathname.startsWith('mops/')) && 
-                   (filename.endsWith('.pdf') || filename.endsWith('.txt'));
+                   (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
           })
           .map(blob => {
             const filename = blob.pathname.split('/').pop();
@@ -47,7 +47,7 @@ export async function GET(request, { params }) {
           .filter(blob => {
             const filename = blob.pathname.split('/').pop();
             return (filename.startsWith(`${prefix}_`) || blob.pathname.startsWith(`${type}/`)) && 
-                   (filename.endsWith('.pdf') || filename.endsWith('.txt'));
+                   (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
           })
           .map(blob => {
             const filename = blob.pathname.split('/').pop();
@@ -73,7 +73,7 @@ export async function GET(request, { params }) {
       const filenames = await fs.readdir(directory);
       
       localFiles = filenames
-        .filter(name => name.endsWith('.pdf') || name.endsWith('.txt'))
+        .filter(name => name.endsWith('.pdf') || name.endsWith('.txt') || name.endsWith('.html'))
         .map(filename => ({
           filename: filename,
           url: `/${type}/${filename}`,

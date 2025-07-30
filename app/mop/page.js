@@ -3,7 +3,7 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
-import PDFPreviewModal from '../components/PDFPreviewModal';
+import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import MOPGenerationModal from '../components/MOPGenerationModal';
 import MOPTemplateModal from '../components/MOPTemplateModal';
 
@@ -60,7 +60,7 @@ function MopPage() {
     const fileData = filesData[filename];
     setSelectedPDF({
       url: fileData?.url || `/mops/${filename}`, // Use Blob URL if available, fallback to local
-      name: filename.replace('.pdf', '').replace('.txt', '')
+      name: filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
     });
     setIsModalOpen(true);
   };
@@ -149,6 +149,20 @@ function MopPage() {
     lineHeight: '1',
     display: 'flex',
     alignItems: 'center'
+  };
+
+  const getFileTypeColor = (filename) => {
+    if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
+    if (filename.toLowerCase().endsWith('.html')) return '#17a2b8';
+    return '#6c757d'; // Default for .txt and others
+  };
+
+  const getFileTypeLabel = (filename) => {
+    const extension = filename.split('.').pop().toUpperCase();
+    if (extension === 'HTML') return 'HTML';
+    if (extension === 'PDF') return 'PDF';
+    if (extension === 'TXT') return 'TXT';
+    return extension;
   };
 
   return (
@@ -349,7 +363,7 @@ function MopPage() {
             filteredFiles.map((filename) => {
               const fileData = filesData[filename];
               const downloadUrl = fileData?.url || `/mops/${filename}`;
-              const displayName = filename.replace('.pdf', '').replace('.txt', '');
+              const displayName = filename.replace('.pdf', '').replace('.txt', '').replace('.html', '');
               
               return (
                 <div key={filename} style={{ 
@@ -510,14 +524,14 @@ function MopPage() {
                     position: 'absolute',
                     bottom: '15px',
                     right: '15px',
-                    backgroundColor: filename.toLowerCase().endsWith('.pdf') ? '#dc3545' : '#6c757d',
+                    backgroundColor: getFileTypeColor(filename),
                     color: 'white',
                     padding: '4px 8px',
                     borderRadius: '4px',
                     fontSize: '12px',
                     fontWeight: 'bold'
                   }}>
-                    {filename.split('.').pop().toUpperCase()}
+                    {getFileTypeLabel(filename)}
                   </div>
                 </div>
               );
@@ -527,7 +541,7 @@ function MopPage() {
       </div>
 
       {/* All the Modals */}
-      <PDFPreviewModal
+      <DocumentPreviewModal
         isOpen={isModalOpen}
         onClose={closeModal}
         pdfUrl={selectedPDF?.url}

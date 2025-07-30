@@ -1,7 +1,23 @@
 'use client';
 
-export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
+export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
   if (!isOpen) return null;
+
+  // Determine file type
+  const fileExtension = pdfUrl?.split('.').pop()?.toLowerCase();
+  const isHtml = fileExtension === 'html' || fileExtension === 'htm';
+  const isPdf = fileExtension === 'pdf';
+  const isTxt = fileExtension === 'txt';
+  
+  // Choose appropriate icon based on file type
+  const getFileIcon = () => {
+    if (isHtml) return '🌐';
+    if (isTxt) return '📝';
+    return '📄';
+  };
+
+  // Get display name without extension
+  const displayName = pdfName?.replace(/\.(pdf|html|htm|txt)$/i, '') || 'Document Preview';
 
   return (
     <div style={{
@@ -48,7 +64,7 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
         }}>
           <div style={{ textAlign: 'center', flex: 1 }}>
             <div style={{ marginBottom: '10px' }}>
-              <span style={{ fontSize: '36px' }}>📄</span>
+              <span style={{ fontSize: '36px' }}>{getFileIcon()}</span>
             </div>
             <h2 style={{
               margin: 0,
@@ -57,8 +73,16 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
               fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
               lineHeight: '1.2'
             }}>
-              {pdfName || 'PDF Preview'}
+              {displayName}
             </h2>
+            <p style={{
+              margin: '5px 0 0 0',
+              color: '#666',
+              fontSize: '0.9em',
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+            }}>
+              {isHtml ? 'HTML Document' : isPdf ? 'PDF Document' : isTxt ? 'Text Document' : 'Document'}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -90,7 +114,7 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           </button>
         </div>
 
-        {/* PDF Content - Flexible Height */}
+        {/* Document Content - Flexible Height */}
         <div style={{
           flex: 1,
           padding: '20px',
@@ -98,7 +122,8 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
           justifyContent: 'center',
           alignItems: 'center',
           overflow: 'hidden',
-          minHeight: '200px'
+          minHeight: '200px',
+          backgroundColor: '#fafafa'
         }}>
           {pdfUrl ? (
             <iframe
@@ -109,7 +134,8 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
                 minHeight: '200px',
                 border: 'none',
                 borderRadius: '8px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                backgroundColor: 'white'
               }}
               title={pdfName}
             />
@@ -120,8 +146,8 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
               fontSize: '18px',
               fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
             }}>
-              <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>📄</span>
-              <p style={{ margin: 0 }}>No PDF selected for preview</p>
+              <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>{getFileIcon()}</span>
+              <p style={{ margin: 0 }}>No document selected for preview</p>
             </div>
           )}
         </div>
@@ -167,7 +193,7 @@ export default function PDFPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              Download PDF
+              Download {isHtml ? 'HTML' : isPdf ? 'PDF' : isTxt ? 'Text' : 'Document'}
             </a>
           )}
           <button
