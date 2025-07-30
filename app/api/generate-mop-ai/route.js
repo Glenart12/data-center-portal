@@ -1,478 +1,184 @@
-'use client';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { put } from '@vercel/blob';
+import { NextResponse } from 'next/server';
 
-import { useState } from 'react';
+// Initialize Gemini with your API key
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export default function MOPGenerationModal({ isOpen, onClose }) {
-  const [formData, setFormData] = useState({
-    manufacturer: '',
-    modelNumber: '',
-    serialNumber: '',
-    location: '',
-    system: '',
-    category: '',
-    description: ''
-  });
-  
-  const [supportingDocs, setSupportingDocs] = useState([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState('');
+// Your comprehensive MOP project instructions
+const PROJECT_INSTRUCTIONS = `You are creating Methods of Procedure (MOPs) for data center technicians.
 
-  if (!isOpen) return null;
+CRITICAL FORMATTING RULES:
+1. Use plain text ONLY - no markdown, no special formatting
+2. Use hyphens/dashes for lists (not *, not •, not ▪)
+3. Use ALL CAPS for section headers (e.g., SECTION 01 - MOP SCHEDULE INFORMATION)
+4. For tables, use simple ASCII formatting with | separators
+5. Use red "UPDATE NEEDED" markers as specified
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+MOP Format (11 sections):
 
-  const handleFileSelect = async (e) => {
-    const files = Array.from(e.target.files);
-    setUploadProgress('Reading files...');
+SECTION 01 - MOP SCHEDULE INFORMATION
+- MOP Title: [Work type + Equipment]
+- MOP Information: [Brief description]
+- MOP Author: UPDATE NEEDED
+- MOP Creation Date: [Current date]
+- MOP Revision Date: [Current date]
+- Document Number: UPDATE NEEDED
+- Revision Number: 1.0
+- Author CET Level: UPDATE NEEDED
+
+SECTION 02 - SITE INFORMATION
+- Data Center Location: 
+  Street: UPDATE NEEDED
+  City: UPDATE NEEDED
+  State: UPDATE NEEDED
+  ZIP: UPDATE NEEDED
+- Service Ticket/Project Number: UPDATE NEEDED
+- Level of Risk: [1-4 based on work type]
+- MBM Required?: [Yes/No based on risk]
+
+SECTION 03 - MOP OVERVIEW
+- MOP Description: [Detailed work description]
+- Work Area: [Specific location]
+- Affected Systems: [List all affected systems]
+- Equipment Information: 
+  Manufacturer: [From input]
+  Equipment ID: [From input or UPDATE NEEDED]
+  Model #: [From input]
+  Serial #: [From input or UPDATE NEEDED]
+- Personnel Required: [List required personnel]
+- Min. # of Facilities Personnel: [Number]
+- Qualifications Required: [List qualifications]
+- Tools Required: [List all tools needed]
+- Advance notifications: [List required notifications]
+- Post notifications: [List post-work notifications]
+
+SECTION 04 - EFFECT OF MOP ON CRITICAL FACILITY
+Create a table showing impact on systems (Yes/No/N/A):
+- Electrical Utility Equipment
+- Emergency Generator System
+- Critical Cooling System
+- Ventilation System
+- UPS
+- Critical Power Distribution
+- Fire Detection/Suppression
+- Monitoring Systems
+- Security Systems
+- etc.
+
+SECTION 05 - MOP SUPPORTING DOCUMENTATION
+[List all referenced documents, manuals, specifications]
+
+SECTION 06 - SAFETY REQUIREMENTS
+[Comprehensive safety requirements including PPE, LOTO, Arc Flash, etc.]
+
+SECTION 07 - MOP RISKS & ASSUMPTIONS
+[List all risks and mitigation strategies]
+
+SECTION 08 - MOP DETAILS
+[Step-by-step procedure with verification steps]
+
+SECTION 09 - BACK-OUT PROCEDURES
+[Detailed rollback procedures if issues occur]
+
+SECTION 10 - MOP APPROVAL
+[Approval signature blocks]
+
+SECTION 11 - MOP COMMENTS
+[Space for additional notes]
+
+RESEARCH REQUIREMENTS:
+- Always research the specific equipment model for accurate procedures
+- Include manufacturer-specific maintenance requirements
+- Reference actual voltage/amperage ratings
+- Include proper torque specifications when applicable
+- Research and include actual SDS information for any chemicals
+- Include specific safety ratings (CAT ratings, Arc Flash boundaries)
+
+USE RED "UPDATE NEEDED" MARKERS FOR:
+- Missing serial numbers or equipment IDs
+- Location details
+- Personnel names
+- Document numbers
+- Any information that must be filled by the technician
+
+Remember: You're creating professional technical documentation for critical infrastructure work. Be precise, thorough, and safety-focused.`;
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { formData, supportingDocs } = body;
     
-    const newDocs = [];
+    // Extract all form data including new system and category fields
+    const { manufacturer, modelNumber, serialNumber, location, system, category, description } = formData;
     
-    for (const file of files) {
-      if (file.type === 'application/pdf' || file.type === 'text/plain' || 
-          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        
-        // Convert file to base64 for sending to API
-        const reader = new FileReader();
-        const base64 = await new Promise((resolve) => {
-          reader.onload = (e) => resolve(e.target.result);
-          reader.readAsDataURL(file);
-        });
-        
-        newDocs.push({
-          name: file.name,
-          type: file.type,
-          content: base64,
-          size: file.size
-        });
+    // Generate filename based on manufacturer, system, category, and date
+    const date = new Date().toISOString().split('T')[0];
+    const safeManufacturer = manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    const safeSystem = system.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    const safeCategory = category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
+    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}.txt`;
+
+    // Create the prompt with all available information
+    const userPrompt = `Create a comprehensive MOP based on this information:
+    
+Equipment Details:
+- Manufacturer: ${manufacturer}
+- Model Number: ${modelNumber}
+- Serial Number: ${serialNumber || 'UPDATE NEEDED'}
+- Location: ${location || 'UPDATE NEEDED'}
+- System: ${system}
+- Category: ${category}
+- Work Description: ${description}
+
+Important context:
+- This is for a ${system} in a data center environment
+- The work category is: ${category}
+- Follow all formatting rules exactly (plain text, no markdown)
+- Research the specific ${manufacturer} ${modelNumber} equipment
+- Include all safety requirements for ${system} work
+- Consider the specific requirements for ${category} type work
+
+${supportingDocs && supportingDocs.length > 0 ? `
+Supporting Documents Provided:
+${supportingDocs.map(doc => `- ${doc.name}`).join('\n')}
+(Use these as reference for equipment-specific procedures)
+` : ''}
+
+Generate a complete 11-section MOP following the exact format provided in the instructions.`;
+
+    // Initialize Gemini model
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 8000,
       }
-    }
-    
-    setSupportingDocs(prev => [...prev, ...newDocs]);
-    setUploadProgress('');
-  };
+    });
 
-  const removeDoc = (index) => {
-    setSupportingDocs(prev => prev.filter((_, i) => i !== index));
-  };
+    // Generate the MOP content
+    const fullPrompt = `${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`;
+    const result = await model.generateContent(fullPrompt);
+    const mopContent = result.response.text();
 
-  const handleGenerate = async () => {
-    // Check all required fields
-    if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
-        !formData.category || !formData.description) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Category\n• Work Description');
-      return;
-    }
+    // Upload to Vercel Blob Storage - fixed to use correct format
+    const blob = await put(`mops/${filename}`, mopContent, {
+      access: 'public',
+      contentType: 'text/plain'
+    });
 
-    setIsGenerating(true);
-    setUploadProgress('Generating MOP with AI...');
+    return NextResponse.json({ 
+      success: true,
+      filename: filename,
+      url: blob.url,
+      message: 'MOP generated successfully'
+    });
 
-    try {
-      const response = await fetch('/api/generate-mop-ai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          formData,
-          supportingDocs: supportingDocs.map(doc => ({
-            name: doc.name,
-            type: doc.type,
-            content: doc.content
-          }))
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate MOP');
-      }
-
-      const data = await response.json();
-      
-      alert('MOP generated successfully! Check the MOP gallery.');
-      onClose();
-      window.location.reload();
-    } catch (error) {
-      console.error('Generation error:', error);
-      alert(`Failed to generate MOP: ${error.message}`);
-    } finally {
-      setIsGenerating(false);
-      setUploadProgress('');
-    }
-  };
-
-  // Common system options for data centers
-  const systemOptions = [
-    'Cooling System',
-    'Power Distribution',
-    'UPS System',
-    'Generator System',
-    'Fire Suppression',
-    'BMS/EPMS',
-    'Security System',
-    'Network Infrastructure',
-    'HVAC',
-    'Electrical System',
-    'Mechanical System',
-    'Emergency Power',
-    'Other'
-  ];
-
-  // Common category options
-  const categoryOptions = [
-    'Preventive Maintenance',
-    'Corrective Maintenance',
-    'Emergency Repair',
-    'Installation',
-    'Replacement',
-    'Upgrade',
-    'Inspection',
-    'Testing',
-    'Commissioning',
-    'Decommissioning',
-    'Troubleshooting',
-    'Calibration',
-    'Other'
-  ];
-
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      zIndex: 9999,
-      paddingTop: '90px',
-      overflowY: 'auto'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '40px',
-        borderRadius: '8px',
-        width: '95%',
-        maxWidth: '700px',
-        maxHeight: 'calc(100vh - 140px)',
-        overflowY: 'auto',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        marginBottom: '40px'
-      }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '10px' }}>🤖</div>
-          <h2 style={{ marginBottom: '5px', fontSize: '24px' }}>Generate MOP with AI</h2>
-          <p style={{ color: '#666', fontSize: '14px' }}>
-            Fill in the basic equipment information and let AI create a comprehensive MOP
-          </p>
-        </div>
-
-        {/* Equipment Information */}
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment Information</h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Manufacturer *
-              </label>
-              <input
-                type="text"
-                value={formData.manufacturer}
-                onChange={(e) => handleInputChange('manufacturer', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., Trane, Carrier, York"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Model Number *
-              </label>
-              <input
-                type="text"
-                value={formData.modelNumber}
-                onChange={(e) => handleInputChange('modelNumber', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., CVHF1000"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Serial Number
-              </label>
-              <input
-                type="text"
-                value={formData.serialNumber}
-                onChange={(e) => handleInputChange('serialNumber', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., SN123456789"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., Data Hall 1"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                System *
-              </label>
-              <select
-                value={formData.system}
-                onChange={(e) => handleInputChange('system', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="">Select System</option>
-                {systemOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Category *
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="">Select Category</option>
-                {categoryOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Work Description *
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                minHeight: '120px',
-                resize: 'vertical'
-              }}
-              placeholder="Describe the work to be performed (e.g., quarterly preventive maintenance, filter replacement, bearing inspection)..."
-            />
-          </div>
-        </div>
-
-        {/* Supporting Documents */}
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#333' }}>Supporting Documents</h3>
-          <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
-            Upload equipment manuals, specifications, or reference documents to help the AI generate a more accurate MOP
-          </p>
-          
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.txt,.doc,.docx"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-            id="doc-upload"
-          />
-          
-          <label
-            htmlFor="doc-upload"
-            style={{
-              display: 'inline-block',
-              padding: '10px 20px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginBottom: '15px',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0051cc'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0070f3'}
-          >
-            📎 Add Documents
-          </label>
-
-          {supportingDocs.length > 0 && (
-            <div style={{ marginTop: '15px' }}>
-              {supportingDocs.map((doc, index) => (
-                <div key={index} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px',
-                  backgroundColor: '#f5f5f5',
-                  borderRadius: '4px',
-                  marginBottom: '8px'
-                }}>
-                  <span style={{ fontSize: '14px' }}>
-                    📄 {doc.name} ({(doc.size / 1024).toFixed(1)} KB)
-                  </span>
-                  <button
-                    onClick={() => removeDoc(index)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#dc3545',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      padding: '5px'
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Progress Message */}
-        {uploadProgress && (
-          <div style={{
-            padding: '15px',
-            backgroundColor: '#e3f2fd',
-            borderRadius: '4px',
-            marginBottom: '20px',
-            textAlign: 'center',
-            color: '#1976d2'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <div style={{
-                width: '20px',
-                height: '20px',
-                border: '3px solid #1976d2',
-                borderTopColor: 'transparent',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }} />
-              {uploadProgress}
-            </div>
-          </div>
-        )}
-
-        {/* Note about AI capabilities */}
-        <div style={{
-          padding: '15px',
-          backgroundColor: '#f0f7ff',
-          borderRadius: '4px',
-          marginBottom: '20px',
-          fontSize: '14px',
-          color: '#555'
-        }}>
-          <strong>Note:</strong> The AI will automatically generate all necessary MOP sections including safety requirements, 
-          tools needed, detailed procedures, and back-out plans based on the equipment information you provide.
-        </div>
-
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: '12px 30px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
-            disabled={isGenerating}
-          >
-            Cancel
-          </button>
-          
-          <button
-            onClick={handleGenerate}
-            style={{
-              padding: '12px 30px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '16px',
-              cursor: isGenerating ? 'not-allowed' : 'pointer',
-              opacity: isGenerating ? 0.6 : 1,
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => !isGenerating && (e.currentTarget.style.backgroundColor = '#218838')}
-            onMouseLeave={(e) => !isGenerating && (e.currentTarget.style.backgroundColor = '#28a745')}
-            disabled={isGenerating}
-          >
-            {isGenerating ? 'Generating...' : '🤖 Generate MOP'}
-          </button>
-        </div>
-      </div>
-
-      {/* Add spinning animation */}
-      <style jsx>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
-  );
+  } catch (error) {
+    console.error('MOP generation error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to generate MOP',
+      details: error.message 
+    }, { status: 500 });
+  }
 }

@@ -106,40 +106,6 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     }
   };
 
-  // Common system options for data centers
-  const systemOptions = [
-    'Cooling System',
-    'Power Distribution',
-    'UPS System',
-    'Generator System',
-    'Fire Suppression',
-    'BMS/EPMS',
-    'Security System',
-    'Network Infrastructure',
-    'HVAC',
-    'Electrical System',
-    'Mechanical System',
-    'Emergency Power',
-    'Other'
-  ];
-
-  // Common category options
-  const categoryOptions = [
-    'Preventive Maintenance',
-    'Corrective Maintenance',
-    'Emergency Repair',
-    'Installation',
-    'Replacement',
-    'Upgrade',
-    'Inspection',
-    'Testing',
-    'Commissioning',
-    'Decommissioning',
-    'Troubleshooting',
-    'Calibration',
-    'Other'
-  ];
-
   return (
     <div style={{
       position: 'fixed',
@@ -256,46 +222,36 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 System *
               </label>
-              <select
+              <input
+                type="text"
                 value={formData.system}
                 onChange={(e) => handleInputChange('system', e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
+                  borderRadius: '4px'
                 }}
-              >
-                <option value="">Select System</option>
-                {systemOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
+                placeholder="e.g., Cooling, Power, UPS"
+              />
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Category *
               </label>
-              <select
+              <input
+                type="text"
                 value={formData.category}
                 onChange={(e) => handleInputChange('category', e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
+                  borderRadius: '4px'
                 }}
-              >
-                <option value="">Select Category</option>
-                {categoryOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
+                placeholder="e.g., Preventive Maintenance"
+              />
             </div>
           </div>
 
