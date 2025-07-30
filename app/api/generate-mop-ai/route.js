@@ -131,83 +131,7 @@ HTML STRUCTURE AND STYLING:
 <body>
     <div class="container">
         <h1>Method of Procedure (MOP)</h1>
-
-DATA CENTER MOP RISK & CET LEVEL FRAMEWORK
-
-MOP RISK LEVEL ASSESSMENT CRITERIA
-Level 4 - Critical Risk: Guaranteed, widespread service outage. Affects entire facility or core platform.
-Level 3 - High Risk: Service impact expected or highly likely. Affects SPOF or critical system without redundancy.
-Level 2 - Medium Risk: Service impact possible but not expected. Affects redundant component.
-Level 1 - Low Risk: No service impact possible. Single non-critical system.
-
-CET SKILL LEVEL DEFINITIONS
-Level 4 - Chief Engineer: Strategic oversight & final approval for critical operations.
-Level 3 - Lead Technician: Leads complex & high-risk work.
-Level 2 - Technician: Independent standard work.
-Level 1 - Junior Technician: Supervised routine tasks.
-
-SECTION REQUIREMENTS:
-
-Section 01 - MOP Schedule Information
-CRITICAL: Never include model numbers in title - use format: [MANUFACTURER] [EQUIPMENT TYPE] - [FREQUENCY] PREVENTIVE MAINTENANCE
-All dates use MM/DD/YYYY format
-Mark facility-specific fields with red UPDATE NEEDED text
-
-Section 02 - Site Information
-Assess risk level using 5 criteria: System Criticality, Redundancy Status, Scope of Impact, Rollback Feasibility, Downtime Potential
-Map CET level from risk level using decision matrix
-Include brief rationale for both risk and CET level determinations
-
-Section 03 - MOP Overview
-Research manufacturer documentation for exact specifications
-Include equipment discipline in qualifications (HVAC/Electrical/Fire Safety)
-Research specific tools and materials required
-Mark serial numbers and asset tags for field completion
-
-Section 04 - Effect of MOP on Critical Facility
-18 system impact assessment with Yes/No/N/A checkboxes
-Monitoring System ALWAYS affected for data center equipment
-Include specific impact details where applicable
-
-Section 05 - MOP Supporting Documentation
-List actual manufacturer manuals with model-specific titles
-Include all applicable OSHA, NFPA, ASHRAE standards
-List Safety Data Sheets for ALL chemicals used
-
-Section 06 - Safety Requirements
-MANDATORY: Research actual SDS for all chemicals
-Four separate tables: Key Hazards, Required PPE, Safety Procedures, Emergency Contacts
-Include chemical-specific hazards from SDS Section 2
-PPE requirements from SDS Section 8
-Combine equipment and chemical safety requirements
-
-Section 07 - MOP Risks & Assumptions
-Equipment-specific risk assessment
-Chemical hazards from SDS research
-Realistic data center operational assumptions
-Specific mitigation strategies
-
-Section 08 - MOP Details
-20-30+ detailed steps minimum
-Include safety-critical steps clearly marked
-Chemical handling procedures from SDS
-Manufacturer-specific procedures
-Verification steps with acceptance criteria
-Step numbering: Major sections (1.0, 2.0) with substeps (1.1, 1.2)
-
-Section 09 - Back-out Procedures
-Equipment-specific emergency procedures
-Minimum 6 detailed steps
-NO generic text - research actual backout procedures
-Include chemical safety and system restoration
-
-Section 10 - MOP Approval
-5 approval stages table format
-Leave all fields blank for completion
-
-Section 11 - MOP Comments
-Relevant equipment-specific comments only
-No fabricated content`;
+`;
 
 const HTML_GENERATION_PROMPT = `
 GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
@@ -349,8 +273,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td class="checkbox">[✓ or blank]</td>
             <td>[Impact details if Yes]</td>
         </tr>
-        <!-- Include all 18 systems -->
-    </tbody>
+        </tbody>
 </table>
 
 <div class="section-separator"></div>
@@ -385,8 +308,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td>[Chemical names and hazards from SDS]</td>
             <td>[PPE and handling requirements]</td>
         </tr>
-        <!-- Include all hazard types -->
-    </tbody>
+        </tbody>
 </table>
 
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
@@ -404,8 +326,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td>Safety glasses with side shields, ANSI Z87.1</td>
             <td>At all times during maintenance work</td>
         </tr>
-        <!-- Include all PPE requirements -->
-    </tbody>
+        </tbody>
 </table>
 
 <h3>SAFETY PROCEDURES</h3>
@@ -421,8 +342,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td><strong>Pre-Work Safety Briefing</strong></td>
             <td>Conduct safety briefing with all personnel, review hazards</td>
         </tr>
-        <!-- Include all safety procedures -->
-    </tbody>
+        </tbody>
 </table>
 
 <h3>EMERGENCY CONTACTS</h3>
@@ -519,8 +439,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td></td>
             <td></td>
         </tr>
-        <!-- Include 20-30+ detailed steps -->
-    </tbody>
+        </tbody>
 </table>
 
 <div class="section-separator"></div>
@@ -542,8 +461,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td></td>
             <td></td>
         </tr>
-        <!-- Include 6+ backout steps -->
-    </tbody>
+        </tbody>
 </table>
 
 <div class="section-separator"></div>
@@ -622,10 +540,10 @@ export async function POST(request) {
 
     // Determine frequency from description
     const frequency = description.toLowerCase().includes('annual') ? 'ANNUAL' : 
-                     description.toLowerCase().includes('quarterly') ? 'QUARTERLY' : 
-                     description.toLowerCase().includes('monthly') ? 'MONTHLY' : 
-                     description.toLowerCase().includes('weekly') ? 'WEEKLY' :
-                     description.toLowerCase().includes('semi-annual') ? 'SEMI-ANNUAL' : 'PREVENTIVE';
+                      description.toLowerCase().includes('quarterly') ? 'QUARTERLY' : 
+                      description.toLowerCase().includes('monthly') ? 'MONTHLY' : 
+                      description.toLowerCase().includes('weekly') ? 'WEEKLY' :
+                      description.toLowerCase().includes('semi-annual') ? 'SEMI-ANNUAL' : 'PREVENTIVE';
 
     // Create comprehensive prompt
     const prompt = `${PROJECT_INSTRUCTIONS}
