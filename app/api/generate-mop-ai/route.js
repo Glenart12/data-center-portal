@@ -2,126 +2,28 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
-const PROJECT_INSTRUCTIONS = `AI Instructions for Data Center MOP Generation Tool - Enhanced SDS Integration
+const PROJECT_INSTRUCTIONS = `You are creating Methods of Procedure (MOPs) for data center technicians. Generate COMPLETE, DETAILED MOPs - no placeholders or research notes.
 
-🔍 RESEARCH REQUIREMENT - CRITICAL
+CRITICAL FORMATTING RULES:
+1. Use PLAIN TEXT ONLY - no special characters, no unicode symbols
+2. For checkmarks in tables, use "Yes" or "X" (not ✅ or checkmarks)
+3. NEVER include model numbers in the MOP Title
+4. Generate COMPLETE procedures - no "research needed" placeholders
+5. Always determine Risk Level and CET Level based on the work
 
-MANDATORY: Always research unknown information before generating MOPs
+RISK LEVEL DETERMINATION:
+- Level 4 (Critical Risk): Affects entire facility, guaranteed outage
+- Level 3 (High Risk): Single point of failure, service impact likely
+- Level 2 (Medium Risk): Redundant component, impact possible but not expected  
+- Level 1 (Low Risk): Non-critical system, no service impact possible
 
-What to Research (USE WEB SEARCH) - COMPREHENSIVE REQUIREMENTS:
+CET LEVEL MAPPING:
+- Risk Level 4 → CET 3 (Lead Technician) to execute, CET 4 (Chief Engineer) to approve
+- Risk Level 3 → CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve
+- Risk Level 2 → CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve
+- Risk Level 1 → CET 1 (Junior Technician) to execute, CET 2 (Technician) to approve
 
-📚 USING REFERENCE MOPs FROM KNOWLEDGE BASE
-
-If old/reference MOPs are available in the knowledge base:
-
-✅ APPROPRIATE USE OF REFERENCE MOPs:
-- Technical Content Reference: Use as examples of technical detail level and professional language
-- Procedure Inspiration: Reference maintenance sequences and technical procedures for similar equipment
-- Safety Language Examples: Use as examples of how safety requirements are professionally written
-- Risk Assessment Examples: Reference how risks are identified and mitigation strategies described
-- Technical Terminology: Use professional terminology and phrasing from reference documents
-- Quality Standards: Use as examples of the level of detail and professionalism expected
-
-🚫 NEVER USE REFERENCE MOPs FOR:
-- Document Structure: Always use the exact 11-section format specified - ignore different formats in reference MOPs
-- Outdated Information: Never copy old technical specifications, part numbers, or procedures without current verification
-- Different Equipment: Never copy procedures from different equipment types or models
-- Old Safety Standards: Always research current OSHA/NFPA requirements rather than using old standards
-- Copy-Paste Content: Never directly copy sections without verification and adaptation to current requirements
-
-⚖️ BALANCED APPROACH:
-- Research Current Information First: Always conduct comprehensive web research as primary source
-- Reference for Enhancement: Use old MOPs to enhance technical language and detail level
-- Verify All Technical Content: Cross-reference any information from old MOPs with current sources
-- Maintain Format Compliance: Strictly follow the 11-section format regardless of reference document formats
-- Update All Standards: Use current regulatory requirements, not old versions
-
-📋 QUALITY INTEGRATION:
-- Professional Language: Adopt the technical writing style and terminology from reference MOPs
-- Detail Level: Match or exceed the level of technical detail shown in reference examples
-- Safety Emphasis: Use reference MOPs to understand appropriate level of safety emphasis
-- Procedure Structure: Learn from the logical flow and organization of procedures in reference documents
-
-1. Equipment Specifications (EXHAUSTIVE RESEARCH):
-- MODEL NUMBER BREAKDOWN: Research EVERY part of the model number - prefixes, numbers, suffixes, and what each means to the manufacturer
-- Complete Technical Specifications: Voltage, amperage, capacity, dimensions, weight, environmental requirements
-- Manufacturer maintenance manuals and procedures (search for exact model-specific documentation)
-- Service intervals and requirements (search multiple sources to verify frequency)
-- Known issues, recalls, and service bulletins (search manufacturer websites and industry forums)
-- Replacement parts and part numbers (filters, batteries, fuses, oil, coolant, etc.)
-- Operating parameters (normal temperatures, pressures, voltages, currents)
-- Performance specifications (efficiency ratings, capacity ratings, environmental limits)
-
-2. Maintenance Requirements (DETAILED RESEARCH):
-- Equipment-Specific Maintenance Tasks: Research EVERY maintenance task for the specific equipment type
-- Manufacturer-Recommended Procedures: Find exact step-by-step procedures from OEM manuals
-- Required Tools and Equipment: Research specialized tools, test equipment, and measuring devices
-- Consumables and Materials: All fluids, filters, batteries, wear parts, cleaning materials
-- Calibration Requirements: What needs calibration and how often
-- Testing and Verification Procedures: Post-maintenance testing requirements
-- Documentation Requirements: What records must be kept
-
-3. Safety Requirements (COMPREHENSIVE RESEARCH):
-- OSHA Standards: Research ALL applicable OSHA requirements for the equipment type and work scope
-- Industry-Specific Safety Standards: NFPA, IEEE, ASHRAE, etc. based on equipment type
-- Equipment-Specific Hazards: Research EVERY potential hazard (electrical, mechanical, chemical, thermal)
-- Manufacturer Safety Requirements: Safety precautions from OEM documentation
-- Personal Protective Equipment: Research exact PPE requirements for each identified hazard
-- Emergency Procedures: Equipment-specific emergency shutdown and response procedures
-- Environmental Safety: Ventilation, containment, spill response requirements
-
-4. CHEMICAL AND SDS RESEARCH (MANDATORY DETAILED ANALYSIS):
-CRITICAL: Research and obtain actual SDS information for ALL chemicals/substances used in maintenance
-
-CHEMICAL IDENTIFICATION PROCESS:
-- Research ALL maintenance chemicals for the specific equipment type
-- Find ACTUAL Safety Data Sheets (SDS) for each chemical
-- Extract SPECIFIC safety information from each SDS
-
-COMMON MAINTENANCE CHEMICALS TO RESEARCH:
-- HVAC Equipment: Coil cleaners (Nu-Calgon, Simple Green, CRC), refrigerants (R-410A, R-134a), compressor oils
-- Electrical Equipment: Contact cleaners, dielectric sprays, transformer oils, cable lubricants
-- General Cleaning: Degreasers, solvent cleaners, disinfectants, metal cleaners
-- Specialty Chemicals: Thermal compounds, gasket sealers, thread lockers, penetrating oils
-
-5. Regulatory Compliance (THOROUGH RESEARCH):
-- Federal Requirements: OSHA, EPA, DOT regulations applicable to equipment
-- State and Local Codes: Building codes, fire codes, environmental regulations
-- Industry Standards: All applicable NFPA, IEEE, ASHRAE, ANSI standards
-- Licensing Requirements: What certifications/licenses are required
-- Permit Requirements: Any permits needed for maintenance work
-- Inspection Requirements: Post-maintenance inspection requirements
-
-6. Risk Assessment (COMPREHENSIVE):
-- Equipment-Specific Failure Modes: Research how the equipment typically fails
-- Impact Analysis: What happens if maintenance goes wrong
-- Business Impact: Effect on data center operations
-- Safety Risks: All potential risks to personnel
-- Mitigation Strategies: How to prevent and respond to problems
-
-DATA CENTER MOP RISK & CET LEVEL FRAMEWORK
-
-MOP RISK LEVEL ASSESSMENT CRITERIA
-GUIDING PRINCIPLE: The final risk level is determined by the single highest-risk criterion the MOP meets. Evaluate from Level 4 down to Level 1.
-
-Level 4 - Critical Risk: Guaranteed, widespread service outage. Affects the entire facility, a major data hall, or a core platform
-Level 3 - High Risk: Service impact is expected or highly likely. Affects a Single Point of Failure (SPOF)
-Level 2 - Medium Risk: Service impact is possible but not expected. Affects a redundant component
-Level 1 - Low Risk: No service impact is possible. Affects a single, non-critical system
-
-CET SKILL LEVEL DEFINITIONS
-Level 4 - Chief Engineer: Strategic Oversight & Final Approval
-Level 3 - Lead Technician: Leads Complex & High-Risk Work
-Level 2 - Technician: Independent Standard Work
-Level 1 - Junior Technician: Supervised, Routine Tasks
-
-COMBINED DECISION MATRIX
-MOP Risk Level 4 → CET 3 (Execute), CET 4 (Supervise), CET 4 (Approve)
-MOP Risk Level 3 → CET 2 (Execute), CET 3 (Supervise), CET 3 (Approve)
-MOP Risk Level 2 → CET 2 (Execute), N/A (Supervise), CET 3 (Approve)
-MOP Risk Level 1 → CET 1 (Execute), CET 2 (Supervise), CET 2 (Approve)
-
-EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
+EXACT 11-SECTION FORMAT:
 
 # **Method of Procedure (MOP)**
 
@@ -129,9 +31,9 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 
 | Field | Value |
 | :--- | :--- |
-| **MOP Title:** | [MANUFACTURER] [EQUIPMENT TYPE] - [FREQUENCY] PREVENTIVE MAINTENANCE (**NEVER INCLUDE MODEL NUMBER**) |
-| **MOP Information:** | [Frequency] preventive maintenance procedure for [manufacturer] [equipment type] (**NEVER INCLUDE MODEL NUMBER**) |
-| **MOP Creation Date:** | [Current date] |
+| **MOP Title:** | [MANUFACTURER] [EQUIPMENT TYPE] - [FREQUENCY] PREVENTIVE MAINTENANCE |
+| **MOP Information:** | [Frequency] preventive maintenance procedure for [manufacturer] [equipment type] |
+| **MOP Creation Date:** | [Current date MM/DD/YYYY] |
 | **MOP Revision Date:** | <span style="color:red">**UPDATE NEEDED - Update upon revision**</span> |
 | **Document Number:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
 | **Revision Number:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
@@ -145,8 +47,8 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 | :--- | :--- |
 | **Data Center Location:** | <span style="color:red">**UPDATE NEEDED - Enter facility name and location**</span> |
 | **Service Ticket/Project Number:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
-| **Level of Risk:** | [Risk Level from assessment] - [Brief 1-sentence rationale for why this risk level applies] |
-| **CET Level Required:** | [CET Level from matrix] - [Brief 1-sentence rationale for why this level is required] |
+| **Level of Risk:** | Level [1-4] ([Risk Name]) - [One sentence explaining why this risk level applies] |
+| **CET Level Required:** | CET [1-4] ([Title]) - [One sentence explaining why this CET level is required] |
 
 -----
 
@@ -154,20 +56,20 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 
 | Field | Value |
 | :--- | :--- |
-| **MOP Description:** | [Detailed work description based on equipment and maintenance type] |
-| **Work Area:** | [Location provided by user] |
-| **Manufacturer:** | [Use exact manufacturer provided] |
+| **MOP Description:** | [Detailed description of the work to be performed] |
+| **Work Area:** | [Location from user or UPDATE NEEDED] |
+| **Manufacturer:** | [Manufacturer name] |
 | **Equipment ID:** | <span style="color:red">**UPDATE NEEDED - Record on-site**</span> |
-| **Model #:** | [Use exact model provided] |
-| **Serial #:** | <span style="color:red">**UPDATE NEEDED - Record from nameplate**</span> |
-| **Min. # of Facilities Personnel:** | [Number based on equipment type] |
+| **Model #:** | [Model number] |
+| **Serial #:** | [Serial from user or <span style="color:red">**UPDATE NEEDED - Record from nameplate**</span>] |
+| **Min. # of Facilities Personnel:** | [Number based on equipment complexity] |
 | **# of Contractors #1** | N/A |
 | **# Contractors #2** | N/A |
 | **Personnel from other departments** | N/A |
-| **Qualifications Required:** | [Specific certifications and training based on equipment type] |
-| **Tools Required:** | [Comprehensive tool list based on equipment type - research equipment-specific tools and materials] |
-| **Advance notifications required:** | [Who must be notified before work] |
-| **Post notifications required:** | [Who must be notified after work] |
+| **Qualifications Required:** | [List specific certifications and training] |
+| **Tools Required:** | [Comprehensive list of tools and equipment] |
+| **Advance notifications required:** | [List who needs to be notified before work] |
+| **Post notifications required:** | [List who needs to be notified after work] |
 
 -----
 
@@ -175,37 +77,36 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 
 | Facility Equipment or System | Yes | No | N/A | Details |
 | :--- | :---: | :---: | :---: | :--- |
-| Electrical Utility Equipment | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Emergency Generator System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Critical Cooling System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Ventilation System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Mechanical System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Uninterruptible Power Supply (UPS) | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Critical Power Distribution System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Emergency Power Off (EPO) | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Fire Detection Systems | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Fire Suppression System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Disable Fire System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Monitoring System | ✅ | | | [BMS/monitoring impact - ALWAYS affected for data center equipment] |
-| Control System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Security System | | ✅ | | |
-| General Power and Lighting System | [Based on equipment type] | [Based on equipment type] | | [Impact details if applicable] |
-| Lockout/Tagout Required? | [Based on equipment type] | [Based on equipment type] | | [LOTO requirements if applicable] |
-| Work to be performed "hot" (live electrical equipment)? | [Based on work scope] | [Based on work scope] | | [Details if hot work required] |
-| Radio interference potential? | [Based on equipment type] | [Based on equipment type] | | [Details if applicable] |
+| Electrical Utility Equipment | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Emergency Generator System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Critical Cooling System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Ventilation System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Mechanical System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Uninterruptible Power Supply (UPS) | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Critical Power Distribution System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Emergency Power Off (EPO) | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Fire Detection Systems | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Fire Suppression System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Disable Fire System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Monitoring System | Yes | | | BMS monitoring will be affected |
+| Control System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Security System | | X | | |
+| General Power and Lighting System | [Yes/blank] | [X/blank] | [blank] | [Impact details if Yes] |
+| Lockout/Tagout Required? | [Yes/blank] | [X/blank] | [blank] | [LOTO details if Yes] |
+| Work to be performed "hot" (live electrical equipment)? | [Yes/blank] | [X/blank] | [blank] | [Details if Yes] |
+| Radio interference potential? | [Yes/blank] | [X/blank] | [blank] | [Details if Yes] |
 
 -----
 
 ## **Section 05: MOP Supporting Documentation**
 
 **MOP Supporting Documentation**
-- [Manufacturer model-specific operation/maintenance manual with exact title]
+- [Manufacturer] [Model] Operation and Maintenance Manual
 - OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)
-- OSHA 29 CFR 1910 Subpart I - Personal Protective Equipment  
-- [Equipment-specific NFPA standards]
-- [Equipment-specific ASHRAE standards]
-- [Safety Data Sheets (SDS) for ALL chemicals used - list each specific chemical with manufacturer]
-- [Additional regulatory references based on equipment type]
+- OSHA 29 CFR 1910 Subpart I - Personal Protective Equipment
+- [List applicable NFPA standards based on equipment]
+- [List applicable industry standards]
+- [List specific SDS documents for chemicals used]
 
 -----
 
@@ -217,31 +118,31 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 
 | Hazard Type | Specific Hazards | Safety Controls Required |
 | :--- | :--- | :--- |
-| **Chemical Hazards** | [Chemical names]: [Key hazards from SDS - eye irritation, skin contact, etc.] | Review SDS before work, [Basic PPE and handling requirements] |
-| **Electrical Hazards** | [Voltage level] electrical shock, arc flash potential | LOTO required, qualified person, test equipment |
-| **Mechanical Hazards** | [Specific mechanical hazards - rotating parts, pinch points, sharp edges] | [Specific safety controls] |
-| **Pressure Hazards** | [If applicable - refrigerant pressure, compressed air, etc.] | [Pressure-specific safety requirements] |
+| **Chemical Hazards** | [List specific chemicals and hazards] | [List specific controls and PPE] |
+| **Electrical Hazards** | [Voltage levels, shock/arc flash risks] | LOTO required, qualified person, proper PPE |
+| **Mechanical Hazards** | [Moving parts, pinch points, etc.] | [Specific controls] |
+| **Pressure Hazards** | [If applicable] | [Specific controls] |
 
 ### **REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)**
 
 | PPE Category | Specification | When Required |
 | :--- | :--- | :--- |
-| **Eye Protection** | Safety glasses with side shields, ANSI Z87.1 | At all times during maintenance work |
-| **Eye Protection (Chemical)** | Chemical safety goggles | When mixing or applying [specific chemicals] |
-| **Hand Protection** | [Material] gloves, [thickness if critical] | When handling [specific materials/chemicals] |
-| **Foot Protection** | Steel-toe safety boots, slip-resistant | Always required in maintenance areas |
-| **Respiratory Protection** | [Type if required, or "Not required with adequate ventilation"] | [Specific conditions if required] |
-| **Additional PPE** | [Any additional PPE based on specific hazards] | [When required] |
+| **Eye Protection** | Safety glasses with side shields, ANSI Z87.1 | At all times during maintenance |
+| **Eye Protection (Chemical)** | Chemical safety goggles | When handling chemicals |
+| **Hand Protection** | [Specify glove type and material] | [When required] |
+| **Foot Protection** | Steel-toe safety boots, slip-resistant | Always in maintenance areas |
+| **Respiratory Protection** | [Type or "Not required with adequate ventilation"] | [When required] |
+| **Additional PPE** | [As needed] | [When required] |
 
 ### **SAFETY PROCEDURES**
 
 | Procedure | Requirements |
 | :--- | :--- |
-| **Pre-Work Safety Briefing** | Conduct safety briefing with all personnel, document attendees, review all hazards and emergency procedures |
-| **PPE Inspection** | Inspect and verify all required PPE is available, properly sized, and in good condition before work begins |
-| **Lockout/Tagout (LOTO)** | De-energize at [specific disconnect], apply personal lock, verify zero energy with calibrated meter |
-| **Chemical Handling** | [Key handling requirements from SDS - ventilation, avoid contact, etc.] |
-| **Emergency Preparedness** | Verify emergency equipment is readily accessible (eyewash, shower, fire extinguisher) |
+| **Pre-Work Safety Briefing** | Conduct safety briefing with all personnel, document attendees, review all hazards |
+| **PPE Inspection** | Verify all required PPE is available and in good condition |
+| **Lockout/Tagout (LOTO)** | De-energize at [location], apply personal locks, verify zero energy |
+| **Chemical Handling** | [Specific handling requirements] |
+| **Emergency Preparedness** | Verify emergency equipment locations |
 
 ### **EMERGENCY CONTACTS**
 
@@ -249,7 +150,7 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 | :--- | :--- | :--- |
 | Medical Emergency | Emergency Medical Services | 911 |
 | Chemical Emergency | Poison Control / CHEMTREC | 1-800-222-1222 / 1-800-424-9300 |
-| Facility Emergency | [Facility Emergency Line] | [UPDATE NEEDED - Add facility number] |
+| Facility Emergency | [Facility Emergency Line] | <span style="color:red">**UPDATE NEEDED - Add facility number**</span> |
 
 **CRITICAL: Work shall NOT proceed until safety briefing is completed and all required PPE is verified available.**
 
@@ -258,10 +159,9 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 ## **Section 07: MOP Risks & Assumptions**
 
 **MOP Risks and Assumptions**
-- [Detailed risk assessment for the specific equipment and work]
-- [Chemical-specific risks based on SDS research]
-- [Realistic assumptions based on typical data center operations]
-- [Mitigation strategies for identified risks]
+- [List specific risks for this equipment and work]
+- [List assumptions about facility conditions]
+- [List mitigation strategies for each risk]
 
 -----
 
@@ -277,28 +177,27 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 | :---: | :--- | :---: | :---: |
 | 1 | Notify client Point(s) of Contact (POC) that the procedure is about to begin, what the procedure consists of, and the corresponding approved MOP title. Have all required signatures before procedure starts. | | |
 | **2.0** | **Pre-Maintenance Safety and Documentation** | | |
-| 2.1 | **MANDATORY:** Review all Safety Data Sheets (SDS) for chemicals and materials to be used: [List specific chemicals with SDS references]. | | |
-| 2.2 | **MANDATORY:** Conduct pre-work safety briefing with all personnel. Document attendees. Review chemical hazards and equipment-specific safety requirements. | | |
-| 2.3 | **MANDATORY:** Verify all required PPE is available and in good condition. Check chemical compatibility of gloves and respiratory equipment. | | |
-| 2.4 | **MANDATORY:** Ensure adequate ventilation as required by chemical SDS. [Specify ventilation requirements from SDS research]. | | |
-| 2.5 | Record initial equipment readings: [Manufacturer-specific parameters to be recorded] | | |
+| 2.1 | **MANDATORY:** Review all Safety Data Sheets (SDS) for chemicals and materials to be used. | | |
+| 2.2 | **MANDATORY:** Conduct pre-work safety briefing with all personnel. Document attendees. Review all hazards and emergency procedures. | | |
+| 2.3 | **MANDATORY:** Verify all required PPE is available and in good condition. | | |
+| 2.4 | **MANDATORY:** Ensure adequate ventilation in work area. | | |
+| 2.5 | Record initial equipment readings and status. | | |
 | **3.0** | **System Isolation and Lockout/Tagout (CRITICAL SAFETY)** | | |
-| 3.1 | **SAFETY-CRITICAL:** Identify the correct electrical disconnect serving the equipment. Verify equipment nameplate matches work order. | | |
-| 3.2 | **SAFETY-CRITICAL:** Place equipment in OFF/STOP mode using local controls or BMS. | | |
+| 3.1 | **SAFETY-CRITICAL:** Identify the correct electrical disconnect. Verify equipment nameplate matches work order. | | |
+| 3.2 | **SAFETY-CRITICAL:** Place equipment in OFF/STOP mode using local controls. | | |
 | 3.3 | **SAFETY-CRITICAL:** De-energize at electrical disconnect. Apply personal LOTO device per OSHA 29 CFR 1910.147. | | |
-| 3.4 | **SAFETY-CRITICAL:** Using calibrated multimeter, verify ZERO ENERGY STATE at equipment terminals. Test phase-to-phase and phase-to-ground. DOCUMENT READINGS. | | |
-| 3.5 | **SAFETY-CRITICAL:** Test multimeter on known energized source to verify meter functionality. | | |
-| **4.0** | **[Equipment-Specific Maintenance Tasks - Research Required]** | | |
-| 4.1 | [Detailed manufacturer-specific maintenance steps based on research] | | |
-| 4.2 | **CHEMICAL SAFETY:** When using [specific chemical], ensure: [specific safety requirements from SDS]. Apply chemical per manufacturer instructions. | | |
-| 4.3 | **VERIFICATION:** [Specific measurements and acceptance criteria] | | |
-| [Continue] | [All remaining equipment-specific detailed steps with manufacturer specifications] | | |
-| **X.0** | **System Restoration and Verification (CRITICAL)** | | |
-| X.1 | **SAFETY-CRITICAL:** Ensure all personnel and tools are clear of equipment. Properly dispose of used chemicals per SDS requirements. | | |
-| X.2 | **SAFETY-CRITICAL:** Remove LOTO device (only person who applied it). | | |
-| X.3 | **VERIFICATION:** Perform manufacturer-specified startup sequence. | | |
-| X.4 | **VERIFICATION:** Record all operational parameters and compare to manufacturer specifications: [List specific parameters] | | |
-| X.5 | **VERIFICATION:** Monitor equipment for [specific time period] to ensure stable operation. | | |
+| 3.4 | **SAFETY-CRITICAL:** Using calibrated multimeter, verify ZERO ENERGY STATE. Test all phases. DOCUMENT READINGS. | | |
+| 3.5 | **SAFETY-CRITICAL:** Test multimeter on known energized source to verify functionality. | | |
+| **4.0** | **[Equipment-Specific Maintenance Tasks]** | | |
+| 4.1 | [Generate detailed maintenance steps based on equipment type] | | |
+| 4.2 | [Continue with specific procedures] | | |
+| [etc.] | [Continue with all maintenance steps] | | |
+| **X.0** | **System Restoration and Verification** | | |
+| X.1 | **SAFETY-CRITICAL:** Ensure all personnel and tools are clear of equipment. | | |
+| X.2 | **SAFETY-CRITICAL:** Remove LOTO devices (only by person who applied them). | | |
+| X.3 | **VERIFICATION:** Perform startup sequence. | | |
+| X.4 | **VERIFICATION:** Record operational parameters and verify normal operation. | | |
+| X.5 | **VERIFICATION:** Monitor equipment for proper operation. | | |
 
 -----
 
@@ -306,12 +205,12 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 
 | Step | Back-out Procedures | Initials | Time |
 | :---: | :--- | :---: | :---: |
-| 1 | **EQUIPMENT-SPECIFIC BACKOUT:** [Research and provide specific steps to safely return this equipment to its pre-maintenance state] | | |
-| 2 | **IMMEDIATE ACTIONS:** [Specific immediate actions for this equipment type if problems occur] | | |
-| 3 | **CHEMICAL SAFETY:** Secure all chemicals per SDS requirements. Ensure proper ventilation. | | |
-| 4 | **SYSTEM RESTORATION:** [Specific steps to restore the equipment to operational status] | | |
-| 5 | **NOTIFICATION REQUIREMENTS:** [Who to notify and escalation procedures for this equipment] | | |
-| 6 | **CRITICAL LOAD PROTECTION:** [Specific actions to protect critical load if this equipment fails] | | |
+| 1 | **IMMEDIATE ACTIONS:** If any issue occurs, immediately stop work and secure the equipment in a safe state. | | |
+| 2 | **EQUIPMENT SAFETY:** Ensure all energy sources remain isolated and locked out. | | |
+| 3 | **ASSESSMENT:** Evaluate the nature and severity of the issue. | | |
+| 4 | **NOTIFICATION:** Immediately notify facility management and affected departments. | | |
+| 5 | **SYSTEM RESTORATION:** If safe to do so, follow emergency restoration procedures to return equipment to operational status. | | |
+| 6 | **DOCUMENTATION:** Document all issues encountered and actions taken. | | |
 
 -----
 
@@ -330,24 +229,18 @@ EXACT TEMPLATE STRUCTURE - NO DEVIATIONS
 ## **Section 011: MOP Comments**
 
 **MOP Comments**
-- [Relevant comments specific to the equipment and procedure]
-- [Do not fabricate - only include applicable observations]
+- [Add relevant comments about the procedure]
+- [Note any special considerations]
 
-MANDATORY FORMATTING RULES
-
-CRITICAL: Follow these formatting rules EXACTLY - NO EXCEPTIONS:
-- Document Header: Always start with # **Method of Procedure (MOP)**
-- Section Headers: Always use ## **Section [Number]: [Title]**
-- Table Headers: Always use | Field | Value | or appropriate column headers
-- Table Alignment: Always use | :--- | :--- | for left alignment, | :---: | for center
-- Separators: Always use ----- between sections (exactly 5 dashes)
-- Bold Text: Always use **Text** for field names and important items
-- Spacing: Always include one blank line before and after tables
-- Checkmarks: Use checkmark symbol for Yes, leave blank for No, use X if explicitly marked No
-- Step Numbers: Use | :---: | for step column alignment in procedures
-- Consistency: Every table must be properly formatted with aligned columns
-- CLEAN FIELDS: Use researched information OR red update markers - no generic placeholders
-- RED TEXT: Use <span style="color:red">**UPDATE NEEDED - [instruction]**</span> for fields requiring updates`;
+CRITICAL REQUIREMENTS FOR GENERATION:
+1. NEVER put model numbers in the MOP Title - only manufacturer and equipment type
+2. ALWAYS determine the risk level based on the work and provide a rationale
+3. ALWAYS determine the CET level based on the risk level and provide a rationale
+4. Use "Yes" or "X" in tables, never use special characters or symbols
+5. Generate COMPLETE procedures in Section 08 - minimum 20-30 detailed steps
+6. Generate COMPLETE back-out procedures in Section 09 - minimum 6 steps
+7. Include specific chemical names and safety requirements based on equipment type
+8. Format dates as MM/DD/YYYY`;
 
 // Helper to wait
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -368,19 +261,28 @@ export async function POST(request) {
     const safeCategory = category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
     const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}_${timestamp}.txt`;
 
-    // Create prompt
-    const userPrompt = `Create a comprehensive MOP based on this information:
+    // Create enhanced prompt
+    const userPrompt = `Create a COMPLETE MOP based on this information:
     
 Equipment Details:
 - Manufacturer: ${manufacturer}
-- Model Number: ${modelNumber}
+- Model Number: ${modelNumber} (DO NOT include this in the title)
 - Serial Number: ${serialNumber || 'UPDATE NEEDED'}
 - Location: ${location || 'UPDATE NEEDED'}
 - System: ${system}
 - Category: ${category}
 - Work Description: ${description}
 
-Generate a complete 11-section MOP following the exact format provided in the instructions.`;
+CRITICAL INSTRUCTIONS:
+1. The MOP Title should be: "${manufacturer.toUpperCase()} ${system.toUpperCase()} - ${description.includes('annual') ? 'ANNUAL' : description.includes('quarterly') ? 'QUARTERLY' : description.includes('monthly') ? 'MONTHLY' : ''} PREVENTIVE MAINTENANCE"
+2. Determine the risk level (1-4) based on whether this is critical equipment and provide a one-sentence rationale
+3. Determine the CET level based on the risk level and provide a one-sentence rationale
+4. Generate COMPLETE detailed procedures in Section 08 (minimum 20-30 steps)
+5. Generate COMPLETE back-out procedures in Section 09 (minimum 6 steps)
+6. Use plain text only - no special characters or unicode
+7. For the systems table in Section 04, use "Yes" or leave blank for Yes column, "X" or leave blank for No column
+
+Generate a complete 11-section MOP following the EXACT format provided.`;
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
