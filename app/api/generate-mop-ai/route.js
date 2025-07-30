@@ -101,6 +101,19 @@ USE RED "UPDATE NEEDED" MARKERS FOR:
 
 Remember: You're creating professional technical documentation for critical infrastructure work. Be precise, thorough, and safety-focused.`;
 
+// Helper function to retry operations
+async function retryOperation(operation, maxRetries = 3, delay = 1000) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      console.log(`Attempt ${i + 1} failed:`, error.message);
+      if (i === maxRetries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+
 export async function POST(request) {
   console.log('MOP Generation API called');
   
@@ -110,6 +123,15 @@ export async function POST(request) {
       console.error('GEMINI_API_KEY is not set');
       return NextResponse.json({ 
         error: 'API configuration error: Missing Gemini API key',
+        details: 'Please check your environment variables'
+      }, { status: 500 });
+    }
+
+    // Check if Blob token exists
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error('BLOB_READ_WRITE_TOKEN is not set');
+      return NextResponse.json({ 
+        error: 'API configuration error: Missing Blob storage token',
         details: 'Please check your environment variables'
       }, { status: 500 });
     }
@@ -143,12 +165,13 @@ export async function POST(request) {
     const { manufacturer, modelNumber, serialNumber, location, system, category, description } = formData;
     console.log('Generating MOP for:', { manufacturer, modelNumber, system, category });
     
-    // Generate filename
+    // Generate filename with timestamp to ensure uniqueness
     const date = new Date().toISOString().split('T')[0];
+    const timestamp = Date.now();
     const safeManufacturer = manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
     const safeSystem = system.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
     const safeCategory = category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}.txt`;
+    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}_${timestamp}.txt`;
     console.log('Generated filename:', filename);
 
     // Create the prompt
@@ -179,7 +202,7 @@ ${supportingDocs.map(doc => `- ${doc.name}`).join('\n')}
 
 Generate a complete 11-section MOP following the exact format provided in the instructions.`;
 
-    // Initialize Gemini
+    // Initialize Gemini with retry
     let genAI;
     try {
       genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -192,39 +215,47 @@ Generate a complete 11-section MOP following the exact format provided in the in
       }, { status: 500 });
     }
 
-    // Generate content
+    // Generate content with retry mechanism
     let mopContent;
     try {
-      const model = genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 8000,
+      const generateContent = async () => {
+        const model = genAI.getGenerativeModel({ 
+          model: 'gemini-1.5-flash',
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8000,
+          }
+        });
+        
+        console.log('Generating content with Gemini...');
+        const fullPrompt = `${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`;
+        const result = await model.generateContent(fullPrompt);
+        
+        if (!result.response) {
+          throw new Error('No response from Gemini');
         }
-      });
+        
+        const content = result.response.text();
+        console.log('Content generated successfully, length:', content.length);
+        
+        if (!content || content.length < 100) {
+          throw new Error('Generated content is too short or empty');
+        }
+        
+        return content;
+      };
+
+      // Use retry mechanism for content generation
+      mopContent = await retryOperation(generateContent, 3, 2000);
       
-      console.log('Generating content with Gemini...');
-      const fullPrompt = `${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`;
-      const result = await model.generateContent(fullPrompt);
-      
-      if (!result.response) {
-        throw new Error('No response from Gemini');
-      }
-      
-      mopContent = result.response.text();
-      console.log('Content generated successfully, length:', mopContent.length);
-      
-      if (!mopContent || mopContent.length < 100) {
-        throw new Error('Generated content is too short or empty');
-      }
     } catch (genError) {
-      console.error('Gemini generation error:', genError);
+      console.error('Gemini generation error after retries:', genError);
       
       // Check for specific error types
-      if (genError.message?.includes('quota')) {
+      if (genError.message?.includes('quota') || genError.message?.includes('429')) {
         return NextResponse.json({ 
           error: 'AI quota exceeded',
-          details: 'The AI service quota has been exceeded. Please try again later or contact support.'
+          details: 'The AI service quota has been exceeded. Please wait a minute and try again.'
         }, { status: 429 });
       }
       
@@ -241,26 +272,45 @@ Generate a complete 11-section MOP following the exact format provided in the in
       }, { status: 500 });
     }
 
-    // Upload to Blob Storage
+    // Add a small delay before blob upload (helps with timing issues)
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Upload to Blob Storage with retry
     let blob;
     try {
-      console.log('Uploading to Blob storage...');
-      blob = await put(`mops/${filename}`, mopContent, {
-        access: 'public',
-        contentType: 'text/plain'
-      });
-      console.log('Successfully uploaded to Blob storage:', blob.url);
-    } catch (blobError) {
-      console.error('Blob storage error:', blobError);
+      const uploadToBlob = async () => {
+        console.log('Uploading to Blob storage...');
+        
+        // Ensure we have a fresh token
+        const token = process.env.BLOB_READ_WRITE_TOKEN;
+        if (!token) {
+          throw new Error('Blob token is missing');
+        }
+        
+        const uploadBlob = await put(filename, mopContent, {
+          access: 'public',
+          contentType: 'text/plain',
+          token: token // Explicitly pass token
+        });
+        
+        console.log('Successfully uploaded to Blob storage:', uploadBlob.url);
+        return uploadBlob;
+      };
+
+      // Use retry mechanism for blob upload
+      blob = await retryOperation(uploadToBlob, 3, 1000);
       
-      // Even if blob storage fails, we generated the content
-      // You could return the content directly as a fallback
+    } catch (blobError) {
+      console.error('Blob storage error after retries:', blobError);
+      
+      // Return the generated content even if blob storage fails
       return NextResponse.json({ 
         error: 'Failed to save MOP to storage',
         details: blobError.message,
         // Include the content so user doesn't lose it
         generatedContent: mopContent,
-        filename: filename
+        filename: filename,
+        suggestion: 'Copy the generated content manually. The file could not be saved automatically.'
       }, { status: 500 });
     }
 

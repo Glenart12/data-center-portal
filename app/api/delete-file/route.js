@@ -18,12 +18,19 @@ export async function DELETE(request) {
 
     console.log(`Attempting to delete: ${filename} from ${type}`);
 
+    // Ensure we have the blob token
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!blobToken) {
+      console.error('BLOB_READ_WRITE_TOKEN is missing');
+      return NextResponse.json({ error: 'Blob storage not configured' }, { status: 500 });
+    }
+
     // Try to delete from Blob storage first
     let blobDeleted = false;
     try {
       // First, check if the file exists in Blob storage
       const { blobs } = await list({
-        token: process.env.BLOB_READ_WRITE_TOKEN
+        token: blobToken
       });
 
       // Find the blob that matches our filename
@@ -34,15 +41,19 @@ export async function DELETE(request) {
       );
 
       if (blobToDelete) {
-        // Delete using the blob's URL
+        // Delete using the blob's URL with explicit token
         await del(blobToDelete.url, {
-          token: process.env.BLOB_READ_WRITE_TOKEN
+          token: blobToken
         });
         blobDeleted = true;
         console.log('Deleted from Blob storage:', blobToDelete.url);
+        
+        // Add a small delay to ensure blob operation completes
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (blobError) {
       console.error('Blob deletion error:', blobError);
+      // Continue to try local deletion even if blob fails
     }
 
     // Try to delete from local file system (for files in public folder)
@@ -56,6 +67,7 @@ export async function DELETE(request) {
       }
     } catch (localError) {
       console.error('Local deletion error:', localError);
+      // This is expected in production, so we don't treat it as a failure
     }
 
     // If file was deleted from either location, consider it a success
