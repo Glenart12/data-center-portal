@@ -4,138 +4,132 @@ import { NextResponse } from 'next/server';
 
 const PROJECT_INSTRUCTIONS = `You are creating Methods of Procedure (MOPs) for data center technicians.
 
-CRITICAL FORMATTING RULES:
-1. Use plain text ONLY - no markdown, no special formatting
-2. Use hyphens/dashes for lists (not *, not •, not ▪)
-3. Use ALL CAPS for section headers (e.g., SECTION 01 - MOP SCHEDULE INFORMATION)
-4. For tables, use simple ASCII formatting with | separators
-5. Use red "UPDATE NEEDED" markers as specified
+Create a simple MOP with these sections:
+SECTION 01 - MOP INFORMATION
+SECTION 02 - EQUIPMENT DETAILS  
+SECTION 03 - SAFETY REQUIREMENTS
+SECTION 04 - PROCEDURE STEPS
+SECTION 05 - COMPLETION
 
-MOP Format (11 sections):
-
-SECTION 01 - MOP SCHEDULE INFORMATION
-- MOP Title: [Work type + Equipment]
-- MOP Information: [Brief description]
-- MOP Author: UPDATE NEEDED
-- MOP Creation Date: [Current date]
-- MOP Revision Date: [Current date]
-- Document Number: UPDATE NEEDED
-- Revision Number: 1.0
-- Author CET Level: UPDATE NEEDED
-
-SECTION 02 - SITE INFORMATION
-- Data Center Location: 
-  Street: UPDATE NEEDED
-  City: UPDATE NEEDED
-  State: UPDATE NEEDED
-  ZIP: UPDATE NEEDED
-- Service Ticket/Project Number: UPDATE NEEDED
-- Level of Risk: [1-4 based on work type]
-- MBM Required?: [Yes/No based on risk]
-
-SECTION 03 - MOP OVERVIEW
-- MOP Description: [Detailed work description]
-- Work Area: [Specific location]
-- Affected Systems: [List all affected systems]
-- Equipment Information: 
-  Manufacturer: [From input]
-  Equipment ID: [From input or UPDATE NEEDED]
-  Model #: [From input]
-  Serial #: [From input or UPDATE NEEDED]
-- Personnel Required: [List required personnel]
-- Min. # of Facilities Personnel: [Number]
-- Qualifications Required: [List qualifications]
-- Tools Required: [List all tools needed]
-- Advance notifications: [List required notifications]
-- Post notifications: [List post-work notifications]
-
-SECTION 04 - EFFECT OF MOP ON CRITICAL FACILITY
-Create a table showing impact on systems (Yes/No/N/A):
-- Electrical Utility Equipment
-- Emergency Generator System
-- Critical Cooling System
-- Ventilation System
-- UPS
-- Critical Power Distribution
-- Fire Detection/Suppression
-- Monitoring Systems
-- Security Systems
-- etc.
-
-SECTION 05 - MOP SUPPORTING DOCUMENTATION
-[List all referenced documents, manuals, specifications]
-
-SECTION 06 - SAFETY REQUIREMENTS
-[Comprehensive safety requirements including PPE, LOTO, Arc Flash, etc.]
-
-SECTION 07 - MOP RISKS & ASSUMPTIONS
-[List all risks and mitigation strategies]
-
-SECTION 08 - MOP DETAILS
-[Step-by-step procedure with verification steps]
-
-SECTION 09 - BACK-OUT PROCEDURES
-[Detailed rollback procedures if issues occur]
-
-SECTION 10 - MOP APPROVAL
-[Approval signature blocks]
-
-SECTION 11 - MOP COMMENTS
-[Space for additional notes]`;
+Use plain text only. Keep it simple.`;
 
 export async function POST(request) {
   try {
+    // Log everything
+    console.log('1. MOP API called');
+    
+    // Check API key
+    const apiKey = process.env.GEMINI_API_KEY;
+    console.log('2. API Key exists:', !!apiKey);
+    console.log('3. API Key length:', apiKey?.length);
+    
+    // Parse body
     const body = await request.json();
+    console.log('4. Body parsed successfully');
+    
     const { formData } = body;
-    const { manufacturer, modelNumber, serialNumber, location, system, category, description } = formData;
+    const { manufacturer, modelNumber, system, category, description } = formData;
+    console.log('5. Form data:', { manufacturer, modelNumber, system, category });
     
-    // Generate filename
-    const date = new Date().toISOString().split('T')[0];
-    const safeManufacturer = manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const safeSystem = system.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const safeCategory = category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}.txt`;
-
-    // Create prompt
-    const userPrompt = `Create a comprehensive MOP based on this information:
+    // Simple filename
+    const filename = `MOP_${Date.now()}.txt`;
+    console.log('6. Filename:', filename);
     
-Equipment Details:
-- Manufacturer: ${manufacturer}
-- Model Number: ${modelNumber}
-- Serial Number: ${serialNumber || 'UPDATE NEEDED'}
-- Location: ${location || 'UPDATE NEEDED'}
-- System: ${system}
-- Category: ${category}
-- Work Description: ${description}
-
-Generate a complete 11-section MOP following the exact format provided in the instructions.`;
-
-    // Initialize and generate
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Try to initialize Gemini
+    let genAI;
+    try {
+      genAI = new GoogleGenerativeAI(apiKey);
+      console.log('7. Gemini initialized');
+    } catch (initError) {
+      console.error('7. ERROR initializing Gemini:', initError);
+      return NextResponse.json({ 
+        error: 'Failed to initialize Gemini',
+        details: initError.toString(),
+        stage: 'initialization'
+      }, { status: 500 });
+    }
     
-    const result = await model.generateContent(`${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`);
-    const response = await result.response;
-    const mopContent = response.text();
-
-    // Save to blob
-    const blob = await put(`mops/${filename}`, mopContent, {
-      access: 'public',
-      contentType: 'text/plain'
-    });
-
-    return NextResponse.json({ 
-      success: true,
-      filename: filename,
-      url: blob.url,
-      message: 'MOP generated successfully'
-    });
-
+    // Try to create model
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      console.log('8. Model created');
+    } catch (modelError) {
+      console.error('8. ERROR creating model:', modelError);
+      return NextResponse.json({ 
+        error: 'Failed to create model',
+        details: modelError.toString(),
+        stage: 'model_creation'
+      }, { status: 500 });
+    }
+    
+    // Simple prompt
+    const prompt = `Create a MOP for ${manufacturer} ${modelNumber} - ${description}`;
+    console.log('9. Prompt created, length:', prompt.length);
+    
+    // Try to generate
+    let mopContent;
+    try {
+      console.log('10. Calling generateContent...');
+      const result = await model.generateContent(prompt);
+      console.log('11. generateContent returned');
+      
+      const response = await result.response;
+      console.log('12. Got response object');
+      
+      mopContent = response.text();
+      console.log('13. Got text, length:', mopContent?.length);
+      
+    } catch (genError) {
+      console.error('Generation ERROR details:', {
+        name: genError.name,
+        message: genError.message,
+        stack: genError.stack,
+        status: genError.status,
+        statusText: genError.statusText,
+        fullError: genError.toString()
+      });
+      
+      return NextResponse.json({ 
+        error: 'Generation failed',
+        details: genError.message || genError.toString(),
+        errorName: genError.name,
+        stage: 'generation',
+        apiKeyPresent: !!apiKey
+      }, { status: 500 });
+    }
+    
+    // Try to save
+    try {
+      console.log('14. Saving to blob...');
+      const blob = await put(`mops/${filename}`, mopContent || 'Test content', {
+        access: 'public',
+        contentType: 'text/plain'
+      });
+      console.log('15. Saved successfully:', blob.url);
+      
+      return NextResponse.json({ 
+        success: true,
+        filename: filename,
+        url: blob.url
+      });
+      
+    } catch (blobError) {
+      console.error('Blob ERROR:', blobError);
+      return NextResponse.json({ 
+        error: 'Save failed',
+        details: blobError.message,
+        stage: 'blob_storage',
+        contentGenerated: !!mopContent
+      }, { status: 500 });
+    }
+    
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Outer catch ERROR:', error);
     return NextResponse.json({ 
-      error: 'Failed to generate MOP',
-      details: error.message 
+      error: 'Unexpected error',
+      details: error.message || error.toString(),
+      stage: 'outer_catch'
     }, { status: 500 });
   }
 }
