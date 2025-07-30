@@ -58,8 +58,15 @@ function MopPage() {
 
   const handlePDFClick = (filename) => {
     const fileData = filesData[filename];
+    const originalUrl = fileData?.url || `/mops/${filename}`;
+    
+    // For HTML files from blob storage, use the serve-html API
+    const url = fileData?.source === 'blob' && filename.endsWith('.html') 
+      ? `/api/serve-html?url=${encodeURIComponent(originalUrl)}`
+      : originalUrl;
+    
     setSelectedPDF({
-      url: fileData?.url || `/mops/${filename}`, // Use Blob URL if available, fallback to local
+      url: url,
       name: filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
     });
     setIsModalOpen(true);

@@ -1,6 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
+  const [htmlContent, setHtmlContent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   if (!isOpen) return null;
 
   // Determine file type
@@ -18,6 +23,23 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
 
   // Get display name without extension
   const displayName = pdfName?.replace(/\.(pdf|html|htm|txt)$/i, '') || 'Document Preview';
+
+  // Fetch HTML content when modal opens for HTML files
+  useEffect(() => {
+    if (isOpen && isHtml && pdfUrl) {
+      setIsLoading(true);
+      fetch(pdfUrl)
+        .then(response => response.text())
+        .then(html => {
+          setHtmlContent(html);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching HTML:', error);
+          setIsLoading(false);
+        });
+    }
+  }, [isOpen, isHtml, pdfUrl]);
 
   return (
     <div style={{
@@ -126,19 +148,53 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
           backgroundColor: '#fafafa'
         }}>
           {pdfUrl ? (
-            <iframe
-              src={pdfUrl}
-              style={{
-                width: '100%',
-                height: '100%',
-                minHeight: '200px',
-                border: 'none',
-                borderRadius: '8px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                backgroundColor: 'white'
-              }}
-              title={pdfName}
-            />
+            <>
+              {isLoading ? (
+                <div style={{
+                  textAlign: 'center',
+                  color: '#666',
+                  fontSize: '18px',
+                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+                }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '4px solid #f3f3f3',
+                    borderTop: '4px solid #0f3456',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 20px'
+                  }} />
+                  <p>Loading document...</p>
+                </div>
+              ) : isHtml && htmlContent ? (
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                    overflow: 'auto'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: htmlContent }}
+                />
+              ) : (
+                <iframe
+                  src={pdfUrl}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    minHeight: '200px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                    backgroundColor: 'white'
+                  }}
+                  title={pdfName}
+                />
+              )}
+            </>
           ) : (
             <div style={{
               textAlign: 'center',
@@ -227,6 +283,13 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
           </button>
         </div>
       </div>
+
+      {/* Add spinning animation */}
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
