@@ -6,8 +6,6 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
   const [htmlContent, setHtmlContent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!isOpen) return null;
-
   // Determine file type
   const fileExtension = pdfUrl?.split('.').pop()?.toLowerCase();
   const isHtml = fileExtension === 'html' || fileExtension === 'htm';
@@ -38,8 +36,14 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
           console.error('Error fetching HTML:', error);
           setIsLoading(false);
         });
+    } else {
+      // Reset when modal closes or for non-HTML files
+      setHtmlContent(null);
+      setIsLoading(false);
     }
   }, [isOpen, isHtml, pdfUrl]);
+
+  if (!isOpen) return null;
 
   return (
     <div style={{
@@ -147,7 +151,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
           minHeight: '200px',
           backgroundColor: '#fafafa'
         }}>
-          {pdfUrl ? (
+          {pdfUrl && (
             <>
               {isLoading ? (
                 <div style={{
@@ -166,6 +170,11 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
                     margin: '0 auto 20px'
                   }} />
                   <p>Loading document...</p>
+                  <style jsx>{`
+                    @keyframes spin {
+                      to { transform: rotate(360deg); }
+                    }
+                  `}</style>
                 </div>
               ) : isHtml && htmlContent ? (
                 <div
@@ -195,7 +204,8 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
                 />
               )}
             </>
-          ) : (
+          )}
+          {!pdfUrl && (
             <div style={{
               textAlign: 'center',
               color: '#666',
@@ -283,13 +293,6 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
           </button>
         </div>
       </div>
-
-      {/* Add spinning animation */}
-      <style jsx>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

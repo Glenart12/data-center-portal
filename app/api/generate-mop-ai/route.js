@@ -26,27 +26,16 @@ export async function POST(request) {
                      description.includes('quarterly') ? 'QUARTERLY' : 
                      description.includes('monthly') ? 'MONTHLY' : 'PREVENTIVE';
 
-    // Create a simpler, more focused prompt
-    const prompt = `Generate a complete HTML document for a Method of Procedure (MOP) for data center equipment maintenance.
+    // Create a very explicit prompt that FORCES HTML generation
+    const prompt = `You MUST generate a complete HTML document. Start your response with <!DOCTYPE html> and end with </html>. Do NOT include any explanation or text outside the HTML tags.
 
-EQUIPMENT DETAILS:
+Generate an HTML document for this equipment:
 - Manufacturer: ${manufacturer}
 - Model: ${modelNumber}
 - System: ${system}
-- Category: ${category}
 - Work: ${description}
-- Serial: ${serialNumber || 'UPDATE NEEDED'}
-- Location: ${location || 'UPDATE NEEDED'}
 
-REQUIREMENTS:
-1. Generate a COMPLETE, VALID HTML document starting with <!DOCTYPE html>
-2. Include ALL 11 sections as shown below
-3. Use proper HTML tables where indicated
-4. For fields needing updates, use: <span class="update-needed">UPDATE NEEDED - [instruction]</span>
-5. Generate realistic, detailed procedures based on the equipment type (minimum 20-30 steps)
-6. Do NOT say "content too large" or truncate - generate the complete document
-
-HTML TEMPLATE TO FOLLOW:
+Here is the EXACT HTML structure you MUST follow:
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,155 +44,76 @@ HTML TEMPLATE TO FOLLOW:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOP - ${manufacturer.toUpperCase()} ${system.toUpperCase()}</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        h1, h2 { color: #0f3456; }
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .container { background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #0f3456; text-align: center; margin-bottom: 40px; }
+        h2 { color: #0f3456; border-bottom: 2px solid #0f3456; padding-bottom: 10px; margin-top: 40px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: #0f3456; color: white; }
-        .update-needed { color: red; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
         .info-table td:first-child { font-weight: bold; background-color: #f0f0f0; width: 30%; }
+        .update-needed { color: red; font-weight: bold; }
+        ul { line-height: 1.8; }
+        .safety-warning { background-color: #fee; padding: 15px; border-radius: 5px; margin: 20px 0; }
     </style>
 </head>
 <body>
-    <h1>Method of Procedure (MOP)</h1>
+    <div class="container">
+        <h1>Method of Procedure (MOP)</h1>
 
-    <h2>Section 01: MOP Schedule Information</h2>
-    <table class="info-table">
-        <tr><td>MOP Title:</td><td>${manufacturer.toUpperCase()} ${system.toUpperCase()} - ${frequency} MAINTENANCE</td></tr>
-        <tr><td>MOP Information:</td><td>${description}</td></tr>
-        <tr><td>MOP Creation Date:</td><td>${new Date().toLocaleDateString('en-US')}</td></tr>
-        <tr><td>MOP Revision Date:</td><td><span class="update-needed">UPDATE NEEDED - Update upon revision</span></td></tr>
-        <tr><td>Document Number:</td><td><span class="update-needed">UPDATE NEEDED - Assign per facility</span></td></tr>
-        <tr><td>Revision Number:</td><td><span class="update-needed">UPDATE NEEDED - Assign per facility</span></td></tr>
-        <tr><td>Author CET Level:</td><td><span class="update-needed">UPDATE NEEDED - Enter CET level</span></td></tr>
-    </table>
-
-    <h2>Section 02: Site Information</h2>
-    <table class="info-table">
-        <tr><td>Data Center Location:</td><td>${location || '<span class="update-needed">UPDATE NEEDED - Enter location</span>'}</td></tr>
-        <tr><td>Service Ticket/Project Number:</td><td><span class="update-needed">UPDATE NEEDED - Enter ticket number</span></td></tr>
-        <tr><td>Level of Risk:</td><td>[Determine based on equipment criticality - Level 1-4]</td></tr>
-        <tr><td>CET Level Required:</td><td>[Determine based on risk level]</td></tr>
-    </table>
-
-    <h2>Section 03: MOP Overview</h2>
-    <table class="info-table">
-        <tr><td>MOP Description:</td><td>${description}</td></tr>
-        <tr><td>Work Area:</td><td>${location || '<span class="update-needed">UPDATE NEEDED</span>'}</td></tr>
-        <tr><td>Manufacturer:</td><td>${manufacturer}</td></tr>
-        <tr><td>Equipment ID:</td><td><span class="update-needed">UPDATE NEEDED - Record on-site</span></td></tr>
-        <tr><td>Model #:</td><td>${modelNumber}</td></tr>
-        <tr><td>Serial #:</td><td>${serialNumber || '<span class="update-needed">UPDATE NEEDED - Record from nameplate</span>'}</td></tr>
-        <tr><td>Min. # of Facilities Personnel:</td><td>[Based on equipment]</td></tr>
-        <tr><td>Qualifications Required:</td><td>[List certifications]</td></tr>
-        <tr><td>Tools Required:</td><td>[List all tools]</td></tr>
-        <tr><td>Advance notifications required:</td><td>[List notifications]</td></tr>
-        <tr><td>Post notifications required:</td><td>[List notifications]</td></tr>
-    </table>
-
-    <h2>Section 04: Effect of MOP on Critical Facility</h2>
-    <table>
-        <thead>
+        <h2>Section 01: MOP Schedule Information</h2>
+        <table class="info-table">
             <tr>
-                <th>Facility Equipment or System</th>
-                <th>Yes</th>
-                <th>No</th>
-                <th>N/A</th>
-                <th>Details</th>
+                <td>MOP Title:</td>
+                <td>${manufacturer.toUpperCase()} ${system.toUpperCase()} - ${frequency} MAINTENANCE</td>
             </tr>
-        </thead>
-        <tbody>
-            [Generate all 18 rows based on equipment type]
-        </tbody>
-    </table>
+            <tr>
+                <td>MOP Information:</td>
+                <td>${description}</td>
+            </tr>
+            <tr>
+                <td>MOP Creation Date:</td>
+                <td>${new Date().toLocaleDateString('en-US')}</td>
+            </tr>
+            <tr>
+                <td>MOP Revision Date:</td>
+                <td><span class="update-needed">UPDATE NEEDED - Update upon revision</span></td>
+            </tr>
+            <tr>
+                <td>Document Number:</td>
+                <td><span class="update-needed">UPDATE NEEDED - Assign per facility</span></td>
+            </tr>
+            <tr>
+                <td>Revision Number:</td>
+                <td><span class="update-needed">UPDATE NEEDED - Assign per facility</span></td>
+            </tr>
+            <tr>
+                <td>Author CET Level:</td>
+                <td><span class="update-needed">UPDATE NEEDED - Enter CET level</span></td>
+            </tr>
+        </table>
 
-    <h2>Section 05: MOP Supporting Documentation</h2>
-    <ul>
-        <li>${manufacturer} ${modelNumber} Operation and Maintenance Manual</li>
-        <li>OSHA 29 CFR 1910.147 - Lockout/Tagout</li>
-        <li>OSHA 29 CFR 1910 Subpart I - PPE</li>
-        <li>[Add relevant standards]</li>
-    </ul>
-
-    <h2>Section 06: Safety Requirements</h2>
-    <h3>Key Hazards Identified</h3>
-    <table>
-        <thead>
-            <tr><th>Hazard Type</th><th>Specific Hazards</th><th>Safety Controls Required</th></tr>
-        </thead>
-        <tbody>
-            [Generate hazards based on equipment]
-        </tbody>
-    </table>
-
-    <h3>Required PPE</h3>
-    <table>
-        <thead>
-            <tr><th>PPE Category</th><th>Specification</th><th>When Required</th></tr>
-        </thead>
-        <tbody>
-            [Generate PPE requirements]
-        </tbody>
-    </table>
-
-    <h2>Section 07: MOP Risks & Assumptions</h2>
-    <ul>
-        [Generate risks and assumptions]
-    </ul>
-
-    <h2>Section 08: MOP Details</h2>
-    <table>
-        <tr><td>Date Performed:</td><td></td><td>Time Begun:</td><td></td></tr>
-        <tr><td>Time Completed:</td><td></td><td>Total Time:</td><td></td></tr>
-    </table>
-
-    <h3>Detailed Procedure Steps</h3>
-    <table>
-        <thead>
-            <tr><th>Step</th><th>Procedure</th><th>Initials</th><th>Time</th></tr>
-        </thead>
-        <tbody>
-            [Generate 20-30 detailed steps specific to the equipment]
-        </tbody>
-    </table>
-
-    <h2>Section 09: Back-out Procedures</h2>
-    <table>
-        <thead>
-            <tr><th>Step</th><th>Back-out Procedures</th><th>Initials</th><th>Time</th></tr>
-        </thead>
-        <tbody>
-            [Generate 6+ back-out steps]
-        </tbody>
-    </table>
-
-    <h2>Section 10: MOP Approval</h2>
-    <table>
-        <thead>
-            <tr><th>Review Stage</th><th>Reviewer's Name</th><th>Reviewer's Title</th><th>Date</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Tested for clarity:</td><td></td><td></td><td></td></tr>
-            <tr><td>Technical review:</td><td></td><td></td><td></td></tr>
-            <tr><td>Chief Engineer approval:</td><td></td><td></td><td></td></tr>
-            <tr><td>Contractor Review:</td><td></td><td></td><td></td></tr>
-            <tr><td>Customer approval:</td><td></td><td></td><td></td></tr>
-        </tbody>
-    </table>
-
-    <h2>Section 11: MOP Comments</h2>
-    <p>[Add any relevant comments]</p>
+        [CONTINUE WITH ALL 11 SECTIONS IN PROPER HTML FORMAT]
+    </div>
 </body>
 </html>
 
-IMPORTANT: Generate the COMPLETE HTML document with ALL sections filled in with realistic content based on the equipment type. Do NOT truncate or say the content is too large.`;
+CRITICAL INSTRUCTIONS:
+1. Your response MUST start with <!DOCTYPE html>
+2. Your response MUST end with </html>
+3. Do NOT include ANY text before <!DOCTYPE html> or after </html>
+4. Generate ALL 11 sections with proper HTML tables
+5. Fill in realistic equipment-specific procedures (20-30 steps minimum)
+6. Use <span class="update-needed"> for fields needing updates
+7. Do NOT say "content too large" or truncate - generate everything`;
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     
-    // Use the lighter model that's less likely to be overloaded
+    // Use the model
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash-8b',
+      model: 'gemini-1.5-flash',
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 8000,
@@ -225,6 +135,18 @@ IMPORTANT: Generate the COMPLETE HTML document with ALL sections filled in with 
         
         // Clean up the response - remove any markdown code blocks
         mopContent = mopContent.replace(/```html\n?/g, '').replace(/```\n?/g, '');
+        
+        // Remove any text before <!DOCTYPE html>
+        const htmlStart = mopContent.indexOf('<!DOCTYPE html>');
+        if (htmlStart > 0) {
+          mopContent = mopContent.substring(htmlStart);
+        }
+        
+        // Remove any text after </html>
+        const htmlEnd = mopContent.lastIndexOf('</html>');
+        if (htmlEnd > -1) {
+          mopContent = mopContent.substring(0, htmlEnd + 7);
+        }
         
         // Verify it's actual HTML
         if (!mopContent.includes('<!DOCTYPE html>') || !mopContent.includes('</html>')) {
