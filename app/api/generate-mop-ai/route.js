@@ -92,12 +92,15 @@ export async function POST(request) {
     const { formData } = body;
     const { manufacturer, modelNumber, serialNumber, location, system, category, description } = formData;
     
+    console.log('MOP generation started for:', manufacturer, modelNumber);
+    
     // Generate filename
     const date = new Date().toISOString().split('T')[0];
+    const timestamp = Date.now();
     const safeManufacturer = manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
     const safeSystem = system.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
     const safeCategory = category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}.txt`;
+    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}_${timestamp}.txt`;
 
     // Create prompt
     const userPrompt = `Create a comprehensive MOP based on this information:
@@ -115,51 +118,111 @@ Generate a complete 11-section MOP following the exact format provided in the in
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
+    // Use the lighter model that's less likely to be overloaded
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash-8b',
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 8000,
+      }
+    });
     
     // Try to generate with retries
     let mopContent;
     let lastError;
+    const maxAttempts = 5;
     
-    for (let attempt = 1; attempt <= 5; attempt++) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        console.log(`Attempt ${attempt} to generate MOP...`);
+        console.log(`Attempt ${attempt} of ${maxAttempts}...`);
         
         const result = await model.generateContent(`${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`);
         const response = await result.response;
         mopContent = response.text();
         
-        console.log('Successfully generated MOP');
+        if (!mopContent || mopContent.length < 100) {
+          throw new Error('Generated content is too short');
+        }
+        
+        console.log('Successfully generated MOP, length:', mopContent.length);
         break; // Success! Exit the loop
         
       } catch (error) {
         lastError = error;
         console.error(`Attempt ${attempt} failed:`, error.message);
         
-        // If it's a 503 error (overloaded), wait and retry
-        if (error.message?.includes('503') || error.message?.includes('overloaded')) {
-          if (attempt < 5) {
-            const waitTime = attempt * 2000; // 2s, 4s, 6s, 8s
+        // If it's a rate limit or overload error, wait and retry
+        if (error.message?.includes('503') || 
+            error.message?.includes('overloaded') || 
+            error.message?.includes('429') ||
+            error.message?.includes('Resource has been exhausted')) {
+          
+          if (attempt < maxAttempts) {
+            // Exponential backoff: 3s, 6s, 9s, 12s
+            const waitTime = attempt * 3000;
             console.log(`Waiting ${waitTime}ms before retry...`);
             await wait(waitTime);
             continue;
           }
         }
         
-        // If it's not a 503 or we're out of retries, throw
-        throw error;
+        // For other errors, don't retry
+        break;
       }
     }
     
     if (!mopContent) {
-      throw lastError || new Error('Failed to generate after 5 attempts');
+      const errorMessage = lastError?.message || 'Failed to generate after all attempts';
+      
+      // Better error messages for users
+      if (errorMessage.includes('503') || errorMessage.includes('overloaded')) {
+        return NextResponse.json({ 
+          error: 'AI service is temporarily busy',
+          details: 'The AI service is experiencing high demand. Please wait 2-3 minutes and try again.',
+          userMessage: 'The AI is busy right now. Please try again in a few minutes.'
+        }, { status: 503 });
+      }
+      
+      if (errorMessage.includes('429') || errorMessage.includes('exhausted')) {
+        return NextResponse.json({ 
+          error: 'Rate limit reached',
+          details: 'You\'ve made too many requests. Please wait a minute before trying again.',
+          userMessage: 'Please wait 60 seconds before generating another MOP.'
+        }, { status: 429 });
+      }
+      
+      throw lastError || new Error(errorMessage);
     }
 
-    // Save to blob
-    const blob = await put(`mops/${filename}`, mopContent, {
-      access: 'public',
-      contentType: 'text/plain'
-    });
+    // Add a small delay before saving to prevent race conditions
+    await wait(500);
+
+    // Save to blob with retry
+    let blob;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        blob = await put(`mops/${filename}`, mopContent, {
+          access: 'public',
+          contentType: 'text/plain'
+        });
+        console.log('Successfully saved to blob storage');
+        break;
+      } catch (blobError) {
+        console.error(`Blob storage attempt ${attempt} failed:`, blobError.message);
+        if (attempt === 3) {
+          // Return the content even if storage fails
+          return NextResponse.json({ 
+            success: false,
+            error: 'Generated but could not save',
+            generatedContent: mopContent,
+            filename: filename,
+            userMessage: 'MOP was generated but could not be saved. Copy the content manually.'
+          }, { status: 200 });
+        }
+        await wait(1000);
+      }
+    }
 
     return NextResponse.json({ 
       success: true,
@@ -169,20 +232,12 @@ Generate a complete 11-section MOP following the exact format provided in the in
     });
 
   } catch (error) {
-    console.error('Final error:', error);
-    
-    // If it's still a 503 error after all retries
-    if (error.message?.includes('503') || error.message?.includes('overloaded')) {
-      return NextResponse.json({ 
-        error: 'Google AI service is temporarily overloaded',
-        details: 'Please wait a few minutes and try again. This is a temporary issue with Google\'s service.',
-        suggestion: 'Try again in 2-3 minutes'
-      }, { status: 503 });
-    }
+    console.error('MOP generation error:', error);
     
     return NextResponse.json({ 
       error: 'Failed to generate MOP',
-      details: error.message 
+      details: error.message,
+      userMessage: 'Unable to generate MOP. Please check your inputs and try again.'
     }, { status: 500 });
   }
 }

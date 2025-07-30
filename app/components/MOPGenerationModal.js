@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function MOPGenerationModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -16,6 +16,35 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   const [supportingDocs, setSupportingDocs] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
+  const [lastGenerationTime, setLastGenerationTime] = useState(0);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  // Check for cooldown on component mount and when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const lastTime = parseInt(localStorage.getItem('lastMOPGeneration') || '0');
+      setLastGenerationTime(lastTime);
+      updateCooldown(lastTime);
+    }
+  }, [isOpen]);
+
+  // Update cooldown timer
+  useEffect(() => {
+    if (cooldownRemaining > 0) {
+      const timer = setTimeout(() => {
+        updateCooldown(lastGenerationTime);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownRemaining, lastGenerationTime]);
+
+  const updateCooldown = (lastTime) => {
+    const now = Date.now();
+    const timePassed = now - lastTime;
+    const cooldownPeriod = 60000; // 60 seconds
+    const remaining = Math.max(0, cooldownPeriod - timePassed);
+    setCooldownRemaining(Math.ceil(remaining / 1000));
+  };
 
   if (!isOpen) return null;
 
@@ -61,6 +90,12 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   };
 
   const handleGenerate = async () => {
+    // Check cooldown
+    if (cooldownRemaining > 0) {
+      alert(`Please wait ${cooldownRemaining} more seconds before generating another MOP. This helps ensure reliable service for all users.`);
+      return;
+    }
+
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
         !formData.category || !formData.description) {
@@ -69,7 +104,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     }
 
     setIsGenerating(true);
-    setUploadProgress('Generating MOP with AI...');
+    setUploadProgress('Connecting to AI service...');
 
     try {
       const response = await fetch('/api/generate-mop-ai', {
@@ -87,19 +122,33 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         })
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate MOP');
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        // Use the user-friendly message if available
+        const errorMessage = data.userMessage || data.error || 'Failed to generate MOP';
+        throw new Error(errorMessage);
+      }
+      
+      // Success! Update last generation time
+      const now = Date.now();
+      localStorage.setItem('lastMOPGeneration', now.toString());
+      setLastGenerationTime(now);
       
       alert('MOP generated successfully! Check the MOP gallery.');
       onClose();
       window.location.reload();
     } catch (error) {
       console.error('Generation error:', error);
-      alert(`Failed to generate MOP: ${error.message}`);
+      
+      // Show user-friendly error messages
+      if (error.message.includes('busy') || error.message.includes('try again')) {
+        alert('The AI service is currently busy. Please wait 2-3 minutes and try again.');
+      } else if (error.message.includes('wait')) {
+        alert(error.message);
+      } else {
+        alert(`Failed to generate MOP: ${error.message}`);
+      }
     } finally {
       setIsGenerating(false);
       setUploadProgress('');
@@ -139,6 +188,20 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           <p style={{ color: '#666', fontSize: '14px' }}>
             Fill in the basic equipment information and let AI create a comprehensive MOP
           </p>
+          
+          {/* Cooldown Notice */}
+          {cooldownRemaining > 0 && (
+            <div style={{
+              marginTop: '15px',
+              padding: '10px',
+              backgroundColor: '#fff3cd',
+              border: '1px solid #ffeaa7',
+              borderRadius: '4px',
+              color: '#856404'
+            }}>
+              ⏱️ Please wait {cooldownRemaining} seconds before generating another MOP
+            </div>
+          )}
         </div>
 
         {/* Equipment Information */}
@@ -378,6 +441,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         }}>
           <strong>Note:</strong> The AI will automatically generate all necessary MOP sections including safety requirements, 
           tools needed, detailed procedures, and back-out plans based on the equipment information you provide.
+          {' '}To ensure reliable service, there's a 60-second cooldown between generations.
         </div>
 
         {/* Action Buttons */}
@@ -405,20 +469,20 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
             onClick={handleGenerate}
             style={{
               padding: '12px 30px',
-              backgroundColor: '#28a745',
+              backgroundColor: cooldownRemaining > 0 ? '#6c757d' : '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
               fontSize: '16px',
-              cursor: isGenerating ? 'not-allowed' : 'pointer',
-              opacity: isGenerating ? 0.6 : 1,
+              cursor: (isGenerating || cooldownRemaining > 0) ? 'not-allowed' : 'pointer',
+              opacity: (isGenerating || cooldownRemaining > 0) ? 0.6 : 1,
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => !isGenerating && (e.currentTarget.style.backgroundColor = '#218838')}
-            onMouseLeave={(e) => !isGenerating && (e.currentTarget.style.backgroundColor = '#28a745')}
-            disabled={isGenerating}
+            onMouseEnter={(e) => !isGenerating && cooldownRemaining === 0 && (e.currentTarget.style.backgroundColor = '#218838')}
+            onMouseLeave={(e) => !isGenerating && cooldownRemaining === 0 && (e.currentTarget.style.backgroundColor = '#28a745')}
+            disabled={isGenerating || cooldownRemaining > 0}
           >
-            {isGenerating ? 'Generating...' : '🤖 Generate MOP'}
+            {isGenerating ? 'Generating...' : cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : '🤖 Generate MOP'}
           </button>
         </div>
       </div>
