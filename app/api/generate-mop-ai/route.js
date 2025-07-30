@@ -2,9 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
-// Initialize Gemini with your API key
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 // Your comprehensive MOP project instructions
 const PROJECT_INSTRUCTIONS = `You are creating Methods of Procedure (MOPs) for data center technicians.
 
@@ -105,21 +102,56 @@ USE RED "UPDATE NEEDED" MARKERS FOR:
 Remember: You're creating professional technical documentation for critical infrastructure work. Be precise, thorough, and safety-focused.`;
 
 export async function POST(request) {
+  console.log('MOP Generation API called');
+  
   try {
-    const body = await request.json();
+    // Check if API key exists
+    if (!process.env.GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY is not set');
+      return NextResponse.json({ 
+        error: 'API configuration error: Missing Gemini API key',
+        details: 'Please check your environment variables'
+      }, { status: 500 });
+    }
+
+    // Parse request body
+    let body;
+    try {
+      body = await request.json();
+      console.log('Request body parsed successfully');
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return NextResponse.json({ 
+        error: 'Invalid request format',
+        details: parseError.message
+      }, { status: 400 });
+    }
+
     const { formData, supportingDocs } = body;
     
-    // Extract all form data including new system and category fields
-    const { manufacturer, modelNumber, serialNumber, location, system, category, description } = formData;
+    // Validate required fields
+    if (!formData || !formData.manufacturer || !formData.modelNumber || !formData.system || 
+        !formData.category || !formData.description) {
+      console.error('Missing required fields:', formData);
+      return NextResponse.json({ 
+        error: 'Missing required fields',
+        details: 'Please fill in all required fields'
+      }, { status: 400 });
+    }
     
-    // Generate filename based on manufacturer, system, category, and date
+    // Extract all form data
+    const { manufacturer, modelNumber, serialNumber, location, system, category, description } = formData;
+    console.log('Generating MOP for:', { manufacturer, modelNumber, system, category });
+    
+    // Generate filename
     const date = new Date().toISOString().split('T')[0];
-    const safeManufacturer = manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_');
-    const safeSystem = system.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    const safeManufacturer = manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
+    const safeSystem = system.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
     const safeCategory = category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
     const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}.txt`;
+    console.log('Generated filename:', filename);
 
-    // Create the prompt with all available information
+    // Create the prompt
     const userPrompt = `Create a comprehensive MOP based on this information:
     
 Equipment Details:
@@ -147,26 +179,92 @@ ${supportingDocs.map(doc => `- ${doc.name}`).join('\n')}
 
 Generate a complete 11-section MOP following the exact format provided in the instructions.`;
 
-    // Initialize Gemini model
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 8000,
+    // Initialize Gemini
+    let genAI;
+    try {
+      genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      console.log('Gemini AI initialized');
+    } catch (initError) {
+      console.error('Failed to initialize Gemini:', initError);
+      return NextResponse.json({ 
+        error: 'Failed to initialize AI service',
+        details: initError.message
+      }, { status: 500 });
+    }
+
+    // Generate content
+    let mopContent;
+    try {
+      const model = genAI.getGenerativeModel({ 
+        model: 'gemini-1.5-flash',
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8000,
+        }
+      });
+      
+      console.log('Generating content with Gemini...');
+      const fullPrompt = `${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`;
+      const result = await model.generateContent(fullPrompt);
+      
+      if (!result.response) {
+        throw new Error('No response from Gemini');
       }
-    });
+      
+      mopContent = result.response.text();
+      console.log('Content generated successfully, length:', mopContent.length);
+      
+      if (!mopContent || mopContent.length < 100) {
+        throw new Error('Generated content is too short or empty');
+      }
+    } catch (genError) {
+      console.error('Gemini generation error:', genError);
+      
+      // Check for specific error types
+      if (genError.message?.includes('quota')) {
+        return NextResponse.json({ 
+          error: 'AI quota exceeded',
+          details: 'The AI service quota has been exceeded. Please try again later or contact support.'
+        }, { status: 429 });
+      }
+      
+      if (genError.message?.includes('API key')) {
+        return NextResponse.json({ 
+          error: 'Invalid API key',
+          details: 'The Gemini API key is invalid or expired.'
+        }, { status: 401 });
+      }
+      
+      return NextResponse.json({ 
+        error: 'Failed to generate MOP content',
+        details: genError.message || 'Unknown error during generation'
+      }, { status: 500 });
+    }
 
-    // Generate the MOP content
-    const fullPrompt = `${PROJECT_INSTRUCTIONS}\n\n${userPrompt}`;
-    const result = await model.generateContent(fullPrompt);
-    const mopContent = result.response.text();
+    // Upload to Blob Storage
+    let blob;
+    try {
+      console.log('Uploading to Blob storage...');
+      blob = await put(`mops/${filename}`, mopContent, {
+        access: 'public',
+        contentType: 'text/plain'
+      });
+      console.log('Successfully uploaded to Blob storage:', blob.url);
+    } catch (blobError) {
+      console.error('Blob storage error:', blobError);
+      
+      // Even if blob storage fails, we generated the content
+      // You could return the content directly as a fallback
+      return NextResponse.json({ 
+        error: 'Failed to save MOP to storage',
+        details: blobError.message,
+        // Include the content so user doesn't lose it
+        generatedContent: mopContent,
+        filename: filename
+      }, { status: 500 });
+    }
 
-    // Upload to Vercel Blob Storage - fixed to use correct format
-    const blob = await put(`mops/${filename}`, mopContent, {
-      access: 'public',
-      contentType: 'text/plain'
-    });
-
+    // Success response
     return NextResponse.json({ 
       success: true,
       filename: filename,
@@ -175,10 +273,12 @@ Generate a complete 11-section MOP following the exact format provided in the in
     });
 
   } catch (error) {
-    console.error('MOP generation error:', error);
+    // Catch-all error handler
+    console.error('Unexpected error in MOP generation:', error);
     return NextResponse.json({ 
-      error: 'Failed to generate MOP',
-      details: error.message 
+      error: 'Unexpected error during MOP generation',
+      details: error.message || 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 });
   }
 }
