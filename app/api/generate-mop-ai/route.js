@@ -5,11 +5,13 @@ import { NextResponse } from 'next/server';
 const PROJECT_INSTRUCTIONS = `You are creating Methods of Procedure (MOPs) for data center technicians. Generate COMPLETE, DETAILED MOPs - no placeholders or research notes.
 
 CRITICAL FORMATTING RULES:
-1. Use PLAIN TEXT ONLY - no special characters, no unicode symbols
-2. For checkmarks in tables, use "Yes" or "X" (not ✅ or checkmarks)
-3. NEVER include model numbers in the MOP Title
-4. Generate COMPLETE procedures - no "research needed" placeholders
-5. Always determine Risk Level and CET Level based on the work
+1. Use PLAIN TEXT ONLY - no HTML, no spans, no formatting tags
+2. For fields that need updates, use: UPDATE NEEDED - [instruction]
+3. No unicode characters - use plain ASCII only (no smart quotes, no special symbols)
+4. For checkmarks in tables, use "Yes" or "X" (not checkmarks or unicode)
+5. NEVER include model numbers in the MOP Title
+6. Generate COMPLETE procedures - no "research needed" placeholders
+7. Always determine Risk Level and CET Level based on the work
 
 RISK LEVEL DETERMINATION:
 - Level 4 (Critical Risk): Affects entire facility, guaranteed outage
@@ -34,10 +36,10 @@ EXACT 11-SECTION FORMAT:
 | **MOP Title:** | [MANUFACTURER] [EQUIPMENT TYPE] - [FREQUENCY] PREVENTIVE MAINTENANCE |
 | **MOP Information:** | [Frequency] preventive maintenance procedure for [manufacturer] [equipment type] |
 | **MOP Creation Date:** | [Current date MM/DD/YYYY] |
-| **MOP Revision Date:** | <span style="color:red">**UPDATE NEEDED - Update upon revision**</span> |
-| **Document Number:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
-| **Revision Number:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
-| **Author CET Level:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
+| **MOP Revision Date:** | UPDATE NEEDED - Update upon revision |
+| **Document Number:** | UPDATE NEEDED - Assign per facility process |
+| **Revision Number:** | UPDATE NEEDED - Assign per facility process |
+| **Author CET Level:** | UPDATE NEEDED - Assign per facility process |
 
 -----
 
@@ -45,8 +47,8 @@ EXACT 11-SECTION FORMAT:
 
 | Field | Value |
 | :--- | :--- |
-| **Data Center Location:** | <span style="color:red">**UPDATE NEEDED - Enter facility name and location**</span> |
-| **Service Ticket/Project Number:** | <span style="color:red">**UPDATE NEEDED - Assign per facility process**</span> |
+| **Data Center Location:** | UPDATE NEEDED - Enter facility name and location |
+| **Service Ticket/Project Number:** | UPDATE NEEDED - Assign per facility process |
 | **Level of Risk:** | Level [1-4] ([Risk Name]) - [One sentence explaining why this risk level applies] |
 | **CET Level Required:** | CET [1-4] ([Title]) - [One sentence explaining why this CET level is required] |
 
@@ -59,9 +61,9 @@ EXACT 11-SECTION FORMAT:
 | **MOP Description:** | [Detailed description of the work to be performed] |
 | **Work Area:** | [Location from user or UPDATE NEEDED] |
 | **Manufacturer:** | [Manufacturer name] |
-| **Equipment ID:** | <span style="color:red">**UPDATE NEEDED - Record on-site**</span> |
+| **Equipment ID:** | UPDATE NEEDED - Record on-site |
 | **Model #:** | [Model number] |
-| **Serial #:** | [Serial from user or <span style="color:red">**UPDATE NEEDED - Record from nameplate**</span>] |
+| **Serial #:** | [Serial from user or UPDATE NEEDED - Record from nameplate] |
 | **Min. # of Facilities Personnel:** | [Number based on equipment complexity] |
 | **# of Contractors #1** | N/A |
 | **# Contractors #2** | N/A |
@@ -150,7 +152,7 @@ EXACT 11-SECTION FORMAT:
 | :--- | :--- | :--- |
 | Medical Emergency | Emergency Medical Services | 911 |
 | Chemical Emergency | Poison Control / CHEMTREC | 1-800-222-1222 / 1-800-424-9300 |
-| Facility Emergency | [Facility Emergency Line] | <span style="color:red">**UPDATE NEEDED - Add facility number**</span> |
+| Facility Emergency | [Facility Emergency Line] | UPDATE NEEDED - Add facility number |
 
 **CRITICAL: Work shall NOT proceed until safety briefing is completed and all required PPE is verified available.**
 
@@ -233,14 +235,19 @@ EXACT 11-SECTION FORMAT:
 - [Note any special considerations]
 
 CRITICAL REQUIREMENTS FOR GENERATION:
-1. NEVER put model numbers in the MOP Title - only manufacturer and equipment type
-2. ALWAYS determine the risk level based on the work and provide a rationale
-3. ALWAYS determine the CET level based on the risk level and provide a rationale
-4. Use "Yes" or "X" in tables, never use special characters or symbols
-5. Generate COMPLETE procedures in Section 08 - minimum 20-30 detailed steps
-6. Generate COMPLETE back-out procedures in Section 09 - minimum 6 steps
-7. Include specific chemical names and safety requirements based on equipment type
-8. Format dates as MM/DD/YYYY`;
+1. NO HTML FORMATTING - use plain text only
+2. NO UNICODE - use only standard ASCII characters
+3. For "UPDATE NEEDED" fields, just write: UPDATE NEEDED - [instruction]
+4. NEVER put model numbers in the MOP Title - only manufacturer and equipment type
+5. ALWAYS determine the risk level based on the work and provide a rationale
+6. ALWAYS determine the CET level based on the risk level and provide a rationale
+7. Use "Yes" or "X" in tables, never use special characters or symbols
+8. Generate COMPLETE procedures in Section 08 - minimum 20-30 detailed steps
+9. Generate COMPLETE back-out procedures in Section 09 - minimum 6 steps
+10. Include specific chemical names and safety requirements based on equipment type
+11. Format dates as MM/DD/YYYY
+12. Use plain apostrophes (') not smart quotes
+13. No formatting tags of any kind`;
 
 // Helper to wait
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -275,12 +282,15 @@ Equipment Details:
 
 CRITICAL INSTRUCTIONS:
 1. The MOP Title should be: "${manufacturer.toUpperCase()} ${system.toUpperCase()} - ${description.includes('annual') ? 'ANNUAL' : description.includes('quarterly') ? 'QUARTERLY' : description.includes('monthly') ? 'MONTHLY' : ''} PREVENTIVE MAINTENANCE"
-2. Determine the risk level (1-4) based on whether this is critical equipment and provide a one-sentence rationale
-3. Determine the CET level based on the risk level and provide a one-sentence rationale
-4. Generate COMPLETE detailed procedures in Section 08 (minimum 20-30 steps)
-5. Generate COMPLETE back-out procedures in Section 09 (minimum 6 steps)
-6. Use plain text only - no special characters or unicode
-7. For the systems table in Section 04, use "Yes" or leave blank for Yes column, "X" or leave blank for No column
+2. DO NOT use any HTML tags, spans, or formatting
+3. For fields needing updates, just write: UPDATE NEEDED - [instruction]
+4. Use only plain ASCII text - no unicode, no smart quotes
+5. Determine the risk level (1-4) based on whether this is critical equipment
+6. Determine the CET level based on the risk level
+7. Generate COMPLETE detailed procedures in Section 08 (minimum 20-30 steps)
+8. Generate COMPLETE back-out procedures in Section 09 (minimum 6 steps)
+9. Use plain text only - no special characters or unicode
+10. For the systems table in Section 04, use "Yes" or leave blank for Yes column, "X" or leave blank for No column
 
 Generate a complete 11-section MOP following the EXACT format provided.`;
 
