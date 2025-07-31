@@ -583,7 +583,7 @@ REMEMBER:
     
     // Use the model - note: using regular flash, not 8b for better quality
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-pro',
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 8192,
