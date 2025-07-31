@@ -942,7 +942,7 @@ REMEMBER:
       model: 'gemini-1.5-flash',
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 75000,
+        maxOutputTokens: 150000,  // INCREASED FROM 75000
       }
     });
     
