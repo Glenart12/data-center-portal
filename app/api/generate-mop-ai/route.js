@@ -110,6 +110,24 @@ HTML STRUCTURE AND STYLING:
             color: black;
             font-weight: normal;
         }
+        .contractor-input {
+            border: 1px solid #999;
+            padding: 5px;
+            background-color: #fff;
+            font-family: inherit;
+            font-size: inherit;
+            width: 100%;
+        }
+        .contractor-input::placeholder {
+            color: #666;
+            font-style: italic;
+        }
+        .small-input {
+            width: 60px;
+            padding: 3px;
+            border: 1px solid #999;
+            font-size: 12px;
+        }
         .safety-critical {
             background-color: #fee;
             font-weight: bold;
@@ -190,7 +208,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
     </tr>
     <tr>
         <td>MOP Revision Date:</td>
-        <td>[SAME AS CREATION DATE for new documents]</td>
+        <td><input type="text" value="[SAME AS CREATION DATE]" style="width:150px" /></td>
     </tr>
     <tr>
         <td>Document Number:</td>
@@ -198,7 +216,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
     </tr>
     <tr>
         <td>Revision Number:</td>
-        <td>V1</td>
+        <td><input type="text" value="V1" style="width:100px" /></td>
     </tr>
     <tr>
         <td>Author CET Level:</td>
@@ -565,9 +583,54 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
 
 <h2>Section 07: MOP Risks & Assumptions</h2>
 <p><strong>MOP Risks and Assumptions</strong></p>
-<p>[FOR EQUIPMENT-SPECIFIC MODELS THAT HAVE MAINTENANCE LOG SHEETS, INCLUDE:]</p>
+
+<p><strong>Detailed Risks and Mitigation Strategies:</strong></p>
+<ul>
+    <li><strong>Risk:</strong> [Equipment-specific risk with detailed explanation of potential consequences]
+        <ul><li><strong>Mitigation:</strong> [Detailed mitigation strategy with specific steps]</li></ul>
+    </li>
+    <li><strong>Risk:</strong> [Chemical exposure risk with specific chemicals identified]
+        <ul><li><strong>Mitigation:</strong> [Specific PPE and handling procedures from SDS]</li></ul>
+    </li>
+    <li><strong>Risk:</strong> [Operational risk related to data center operations]
+        <ul><li><strong>Mitigation:</strong> [Specific backup systems and verification procedures]</li></ul>
+    </li>
+    [GENERATE AT LEAST 5-7 DETAILED RISKS WITH COMPREHENSIVE MITIGATION STRATEGIES]
+</ul>
+
+<p><strong>Key Assumptions:</strong></p>
+<ul>
+    <li><strong>Assumption:</strong> [Detailed operational assumption]</li>
+    <li><strong>Assumption:</strong> [Equipment condition assumption]</li>
+    <li><strong>Assumption:</strong> [Environmental condition assumption]</li>
+    [GENERATE AT LEAST 4-5 DETAILED ASSUMPTIONS]
+</ul>
+
+<div class="section-separator"></div>
+
+<h2>Section 08: MOP Details</h2>
+<table class="info-table">
+    <tr>
+        <td>Date Performed:</td>
+        <td style="width: 150px;"><input type="text" class="field-box" /></td>
+        <td>Time Begun:</td>
+        <td style="width: 150px;"><input type="text" class="field-box" /></td>
+        <td>Time Completed:</td>
+        <td style="width: 150px;"><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td colspan="2">Facilities personnel performing work:</td>
+        <td colspan="4"><input type="text" class="field-box" style="width:100%" /></td>
+    </tr>
+    <tr>
+        <td colspan="2">Contractor/Vendor personnel performing work:</td>
+        <td colspan="4"><input type="text" class="contractor-input" placeholder="If subcontractor selected in Section 3, reference that company name" /></td>
+    </tr>
+</table>
+
+[FOR EQUIPMENT-SPECIFIC MODELS THAT HAVE MAINTENANCE LOG SHEETS, INCLUDE:]
 <h3>Pre-Maintenance Data Recording Requirements</h3>
-<p>For equipment with manufacturer-specified maintenance log sheets, record the following baseline data before beginning maintenance:</p>
+<p>Record the following baseline data before beginning maintenance:</p>
 <div class="data-recording-wrapper">
 <table class="data-recording-table">
     <thead>
@@ -610,50 +673,6 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
 </table>
 </div>
 
-<p><strong>Detailed Risks and Mitigation Strategies:</strong></p>
-<ul>
-    <li><strong>Risk:</strong> [Equipment-specific risk with detailed explanation of potential consequences]
-        <ul><li><strong>Mitigation:</strong> [Detailed mitigation strategy with specific steps]</li></ul>
-    </li>
-    <li><strong>Risk:</strong> [Chemical exposure risk with specific chemicals identified]
-        <ul><li><strong>Mitigation:</strong> [Specific PPE and handling procedures from SDS]</li></ul>
-    </li>
-    <li><strong>Risk:</strong> [Operational risk related to data center operations]
-        <ul><li><strong>Mitigation:</strong> [Specific backup systems and verification procedures]</li></ul>
-    </li>
-    [GENERATE AT LEAST 5-7 DETAILED RISKS WITH COMPREHENSIVE MITIGATION STRATEGIES]
-</ul>
-
-<p><strong>Key Assumptions:</strong></p>
-<ul>
-    <li><strong>Assumption:</strong> [Detailed operational assumption]</li>
-    <li><strong>Assumption:</strong> [Equipment condition assumption]</li>
-    <li><strong>Assumption:</strong> [Environmental condition assumption]</li>
-    [GENERATE AT LEAST 4-5 DETAILED ASSUMPTIONS]
-</ul>
-
-<div class="section-separator"></div>
-
-<h2>Section 08: MOP Details</h2>
-<table class="info-table">
-    <tr>
-        <td>Date Performed:</td>
-        <td style="width: 150px;"><input type="text" class="field-box" /></td>
-        <td>Time Begun:</td>
-        <td style="width: 150px;"><input type="text" class="field-box" /></td>
-        <td>Time Completed:</td>
-        <td style="width: 150px;"><input type="text" class="field-box" /></td>
-    </tr>
-    <tr>
-        <td colspan="2">Facilities personnel performing work:</td>
-        <td colspan="4"><input type="text" class="field-box" style="width:100%" /></td>
-    </tr>
-    <tr>
-        <td colspan="2">Contractor/Vendor personnel performing work:</td>
-        <td colspan="4">[If subcontractor selected in Section 3, reference that company name]</td>
-    </tr>
-</table>
-
 <h3>Detailed Procedure Steps</h3>
 <table>
     <thead>
@@ -668,20 +687,20 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
         <tr>
             <td style="text-align: center;">1</td>
             <td>Notify Data Center Operations Manager, Site Security, and NOC/BMS Operator that procedure is about to begin</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;"><strong>2.0</strong></td>
             <td><strong>Pre-Maintenance Safety and Documentation</strong></td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">2.1</td>
             <td class="safety-critical">MANDATORY: Review all Safety Data Sheets (SDS) for chemicals</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">2.2</td>
@@ -689,8 +708,8 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
                 <br>□ Yes (Detail: <input type="text" style="width:300px" />)
                 <br>□ No
             </td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">2.3</td>
@@ -698,8 +717,8 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
                 <br>□ Yes (Detail: <input type="text" style="width:300px" />)
                 <br>□ No
             </td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">3.0</td>
@@ -713,8 +732,8 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
                     <br>d) [Continue with all necessary steps]
                 </div>
             </td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">4.0</td>
@@ -724,8 +743,8 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
                 <br>• Control wiring: ___ in-lbs
                 <br>• Compressor terminals: ___ ft-lbs
             </td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         [CONTINUE WITH LOGICAL SEQUENCE: 
         - Complete all shutdown and LOTO procedures first
@@ -756,38 +775,38 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE (DO NOT INCLU
         <tr>
             <td style="text-align: center;">1</td>
             <td><strong>Immediate Actions:</strong> Stop all work immediately and secure the area</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">2</td>
             <td><strong>Equipment Stabilization:</strong> [Detailed procedure to return equipment to safe state]</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">3</td>
             <td><strong>System Verification:</strong> [Detailed checks to ensure no impact to critical systems]</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">4</td>
             <td><strong>Notification Procedures:</strong> Contact Data Center Operations Manager, explain situation and current equipment status</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">5</td>
             <td><strong>Documentation:</strong> Document exact state of equipment, work completed, and reason for back-out</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
             <td style="text-align: center;">6</td>
             <td><strong>Recovery Planning:</strong> Develop recovery plan with management before leaving site</td>
-            <td></td>
-            <td></td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         [GENERATE AT LEAST 8-10 DETAILED BACK-OUT STEPS]
     </tbody>
@@ -888,21 +907,24 @@ ${HTML_GENERATION_PROMPT}
 CRITICAL REQUIREMENTS FOR THIS MOP:
 1. DO NOT include any EQUIPMENT DETAILS section before Section 01
 2. Research the specific model ${modelNumber} for accurate technical specifications
-3. Section 1: Make MOP Information SUCCINCT (one sentence), set Revision Number to "V1", set Revision Date same as Creation Date
+3. Section 1: Make MOP Information SUCCINCT (one sentence), MOP Revision Date should be editable input with same date as creation date, Revision Number should be editable input with value "V1"
 4. Section 3: Research "How many engineers does it take to perform ${frequency} maintenance on ${manufacturer} ${modelNumber}?"
 5. Section 3: Include subcontractor checkbox options with fields for company, personnel, contact details
 6. Section 3: Set notifications to ALWAYS include: Data Center Operations Manager, Site Security, NOC/BMS Operator
 7. Section 4: Include ALL 20 systems listed (not just 6)
 8. Section 5: Add actual hyperlinks to all referenced documents
-9. Section 7: Include maintenance log sheet ONLY for equipment types that require it (chillers, generators, UPS systems). Include comprehensive risks and assumptions for ALL equipment.
-10. Section 8: Break down ALL complex procedures into detailed sub-steps
-11. Section 8: Include specific torque values and technical specifications
-12. Section 8: Add data recording fields/tables for all measurements
-13. Section 8: Fix procedural logic - running checks must be AFTER startup
-14. Section 9: Generate DETAILED back-out procedures (at least 8-10 steps)
-15. Section 10: Add input fields for all approval signatures
-16. Monitoring System is ALWAYS affected (Yes) for data center equipment
-17. Use actual <input> tags for all editable fields, not spans
+9. Section 7: Remove maintenance log sheet from here - only include comprehensive risks and assumptions
+10. Section 8: Move maintenance log sheet to beginning of this section (after the info table), break down ALL complex procedures into detailed sub-steps
+11. Section 8: Contractor/Vendor field should be editable input with placeholder text
+12. Section 8: ALL Initials and Time columns must have input boxes
+13. Section 8: Include specific torque values and technical specifications
+14. Section 8: Add data recording fields/tables for all measurements
+15. Section 8: Fix procedural logic - running checks must be AFTER startup
+16. Section 9: ALL Initials and Time columns must have input boxes
+17. Section 9: Generate DETAILED back-out procedures (at least 8-10 steps)
+18. Section 10: Add input fields for all approval signatures
+19. Monitoring System is ALWAYS affected (Yes) for data center equipment
+20. Use actual <input> tags for all editable fields, not spans
 
 REMEMBER: 
 - Start with <!DOCTYPE html>
