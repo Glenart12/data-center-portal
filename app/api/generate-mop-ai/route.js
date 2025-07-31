@@ -102,6 +102,13 @@ HTML STRUCTURE AND STYLING:
             text-align: center;
             font-size: 1.2em;
         }
+        .field-box {
+            border: 1px solid #999;
+            padding: 5px;
+            min-width: 150px;
+            display: inline-block;
+            background-color: #f9f9f9;
+        }
         ul { 
             line-height: 1.8; 
             margin-left: 20px;
@@ -119,6 +126,14 @@ HTML STRUCTURE AND STYLING:
         .section-separator {
             border-top: 2px solid #ccc;
             margin: 40px 0;
+        }
+        .data-recording-table {
+            background-color: #f5f5f5;
+            margin: 10px 0;
+        }
+        .sub-procedure {
+            margin-left: 30px;
+            font-style: italic;
         }
         @media print {
             body { background-color: white; }
@@ -144,7 +159,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
     </tr>
     <tr>
         <td>MOP Information:</td>
-        <td>[Detailed description of maintenance work]</td>
+        <td>[Be SUCCINCT - One sentence like "This is an annual maintenance on the [manufacturer] [equipment type]."]</td>
     </tr>
     <tr>
         <td>MOP Creation Date:</td>
@@ -152,7 +167,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
     </tr>
     <tr>
         <td>MOP Revision Date:</td>
-        <td><span class="update-needed">UPDATE NEEDED - Update upon revision</span></td>
+        <td>[SAME AS CREATION DATE for new documents]</td>
     </tr>
     <tr>
         <td>Document Number:</td>
@@ -160,7 +175,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
     </tr>
     <tr>
         <td>Revision Number:</td>
-        <td><span class="update-needed">UPDATE NEEDED - Assign per facility process</span></td>
+        <td>V1</td>
     </tr>
     <tr>
         <td>Author CET Level:</td>
@@ -220,19 +235,29 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
     </tr>
     <tr>
         <td>Min. # of Facilities Personnel:</td>
-        <td>[Number based on equipment type]</td>
+        <td>[DETERMINE BY RESEARCH: "How many engineers does it take to perform [maintenance type] on [manufacturer] [model]?"]</td>
     </tr>
     <tr>
-        <td># of Contractors #1:</td>
-        <td>N/A</td>
+        <td>Work Performed By:</td>
+        <td colspan="3">
+            <input type="checkbox" id="self-delivered" name="work-type"> 
+            <label for="self-delivered">Self-Delivered</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="checkbox" id="subcontractor" name="work-type"> 
+            <label for="subcontractor">Subcontractor</label>
+        </td>
     </tr>
     <tr>
-        <td># of Contractors #2:</td>
-        <td>N/A</td>
+        <td>If Subcontractor - Company Name:</td>
+        <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
     </tr>
     <tr>
-        <td>Personnel from other departments:</td>
-        <td>N/A</td>
+        <td>If Subcontractor - Personnel Name:</td>
+        <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Contact Details:</td>
+        <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
     </tr>
     <tr>
         <td>Qualifications Required:</td>
@@ -244,11 +269,11 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
     </tr>
     <tr>
         <td>Advance notifications required:</td>
-        <td>[Who must be notified before work]</td>
+        <td>Data Center Operations Manager, Site Security, NOC/BMS Operator</td>
     </tr>
     <tr>
         <td>Post notifications required:</td>
-        <td>[Who must be notified after work]</td>
+        <td>Data Center Operations Manager, Site Security, NOC/BMS Operator</td>
     </tr>
 </table>
 
@@ -273,7 +298,140 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td class="checkbox">[✓ or blank]</td>
             <td>[Impact details if Yes]</td>
         </tr>
-        </tbody>
+        <tr>
+            <td>Emergency Generator System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Critical Cooling System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Ventilation System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Mechanical System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Uninterruptible Power Supply (UPS)</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Critical Power Distribution System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Emergency Power Off (EPO)</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Fire Detection Systems</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Fire Suppression System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Monitoring System</td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td class="checkbox"></td>
+            <td>Monitoring System is ALWAYS affected for data center equipment maintenance</td>
+        </tr>
+        <tr>
+            <td>Control System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Security System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>General Power and Lighting System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Lockout/Tagout Required?</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Work to be performed "hot"?</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Radio interference potential?</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Water/Leak Detection System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Building Automation System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+        <tr>
+            <td>Transfer Switch System</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td class="checkbox">[✓ or blank]</td>
+            <td>[Impact details if Yes]</td>
+        </tr>
+    </tbody>
 </table>
 
 <div class="section-separator"></div>
@@ -281,11 +439,11 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
 <h2>Section 05: MOP Supporting Documentation</h2>
 <p><strong>MOP Supporting Documentation</strong></p>
 <ul>
-    <li>[Manufacturer model-specific operation/maintenance manual]</li>
-    <li>OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)</li>
-    <li>OSHA 29 CFR 1910 Subpart I - Personal Protective Equipment</li>
-    <li>[Equipment-specific NFPA standards]</li>
-    <li>[Safety Data Sheets for all chemicals]</li>
+    <li><a href="[URL]" target="_blank">[Manufacturer model-specific operation/maintenance manual]</a></li>
+    <li><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147" target="_blank">OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)</a></li>
+    <li><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910SubpartI" target="_blank">OSHA 29 CFR 1910 Subpart I - Personal Protective Equipment</a></li>
+    <li><a href="[URL]" target="_blank">[Equipment-specific NFPA standards]</a></li>
+    <li><a href="[URL]" target="_blank">[Safety Data Sheets for all chemicals]</a></li>
 </ul>
 
 <div class="section-separator"></div>
@@ -308,7 +466,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td>[Chemical names and hazards from SDS]</td>
             <td>[PPE and handling requirements]</td>
         </tr>
-        </tbody>
+    </tbody>
 </table>
 
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
@@ -326,7 +484,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td>Safety glasses with side shields, ANSI Z87.1</td>
             <td>At all times during maintenance work</td>
         </tr>
-        </tbody>
+    </tbody>
 </table>
 
 <h3>SAFETY PROCEDURES</h3>
@@ -342,7 +500,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td><strong>Pre-Work Safety Briefing</strong></td>
             <td>Conduct safety briefing with all personnel, review hazards</td>
         </tr>
-        </tbody>
+    </tbody>
 </table>
 
 <h3>EMERGENCY CONTACTS</h3>
@@ -394,20 +552,64 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
 <table class="info-table">
     <tr>
         <td>Date Performed:</td>
-        <td style="width: 150px;"></td>
+        <td style="width: 150px;"><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
         <td>Time Begun:</td>
-        <td style="width: 150px;"></td>
+        <td style="width: 150px;"><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
         <td>Time Completed:</td>
-        <td style="width: 150px;"></td>
+        <td style="width: 150px;"><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
     </tr>
     <tr>
         <td colspan="2">Facilities personnel performing work:</td>
-        <td colspan="4"></td>
+        <td colspan="4"><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
     </tr>
     <tr>
         <td colspan="2">Contractor/Vendor personnel performing work:</td>
-        <td colspan="4"></td>
+        <td colspan="4">[If subcontractor selected in Section 3, auto-populate with company name]</td>
     </tr>
+</table>
+
+<h3>Pre-Startup Checks & Restoration</h3>
+<p><strong>Equipment Maintenance Log Sheet</strong></p>
+[RESEARCH AND INCLUDE: Find the official Maintenance Log Sheet for [manufacturer] [model] and include specific criteria and readings that need to be recorded, such as:]
+
+<table class="data-recording-table">
+    <thead>
+        <tr>
+            <th>Circuit/Unit</th>
+            <th>Oil Level</th>
+            <th>Oil Pressure (PSI)</th>
+            <th>Suction Temp (°F)</th>
+            <th>Discharge Temp (°F)</th>
+            <th>Suction Pressure (PSI)</th>
+            <th>Discharge Pressure (PSI)</th>
+            <th>Superheat (°F)</th>
+            <th>Subcooling (°F)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Circuit 1</td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+        </tr>
+        <tr>
+            <td>Circuit 2</td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+            <td><span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+        </tr>
+    </tbody>
 </table>
 
 <h3>Detailed Procedure Steps</h3>
@@ -423,7 +625,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
     <tbody>
         <tr>
             <td style="text-align: center;">1</td>
-            <td>Notify client Point(s) of Contact (POC) that procedure is about to begin</td>
+            <td>Notify Data Center Operations Manager, Site Security, and NOC/BMS Operator that procedure is about to begin</td>
             <td></td>
             <td></td>
         </tr>
@@ -439,7 +641,58 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td></td>
             <td></td>
         </tr>
-        </tbody>
+        <tr>
+            <td style="text-align: center;">2.2</td>
+            <td>Check for active alarms on equipment control panel:
+                <br>□ Yes (Detail: <span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>)
+                <br>□ No
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">2.3</td>
+            <td>Check for historical fault codes:
+                <br>□ Yes (Detail: <span class="field-box">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>)
+                <br>□ No
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">3.0</td>
+            <td>
+                <strong>Perform controlled shutdown of [equipment]</strong>
+                <div class="sub-procedure">
+                    [GENERATE DETAILED SUB-PROCEDURE: Create step-by-step procedure for shutting down [manufacturer] [model]]
+                    <br>a) [Step 1 of shutdown procedure]
+                    <br>b) [Step 2 of shutdown procedure]
+                    <br>c) [Step 3 of shutdown procedure]
+                    <br>d) [Continue with all necessary steps]
+                </div>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">4.0</td>
+            <td>When torquing electrical connections, use manufacturer specified torque settings:
+                <br>[INCLUDE SPECIFIC TORQUE VALUES: Research and list torque specifications for [manufacturer] [model]]
+                <br>• Main power connections: ___ ft-lbs
+                <br>• Control wiring: ___ in-lbs
+                <br>• Compressor terminals: ___ ft-lbs
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        [CONTINUE WITH LOGICAL SEQUENCE: 
+        - Complete all shutdown and LOTO procedures first
+        - Then perform all maintenance tasks that require equipment to be off
+        - Move running checks (oil levels, refrigerant checks, pressure readings) to AFTER startup
+        - Include specific technical specifications where mentioned
+        - Break down complex procedures into detailed sub-steps
+        - Add data recording fields for all measurements]
+    </tbody>
 </table>
 
 <div class="section-separator"></div>
@@ -461,7 +714,7 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
             <td></td>
             <td></td>
         </tr>
-        </tbody>
+    </tbody>
 </table>
 
 <div class="section-separator"></div>
@@ -491,12 +744,6 @@ GENERATE THE COMPLETE HTML DOCUMENT FOLLOWING THIS EXACT STRUCTURE:
         </tr>
         <tr>
             <td><strong>Chief Engineer approval:</strong></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td><strong>Contractor Review (if applicable):</strong></td>
             <td></td>
             <td></td>
             <td></td>
@@ -561,15 +808,19 @@ ${HTML_GENERATION_PROMPT}
 
 CRITICAL REQUIREMENTS FOR THIS MOP:
 1. Research the specific model ${modelNumber} for accurate technical specifications
-2. Determine risk level based on ${system} type and redundancy
-3. Map appropriate CET level from risk assessment
-4. Include manufacturer-specific maintenance procedures for ${manufacturer} ${modelNumber}
-5. Research actual chemicals used for ${system} maintenance
-6. Generate 20-30 detailed maintenance steps specific to ${modelNumber}
-7. Include equipment-specific backout procedures
-8. Use <span class="update-needed">UPDATE NEEDED - [instruction]</span> for facility-specific fields
-9. Fill in realistic, researched content - no placeholders or generic text
-10. Monitoring System is ALWAYS affected (Yes) for data center equipment
+2. Section 1: Make MOP Information SUCCINCT (one sentence), set Revision Number to "V1", set Revision Date same as Creation Date
+3. Section 3: Research "How many engineers does it take to perform ${frequency} maintenance on ${manufacturer} ${modelNumber}?"
+4. Section 3: Include subcontractor checkbox options with fields for company, personnel, contact details
+5. Section 3: Set notifications to ALWAYS include: Data Center Operations Manager, Site Security, NOC/BMS Operator
+6. Section 4: Include ALL 20 systems listed (not just 6)
+7. Section 5: Add actual hyperlinks to all referenced documents
+8. Section 7: Research and include the official Maintenance Log Sheet for ${manufacturer} ${modelNumber}
+9. Section 8: Break down ALL complex procedures into detailed sub-steps
+10. Section 8: Include specific torque values and technical specifications
+11. Section 8: Add data recording fields/tables for all measurements
+12. Section 8: Fix procedural logic - running checks must be AFTER startup
+13. Section 10: Remove "Contractor Review" row entirely
+14. Monitoring System is ALWAYS affected (Yes) for data center equipment
 
 REMEMBER: 
 - Start with <!DOCTYPE html>
@@ -583,10 +834,10 @@ REMEMBER:
     
     // Use the model - note: using regular flash, not 8b for better quality
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-pro',
+      model: 'gemini-1.5-flash',
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 65536,
+        maxOutputTokens: 50000,
       }
     });
     
