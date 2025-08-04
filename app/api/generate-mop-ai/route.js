@@ -186,6 +186,35 @@ CRITICAL REQUIREMENTS:
 EQUIPMENT INFORMATION:
 {EQUIPMENT_DETAILS}
 
+CRITICAL RISK LEVEL DETERMINATION RULES:
+You MUST analyze the equipment and work being performed to determine the correct risk level (1-4):
+
+Level 1 (Low): 
+- Single system affected
+- Low probability of service interruption
+- Examples: Basic visual inspections, filter changes with redundant systems
+
+Level 2 (Medium): 
+- Multiple systems affected OR one critical system with redundancy
+- Medium probability of service interruption
+- Examples: Single chiller maintenance with redundant chiller available, UPS battery replacement
+
+Level 3 (High): 
+- Critical systems affected with limited redundancy
+- High probability of service interruption if something goes wrong
+- Examples: Generator maintenance, critical cooling system work, major electrical work
+
+Level 4 (Critical): 
+- Multiple critical systems affected
+- Certain service interruption or extremely high risk
+- Examples: Main switchgear work, complete cooling system shutdown, EPO system work
+
+CET LEVEL REQUIREMENTS BASED ON RISK:
+- Risk Level 1: CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve
+- Risk Level 2: CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve  
+- Risk Level 3: CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve
+- Risk Level 4: CET 4 (Manager) to execute, CET 5 (Director) to approve
+
 GENERATE THE FOLLOWING 11 SECTIONS:
 
 Section 01: MOP Schedule Information
@@ -194,7 +223,10 @@ Section 01: MOP Schedule Information
 
 Section 02: Site Information  
 - Location field should be editable with red UPDATE NEEDED placeholder
-- Include risk level and CET level requirements
+- CRITICAL: Risk Level MUST be properly determined based on the rules above
+  Format: "Level [1-4] ([Low/Medium/High/Critical]) - [Specific justification based on systems affected]"
+  Example: "Level 3 (High) - Critical cooling system maintenance with high risk to data center operations if redundancy fails"
+- CET Level must match the risk level requirements
 
 Section 03: MOP Overview
 - Include all equipment details
@@ -203,6 +235,8 @@ Section 03: MOP Overview
 
 Section 04: Effect of MOP on Critical Facility
 - Create a 20-row table with all facility systems
+- CRITICAL: Your selections in this table MUST support the risk level in Section 02
+- Mark "Yes" for systems that will be affected by the maintenance
 - Monitoring System is ALWAYS affected (Yes)
 - Include checkboxes for Yes/No/N/A
 
@@ -348,6 +382,15 @@ export async function POST(request) {
           // If we're missing sections, try to complete the MOP
           if (attempt < maxAttempts) {
             console.log('Attempting to regenerate with focus on completeness...');
+            continue;
+          }
+        }
+        
+        // Verify risk level is properly formatted
+        if (!mopContent.includes('Level 1') && !mopContent.includes('Level 2') && 
+            !mopContent.includes('Level 3') && !mopContent.includes('Level 4')) {
+          console.log('Risk level not properly formatted, regenerating...');
+          if (attempt < maxAttempts) {
             continue;
           }
         }
