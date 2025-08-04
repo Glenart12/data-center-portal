@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
-  const [htmlContent, setHtmlContent] = useState(null);
+  const [iframeUrl, setIframeUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Determine file type
@@ -22,25 +22,45 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
   // Get display name without extension
   const displayName = pdfName?.replace(/\.(pdf|html|htm|txt)$/i, '') || 'Document Preview';
 
-  // Fetch HTML content when modal opens for HTML files
+  // Handle HTML files - create a blob URL for proper rendering
   useEffect(() => {
     if (isOpen && isHtml && pdfUrl) {
       setIsLoading(true);
-      fetch(pdfUrl)
-        .then(response => response.text())
-        .then(html => {
-          setHtmlContent(html);
-          setIsLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching HTML:', error);
-          setIsLoading(false);
-        });
-    } else {
-      // Reset when modal closes or for non-HTML files
-      setHtmlContent(null);
-      setIsLoading(false);
+      
+      // For HTML files, we need to ensure they render with proper styling
+      // If it's a blob URL, use it directly
+      if (pdfUrl.startsWith('blob:') || pdfUrl.startsWith('https://')) {
+        setIframeUrl(pdfUrl);
+        setIsLoading(false);
+      } else {
+        // For local files, fetch and create a blob URL
+        fetch(pdfUrl)
+          .then(response => response.text())
+          .then(html => {
+            // Create a blob with the HTML content
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            setIframeUrl(url);
+            setIsLoading(false);
+          })
+          .catch(error => {
+            console.error('Error fetching HTML:', error);
+            setIsLoading(false);
+            // Fallback to direct URL
+            setIframeUrl(pdfUrl);
+          });
+      }
+    } else if (isOpen && !isHtml) {
+      // For non-HTML files, use the URL directly
+      setIframeUrl(pdfUrl);
     }
+
+    // Cleanup blob URLs when modal closes
+    return () => {
+      if (iframeUrl && iframeUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(iframeUrl);
+      }
+    };
   }, [isOpen, isHtml, pdfUrl]);
 
   if (!isOpen) return null;
@@ -67,9 +87,9 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
         backgroundColor: 'white',
         borderRadius: '15px',
         width: '95%',
-        maxWidth: '1000px',
-        height: 'calc(100vh - 180px)',
-        maxHeight: 'calc(100vh - 180px)',
+        maxWidth: '1200px',
+        height: 'calc(100vh - 140px)',
+        maxHeight: 'calc(100vh - 140px)',
         overflow: 'hidden',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         display: 'flex',
@@ -143,15 +163,14 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
         {/* Document Content - Flexible Height */}
         <div style={{
           flex: 1,
-          padding: '20px',
+          padding: '10px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           overflow: 'hidden',
-          minHeight: '200px',
           backgroundColor: '#fafafa'
         }}>
-          {pdfUrl && (
+          {iframeUrl && (
             <>
               {isLoading ? (
                 <div style={{
@@ -176,31 +195,20 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
                     }
                   `}</style>
                 </div>
-              ) : isHtml && htmlContent ? (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'white',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                    overflow: 'auto'
-                  }}
-                  dangerouslySetInnerHTML={{ __html: htmlContent }}
-                />
               ) : (
                 <iframe
-                  src={pdfUrl}
+                  src={iframeUrl}
                   style={{
                     width: '100%',
                     height: '100%',
-                    minHeight: '200px',
                     border: 'none',
                     borderRadius: '8px',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                     backgroundColor: 'white'
                   }}
                   title={pdfName}
+                  // Allow HTML documents to have their own styling
+                  sandbox="allow-same-origin allow-scripts"
                 />
               )}
             </>
