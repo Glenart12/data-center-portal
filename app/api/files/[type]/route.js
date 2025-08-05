@@ -3,8 +3,10 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
-export async function GET(request, { params }) {
+export async function GET(request, props) {
   try {
+    // Await params for Next.js 15
+    const params = await props.params;
     const { type } = params;
     
     if (!['mops', 'sops', 'eops'].includes(type)) {

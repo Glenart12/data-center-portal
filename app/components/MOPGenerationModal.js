@@ -8,6 +8,12 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     modelNumber: '',
     serialNumber: '',
     location: '',
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: ''
+    },
     system: '',
     category: '',
     description: ''
@@ -52,6 +58,16 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleAddressChange = (addressField, value) => {
+    setFormData(prev => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        [addressField]: value
+      }
     }));
   };
 
@@ -113,7 +129,11 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          formData,
+          formData: {
+            ...formData,
+            frequency: formData.category, // Add frequency field using category value
+            workDescription: formData.description // Ensure workDescription is available
+          },
           supportingDocs: supportingDocs.map(doc => ({
             name: doc.name,
             type: doc.type,
@@ -280,6 +300,80 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 placeholder="e.g., Data Hall 1"
               />
             </div>
+          </div>
+
+          {/* Address Section */}
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#333' }}>
+              Site Address
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 80px', gap: '15px', marginBottom: '15px' }}>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.street}
+                  onChange={(e) => handleAddressChange('street', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="Street Address"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.city}
+                  onChange={(e) => handleAddressChange('city', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="City"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.state}
+                  onChange={(e) => handleAddressChange('state', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    textTransform: 'uppercase'
+                  }}
+                  placeholder="State"
+                  maxLength="2"
+                />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '15px' }}>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.zipCode}
+                  onChange={(e) => handleAddressChange('zipCode', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="ZIP Code"
+                  maxLength="10"
+                />
+              </div>
+              <div></div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
