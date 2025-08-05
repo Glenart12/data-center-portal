@@ -1,7 +1,91 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getEquipmentData } from '@/lib/mop-knowledge/enhanced-equipment-database';
 import { ENHANCED_PPE_REQUIREMENTS } from '@/lib/mop-knowledge/enhanced-safety-standards';
 import { getRelevantEOPs } from '@/lib/mop-knowledge/eop-references';
+
+// Function to research local emergency contacts using AI
+async function researchLocalEmergencyContacts(address) {
+  if (!address?.city || !address?.state || !address?.zipCode) {
+    console.log('Insufficient address information for emergency contact research');
+    return null;
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-pro",
+      generationConfig: {
+        temperature: 0.1,
+        topP: 0.1,
+        topK: 1,
+        maxOutputTokens: 2048,
+      }
+    });
+
+    const prompt = `Research and provide ACTUAL phone numbers and addresses for local emergency services in ${address.city}, ${address.state} ${address.zipCode}. Look up real hospitals, real fire/police non-emergency numbers, and real utility companies serving this area. Only use 'XXX-XXX-XXXX' placeholders if you cannot find real information after searching.
+
+For utilities, identify the actual companies based on location:
+- For Illinois: ComEd or Ameren for electric, Nicor or Peoples Gas for gas
+- For New York: ConEd or National Grid  
+- For California: PG&E, SCE, or SDG&E
+- For Texas: Oncor, CenterPoint, AEP Texas, etc.
+- Research which utilities actually serve the specific zip code ${address.zipCode}
+
+Provide the information in this JSON format:
+{
+  "buildingDepartment": {
+    "name": "Actual building department name",
+    "phone": "actual phone number",
+    "address": "actual address"
+  },
+  "nearestHospital": {
+    "name": "Actual hospital name",
+    "phone": "actual phone number", 
+    "address": "actual address"
+  },
+  "fireNonEmergency": {
+    "name": "Actual fire department name",
+    "phone": "actual non-emergency number",
+    "address": "actual address"
+  },
+  "policeNonEmergency": {
+    "name": "Actual police department name", 
+    "phone": "actual non-emergency number",
+    "address": "actual address"
+  },
+  "electricUtility": {
+    "name": "Actual electric utility company name",
+    "phone": "actual emergency/outage number"
+  },
+  "gasUtility": {
+    "name": "Actual gas utility company name",
+    "phone": "actual emergency number"
+  }
+}
+
+Research this information thoroughly - these are real emergency contacts that may be needed during actual data center operations.`;
+
+    console.log('Researching emergency contacts for:', address.city, address.state, address.zipCode);
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+    
+    console.log('AI emergency contact research response:', responseText);
+    
+    // Parse the JSON response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    
+    console.log('No valid JSON found in AI response');
+    return null;
+    
+  } catch (error) {
+    console.error('Error researching emergency contacts:', error);
+    return null;
+  }
+}
 
 export async function POST(request) {
   try {
@@ -29,6 +113,11 @@ export async function POST(request) {
     const relevantEOPs = getRelevantEOPs(system?.toLowerCase() || '', workDescription || '');
     
     console.log('Relevant EOPs result:', relevantEOPs);
+    
+    // Research local emergency contacts
+    console.log('Researching local emergency contacts...');
+    const emergencyContacts = await researchLocalEmergencyContacts(address);
+    console.log('Emergency contacts research result:', emergencyContacts);
     
     
     // Build PPE table with specific models
@@ -177,9 +266,13 @@ ${eopSection}
 
 <h3>LOCAL EMERGENCY SERVICES</h3>
 <p><strong>Location: ${address?.street || 'Site Address'}, ${address?.city || 'City'}, ${address?.state || 'State'} ${address?.zipCode || 'ZIP'}</strong></p>
+${emergencyContacts ? `
+<div style="background-color: #d4edda; border: 1px solid #28a745; padding: 10px; margin: 10px 0; border-radius: 4px;">
+    <strong>✓ RESEARCHED:</strong> The contact information below has been researched for this specific location. Please verify current phone numbers before use as they may change over time.
+</div>` : `
 <div style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin: 10px 0; border-radius: 4px;">
-    <strong>⚠️ IMPORTANT:</strong> All phone numbers below require local verification before use. Contact local directory assistance or city/county offices to verify current emergency service contact information for this specific location.
-</div>
+    <strong>⚠️ IMPORTANT:</strong> Unable to research specific contact information for this location. Please verify all phone numbers below with local directory assistance or city/county offices before use.
+</div>`}
 <table>
     <thead>
         <tr>
@@ -192,38 +285,38 @@ ${eopSection}
     <tbody>
         <tr>
             <td><strong>Local AHJ (Authority Having Jurisdiction)</strong></td>
-            <td>${address?.city || 'City'} Building Department</td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:200px" /></td>
-            <td>${address?.city || 'City'} Municipal Building</td>
+            <td>${emergencyContacts?.buildingDepartment?.name || `${address?.city || 'City'} Building Department`}</td>
+            <td>${emergencyContacts?.buildingDepartment?.phone || 'XXX-XXX-XXXX (VERIFY LOCALLY)'}</td>
+            <td>${emergencyContacts?.buildingDepartment?.address || `${address?.city || 'City'} Municipal Building`}</td>
         </tr>
         <tr>
             <td><strong>Nearest Hospital</strong></td>
-            <td>${address?.city || 'City'} General Hospital</td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:200px" /></td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:250px" /></td>
+            <td>${emergencyContacts?.nearestHospital?.name || `${address?.city || 'City'} General Hospital`}</td>
+            <td>${emergencyContacts?.nearestHospital?.phone || 'XXX-XXX-XXXX (VERIFY LOCALLY)'}</td>
+            <td>${emergencyContacts?.nearestHospital?.address || 'Address not available - verify locally'}</td>
         </tr>
         <tr>
             <td><strong>Fire Department (Non-Emergency)</strong></td>
-            <td>${address?.city || 'City'} Fire Department</td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:200px" /></td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:250px" /></td>
+            <td>${emergencyContacts?.fireNonEmergency?.name || `${address?.city || 'City'} Fire Department`}</td>
+            <td>${emergencyContacts?.fireNonEmergency?.phone || 'XXX-XXX-XXXX (VERIFY LOCALLY)'}</td>
+            <td>${emergencyContacts?.fireNonEmergency?.address || 'Address not available - verify locally'}</td>
         </tr>
         <tr>
             <td><strong>Police Department (Non-Emergency)</strong></td>
-            <td>${address?.city || 'City'} Police Department</td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:200px" /></td>
-            <td>${address?.city || 'City'} Police Headquarters</td>
+            <td>${emergencyContacts?.policeNonEmergency?.name || `${address?.city || 'City'} Police Department`}</td>
+            <td>${emergencyContacts?.policeNonEmergency?.phone || 'XXX-XXX-XXXX (VERIFY LOCALLY)'}</td>
+            <td>${emergencyContacts?.policeNonEmergency?.address || `${address?.city || 'City'} Police Headquarters`}</td>
         </tr>
         <tr>
             <td><strong>Local Utility - Electric</strong></td>
-            <td>${address?.state || 'State'} Electric Company</td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:200px" /></td>
+            <td>${emergencyContacts?.electricUtility?.name || `${address?.state || 'State'} Electric Company`}</td>
+            <td>${emergencyContacts?.electricUtility?.phone || 'XXX-XXX-XXXX (VERIFY LOCALLY)'}</td>
             <td>24/7 Emergency Line</td>
         </tr>
         <tr>
             <td><strong>Local Utility - Gas</strong></td>
-            <td>${address?.state || 'State'} Gas Company</td>
-            <td><input type="text" placeholder="NEEDS LOCAL VERIFICATION" class="update-needed-input" style="width:200px" /></td>
+            <td>${emergencyContacts?.gasUtility?.name || `${address?.state || 'State'} Gas Company`}</td>
+            <td>${emergencyContacts?.gasUtility?.phone || 'XXX-XXX-XXXX (VERIFY LOCALLY)'}</td>
             <td>24/7 Emergency Line</td>
         </tr>
     </tbody>
