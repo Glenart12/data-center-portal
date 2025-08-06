@@ -5,13 +5,24 @@ import { put } from '@vercel/blob';
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const PROJECT_INSTRUCTIONS = `Generate a complete Emergency Operating Procedure (EOP) for data center equipment failures. Create a COMPLETE HTML document with ALL 8 sections - no placeholders or summaries.
+const PROJECT_INSTRUCTIONS = `Generate a complete Emergency Operating Procedure (EOP) for data center equipment failures. Create ALL 8 sections with complete content - no placeholders or summaries.
+
+CRITICAL HTML GENERATION RULES:
+- DO NOT generate DOCTYPE, html, head, body, or container div tags
+- Generate ONLY the content that goes INSIDE the existing container div
+- Start with the main H1 title, then proceed with sections
+- Use H2 for all section headers (not H1)
+- Use H3 for subsection headers
+- The HTML template already provides the document structure
 
 IMPORTANT: This EOP must be INTERACTIVE with editable input fields. Include HTML input elements throughout.
 
 The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 
-SECTION 1: EOP Identification & Control
+START WITH:
+<h1>Emergency Operating Procedure (EOP)</h1>
+
+<h2>Section 01: EOP Identification & Control</h2>
 - EOP Title, Identifier
 - Equipment Details as a properly formatted list:
   • Manufacturer: {actual manufacturer from form data}
@@ -24,11 +35,11 @@ SECTION 1: EOP Identification & Control
 - Author: <input type="text" placeholder="Enter Author Name" style="width:250px" />
 - Approver: <input type="text" placeholder="Enter Approver Name" style="width:250px" />
 
-SECTION 2: Purpose & Scope
+<h2>Section 02: Purpose & Scope</h2>
 - Clear statement of emergency response goals
 - Who this procedure applies to
 
-SECTION 3: IMMEDIATE EMERGENCY ACTIONS
+<h2>Section 03: Immediate Emergency Actions</h2>
 - Create a table with columns: Step, Action, Initials, Time
 - Each action row should have:
   - Initials column: <input type="text" class="small-input" style="width:60px" />
@@ -36,18 +47,17 @@ SECTION 3: IMMEDIATE EMERGENCY ACTIONS
 - 4-5 numbered steps for immediate response
 - Use CAPITAL LETTERS for critical actions like PRESS, NOTIFY, PROCEED
 
-SECTION 4: Trigger Conditions & Specific Scenarios
+<h2>Section 04: Trigger Conditions & Specific Scenarios</h2>
 - Create 4 scenarios based on the emergency type provided
 - Each scenario with trigger conditions and specific actions
 
-SECTION 5: Communication & Escalation Protocol
+<h2>Section 05: Communication & Escalation Protocol</h2>
 - Table with contact levels 0-3 plus emergency services
 - Phone number fields: <input type="text" placeholder="Enter phone" style="width:150px" />
 - Contact name fields where appropriate: <input type="text" placeholder="Enter contact name" style="width:200px" />
 
-Include a comprehensive Emergency Contacts subsection with the following categories in a table format:
-
-Emergency Contacts Table with columns: Service Type, Contact Name/Organization, Phone Number, Notes/Address
+<h3>Emergency Contacts</h3>
+Include a comprehensive Emergency Contacts table with columns: Service Type, Contact Name/Organization, Phone Number, Notes/Address
 
 Include these essential emergency contacts (use editable input fields for phone numbers):
 - Police Emergency: 911
@@ -66,13 +76,14 @@ Include these essential emergency contacts (use editable input fields for phone 
 Add this important note at the bottom of the Emergency Contacts section:
 "⚠️ IMPORTANT: Verify all emergency contact numbers for your specific facility location. Update phone numbers as needed."
 
-SECTION 6: Recovery & Return to Service
+<h2>Section 06: Recovery & Return to Service</h2>
 - Fault verification, system reset, return to service steps
 
-SECTION 7: Supporting Information
+<h2>Section 07: Supporting Information</h2>
 - Equipment locations
 
-PPE Requirements - Create a professional table with columns: PPE Category | Specification | When Required
+<h3>PPE Requirements</h3>
+Create a professional table with columns: PPE Category | Specification | When Required
 Include these specific rows:
 - Safety Glasses | ANSI Z87.1 rated | At all times in mechanical areas
 - Gloves | Insulated, voltage-rated | When working on electrical components  
@@ -80,32 +91,33 @@ Include these specific rows:
 - Arc Flash PPE | Category 2 minimum | When working on energized electrical panels
 - Hard Hat | ANSI Z89.1 | When working in areas with overhead hazards
 
-Related Documents - Make these clickable hyperlinks:
+<h3>Related Documents</h3>
+Make these clickable hyperlinks:
 - <a href="#" style="color: #0070f3; text-decoration: underline;">Equipment Operation Manual</a> (Internal Document)
 - <a href="#" style="color: #0070f3; text-decoration: underline;">Data Center Power Distribution Diagram</a> (Internal Document)
 - <a href="#" style="color: #0070f3; text-decoration: underline;">Emergency Contact List</a> (Internal Document)
 - <a href="https://www.osha.gov/emergency-preparedness" target="_blank" style="color: #0070f3; text-decoration: underline;">OSHA Emergency Preparedness Guidelines</a>
 - <a href="https://www.nfpa.org/codes-and-standards" target="_blank" style="color: #0070f3; text-decoration: underline;">NFPA Standards Database</a>
 
-SECTION 8: EOP Approval & Review
+<h2>Section 08: EOP Approval & Review</h2>
 - Approval matrix table with editable fields:
   - Name column: <input type="text" placeholder="Enter name" style="width:200px" />
   - Signature column: <input type="text" placeholder="Signature" style="width:200px" />
   - Date column: <input type="text" placeholder="MM/DD/YYYY" style="width:120px" />
 
 CRITICAL FORMATTING REQUIREMENTS:
+- DO NOT generate DOCTYPE, html, head, body tags or container div
+- Start with <h1>Emergency Operating Procedure (EOP)</h1>
+- Use H2 for section headers: "Section 01:", "Section 02:", etc. (with zero-padded numbers)
+- Use H3 for subsection headers like "Emergency Contacts", "PPE Requirements"
 - Use red (color: #dc3545) for all emergency warnings and critical actions
-- Replace ANY placeholder text like "[Signature Placeholder]" with proper input fields
-- Use .emergency-action class for emergency action boxes
-- Use .emergency-warning class for warning banners
-- Use .critical-text class for critical text that should be red and uppercase
+- Replace ANY placeholder text with proper input fields
+- Use CSS classes: .emergency-action, .emergency-warning, .critical-text
 - Make tables professional with proper styling and borders
-- Equipment Details in Section 1 must be formatted as a clean bulleted list using actual form data
-- PPE Requirements must be in a proper HTML table format with headers and borders
-- Related Documents must use actual clickable <a> tags with proper styling
-- Internal document links use href="#" and external links use real URLs with target="_blank"
-
-Format as complete HTML content (body content only, not full HTML document).`;
+- Equipment Details must be formatted as a clean bulleted list using actual form data
+- PPE Requirements must be in proper HTML table format
+- Related Documents must use actual clickable <a> tags
+- Generate content only - no document structure tags`;
 
 const HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
@@ -289,11 +301,13 @@ Emergency Details:
 - Emergency Type: ${formData.emergencyType}
 - Emergency Description: ${formData.description}
 
-Generate a complete HTML document for the body content only (everything that goes inside the container div). 
-Include ALL 8 sections with complete, detailed content with INTERACTIVE INPUT FIELDS as specified above.
-For Section 4, create 4 specific scenarios based on the emergency type "${formData.emergencyType}".
+Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
+Start with <h1>Emergency Operating Procedure (EOP)</h1> then proceed with sections using H2 headers.
+Include ALL 8 sections with complete, detailed content and INTERACTIVE INPUT FIELDS as specified above.
+For Section 04, create 4 specific scenarios based on the emergency type "${formData.emergencyType}".
+Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded numbers).
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
-IMPORTANT: Include interactive input fields throughout the document as specified in the instructions above.`;
+CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).`;
 
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
@@ -308,9 +322,12 @@ IMPORTANT: Include interactive input fields throughout the document as specified
     generatedContent = generatedContent
       .replace(/```html/g, '')
       .replace(/```/g, '')
+      .replace(/<!DOCTYPE[^>]*>/gi, '')
       .replace(/<\/?html[^>]*>/gi, '')
       .replace(/<\/?head[^>]*>/gi, '')
       .replace(/<\/?body[^>]*>/gi, '')
+      .replace(/<div[^>]*class="container"[^>]*>/gi, '')
+      .replace(/<\/div>\s*$/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
       .replace(/<meta[^>]*>/gi, '')
       .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
