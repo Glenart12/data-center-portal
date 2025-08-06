@@ -23,7 +23,17 @@ export async function GET(request, props) {
       
       console.log(`Found ${blobs.length} total blobs`);
       
-      // For MOPs, also include files that start with MOP_ (since they're in root)
+      // Debug: Log all blob pathnames for EOPs
+      if (type === 'eops') {
+        console.log('All blob pathnames:', blobs.map(b => b.pathname));
+        const eopBlobs = blobs.filter(blob => {
+          const filename = blob.pathname.split('/').pop();
+          return filename.startsWith('EOP_') || blob.pathname.startsWith('eops/');
+        });
+        console.log('Filtered EOP blobs:', eopBlobs.map(b => b.pathname));
+      }
+      
+      // Handle different document types
       if (type === 'mops') {
         blobFiles = blobs
           .filter(blob => {
@@ -42,13 +52,30 @@ export async function GET(request, props) {
               source: 'blob'
             };
           });
-      } else {
-        // For SOPs and EOPs, look for files in their folders or with their prefixes
-        const prefix = type.toUpperCase().slice(0, -1); // SOP or EOP
+      } else if (type === 'eops') {
         blobFiles = blobs
           .filter(blob => {
             const filename = blob.pathname.split('/').pop();
-            return (filename.startsWith(`${prefix}_`) || blob.pathname.startsWith(`${type}/`)) && 
+            // Include files that start with EOP_ or are in eops/ folder
+            return (filename.startsWith('EOP_') || blob.pathname.startsWith('eops/')) && 
+                   (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
+          })
+          .map(blob => {
+            const filename = blob.pathname.split('/').pop();
+            return {
+              filename: filename,
+              url: blob.url,
+              size: blob.size,
+              uploadedAt: blob.uploadedAt,
+              source: 'blob'
+            };
+          });
+      } else if (type === 'sops') {
+        blobFiles = blobs
+          .filter(blob => {
+            const filename = blob.pathname.split('/').pop();
+            // Include files that start with SOP_ or are in sops/ folder
+            return (filename.startsWith('SOP_') || blob.pathname.startsWith('sops/')) && 
                    (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
           })
           .map(blob => {
