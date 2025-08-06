@@ -124,7 +124,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Operating Procedure (EOP)</title>
+    <title>${EOP_TITLE}</title>
     <style>
         body { 
             font-family: 'Century Gothic', Arial, sans-serif; 
@@ -338,8 +338,13 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       generatedContent = `<h1>Emergency Operating Procedure (EOP)</h1>\n${generatedContent}`;
     }
     
-    // Build complete HTML
-    const completeHtml = HTML_TEMPLATE.replace('{{CONTENT}}', generatedContent);
+    // Generate dynamic EOP title
+    const eopTitle = `EOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.emergencyType}`;
+    
+    // Build complete HTML with dynamic title
+    const completeHtml = HTML_TEMPLATE
+      .replace('${EOP_TITLE}', eopTitle)
+      .replace('{{CONTENT}}', generatedContent);
     
     // Generate filename
     const date = new Date().toISOString().split('T')[0];
