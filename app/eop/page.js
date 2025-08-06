@@ -13,7 +13,7 @@ function EopPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showEOPModal, setShowEOPModal] = useState(false);
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [deletingFile, setDeletingFile] = useState(null);
 
   useEffect(() => {
@@ -75,6 +75,12 @@ function EopPage() {
     setSelectedPDF(null);
   };
 
+  const closeGenerateModal = () => {
+    setIsGenerateModalOpen(false);
+    // Refresh files after closing generate modal
+    fetchFiles();
+  };
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -121,6 +127,31 @@ function EopPage() {
     }
   };
 
+  // Fixed button style with proper emoji and text alignment
+  const buttonStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+    padding: '12px 24px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    minWidth: '180px',
+    height: '48px',
+    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+  };
+
+  const emojiStyle = {
+    fontSize: '18px',
+    lineHeight: '1',
+    display: 'flex',
+    alignItems: 'center'
+  };
+
   const getFileTypeColor = (filename) => {
     if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
     if (filename.toLowerCase().endsWith('.html')) return '#17a2b8';
@@ -161,7 +192,7 @@ function EopPage() {
           color: '#666',
           margin: '0'
         }}>
-          Access and manage your emergency operational procedures
+          Access and manage critical emergency response procedures
         </p>
       </div>
 
@@ -202,7 +233,7 @@ function EopPage() {
                 transition: 'border-color 0.3s ease',
                 paddingRight: searchTerm ? '50px' : '20px'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#0070f3'}
+              onFocus={(e) => e.target.style.borderColor = '#dc3545'}
               onBlur={(e) => e.target.style.borderColor = '#ddd'}
             />
             {searchTerm && (
@@ -235,9 +266,9 @@ function EopPage() {
             textAlign: 'center',
             marginBottom: '20px',
             padding: '10px',
-            backgroundColor: '#e8f4f8',
+            backgroundColor: '#ffe8e8',
             borderRadius: '8px',
-            color: '#0f3456'
+            color: '#dc3545'
           }}>
             {filteredFiles.length === 0 ? (
               <span>No documents found matching "{searchTerm}"</span>
@@ -249,7 +280,7 @@ function EopPage() {
           </div>
         )}
         
-        {/* Generate EOP and Upload Buttons */}
+        {/* Fixed Action Buttons */}
         <div style={{ 
           display: 'flex', 
           gap: '15px', 
@@ -259,39 +290,28 @@ function EopPage() {
           justifyContent: 'center'
         }}>
           <button
-            onClick={() => setShowEOPModal(true)}
+            onClick={() => setIsGenerateModalOpen(true)}
             style={{
-              minWidth: '180px',
-              height: '48px',
+              ...buttonStyle,
               backgroundColor: '#dc3545',
               color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
+              boxShadow: '0 2px 10px rgba(220, 53, 69, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#c82333';
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#dc3545';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.boxShadow = '0 2px 10px rgba(220, 53, 69, 0.3)';
             }}
           >
-            🚨 Generate EOP
+            <span style={emojiStyle}>🚨</span>
+            <span>Generate EOP</span>
           </button>
+
           <div style={{ minWidth: '180px', height: '48px' }}>
-            <UploadButton type="eops" />
+            <UploadButton type="eops" onUploadSuccess={fetchFiles} />
           </div>
         </div>
 
@@ -316,8 +336,8 @@ function EopPage() {
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '64px' }}>🚨</span>
               </div>
-              <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#0f3456' }}>No EOP files found</p>
-              <p style={{ margin: 0, fontSize: '16px' }}>Upload PDFs to get started</p>
+              <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#dc3545' }}>No EOP files found</p>
+              <p style={{ margin: 0, fontSize: '16px' }}>Upload PDFs or create new EOPs to get started</p>
             </div>
           ) : (
             filteredFiles.map((filename) => {
@@ -340,7 +360,7 @@ function EopPage() {
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-5px)';
                   e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
-                  e.currentTarget.style.borderColor = '#0f3456';
+                  e.currentTarget.style.borderColor = '#dc3545';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
@@ -477,44 +497,12 @@ function EopPage() {
                     >
                       Download
                     </a>
-                    <button
-                      onClick={(e) => handleDelete(filename, e)}
-                      style={{
-                        padding: '10px 15px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-                        fontWeight: '500',
-                        flex: 1,
-                        opacity: deletingFile === filename ? 0.6 : 1
-                      }}
-                      onMouseEnter={(e) => {
-                        if (deletingFile !== filename) {
-                          e.currentTarget.style.backgroundColor = '#c82333';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (deletingFile !== filename) {
-                          e.currentTarget.style.backgroundColor = '#dc3545';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }
-                      }}
-                      disabled={deletingFile === filename}
-                    >
-                      {deletingFile === filename ? 'Deleting...' : 'Delete'}
-                    </button>
                   </div>
 
                   {/* File Type Badge */}
                   <div style={{
                     position: 'absolute',
-                    top: '15px',
+                    bottom: '15px',
                     right: '15px',
                     backgroundColor: getFileTypeColor(filename),
                     color: 'white',
@@ -532,7 +520,7 @@ function EopPage() {
         </div>
       </div>
 
-      {/* Document Preview Modal */}
+      {/* All the Modals */}
       <DocumentPreviewModal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -540,14 +528,9 @@ function EopPage() {
         pdfName={selectedPDF?.name}
       />
 
-      {/* EOP Generation Modal */}
-      <EOPGenerationModal 
-        isOpen={showEOPModal}
-        onClose={() => {
-          setShowEOPModal(false);
-          // Refresh files after closing generate modal
-          fetchFiles();
-        }}
+      <EOPGenerationModal
+        isOpen={isGenerateModalOpen}
+        onClose={closeGenerateModal}
       />
     </div>
   );
