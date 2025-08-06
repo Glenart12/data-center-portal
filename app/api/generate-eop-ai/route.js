@@ -365,12 +365,32 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     // Extract EOP Identifier from generated content for filename
     let filename = '';
     try {
-      // Use specific regex pattern to extract EOP Identifier
-      const identifierMatch = completeHtml.match(/EOP Identifier:\s*<\/.*?>\s*([^<]+)/);
+      // Try multiple regex patterns to extract EOP Identifier
+      const identifierPatterns = [
+        // Specific pattern for <b> or <strong> tags
+        /EOP Identifier:<\/(?:b|strong|span)>\s*([A-Z0-9\-_]+)/i,
+        // Broader pattern for any HTML tags after EOP Identifier:
+        /EOP Identifier:.*?>\s*([A-Z0-9\-_]+)/i,
+        // Even broader pattern that handles multiple tags and whitespace
+        /EOP Identifier:[^>]*>.*?([A-Z0-9\-_]{3,})/i,
+        // Simple pattern without HTML tags
+        /EOP Identifier:\s*([A-Z0-9\-_]+)/i
+      ];
       
-      if (identifierMatch && identifierMatch[1]) {
-        let eopIdentifier = identifierMatch[1].trim();
-        console.log('Extracted EOP Identifier:', eopIdentifier);
+      let eopIdentifier = '';
+      let matchedPattern = -1;
+      
+      for (let i = 0; i < identifierPatterns.length; i++) {
+        const identifierMatch = completeHtml.match(identifierPatterns[i]);
+        if (identifierMatch && identifierMatch[1] && identifierMatch[1].trim().length >= 3) {
+          eopIdentifier = identifierMatch[1].trim();
+          matchedPattern = i;
+          break;
+        }
+      }
+      
+      if (eopIdentifier) {
+        console.log(`Extracted EOP Identifier using pattern ${matchedPattern}:`, eopIdentifier);
         
         // Sanitize the identifier to remove invalid filename characters
         const sanitizedIdentifier = eopIdentifier
