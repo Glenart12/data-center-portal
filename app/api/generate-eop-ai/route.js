@@ -7,16 +7,26 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const PROJECT_INSTRUCTIONS = `Generate a complete Emergency Operating Procedure (EOP) for data center equipment failures. Create a COMPLETE HTML document with ALL 8 sections - no placeholders or summaries.
 
-The EOP must follow this EXACT structure:
+IMPORTANT: This EOP must be INTERACTIVE with editable input fields. Include HTML input elements throughout.
+
+The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 
 SECTION 1: EOP Identification & Control
-- EOP Title, Identifier, Equipment details, Version, Dates, Author/Approver
+- EOP Title, Identifier, Equipment details
+- Version: <input type="text" value="1.0" style="width:80px" />
+- Date fields: <input type="text" value="[current_date]" style="width:150px" />
+- Author: <input type="text" placeholder="Enter Author Name" style="width:250px" />
+- Approver: <input type="text" placeholder="Enter Approver Name" style="width:250px" />
 
 SECTION 2: Purpose & Scope
 - Clear statement of emergency response goals
 - Who this procedure applies to
 
 SECTION 3: IMMEDIATE EMERGENCY ACTIONS
+- Create a table with columns: Step, Action, Initials, Time
+- Each action row should have:
+  - Initials column: <input type="text" class="small-input" style="width:60px" />
+  - Time column: <input type="text" class="small-input" style="width:60px" />
 - 4-5 numbered steps for immediate response
 - Use CAPITAL LETTERS for critical actions like PRESS, NOTIFY, PROCEED
 
@@ -26,6 +36,8 @@ SECTION 4: Trigger Conditions & Specific Scenarios
 
 SECTION 5: Communication & Escalation Protocol
 - Table with contact levels 0-3 plus emergency services
+- Phone number fields: <input type="text" placeholder="Enter phone" style="width:150px" />
+- Contact name fields where appropriate: <input type="text" placeholder="Enter contact name" style="width:200px" />
 
 SECTION 6: Recovery & Return to Service
 - Fault verification, system reset, return to service steps
@@ -34,9 +46,20 @@ SECTION 7: Supporting Information
 - Equipment locations, PPE requirements, related documents
 
 SECTION 8: EOP Approval & Review
-- Approval matrix table
+- Approval matrix table with editable fields:
+  - Name column: <input type="text" placeholder="Enter name" style="width:200px" />
+  - Signature column: <input type="text" placeholder="Signature" style="width:200px" />
+  - Date column: <input type="text" placeholder="MM/DD/YYYY" style="width:120px" />
 
-Use red (color: #dc3545) for all emergency warnings and critical actions. Format as a complete HTML document with professional styling.`;
+CRITICAL FORMATTING REQUIREMENTS:
+- Use red (color: #dc3545) for all emergency warnings and critical actions
+- Replace ANY placeholder text like "[Signature Placeholder]" with proper input fields
+- Use .emergency-action class for emergency action boxes
+- Use .emergency-warning class for warning banners
+- Use .critical-text class for critical text that should be red and uppercase
+- Make tables professional with proper styling
+
+Format as complete HTML content (body content only, not full HTML document).`;
 
 const HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
@@ -146,6 +169,27 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             border-top: 2px solid #ccc;
             margin: 40px 0;
         }
+        .small-input {
+            width: 60px;
+            padding: 3px;
+            border: 1px solid #999;
+            font-size: 12px;
+        }
+        .field-box {
+            border: 1px solid #999;
+            padding: 5px;
+            background-color: #fff;
+            font-family: inherit;
+            font-size: inherit;
+            width: 90%;
+        }
+        input[type="text"] {
+            border: 1px solid #999;
+            padding: 5px;
+            background-color: #fff;
+            font-family: inherit;
+            font-size: inherit;
+        }
         @media print {
             body { background-color: white; }
             .container { box-shadow: none; padding: 20px; }
@@ -177,8 +221,11 @@ export async function POST(request) {
     
     console.log('Starting EOP generation for:', formData.manufacturer, formData.modelNumber);
     
+    // Get current date for input fields
+    const currentDate = new Date().toLocaleDateString('en-US');
+    
     // Prepare the prompt for Gemini
-    const prompt = `${PROJECT_INSTRUCTIONS}
+    const prompt = `${PROJECT_INSTRUCTIONS.replace('[current_date]', currentDate)}
 
 Emergency Details:
 - Manufacturer: ${formData.manufacturer}
@@ -190,9 +237,10 @@ Emergency Details:
 - Emergency Description: ${formData.description}
 
 Generate a complete HTML document for the body content only (everything that goes inside the container div). 
-Include ALL 8 sections with complete, detailed content. 
+Include ALL 8 sections with complete, detailed content with INTERACTIVE INPUT FIELDS as specified above.
 For Section 4, create 4 specific scenarios based on the emergency type "${formData.emergencyType}".
-Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.`;
+Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
+IMPORTANT: Include interactive input fields throughout the document as specified in the instructions above.`;
 
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
