@@ -39,6 +39,27 @@ SECTION 5: Communication & Escalation Protocol
 - Phone number fields: <input type="text" placeholder="Enter phone" style="width:150px" />
 - Contact name fields where appropriate: <input type="text" placeholder="Enter contact name" style="width:200px" />
 
+Include a comprehensive Emergency Contacts subsection with the following categories in a table format:
+
+Emergency Contacts Table with columns: Service Type, Contact Name/Organization, Phone Number, Notes/Address
+
+Include these essential emergency contacts (use editable input fields for phone numbers):
+- Police Emergency: 911
+- Fire/EMS Emergency: 911  
+- Police Non-Emergency: <input type="text" value="(630) 554-3426" style="width:150px" />
+- Fire Non-Emergency (Oswego FPD): <input type="text" value="(630) 554-2110" style="width:150px" />
+- Poison Control: <input type="text" value="1-800-222-1222" style="width:150px" />
+- Electric Emergency (ComEd): <input type="text" value="(800) 334-7661" style="width:150px" />
+- Natural Gas Emergency (Nicor): <input type="text" value="(888) 642-6748" style="width:150px" />
+- Water/Sewer Emergency (Village): <input type="text" value="(630) 554-2282" style="width:150px" />
+- EPA Emergency Hotline: <input type="text" value="(800) 424-8802" style="width:150px" />
+- CHEMTREC (Chemical Emergency): <input type="text" value="1-800-424-9300" style="width:150px" />
+- Building Department (AHJ): <input type="text" value="(630) 554-2310" style="width:150px" />
+- JULIE (Dig Alert): <input type="text" value="(800) 892-0123" style="width:150px" />
+
+Add this important note at the bottom of the Emergency Contacts section:
+"⚠️ IMPORTANT: Verify all emergency contact numbers for your specific facility location. Update phone numbers as needed."
+
 SECTION 6: Recovery & Return to Service
 - Fault verification, system reset, return to service steps
 
