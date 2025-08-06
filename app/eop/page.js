@@ -14,6 +14,7 @@ function EopPage() {
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showEOPModal, setShowEOPModal] = useState(false);
+  const [deletingFile, setDeletingFile] = useState(null);
 
   useEffect(() => {
     fetchFiles();
@@ -80,6 +81,44 @@ function EopPage() {
 
   const clearSearch = () => {
     setSearchTerm('');
+  };
+
+  const handleDelete = async (filename, e) => {
+    e.stopPropagation(); // Prevent card click
+    
+    // Confirmation dialog
+    if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+      return;
+    }
+
+    setDeletingFile(filename);
+
+    try {
+      const response = await fetch('/api/delete-file', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename,
+          type: 'eops'
+        })
+      });
+
+      if (response.ok) {
+        // Refresh the file list
+        await fetchFiles();
+        alert('File deleted successfully');
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete file: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete file');
+    } finally {
+      setDeletingFile(null);
+    }
   };
 
   const getFileTypeColor = (filename) => {
@@ -309,20 +348,66 @@ function EopPage() {
                   e.currentTarget.style.borderColor = '#e0e0e0';
                 }}
                 >
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => handleDelete(filename, e)}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: '#dc3545',
+                      cursor: 'pointer',
+                      fontSize: '20px',
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease',
+                      opacity: 0.7,
+                      zIndex: 10
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dc3545';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#dc3545';
+                      e.currentTarget.style.opacity = '0.7';
+                    }}
+                    disabled={deletingFile === filename}
+                    title="Delete file"
+                  >
+                    {deletingFile === filename ? '⟳' : '×'}
+                  </button>
+
                   <div style={{ 
                     display: 'flex', 
-                    alignItems: 'center', 
+                    alignItems: 'flex-start', 
                     marginBottom: '15px',
-                    gap: '10px'
+                    gap: '10px',
+                    paddingRight: '40px' // Make room for delete button
                   }}>
-                    <span style={{ fontSize: '32px', color: '#dc3545' }}>🚨</span>
+                    <span style={{ fontSize: '32px', color: '#dc3545', flexShrink: 0 }}>🚨</span>
                     <h3 style={{ 
                       margin: 0, 
                       fontSize: '18px', 
                       color: '#333',
                       lineHeight: '1.4',
-                      flex: 1
-                    }}>
+                      flex: 1,
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      wordBreak: 'break-word'
+                    }}
+                    title={displayName} // Show full name on hover
+                    >
                       {displayName}
                     </h3>
                   </div>
@@ -391,7 +476,39 @@ function EopPage() {
                       }}
                     >
                       Download
-                    </a>
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(filename, e)}
+                      style={{
+                        padding: '10px 15px',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                        fontWeight: '500',
+                        flex: 1,
+                        opacity: deletingFile === filename ? 0.6 : 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deletingFile !== filename) {
+                          e.currentTarget.style.backgroundColor = '#c82333';
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deletingFile !== filename) {
+                          e.currentTarget.style.backgroundColor = '#dc3545';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }
+                      }}
+                      disabled={deletingFile === filename}
+                    >
+                      {deletingFile === filename ? 'Deleting...' : 'Delete'}
+                    </button>
                   </div>
 
                   {/* File Type Badge */}

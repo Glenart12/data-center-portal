@@ -12,7 +12,13 @@ IMPORTANT: This EOP must be INTERACTIVE with editable input fields. Include HTML
 The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 
 SECTION 1: EOP Identification & Control
-- EOP Title, Identifier, Equipment details
+- EOP Title, Identifier
+- Equipment Details as a properly formatted list:
+  • Manufacturer: {actual manufacturer from form data}
+  • Model Number: {actual model from form data}
+  • Serial Number: {actual serial or "N/A" if not provided}
+  • Location: {actual location from form data}
+  • System: {actual system from form data}
 - Version: <input type="text" value="1.0" style="width:80px" />
 - Date fields: <input type="text" value="[current_date]" style="width:150px" />
 - Author: <input type="text" placeholder="Enter Author Name" style="width:250px" />
@@ -64,7 +70,22 @@ SECTION 6: Recovery & Return to Service
 - Fault verification, system reset, return to service steps
 
 SECTION 7: Supporting Information
-- Equipment locations, PPE requirements, related documents
+- Equipment locations
+
+PPE Requirements - Create a professional table with columns: PPE Category | Specification | When Required
+Include these specific rows:
+- Safety Glasses | ANSI Z87.1 rated | At all times in mechanical areas
+- Gloves | Insulated, voltage-rated | When working on electrical components  
+- Hearing Protection | NRR 25+ earplugs/earmuffs | When equipment is operating
+- Arc Flash PPE | Category 2 minimum | When working on energized electrical panels
+- Hard Hat | ANSI Z89.1 | When working in areas with overhead hazards
+
+Related Documents - Make these clickable hyperlinks:
+- <a href="#" style="color: #0070f3; text-decoration: underline;">Equipment Operation Manual</a> (Internal Document)
+- <a href="#" style="color: #0070f3; text-decoration: underline;">Data Center Power Distribution Diagram</a> (Internal Document)
+- <a href="#" style="color: #0070f3; text-decoration: underline;">Emergency Contact List</a> (Internal Document)
+- <a href="https://www.osha.gov/emergency-preparedness" target="_blank" style="color: #0070f3; text-decoration: underline;">OSHA Emergency Preparedness Guidelines</a>
+- <a href="https://www.nfpa.org/codes-and-standards" target="_blank" style="color: #0070f3; text-decoration: underline;">NFPA Standards Database</a>
 
 SECTION 8: EOP Approval & Review
 - Approval matrix table with editable fields:
@@ -78,7 +99,11 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Use .emergency-action class for emergency action boxes
 - Use .emergency-warning class for warning banners
 - Use .critical-text class for critical text that should be red and uppercase
-- Make tables professional with proper styling
+- Make tables professional with proper styling and borders
+- Equipment Details in Section 1 must be formatted as a clean bulleted list using actual form data
+- PPE Requirements must be in a proper HTML table format with headers and borders
+- Related Documents must use actual clickable <a> tags with proper styling
+- Internal document links use href="#" and external links use real URLs with target="_blank"
 
 Format as complete HTML content (body content only, not full HTML document).`;
 
@@ -210,6 +235,13 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             background-color: #fff;
             font-family: inherit;
             font-size: inherit;
+        }
+        a {
+            color: #0070f3;
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #0051cc;
         }
         @media print {
             body { background-color: white; }
