@@ -476,7 +476,7 @@ function EopPage() {
                       }}
                     >
                       Download
-                    </button>
+                    </a>
                     <button
                       onClick={(e) => handleDelete(filename, e)}
                       style={{
