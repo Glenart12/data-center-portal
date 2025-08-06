@@ -9,6 +9,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     serialNumber: '',
     location: '',
     system: '',
+    component: '',
     emergencyType: '',
     description: ''
   });
@@ -63,8 +64,8 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
-        !formData.emergencyType || !formData.description) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Emergency Type\n• Emergency Description');
+        !formData.component || !formData.emergencyType || !formData.description) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Component/Equipment Type\n• Emergency Type\n• Emergency Description');
       return;
     }
 
@@ -277,6 +278,26 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
               />
             </div>
 
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Component/Equipment Type *
+              </label>
+              <input
+                type="text"
+                value={formData.component}
+                onChange={(e) => handleInputChange('component', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Air Cooled Chiller, Water Cooled Chiller, Cooling Tower, etc."
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Emergency Type *

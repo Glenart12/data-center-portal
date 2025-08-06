@@ -277,10 +277,18 @@ export async function POST(request) {
     
     // Validate required fields
     if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.emergencyType || !formData?.description) {
+        !formData?.component || !formData?.emergencyType || !formData?.description) {
       return NextResponse.json({ 
         error: 'Missing required fields',
         userMessage: 'Please fill in all required fields'
+      }, { status: 400 });
+    }
+
+    // Additional specific validation for component
+    if (!formData?.component) {
+      return NextResponse.json({ 
+        error: 'Component/Equipment Type is required',
+        userMessage: 'Component/Equipment Type is required'
       }, { status: 400 });
     }
     
@@ -292,12 +300,20 @@ export async function POST(request) {
     // Prepare the prompt for Gemini
     const prompt = `${PROJECT_INSTRUCTIONS.replace('[current_date]', currentDate)}
 
+CRITICAL EQUIPMENT TYPE: ${formData.component}
+THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are specific to ${formData.component}
+
+If this is an AIR COOLED CHILLER, don't reference water cooling towers or condenser water.
+If this is WATER COOLED, include those references.
+Make all procedures specific to the component technology.
+
 Emergency Details:
 - Manufacturer: ${formData.manufacturer}
 - Model Number: ${formData.modelNumber}
 - Serial Number: ${formData.serialNumber || 'N/A'}
 - Location: ${formData.location || 'N/A'}
 - System: ${formData.system}
+- Component/Equipment Type: ${formData.component}
 - Emergency Type: ${formData.emergencyType}
 - Emergency Description: ${formData.description}
 
