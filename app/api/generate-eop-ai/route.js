@@ -124,7 +124,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${EOP_TITLE}</title>
+    <title>__EOP_TITLE__</title>
     <style>
         body { 
             font-family: 'Century Gothic', Arial, sans-serif; 
@@ -343,7 +343,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     
     // Build complete HTML with dynamic title
     const completeHtml = HTML_TEMPLATE
-      .replace('${EOP_TITLE}', eopTitle)
+      .replace('__EOP_TITLE__', eopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
     // Generate filename
