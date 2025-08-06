@@ -4,6 +4,7 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
+import EOPGenerationModal from '../components/EOPGenerationModal';
 
 function EopPage() {
   const [files, setFiles] = useState([]);
@@ -11,6 +12,7 @@ function EopPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showEOPModal, setShowEOPModal] = useState(false);
 
   useEffect(() => {
     fetch('/api/files/eops')
@@ -183,7 +185,7 @@ function EopPage() {
           </div>
         )}
         
-        {/* Upload Button Only */}
+        {/* Generate EOP and Upload Buttons */}
         <div style={{ 
           display: 'flex', 
           gap: '15px', 
@@ -192,6 +194,38 @@ function EopPage() {
           alignItems: 'stretch',
           justifyContent: 'center'
         }}>
+          <button
+            onClick={() => setShowEOPModal(true)}
+            style={{
+              minWidth: '180px',
+              height: '48px',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#c82333';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#dc3545';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            🚨 Generate EOP
+          </button>
           <div style={{ minWidth: '180px', height: '48px' }}>
             <UploadButton type="eops" />
           </div>
@@ -356,6 +390,12 @@ function EopPage() {
         onClose={closeModal}
         pdfUrl={selectedPDF?.url}
         pdfName={selectedPDF?.name}
+      />
+
+      {/* EOP Generation Modal */}
+      <EOPGenerationModal 
+        isOpen={showEOPModal}
+        onClose={() => setShowEOPModal(false)}
       />
     </div>
   );
