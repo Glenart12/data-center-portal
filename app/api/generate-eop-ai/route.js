@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { put } from '@vercel/blob';
 
 // Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const PROJECT_INSTRUCTIONS = `Generate a complete Emergency Operating Procedure (EOP) for data center equipment failures. Create a COMPLETE HTML document with ALL 8 sections - no placeholders or summaries.
 
@@ -167,7 +167,7 @@ export async function POST(request) {
     const { formData } = body;
     
     // Validate required fields
-    if (!formData?.equipmentName || !formData?.equipmentId || !formData?.location || 
+    if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
         !formData?.emergencyType || !formData?.description) {
       return NextResponse.json({ 
         error: 'Missing required fields',
@@ -175,17 +175,19 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
-    console.log('Starting EOP generation for:', formData.equipmentName);
+    console.log('Starting EOP generation for:', formData.manufacturer, formData.modelNumber);
     
     // Prepare the prompt for Gemini
     const prompt = `${PROJECT_INSTRUCTIONS}
 
 Emergency Details:
-- Equipment Name: ${formData.equipmentName}
-- Equipment ID: ${formData.equipmentId}
-- Location: ${formData.location}
+- Manufacturer: ${formData.manufacturer}
+- Model Number: ${formData.modelNumber}
+- Serial Number: ${formData.serialNumber || 'N/A'}
+- Location: ${formData.location || 'N/A'}
+- System: ${formData.system}
 - Emergency Type: ${formData.emergencyType}
-- Description: ${formData.description}
+- Emergency Description: ${formData.description}
 
 Generate a complete HTML document for the body content only (everything that goes inside the container div). 
 Include ALL 8 sections with complete, detailed content. 
@@ -194,13 +196,7 @@ Make sure all critical actions use the .critical-text class and emergency warnin
 
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp",
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 30000,
-      }
+      model: 'gemini-2.0-flash-exp'
     });
     
     const result = await model.generateContent(prompt);
@@ -230,9 +226,9 @@ Make sure all critical actions use the .critical-text class and emergency warnin
     // Generate filename
     const date = new Date().toISOString().split('T')[0];
     const timestamp = Date.now();
-    const safeEquipmentName = formData.equipmentName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const safeEquipmentId = formData.equipmentId.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const filename = `EOP_${safeEquipmentName}_${safeEquipmentId}_${date}_${timestamp}.html`;
+    const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
+    const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
+    const filename = `EOP_${safeManufacturer}_${safeModel}_${date}_${timestamp}.html`;
 
     // Save to blob storage
     const blob = await put(`eops/${filename}`, completeHtml, {
@@ -260,7 +256,7 @@ Make sure all critical actions use the .critical-text class and emergency warnin
       }, { status: 429 });
     }
     
-    if (error.message?.includes('API key')) {
+    if (error.message?.includes('API key') || error.message?.includes('API_KEY')) {
       return NextResponse.json({ 
         error: 'Configuration error',
         userMessage: 'AI service is not properly configured. Please contact support.'

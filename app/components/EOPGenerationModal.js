@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 
 export default function EOPGenerationModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
-    equipmentName: '',
-    equipmentId: '',
+    manufacturer: '',
+    modelNumber: '',
+    serialNumber: '',
     location: '',
+    system: '',
     emergencyType: '',
     description: ''
   });
@@ -60,9 +62,9 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     }
 
     // Check all required fields
-    if (!formData.equipmentName || !formData.equipmentId || !formData.location || 
+    if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
         !formData.emergencyType || !formData.description) {
-      alert('Please fill in all required fields:\n• Equipment Name\n• Equipment ID\n• Location\n• Emergency Type\n• Description');
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Emergency Type\n• Emergency Description');
       return;
     }
 
@@ -180,48 +182,66 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
 
         {/* Form Fields */}
         <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#333' }}>Emergency Information</h3>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment & Emergency Information</h3>
           
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Equipment Name *
-            </label>
-            <input
-              type="text"
-              value={formData.equipmentName}
-              onChange={(e) => handleInputChange('equipmentName', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-              placeholder="e.g., Chiller Unit #1, UPS System A"
-            />
-          </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Equipment ID *
+                Manufacturer *
               </label>
               <input
                 type="text"
-                value={formData.equipmentId}
-                onChange={(e) => handleInputChange('equipmentId', e.target.value)}
+                value={formData.manufacturer}
+                onChange={(e) => handleInputChange('manufacturer', e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., CH-001, UPS-A-01"
+                placeholder="e.g., York, Trane, Carrier"
               />
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Location *
+                Model Number *
+              </label>
+              <input
+                type="text"
+                value={formData.modelNumber}
+                onChange={(e) => handleInputChange('modelNumber', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., YVAA0350"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Serial Number
+              </label>
+              <input
+                type="text"
+                value={formData.serialNumber}
+                onChange={(e) => handleInputChange('serialNumber', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., SN123456789"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Location
               </label>
               <input
                 type="text"
@@ -233,39 +253,52 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., Data Hall 1, Mechanical Room B"
+                placeholder="e.g., Data Hall 1"
               />
             </div>
           </div>
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Emergency Type *
-            </label>
-            <select
-              value={formData.emergencyType}
-              onChange={(e) => handleInputChange('emergencyType', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                backgroundColor: 'white',
-                cursor: 'pointer'
-              }}
-            >
-              <option value="">Select Emergency Type</option>
-              <option value="Water/Glycol Leak">Water/Glycol Leak</option>
-              <option value="Fire/Smoke">Fire/Smoke</option>
-              <option value="High Temperature/Pressure">High Temperature/Pressure</option>
-              <option value="Mechanical Failure">Mechanical Failure</option>
-              <option value="General Emergency">General Emergency</option>
-            </select>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                System *
+              </label>
+              <input
+                type="text"
+                value={formData.system}
+                onChange={(e) => handleInputChange('system', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Cooling System, Power Distribution"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Emergency Type *
+              </label>
+              <input
+                type="text"
+                value={formData.emergencyType}
+                onChange={(e) => handleInputChange('emergencyType', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Power Failure, High Temperature Alarm, Compressor Failure"
+              />
+            </div>
           </div>
 
           <div>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Description *
+              Emergency Description *
             </label>
             <textarea
               value={formData.description}
@@ -278,7 +311,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                 minHeight: '120px',
                 resize: 'vertical'
               }}
-              placeholder="Describe the emergency situation and any specific symptoms or observations (e.g., visible leak from pump seal, high temperature alarm on chiller, unusual noise from motor)..."
+              placeholder="Describe the emergency condition and required response"
             />
           </div>
         </div>
