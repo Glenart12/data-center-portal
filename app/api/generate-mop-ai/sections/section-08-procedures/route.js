@@ -791,6 +791,7 @@ export async function POST(request) {
       return `Generate comprehensive maintenance procedure steps for ${manufacturer} ${modelNumber} ${system} ${workDescription || 'maintenance'}.
       
       CRITICAL ACCURACY REQUIREMENTS:
+      - Generate procedures SPECIFIC to ${manufacturer} ${modelNumber} ${system}
       - Research actual ${manufacturer} ${modelNumber} specifications and maintenance procedures
       - Use real regulatory requirements (OSHA, EPA, NFPA) and industry standards
       - Base procedures on accurate technical data and documented manufacturer requirements
@@ -798,6 +799,8 @@ export async function POST(request) {
       - If specific manufacturer data is not known, mark as "VERIFY WITH MANUFACTURER" or "REFER TO ${manufacturer} MANUAL"
       - Use genuine safety procedures and industry-standard practices
       - Reference actual equipment characteristics and known maintenance requirements
+      - ALWAYS reference the specific equipment: ${manufacturer} ${modelNumber} Serial #${formData.serialNumber || 'TBD'}
+      - Make every step relate to THIS SPECIFIC EQUIPMENT, not generic procedures
       
       EQUIPMENT-SPECIFIC REQUIREMENTS:
       ${equipmentData.specificProcedures ? `
@@ -917,9 +920,267 @@ export async function POST(request) {
     </tr>
 </table>
 
+<h3>Step 1: Obvious Power Loss Indicators Check (BEFORE opening any equipment)</h3>
+<p><strong>Verify facility-wide power status indicators before approaching ${manufacturer} ${modelNumber}</strong></p>
+<table>
+    <thead>
+        <tr>
+            <th>Check Item</th>
+            <th>Expected Condition if Power Lost</th>
+            <th>Verification Method</th>
+            <th width="80">Initial</th>
+            <th width="80">Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Generator Running (Audible)</strong></td>
+            <td>Generator engine noise audible from equipment room</td>
+            <td>Listen for engine sound upon entering facility</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Generator Alarms</strong></td>
+            <td>Generator control panel showing "Running" or active alarms</td>
+            <td>Visual check of generator control panel</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Emergency Lighting</strong></td>
+            <td>Emergency lights activated in corridors and equipment rooms</td>
+            <td>Visual observation of emergency lighting status</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>UPS on Battery</strong></td>
+            <td>UPS alarm beeping, "On Battery" LED illuminated</td>
+            <td>Check UPS front panel indicators and listen for alarms</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Facility Alarms</strong></td>
+            <td>BMS/EPMS showing utility power loss alarms</td>
+            <td>Check alarm panel or BMS workstation</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Step 2: System Monitoring Verification</h3>
+<p><strong>Verify how ${manufacturer} ${modelNumber} appears in monitoring systems when de-energized</strong></p>
+<table>
+    <thead>
+        <tr>
+            <th>System</th>
+            <th>Check Location</th>
+            <th>What to Verify</th>
+            <th>Expected Reading for ${modelNumber}</th>
+            <th>Actual Reading</th>
+            <th width="80">Initial</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>EPMS</strong></td>
+            <td>Electrical Power Monitoring System</td>
+            <td>Power consumption for ${modelNumber}</td>
+            <td>0 kW if de-energized</td>
+            <td><input type="text" style="width:100px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>BMS</strong></td>
+            <td>Building Management System</td>
+            <td>${manufacturer} ${modelNumber} status</td>
+            <td>"Offline" or "No Communication"</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>SCADA</strong></td>
+            <td>SCADA System (if available)</td>
+            <td>${system} operational status</td>
+            <td>Shows ${modelNumber} as non-operational</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Generator Status</strong></td>
+            <td>Generator Control Panel</td>
+            <td>Load percentage and kW output</td>
+            <td>Load increased if utility power lost</td>
+            <td><input type="text" style="width:100px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>ATS Status</strong></td>
+            <td>Automatic Transfer Switch</td>
+            <td>Source position (Utility/Generator)</td>
+            <td>"Emergency" or "Generator" if transferred</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Step 3-X: Equipment Checks</h3>
+
+<h4>INTERNAL CHECKS (for ${manufacturer} ${modelNumber} Serial #${formData.serialNumber || 'TBD'}):</h4>
+<table>
+    <thead>
+        <tr>
+            <th>Check Item</th>
+            <th>Location/Component</th>
+            <th>Expected Status</th>
+            <th>Actual Status</th>
+            <th width="80">Initial</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Main Breaker Status</strong></td>
+            <td>Breaker on ${modelNumber} control panel</td>
+            <td>Tripped or OFF if power issue</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Transformer Feeding ${system}</strong></td>
+            <td>Step-down transformer for ${modelNumber}</td>
+            <td>Check for overheating, tripped protection</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Isolator Feed to Equipment</strong></td>
+            <td>Disconnect switch feeding ${modelNumber}</td>
+            <td>Verify position (ON/OFF)</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Internal Connections</strong></td>
+            <td>Power connections specific to ${modelNumber}</td>
+            <td>Check for loose connections, burn marks</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Control Power</strong></td>
+            <td>Control transformer in ${modelNumber}</td>
+            <td>Verify control voltage present</td>
+            <td><input type="text" style="width:150px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+    </tbody>
+</table>
+
+<h4>EXTERNAL CHECKS (Facility-Wide):</h4>
+<table>
+    <thead>
+        <tr>
+            <th>Check Item</th>
+            <th>Location</th>
+            <th>What to Verify</th>
+            <th>Finding</th>
+            <th width="80">Initial</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>ATS Tripped Status</strong></td>
+            <td>Main ATS serving ${system}</td>
+            <td>Check if ATS failed to transfer</td>
+            <td><input type="text" style="width:200px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Utility Feed Loss</strong></td>
+            <td>Main utility switchgear</td>
+            <td>Confirm utility power presence/absence</td>
+            <td><input type="text" style="width:200px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>EPMS/BMS Issues</strong></td>
+            <td>System-wide monitoring</td>
+            <td>Check for cascading failures or related alarms</td>
+            <td><input type="text" style="width:200px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Generator Transfer</strong></td>
+            <td>Generator paralleling switchgear</td>
+            <td>Verify if generator picked up critical loads</td>
+            <td><input type="text" style="width:200px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>Distribution Panel</strong></td>
+            <td>Panel feeding ${modelNumber}</td>
+            <td>Check all breakers in distribution path</td>
+            <td><input type="text" style="width:200px" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+    </tbody>
+</table>
+
 ${operationalDataTable}
 
-<h3>Detailed Procedure Steps</h3>
+<h3>Final Step: Escalation Protocol (AFTER Initial Assessment Complete)</h3>
+<p><strong>Complete all checks above before escalating. Report specific findings for ${manufacturer} ${modelNumber}:</strong></p>
+<table>
+    <thead>
+        <tr>
+            <th>Contact Level</th>
+            <th>Who to Contact</th>
+            <th>What to Report</th>
+            <th>Contact Made</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>1. Chief Engineer</strong></td>
+            <td><input type="text" placeholder="Enter name" style="width:150px" /></td>
+            <td>Report ${manufacturer} ${modelNumber} Serial #${formData.serialNumber || 'TBD'} status and all findings from checks above</td>
+            <td><input type="checkbox" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>2. Building Manager</strong></td>
+            <td><input type="text" placeholder="Enter name" style="width:150px" /></td>
+            <td>Report scope: How many ${system} units affected, is this site-wide or isolated to ${modelNumber}</td>
+            <td><input type="checkbox" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>3. Customer/Tenant</strong></td>
+            <td><input type="text" placeholder="Enter contact" style="width:150px" /></td>
+            <td>Report business impact: ${system} status, estimated resolution time, backup systems status</td>
+            <td><input type="checkbox" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+        <tr>
+            <td><strong>4. ${manufacturer} Support</strong></td>
+            <td><input type="text" placeholder="Enter number" style="width:150px" /></td>
+            <td>If equipment-specific issue found: Report ${modelNumber} Serial #${formData.serialNumber || 'TBD'} fault codes and symptoms</td>
+            <td><input type="checkbox" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="safety-warning">
+    <strong>CRITICAL:</strong> Do NOT attempt repairs until power source is confirmed and proper isolation procedures are followed. If utility power is confirmed lost, follow EOP for power failure response.
+</div>
+
+<h3>Detailed Procedure Steps (After Power Verification)</h3>
 <table>
     <thead>
         <tr>
@@ -932,7 +1193,7 @@ ${operationalDataTable}
     <tbody>
         <tr>
             <td style="text-align: center;">1</td>
-            <td>Notify Data Center Operations Manager, Site Security, and NOC/BMS Operator that procedure is about to begin</td>
+            <td>Complete all power loss verification checks above before proceeding with maintenance</td>
             <td><input type="text" class="small-input" /></td>
             <td><input type="text" class="small-input" /></td>
         </tr>

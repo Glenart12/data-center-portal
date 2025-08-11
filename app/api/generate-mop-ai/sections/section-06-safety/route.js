@@ -169,10 +169,88 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
 </div>`;
     }
 
+    // Generate Tools Required table based on equipment
+    const toolsRequired = `
+<h3>TOOLS REQUIRED</h3>
+<p><strong>Specific tools required for ${manufacturer} ${modelNumber} ${system} based on manufacturer specifications:</strong></p>
+<table>
+    <thead>
+        <tr>
+            <th>Tool Category</th>
+            <th>Specific Tools</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Electrical Test Equipment</strong></td>
+            <td>• Fluke 87V or equivalent multimeter<br>
+                • Fluke 376 FC clamp meter<br>
+                • Megger MIT1025 insulation tester<br>
+                • Fluke 1587 FC insulation multimeter</td>
+            <td>Voltage verification, current measurement, insulation resistance testing for ${modelNumber}</td>
+        </tr>
+        <tr>
+            <td><strong>Torque Tools</strong></td>
+            <td>• Torque wrench (10-250 ft-lbs)<br>
+                • Torque screwdriver set (5-50 in-lbs)<br>
+                • Digital torque adapter</td>
+            <td>Proper torquing of ${manufacturer} ${modelNumber} electrical and mechanical connections per manufacturer specs</td>
+        </tr>
+        <tr>
+            <td><strong>Temperature & Pressure</strong></td>
+            <td>• Infrared thermometer (-58°F to 1022°F)<br>
+                • Digital manifold gauge set<br>
+                • Differential pressure gauge<br>
+                • Thermocouple probe set</td>
+            <td>Temperature and pressure measurements specific to ${system} operating parameters</td>
+        </tr>
+        <tr>
+            <td><strong>Vibration Analysis</strong></td>
+            <td>• Fluke 810 vibration tester<br>
+                • SKF CMXA 80 analyzer<br>
+                • Accelerometer sensors</td>
+            <td>Vibration analysis of rotating equipment in ${manufacturer} ${modelNumber}</td>
+        </tr>
+        <tr>
+            <td><strong>Refrigerant Service</strong></td>
+            <td>• Recovery machine (EPA certified)<br>
+                • Vacuum pump (2-stage, 5 CFM min)<br>
+                • Refrigerant scale<br>
+                • Leak detector (electronic)</td>
+            <td>${system.toLowerCase().includes('chiller') || system.toLowerCase().includes('cooling') ? 
+                `Refrigerant service for ${modelNumber} cooling system` : 
+                'If applicable to equipment type'}</td>
+        </tr>
+        <tr>
+            <td><strong>Hand Tools</strong></td>
+            <td>• Insulated tool set (1000V rated)<br>
+                • Socket set (metric and standard)<br>
+                • Allen key set<br>
+                • Channel lock pliers</td>
+            <td>General maintenance on ${manufacturer} ${modelNumber} components</td>
+        </tr>
+        <tr>
+            <td><strong>Safety Equipment</strong></td>
+            <td>• Lockout/tagout kit<br>
+                • Voltage detector (non-contact)<br>
+                • Ground fault tester<br>
+                • Arc flash boundary tape</td>
+            <td>Safety isolation and verification for work on ${modelNumber}</td>
+        </tr>
+        <tr>
+            <td><strong>Specialized ${manufacturer} Tools</strong></td>
+            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter ${manufacturer}-specific service tools" style="width:100%" /></td>
+            <td>Manufacturer-specific tools required for ${modelNumber} service</td>
+        </tr>
+    </tbody>
+</table>`;
+
     const html = `<h2>Section 06: Safety Requirements</h2>
-<p><strong>Pre Work Conditions / Safety Requirements</strong></p>
+<p><strong>Pre Work Conditions / Safety Requirements for ${manufacturer} ${modelNumber} ${system}</strong></p>
 
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
+<p><strong>PPE requirements specific to ${manufacturer} ${modelNumber} ${system} maintenance:</strong></p>
 <table>
     <thead>
         <tr>
@@ -185,6 +263,8 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
         ${ppeRows}
     </tbody>
 </table>
+
+${toolsRequired}
 
 ${eopSection}
 
