@@ -45,7 +45,110 @@ START WITH:
 
 <h2>Section 03: Immediate Emergency Actions - Power Failure Diagnostics</h2>
 
-First, research and identify the specific equipment type from the manufacturer and model provided. Determine:
+<h3>Step 1: Obvious Power Loss Indicators Check (BEFORE opening any equipment)</h3>
+<p><strong>Verify facility-wide power status indicators before approaching ${manufacturer} ${modelNumber}</strong></p>
+<table>
+<tr>
+  <th>Check Item</th>
+  <th>Expected Condition if Power Lost</th>
+  <th>Verification Method</th>
+  <th>Data Reading Field</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>Generator Running (Audible)</td>
+  <td>Generator engine noise audible from equipment room</td>
+  <td>Listen for engine sound upon entering facility</td>
+  <td><input type="text" placeholder="Yes/No" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Generator Alarms</td>
+  <td>Generator control panel showing "Running" or active alarms</td>
+  <td>Visual check of generator control panel</td>
+  <td><input type="text" placeholder="Status" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Emergency Lighting</td>
+  <td>Emergency lights activated in corridors and equipment rooms</td>
+  <td>Visual observation of emergency lighting status</td>
+  <td><input type="text" placeholder="On/Off" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>UPS on Battery</td>
+  <td>UPS alarm beeping, "On Battery" LED illuminated</td>
+  <td>Check UPS front panel indicators and listen for alarms</td>
+  <td><input type="text" placeholder="Status" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Facility Alarms</td>
+  <td>BMS/EPMS showing utility power loss alarms</td>
+  <td>Check alarm panel or BMS workstation</td>
+  <td><input type="text" placeholder="Alarms present" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
+
+<h3>Step 2: System Monitoring Verification</h3>
+<p><strong>Verify how ${manufacturer} ${modelNumber} appears in monitoring systems</strong></p>
+<table>
+<tr>
+  <th>System</th>
+  <th>Check Location</th>
+  <th>What to Verify</th>
+  <th>Expected Reading for ${modelNumber}</th>
+  <th>Actual Reading</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>EPMS</td>
+  <td>Electrical Power Monitoring System</td>
+  <td>Power consumption for ${modelNumber}</td>
+  <td>0 kW if de-energized</td>
+  <td><input type="text" placeholder="kW reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>BMS</td>
+  <td>Building Management System</td>
+  <td>${manufacturer} ${modelNumber} status</td>
+  <td>"Offline" or "No Communication"</td>
+  <td><input type="text" placeholder="Status" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>SCADA (if available)</td>
+  <td>SCADA System</td>
+  <td>${system} operational status</td>
+  <td>Shows ${modelNumber} as non-operational</td>
+  <td><input type="text" placeholder="Status" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Generator Monitoring</td>
+  <td>Generator Control Panel</td>
+  <td>Load percentage and kW output</td>
+  <td>Load increased if utility power lost</td>
+  <td><input type="text" placeholder="% Load" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>ATS Status</td>
+  <td>Automatic Transfer Switch</td>
+  <td>Source position (Utility/Generator)</td>
+  <td>"Emergency" or "Generator" if transferred</td>
+  <td><input type="text" placeholder="Position" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
+
+<h3>Step 3: Electrical Diagnostics</h3>
+<p><strong>Equipment-specific electrical verification for ${manufacturer} ${modelNumber}</strong></p>
+
+First, identify the specific equipment type from the manufacturer and model provided. Determine:
 - Equipment category (chiller, UPS, generator, PDU, CRAC unit, etc.)
 - Voltage requirements (single-phase, 3-phase, DC voltage, etc.)
 - Control voltage specifications
@@ -185,6 +288,72 @@ Add this important note at the bottom of the Emergency Contacts section:
 <h3>PPE Requirements for Electrical Work</h3>
 Create a professional table with columns: PPE Category | Specification | When Required
 Include voltage-specific PPE requirements based on the equipment type
+
+<h3>Tools Required for Emergency Response</h3>
+Create a comprehensive table with columns: Tool Category | Specific Tools | Purpose
+<table>
+<tr>
+  <th>Tool Category</th>
+  <th>Specific Tools</th>
+  <th>Purpose</th>
+</tr>
+<tr>
+  <td><strong>Electrical Test Equipment</strong></td>
+  <td>• Fluke 87V or equivalent multimeter<br>
+      • Non-contact voltage detector (NCVD)<br>
+      • Clamp meter (AC/DC capable)<br>
+      • Megger insulation tester</td>
+  <td>Voltage verification and electrical diagnostics for ${modelNumber}</td>
+</tr>
+<tr>
+  <td><strong>Insulated Tools</strong></td>
+  <td>• 1000V rated insulated screwdrivers<br>
+      • Insulated pliers and cutters<br>
+      • Insulated torque wrench<br>
+      • Insulated glove kit</td>
+  <td>Safe work on energized or potentially energized ${system} components</td>
+</tr>
+<tr>
+  <td><strong>LOTO Equipment</strong></td>
+  <td>• Lockout hasps and tags<br>
+      • Circuit breaker lockout devices<br>
+      • Disconnect switch lockout<br>
+      • Personal safety locks</td>
+  <td>Proper isolation of ${manufacturer} ${modelNumber} during emergency work</td>
+</tr>
+<tr>
+  <td><strong>Documentation Tools</strong></td>
+  <td>• Digital camera or smartphone<br>
+      • Clipboard with EOP forms<br>
+      • Permanent markers<br>
+      • Label maker</td>
+  <td>Document findings, label components, record data for ${modelNumber}</td>
+</tr>
+<tr>
+  <td><strong>Emergency Lighting</strong></td>
+  <td>• Headlamp (hands-free)<br>
+      • Portable LED work light<br>
+      • Flashlight (backup)<br>
+      • Glow sticks (non-electric)</td>
+  <td>Visibility during power failure conditions</td>
+</tr>
+<tr>
+  <td><strong>Communication</strong></td>
+  <td>• Two-way radio<br>
+      • Cell phone (fully charged)<br>
+      • Backup battery pack<br>
+      • Emergency contact list</td>
+  <td>Coordination with team and escalation contacts</td>
+</tr>
+<tr>
+  <td><strong>Safety Equipment</strong></td>
+  <td>• Arc flash boundary tape<br>
+      • Safety cones/barriers<br>
+      • Ground fault circuit tester<br>
+      • First aid kit</td>
+  <td>Establish safe work zones around ${modelNumber}</td>
+</tr>
+</table>
 
 <h3>Related Documents</h3>
 Make these clickable hyperlinks:
