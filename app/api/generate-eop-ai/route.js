@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { put } from '@vercel/blob';
+import { getEquipmentSpecs, getEmergencyPPE } from '@/lib/equipment-database';
 
 // Import EOP sections
 import { getEOPHeader } from '@/lib/eop-sections/header';
@@ -18,31 +19,31 @@ import { getFormattingInstructions } from '@/lib/eop-sections/formatting';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Build PROJECT_INSTRUCTIONS from modular sections
-function buildProjectInstructions() {
+function buildProjectInstructions(emergencyType) {
   return [
-    getEOPHeader(),
+    getEOPHeader(emergencyType),
     '',
-    getSection01Identification(),
+    getSection01Identification(emergencyType),
     '',
-    getSection02PurposeScope(),
+    getSection02PurposeScope(emergencyType),
     '',
-    getSection03ImmediateActions(),
+    getSection03ImmediateActions(emergencyType),
     '',
-    getSection04Scenarios(),
+    getSection04Scenarios(emergencyType),
     '',
-    getSection05Communication(),
+    getSection05Communication(emergencyType),
     '',
-    getSection06Recovery(),
+    getSection06Recovery(emergencyType),
     '',
-    getSection07Supporting(),
+    getSection07Supporting(emergencyType),
     '',
-    getSection08Approval(),
+    getSection08Approval(emergencyType),
     '',
-    getFormattingInstructions()
+    getFormattingInstructions(emergencyType)
   ].join('\n');
 }
 
-const PROJECT_INSTRUCTIONS = buildProjectInstructions();
+// PROJECT_INSTRUCTIONS will be built dynamically with emergency type
 
 const HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
@@ -223,6 +224,9 @@ export async function POST(request) {
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
     
+    // Build project instructions with the specific emergency type
+    const PROJECT_INSTRUCTIONS = buildProjectInstructions(formData.emergencyType);
+    
     // Prepare the prompt for Gemini
     const prompt = `${PROJECT_INSTRUCTIONS.replace('[current_date]', currentDate)}
 
@@ -236,54 +240,34 @@ Section 03 MUST include comprehensive power diagnostics with voltage verificatio
 Section 04 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
 ` : ''}
 
+// Get equipment specifications from database
+const equipmentSpecs = getEquipmentSpecs(formData.manufacturer, formData.modelNumber);
+const emergencyPPE = getEmergencyPPE(formData.emergencyType, equipmentSpecs);
+
 Equipment-Specific Details for ${formData.manufacturer} ${formData.modelNumber}:
-${formData.component?.toLowerCase().includes('chiller') ? `
-CHILLER SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
-- Main Power: ${formData.manufacturer === 'Carrier' ? '480VAC 3-phase (typical for Carrier centrifugal)' : formData.manufacturer === 'Trane' ? '460-480VAC 3-phase' : formData.manufacturer === 'York' ? '460VAC 3-phase standard' : '480VAC 3-phase'}
-- Control Power: ${formData.manufacturer === 'Carrier' ? '120VAC control circuit via transformer' : '24VAC or 120VAC control circuits'}
-- VFD Power: Check Variable Frequency Drive if ${formData.modelNumber} is VFD-equipped
-- Compressor Count: ${formData.modelNumber?.includes('19XRV') ? '2 compressors' : 'Verify compressor configuration'}
-- Refrigerant: ${formData.modelNumber?.includes('19XRV') ? 'R-134a' : formData.modelNumber?.includes('CVHE') ? 'R-123 or R-514A' : 'Check nameplate'}
-- Arc Flash PPE: Category 2 minimum for 480V systems
-- Special Tools: ${formData.manufacturer} diagnostic interface required
-` : ''}
-${formData.component?.toLowerCase().includes('ups') ? `
-UPS SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
-- Input Power: ${formData.manufacturer === 'Liebert' ? '480VAC 3-phase typical' : '480VAC 3-phase input'}
-- DC Bus Voltage: ${formData.modelNumber?.includes('NX') ? '480-540VDC' : 'Battery string voltage per specs'}
-- Output Power: Verify critical load voltage requirements
-- Battery Type: ${formData.manufacturer === 'Liebert' ? 'VRLA or Wet Cell per model' : 'Check battery configuration'}
-- Arc Flash PPE: Category 2-3 for DC bus work
-- Special Tools: ${formData.manufacturer} monitoring interface cable
-` : ''}
-${formData.component?.toLowerCase().includes('generator') ? `
-GENERATOR SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
-- Starting System: ${formData.manufacturer === 'Caterpillar' ? '24VDC starting batteries' : '12VDC or 24VDC starting system'}
-- Control Voltage: ${formData.manufacturer === 'Caterpillar' ? '24VDC control circuits' : 'Verify control voltage'}
-- Output Voltage: ${formData.modelNumber?.includes('3512') ? '480VAC 3-phase' : 'Check nameplate rating'}
-- Transfer Switch: Verify ATS model and control requirements
-- Arc Flash PPE: Category based on generator output rating
-- Special Tools: ${formData.manufacturer === 'Caterpillar' ? 'CAT ET diagnostic tool' : 'Manufacturer diagnostic tool'}
-- Additional PPE: Hearing protection mandatory, CO detector required
-` : ''}
-${formData.component?.toLowerCase().includes('pdu') ? `
-PDU SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
-- Input Voltage: Verify main breaker rating and voltage
-- Transformer: ${formData.modelNumber?.includes('Transform') ? 'Check tap settings' : 'N/A if non-transformer PDU'}
-- Branch Circuits: Document all branch circuit ratings
-- Monitoring: ${formData.manufacturer} monitoring system voltage requirements
-- Arc Flash PPE: Category based on available fault current
-- Special Tools: Circuit tracer for branch identification
-` : ''}
-${formData.component?.toLowerCase().includes('crac') || formData.component?.toLowerCase().includes('crah') ? `
-CRAC/CRAH SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
-- Fan Motor Power: ${formData.manufacturer === 'Liebert' ? '460VAC 3-phase typical' : '480VAC 3-phase'}
-- Control Power: 24VAC control transformer standard
-- Humidifier: ${formData.component?.includes('CRAH') ? 'N/A for CRAH units' : 'Check humidifier power requirements'}
-- Refrigerant: ${formData.component?.includes('CRAH') ? 'N/A - Chilled water' : 'R-410A or R-407C typical'}
-- Arc Flash PPE: Category 1-2 based on voltage
-- Special Tools: ${formData.manufacturer} control interface, refrigerant gauges if DX
-` : ''}
+${equipmentSpecs ? `
+VERIFIED EQUIPMENT SPECIFICATIONS FROM DATABASE:
+- Voltage: ${equipmentSpecs.voltage || 'Unknown'}
+- Phase: ${equipmentSpecs.phase || 'Unknown'}
+- Control Voltage: ${equipmentSpecs.controlVoltage || 'Unknown'}
+- Control System: ${equipmentSpecs.controlSystem || 'Unknown'}
+${equipmentSpecs.refrigerant ? `- Refrigerant: ${equipmentSpecs.refrigerant}` : ''}
+${equipmentSpecs.compressorType ? `- Compressor Type: ${equipmentSpecs.compressorType}` : ''}
+${equipmentSpecs.capacity ? `- Capacity: ${equipmentSpecs.capacity}` : ''}
+${equipmentSpecs.fuelType ? `- Fuel Type: ${equipmentSpecs.fuelType}` : ''}
+${equipmentSpecs.batteryType ? `- Battery Type: ${equipmentSpecs.batteryType}` : ''}
+${equipmentSpecs.vfd ? '- Variable Frequency Drive (VFD) Equipped' : ''}
+- Arc Flash PPE Required: ${equipmentSpecs.arcFlashPPE || 'Verify on site'}
+${emergencyPPE.respiratory ? `- Respiratory Protection: ${emergencyPPE.respiratory}` : ''}
+${emergencyPPE.additional ? `- Additional PPE: ${emergencyPPE.additional}` : ''}
+` : `
+EQUIPMENT SPECIFICATIONS NOT IN DATABASE - USE YOUR KNOWLEDGE:
+Generate accurate specifications for ${formData.manufacturer} ${formData.modelNumber} based on:
+- Component Type: ${formData.component}
+- Manufacturer standards and typical configurations
+- Industry standard voltages and control systems
+- Emergency Type: ${formData.emergencyType} (adapt PPE requirements accordingly)
+`}
 
 Emergency Details:
 - Manufacturer: ${formData.manufacturer}
@@ -320,9 +304,14 @@ Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded nu
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
 CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).`;
 
-    // Generate content using Gemini
+    // Generate content using Gemini with optimized configuration
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-pro'
+      model: 'gemini-2.5-pro',
+      generationConfig: {
+        temperature: 0.3,  // Lower for more consistent, factual output
+        maxOutputTokens: 12000,  // Sufficient for detailed EOP
+        candidateCount: 1
+      }
     });
     
     const result = await model.generateContent(prompt);
