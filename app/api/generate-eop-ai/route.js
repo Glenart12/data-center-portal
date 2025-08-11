@@ -96,7 +96,7 @@ Generate 4 scenarios based on the SPECIFIC EQUIPMENT TYPE and its typical instal
 
 <h3>SCENARIO 1 - PRIMARY POWER SOURCE FAILURE</h3>
 [Adapt based on equipment: utility for most equipment, upstream UPS for critical loads, generator for emergency systems, etc.]
-<div class="emergency-warning">
+<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
 Trigger Conditions: (specific to how this equipment is typically powered)
 </div>
 Verification Checks: (specific to this equipment's power source)
@@ -106,7 +106,7 @@ Include verification steps with input fields for readings
 
 <h3>SCENARIO 2 - DISTRIBUTION FAILURE</h3>
 [Adapt based on equipment: MCC for motors, PDU for IT equipment, panelboard for HVAC, switchgear for large equipment, etc.]
-<div class="emergency-warning">
+<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
 Trigger Conditions: (specific to this equipment's distribution type)
 </div>
 Verification Checks: (appropriate for the distribution equipment)
@@ -116,7 +116,7 @@ Include verification steps with input fields for readings
 
 <h3>SCENARIO 3 - FEEDER/CIRCUIT FAILURE</h3>
 [Adapt based on equipment: cable types, voltage levels, typical routing for this equipment]
-<div class="emergency-warning">
+<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
 Trigger Conditions: (based on this equipment's typical circuit configuration)
 </div>
 Verification Checks: (appropriate tests for this voltage level and cable type)
@@ -126,7 +126,7 @@ Include verification steps with input fields for readings
 
 <h3>SCENARIO 4 - LOCAL PROTECTION DEVICE FAILURE</h3>
 [Adapt based on equipment: disconnect type, breaker size, fusing, etc.]
-<div class="emergency-warning">
+<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
 Trigger Conditions: (specific to protection devices used with this equipment)
 </div>
 Verification Checks: (appropriate for this equipment's protection scheme)
@@ -307,8 +307,9 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             margin-bottom: 8px;
         }
         .emergency-warning { 
-            background-color: #dc3545; 
-            color: white;
+            background-color: #f8d7da; 
+            color: #721c24;
+            border: 2px solid #dc3545;
             padding: 15px; 
             border-radius: 5px; 
             margin: 20px 0;
