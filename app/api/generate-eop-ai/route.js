@@ -24,6 +24,13 @@ The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 START WITH:
 <h1>Emergency Operating Procedure (EOP)</h1>
 
+<div class="emergency-warning" style="background: #dc3545; color: white; padding: 20px; margin: 20px 0; border-radius: 5px; font-size: 1.1em;">
+<strong>⚠️ EMERGENCY RESPONSE: \${manufacturer} \${modelNumber}</strong><br>
+<strong>Location:</strong> \${location || 'Data Center'}<br>
+<strong>Emergency Type:</strong> \${emergencyType}<br>
+<strong>Critical Specs:</strong> Generate based on equipment database - voltage, phase, capacity, refrigerant type, etc.
+</div>
+
 <h2>Section 01: EOP Identification & Control</h2>
 <p><strong>EOP Title:</strong> Emergency Operating Procedure for \${manufacturer} \${modelNumber}</p>
 <p><strong>EOP Identifier:</strong> EOP-\${manufacturer.toUpperCase().substring(0,3)}-\${modelNumber.replace(/[^A-Z0-9]/gi, '').substring(0,8)}-PWR-001</p>
@@ -46,6 +53,102 @@ START WITH:
 <p><strong>Safety Notice:</strong> All personnel must follow proper electrical safety procedures, use appropriate PPE, and verify de-energization before working on any electrical equipment.</p>
 
 <h2>Section 03: Immediate Emergency Actions - Power Failure Diagnostics</h2>
+
+<h3>Pre-Action Safety & Equipment Requirements</h3>
+
+<div class="emergency-action" style="background: #fee; border: 2px solid #dc3545; padding: 15px; margin: 20px 0;">
+<h4>⚠️ CRITICAL SAFETY CHECKPOINT - STOP Before Proceeding:</h4>
+<p><strong>Equipment-Specific PPE Requirements for \${manufacturer} \${modelNumber}:</strong></p>
+
+Generate PPE requirements based on the SPECIFIC equipment type and voltage:
+- For 480V 3-phase equipment (chillers, large motors): Arc Flash Category 2 PPE minimum
+- For 208V/240V equipment: Arc Flash Category 1 PPE
+- For DC systems (UPS batteries): Acid-resistant gloves, face shield
+- For refrigerant systems: SCBA or respirator if leak suspected
+- For generators: Hearing protection, CO monitor
+
+<table>
+<tr>
+  <th>PPE Item</th>
+  <th>Specification for \${modelNumber}</th>
+  <th>Verified</th>
+</tr>
+<tr>
+  <td>Arc Flash PPE</td>
+  <td>Category [specify based on voltage] - [cal/cm²] rated</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Insulated Gloves</td>
+  <td>Class [0-4 based on voltage] rated for [specific voltage]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Safety Glasses/Face Shield</td>
+  <td>ANSI Z87.1 rated with side shields</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Additional PPE</td>
+  <td>[Equipment-specific: respirator for refrigerants, hearing protection for generators, etc.]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
+
+<p><strong>Required Tools & Test Equipment for \${manufacturer} \${modelNumber}:</strong></p>
+
+Generate tool list based on the SPECIFIC equipment model:
+- For Carrier 19XRV5P5: Carrier CCN interface tool, specific control board diagnostic tools
+- For Trane CVHE: Tracer SC+ interface, oil pressure gauges
+- For Caterpillar generators: CAT ET diagnostic tool
+- For Liebert UPS: Liebert monitoring interface cable
+
+<table>
+<tr>
+  <th>Tool/Equipment</th>
+  <th>Specific Model/Type for \${modelNumber}</th>
+  <th>Available</th>
+</tr>
+<tr>
+  <td>Multimeter</td>
+  <td>True RMS, CAT III rated for [equipment voltage]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Clamp Meter</td>
+  <td>AC/DC capable, [amperage range based on equipment FLA]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Non-Contact Voltage Detector</td>
+  <td>Rated for [equipment voltage range]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>Manufacturer Interface Tool</td>
+  <td>[Specific tool for \${manufacturer} \${modelNumber}]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>LOTO Equipment</td>
+  <td>Lockout devices for [breaker type/disconnect type]</td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
+
+<p><strong>\${manufacturer} \${modelNumber} Specific Safety Requirements:</strong></p>
+<ul>
+<li>□ Verify de-energization procedures per \${manufacturer} service manual</li>
+<li>□ Check for stored energy in [capacitors/VFDs/control circuits] specific to this model</li>
+<li>□ Review \${manufacturer} emergency shutdown sequence</li>
+<li>□ Confirm [equipment-specific hazards: refrigerant pressure, battery acid, hot surfaces, etc.]</li>
+<li>□ Emergency contact for \${manufacturer} technical support ready: <input type="text" placeholder="Support #" style="width:150px" /></li>
+</ul>
+
+<div style="background: #dc3545; color: white; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
+DO NOT PROCEED until all safety requirements are verified for \${manufacturer} \${modelNumber}
+</div>
+</div>
 
 <h3>Step 1: Obvious Power Loss Indicators Check (BEFORE opening any equipment)</h3>
 <p><strong>Verify facility-wide power status indicators before approaching \${manufacturer} \${modelNumber}</strong></p>
@@ -461,76 +564,6 @@ Add this important note at the bottom of the Emergency Contacts section:
   </tr>
 </table>
 
-<h3>PPE Requirements for Electrical Work</h3>
-Create a professional table with columns: PPE Category | Specification | When Required
-Include voltage-specific PPE requirements based on the equipment type
-
-<h3>Tools Required for Emergency Response</h3>
-Create a comprehensive table with columns: Tool Category | Specific Tools | Purpose
-<table>
-<tr>
-  <th>Tool Category</th>
-  <th>Specific Tools</th>
-  <th>Purpose</th>
-</tr>
-<tr>
-  <td><strong>Electrical Test Equipment</strong></td>
-  <td>• Fluke 87V or equivalent multimeter<br>
-      • Non-contact voltage detector (NCVD)<br>
-      • Clamp meter (AC/DC capable)<br>
-      • Megger insulation tester</td>
-  <td>Voltage verification and electrical diagnostics for \${modelNumber}</td>
-</tr>
-<tr>
-  <td><strong>Insulated Tools</strong></td>
-  <td>• 1000V rated insulated screwdrivers<br>
-      • Insulated pliers and cutters<br>
-      • Insulated torque wrench<br>
-      • Insulated glove kit</td>
-  <td>Safe work on energized or potentially energized \${system} components</td>
-</tr>
-<tr>
-  <td><strong>LOTO Equipment</strong></td>
-  <td>• Lockout hasps and tags<br>
-      • Circuit breaker lockout devices<br>
-      • Disconnect switch lockout<br>
-      • Personal safety locks</td>
-  <td>Proper isolation of \${manufacturer} \${modelNumber} during emergency work</td>
-</tr>
-<tr>
-  <td><strong>Documentation Tools</strong></td>
-  <td>• Digital camera or smartphone<br>
-      • Clipboard with EOP forms<br>
-      • Permanent markers<br>
-      • Label maker</td>
-  <td>Document findings, label components, record data for \${modelNumber}</td>
-</tr>
-<tr>
-  <td><strong>Emergency Lighting</strong></td>
-  <td>• Headlamp (hands-free)<br>
-      • Portable LED work light<br>
-      • Flashlight (backup)<br>
-      • Glow sticks (non-electric)</td>
-  <td>Visibility during power failure conditions</td>
-</tr>
-<tr>
-  <td><strong>Communication</strong></td>
-  <td>• Two-way radio<br>
-      • Cell phone (fully charged)<br>
-      • Backup battery pack<br>
-      • Emergency contact list</td>
-  <td>Coordination with team and escalation contacts</td>
-</tr>
-<tr>
-  <td><strong>Safety Equipment</strong></td>
-  <td>• Arc flash boundary tape<br>
-      • Safety cones/barriers<br>
-      • Ground fault circuit tester<br>
-      • First aid kit</td>
-  <td>Establish safe work zones around \${modelNumber}</td>
-</tr>
-</table>
-
 <h3>Related Documents</h3>
 Make these clickable hyperlinks:
 - <a href="#" style="color: #0070f3; text-decoration: underline;">Equipment Electrical Drawings</a> (Internal Document)
@@ -748,36 +781,53 @@ Section 03 MUST include comprehensive power diagnostics with voltage verificatio
 Section 04 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
 ` : ''}
 
-Equipment-Specific Power Requirements to Consider:
+Equipment-Specific Details for ${formData.manufacturer} ${formData.modelNumber}:
 ${formData.component?.toLowerCase().includes('chiller') ? `
-- Main Power: Typically 480VAC 3-phase for compressors
-- Control Power: 120VAC or 24VAC for control circuits
-- VFD Power: Check Variable Frequency Drive if equipped
-- Motor Starter: Check magnetic contactors and overloads
+CHILLER SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
+- Main Power: ${formData.manufacturer === 'Carrier' ? '480VAC 3-phase (typical for Carrier centrifugal)' : formData.manufacturer === 'Trane' ? '460-480VAC 3-phase' : formData.manufacturer === 'York' ? '460VAC 3-phase standard' : '480VAC 3-phase'}
+- Control Power: ${formData.manufacturer === 'Carrier' ? '120VAC control circuit via transformer' : '24VAC or 120VAC control circuits'}
+- VFD Power: Check Variable Frequency Drive if ${formData.modelNumber} is VFD-equipped
+- Compressor Count: ${formData.modelNumber?.includes('19XRV') ? '2 compressors' : 'Verify compressor configuration'}
+- Refrigerant: ${formData.modelNumber?.includes('19XRV') ? 'R-134a' : formData.modelNumber?.includes('CVHE') ? 'R-123 or R-514A' : 'Check nameplate'}
+- Arc Flash PPE: Category 2 minimum for 480V systems
+- Special Tools: ${formData.manufacturer} diagnostic interface required
 ` : ''}
 ${formData.component?.toLowerCase().includes('ups') ? `
-- Input Power: Verify utility input voltage (typically 480VAC 3-phase)
-- DC Bus: Check battery voltage (typically 480-540VDC)
-- Output Power: Verify output to critical loads
-- Bypass Power: Check static and maintenance bypass sources
+UPS SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
+- Input Power: ${formData.manufacturer === 'Liebert' ? '480VAC 3-phase typical' : '480VAC 3-phase input'}
+- DC Bus Voltage: ${formData.modelNumber?.includes('NX') ? '480-540VDC' : 'Battery string voltage per specs'}
+- Output Power: Verify critical load voltage requirements
+- Battery Type: ${formData.manufacturer === 'Liebert' ? 'VRLA or Wet Cell per model' : 'Check battery configuration'}
+- Arc Flash PPE: Category 2-3 for DC bus work
+- Special Tools: ${formData.manufacturer} monitoring interface cable
 ` : ''}
 ${formData.component?.toLowerCase().includes('generator') ? `
-- Starting Batteries: 12VDC or 24VDC system
-- Control Power: Verify control circuit voltage
-- Transfer Switch: Check ATS position and control power
-- Field Excitation: Verify excitation voltage when running
+GENERATOR SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
+- Starting System: ${formData.manufacturer === 'Caterpillar' ? '24VDC starting batteries' : '12VDC or 24VDC starting system'}
+- Control Voltage: ${formData.manufacturer === 'Caterpillar' ? '24VDC control circuits' : 'Verify control voltage'}
+- Output Voltage: ${formData.modelNumber?.includes('3512') ? '480VAC 3-phase' : 'Check nameplate rating'}
+- Transfer Switch: Verify ATS model and control requirements
+- Arc Flash PPE: Category based on generator output rating
+- Special Tools: ${formData.manufacturer === 'Caterpillar' ? 'CAT ET diagnostic tool' : 'Manufacturer diagnostic tool'}
+- Additional PPE: Hearing protection mandatory, CO detector required
 ` : ''}
 ${formData.component?.toLowerCase().includes('pdu') ? `
-- Input Breaker: Verify main input voltage
-- Transformer: Check transformer secondary voltages
-- Branch Circuits: Verify individual branch circuit voltages
-- Monitoring: Check monitoring circuit power
+PDU SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
+- Input Voltage: Verify main breaker rating and voltage
+- Transformer: ${formData.modelNumber?.includes('Transform') ? 'Check tap settings' : 'N/A if non-transformer PDU'}
+- Branch Circuits: Document all branch circuit ratings
+- Monitoring: ${formData.manufacturer} monitoring system voltage requirements
+- Arc Flash PPE: Category based on available fault current
+- Special Tools: Circuit tracer for branch identification
 ` : ''}
 ${formData.component?.toLowerCase().includes('crac') || formData.component?.toLowerCase().includes('crah') ? `
-- Fan Motor Power: Typically 480VAC 3-phase
-- Control Power: 24VAC control transformer
-- Humidifier Power: Check humidification system power
-- Reheat Elements: Verify electric reheat power if equipped
+CRAC/CRAH SPECIFIC - ${formData.manufacturer} ${formData.modelNumber}:
+- Fan Motor Power: ${formData.manufacturer === 'Liebert' ? '460VAC 3-phase typical' : '480VAC 3-phase'}
+- Control Power: 24VAC control transformer standard
+- Humidifier: ${formData.component?.includes('CRAH') ? 'N/A for CRAH units' : 'Check humidifier power requirements'}
+- Refrigerant: ${formData.component?.includes('CRAH') ? 'N/A - Chilled water' : 'R-410A or R-407C typical'}
+- Arc Flash PPE: Category 1-2 based on voltage
+- Special Tools: ${formData.manufacturer} control interface, refrigerant gauges if DX
 ` : ''}
 
 Emergency Details:
@@ -790,10 +840,16 @@ Emergency Details:
 - Emergency Type: ${formData.emergencyType}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
-Start with <h1>Emergency Operating Procedure (EOP)</h1> then proceed with sections using H2 headers.
+Start with <h1>Emergency Operating Procedure (EOP)</h1> followed by the Quick Response header div, then proceed with sections using H2 headers.
+
+IMPORTANT: In Section 07, do NOT include PPE Requirements or Tools Required subsections - these are now in Section 03 where they're needed immediately.
 Include ALL 8 sections with complete, detailed content and INTERACTIVE INPUT FIELDS as specified above.
 
 CRITICAL FOR SECTION 03:
+- FIRST add Pre-Action Safety & Equipment Requirements subsection with:
+  * PPE requirements specific to ${formData.component} voltage and hazards
+  * Tool requirements based on ${formData.manufacturer} ${formData.modelNumber}
+  * Safety checkpoint with equipment-specific hazards
 - Create a detailed diagnostic table with voltage verification specific to ${formData.component}
 - Include actual expected voltages based on equipment type
 - Add input fields for technician readings
