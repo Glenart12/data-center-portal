@@ -46,7 +46,7 @@ START WITH:
 <h2>Section 03: Immediate Emergency Actions - Power Failure Diagnostics</h2>
 
 <h3>Step 1: Obvious Power Loss Indicators Check (BEFORE opening any equipment)</h3>
-<p><strong>Verify facility-wide power status indicators before approaching ${manufacturer} ${modelNumber}</strong></p>
+<p><strong>Verify facility-wide power status indicators before approaching \${manufacturer} \${modelNumber}</strong></p>
 <table>
 <tr>
   <th>Check Item</th>
@@ -93,20 +93,20 @@ START WITH:
 </table>
 
 <h3>Step 2: System Monitoring Verification</h3>
-<p><strong>Verify how ${manufacturer} ${modelNumber} appears in monitoring systems</strong></p>
+<p><strong>Verify how \${manufacturer} \${modelNumber} appears in monitoring systems</strong></p>
 <table>
 <tr>
   <th>System</th>
   <th>Check Location</th>
   <th>What to Verify</th>
-  <th>Expected Reading for ${modelNumber}</th>
+  <th>Expected Reading for \${modelNumber}</th>
   <th>Actual Reading</th>
   <th>Pass/Fail</th>
 </tr>
 <tr>
   <td>EPMS</td>
   <td>Electrical Power Monitoring System</td>
-  <td>Power consumption for ${modelNumber}</td>
+  <td>Power consumption for \${modelNumber}</td>
   <td>0 kW if de-energized</td>
   <td><input type="text" placeholder="kW reading" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
@@ -114,7 +114,7 @@ START WITH:
 <tr>
   <td>BMS</td>
   <td>Building Management System</td>
-  <td>${manufacturer} ${modelNumber} status</td>
+  <td>\${manufacturer} \${modelNumber} status</td>
   <td>"Offline" or "No Communication"</td>
   <td><input type="text" placeholder="Status" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
@@ -122,8 +122,8 @@ START WITH:
 <tr>
   <td>SCADA (if available)</td>
   <td>SCADA System</td>
-  <td>${system} operational status</td>
-  <td>Shows ${modelNumber} as non-operational</td>
+  <td>\${system} operational status</td>
+  <td>Shows \${modelNumber} as non-operational</td>
   <td><input type="text" placeholder="Status" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
 </tr>
@@ -146,7 +146,7 @@ START WITH:
 </table>
 
 <h3>Step 3: Electrical Diagnostics</h3>
-<p><strong>Equipment-specific electrical verification for ${manufacturer} ${modelNumber}</strong></p>
+<p><strong>Equipment-specific electrical verification for \${manufacturer} \${modelNumber}</strong></p>
 
 First, identify the specific equipment type from the manufacturer and model provided. Determine:
 - Equipment category (chiller, UPS, generator, PDU, CRAC unit, etc.)
@@ -303,7 +303,7 @@ Create a comprehensive table with columns: Tool Category | Specific Tools | Purp
       • Non-contact voltage detector (NCVD)<br>
       • Clamp meter (AC/DC capable)<br>
       • Megger insulation tester</td>
-  <td>Voltage verification and electrical diagnostics for ${modelNumber}</td>
+  <td>Voltage verification and electrical diagnostics for \${modelNumber}</td>
 </tr>
 <tr>
   <td><strong>Insulated Tools</strong></td>
@@ -311,7 +311,7 @@ Create a comprehensive table with columns: Tool Category | Specific Tools | Purp
       • Insulated pliers and cutters<br>
       • Insulated torque wrench<br>
       • Insulated glove kit</td>
-  <td>Safe work on energized or potentially energized ${system} components</td>
+  <td>Safe work on energized or potentially energized \${system} components</td>
 </tr>
 <tr>
   <td><strong>LOTO Equipment</strong></td>
@@ -319,7 +319,7 @@ Create a comprehensive table with columns: Tool Category | Specific Tools | Purp
       • Circuit breaker lockout devices<br>
       • Disconnect switch lockout<br>
       • Personal safety locks</td>
-  <td>Proper isolation of ${manufacturer} ${modelNumber} during emergency work</td>
+  <td>Proper isolation of \${manufacturer} \${modelNumber} during emergency work</td>
 </tr>
 <tr>
   <td><strong>Documentation Tools</strong></td>
@@ -327,7 +327,7 @@ Create a comprehensive table with columns: Tool Category | Specific Tools | Purp
       • Clipboard with EOP forms<br>
       • Permanent markers<br>
       • Label maker</td>
-  <td>Document findings, label components, record data for ${modelNumber}</td>
+  <td>Document findings, label components, record data for \${modelNumber}</td>
 </tr>
 <tr>
   <td><strong>Emergency Lighting</strong></td>
@@ -351,7 +351,7 @@ Create a comprehensive table with columns: Tool Category | Specific Tools | Purp
       • Safety cones/barriers<br>
       • Ground fault circuit tester<br>
       • First aid kit</td>
-  <td>Establish safe work zones around ${modelNumber}</td>
+  <td>Establish safe work zones around \${modelNumber}</td>
 </tr>
 </table>
 
