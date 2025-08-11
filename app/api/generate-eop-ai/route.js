@@ -419,7 +419,9 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     // Save to blob storage
     const blob = await put(`eops/${filename}`, completeHtml, {
       access: 'public',
-      contentType: 'text/html'
+      contentType: 'text/html',
+      addRandomSuffix: false,
+      allowOverwrite: true
     });
     
     console.log('EOP generation complete:', filename);
