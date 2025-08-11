@@ -227,6 +227,10 @@ export async function POST(request) {
     // Build project instructions with the specific emergency type
     const PROJECT_INSTRUCTIONS = buildProjectInstructions(formData.emergencyType);
     
+    // Get equipment specifications from database
+    const equipmentSpecs = getEquipmentSpecs(formData.manufacturer, formData.modelNumber);
+    const emergencyPPE = getEmergencyPPE(formData.emergencyType, equipmentSpecs);
+    
     // Prepare the prompt for Gemini
     const prompt = `${PROJECT_INSTRUCTIONS.replace('[current_date]', currentDate)}
 
@@ -239,10 +243,6 @@ POWER FAILURE EMERGENCY - This EOP is specifically for power failure response.
 Section 03 MUST include comprehensive power diagnostics with voltage verification tables.
 Section 04 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
 ` : ''}
-
-// Get equipment specifications from database
-const equipmentSpecs = getEquipmentSpecs(formData.manufacturer, formData.modelNumber);
-const emergencyPPE = getEmergencyPPE(formData.emergencyType, equipmentSpecs);
 
 Equipment-Specific Details for ${formData.manufacturer} ${formData.modelNumber}:
 ${equipmentSpecs ? `
