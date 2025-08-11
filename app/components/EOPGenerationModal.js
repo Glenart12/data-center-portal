@@ -10,8 +10,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     location: '',
     system: '',
     component: '',
-    emergencyType: '',
-    description: ''
+    emergencyType: ''
   });
   
   const [isGenerating, setIsGenerating] = useState(false);
@@ -64,8 +63,8 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
-        !formData.component || !formData.emergencyType || !formData.description) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Component/Equipment Type\n• Emergency Type\n• Emergency Description');
+        !formData.component || !formData.emergencyType) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Component/Equipment Type\n• Emergency Type');
       return;
     }
 
@@ -315,25 +314,6 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                 placeholder="e.g., Power Failure, High Temperature Alarm, Compressor Failure"
               />
             </div>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Emergency Description *
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                minHeight: '120px',
-                resize: 'vertical'
-              }}
-              placeholder="Describe the emergency condition and required response"
-            />
           </div>
         </div>
 

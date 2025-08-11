@@ -369,7 +369,7 @@ export async function POST(request) {
     
     // Validate required fields
     if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.component || !formData?.emergencyType || !formData?.description) {
+        !formData?.component || !formData?.emergencyType) {
       return NextResponse.json({ 
         error: 'Missing required fields',
         userMessage: 'Please fill in all required fields'
@@ -442,7 +442,6 @@ Emergency Details:
 - System: ${formData.system}
 - Component/Equipment Type: ${formData.component}
 - Emergency Type: ${formData.emergencyType}
-- Emergency Description: ${formData.description}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Start with <h1>Emergency Operating Procedure (EOP)</h1> then proceed with sections using H2 headers.
