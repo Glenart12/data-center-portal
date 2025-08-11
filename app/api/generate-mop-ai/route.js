@@ -24,7 +24,16 @@ export async function POST(request) {
     });
     
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ error: 'Server error', userMessage: 'Server is busy. Please try again.' }));
+      
+      // Add better error messages for common issues
+      if (response.status === 429 || errorData.error?.includes('busy')) {
+        return NextResponse.json({ 
+          error: 'AI service is busy',
+          userMessage: 'The AI service is currently busy. Please wait 2-3 minutes and try again.'
+        }, { status: 429 });
+      }
+      
       return NextResponse.json(errorData, { status: response.status });
     }
     

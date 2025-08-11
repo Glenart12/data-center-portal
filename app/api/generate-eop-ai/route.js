@@ -25,23 +25,25 @@ START WITH:
 <h1>Emergency Operating Procedure (EOP)</h1>
 
 <h2>Section 01: EOP Identification & Control</h2>
-- EOP Title, Identifier
-- Equipment Details as a properly formatted list:
-  • Manufacturer: {actual manufacturer from form data}
-  • Model Number: {actual model from form data}
-  • Serial Number: {actual serial or "N/A" if not provided}
-  • Location: {actual location from form data}
-  • System: {actual system from form data}
-  • Component Type: {actual component from form data}
-- Version: <input type="text" value="1.0" style="width:80px" />
-- Date fields: <input type="text" value="[current_date]" style="width:150px" />
-- Author: <input type="text" placeholder="Enter Author Name" style="width:250px" />
-- Approver: <input type="text" placeholder="Enter Approver Name" style="width:250px" />
+<p><strong>EOP Title:</strong> Emergency Operating Procedure for \${manufacturer} \${modelNumber}</p>
+<p><strong>EOP Identifier:</strong> EOP-\${manufacturer.toUpperCase().substring(0,3)}-\${modelNumber.replace(/[^A-Z0-9]/gi, '').substring(0,8)}-PWR-001</p>
+<p><strong>Equipment Details:</strong></p>
+<p><strong>Manufacturer:</strong> \${manufacturer}</p>
+<p><strong>Model Number:</strong> \${modelNumber}</p>
+<p><strong>Serial Number:</strong> \${serialNumber || 'N/A'}</p>
+<p><strong>Location:</strong> \${location || 'Data Center'}</p>
+<p><strong>System:</strong> \${system}</p>
+<p><strong>Component Type:</strong> \${component}</p>
+<p><strong>Version:</strong> <input type="text" value="1.0" style="width:80px" /></p>
+<p><strong>Date:</strong> <input type="text" value="[current_date]" style="width:150px" /></p>
+<p><strong>Author:</strong> <input type="text" placeholder="Enter Author Name" style="width:250px" /></p>
+<p><strong>Approver:</strong> <input type="text" placeholder="Enter Approver Name" style="width:250px" /></p>
 
 <h2>Section 02: Purpose & Scope</h2>
-- Clear statement of emergency response goals for power failure situations
-- Who this procedure applies to
-- When to activate this EOP
+<p><strong>Purpose:</strong> This Emergency Operating Procedure provides step-by-step instructions for responding to power failure emergencies affecting the \${manufacturer} \${modelNumber} \${system}. This document ensures rapid, safe, and effective response to restore critical infrastructure operations.</p>
+<p><strong>Scope:</strong> This procedure applies to all data center operations personnel, facilities engineers, and emergency response teams responsible for maintaining the \${manufacturer} \${modelNumber} and associated critical infrastructure systems.</p>
+<p><strong>Activation Criteria:</strong> This EOP shall be activated when power loss is detected or suspected on the \${manufacturer} \${modelNumber}, including but not limited to: utility power outages, automatic transfer switch failures, distribution panel failures, circuit breaker trips, or equipment-specific power supply failures.</p>
+<p><strong>Safety Notice:</strong> All personnel must follow proper electrical safety procedures, use appropriate PPE, and verify de-energization before working on any electrical equipment.</p>
 
 <h2>Section 03: Immediate Emergency Actions - Power Failure Diagnostics</h2>
 
@@ -274,16 +276,190 @@ Add this important note at the bottom of the Emergency Contacts section:
 "⚠️ IMPORTANT: Verify all emergency contact numbers for your specific facility location. Update phone numbers as needed."
 
 <h2>Section 06: Recovery & Return to Service</h2>
-- Power restoration verification steps
-- Equipment-specific restart procedures
-- System functionality checks
-- Return to normal operation confirmation
+<h3>Power Restoration and Equipment Recovery Procedures</h3>
+<p>Follow these steps in sequence to safely restore the \${manufacturer} \${modelNumber} to normal operation after power has been restored:</p>
+
+<ol>
+  <li>
+    <strong>Power Restoration Verification</strong>
+    <p>Confirm stable power supply is available at all distribution levels:</p>
+    <ul>
+      <li>Verify utility power restoration at main switchgear</li>
+      <li>Check automatic transfer switch position (should be on "Normal" source)</li>
+      <li>Confirm voltage readings at equipment disconnect: <input type="text" placeholder="Enter voltage" style="width:100px" /> VAC</li>
+      <li>Verify phase rotation if applicable</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Pre-Start Safety Checks</strong>
+    <p>Complete all safety verifications before energizing equipment:</p>
+    <ul>
+      <li>Verify all LOTO devices have been removed</li>
+      <li>Confirm no personnel are working on the \${manufacturer} \${modelNumber}</li>
+      <li>Reset all emergency stops and safety interlocks</li>
+      <li>Check control power availability: <input type="text" placeholder="Control voltage" style="width:100px" /> VAC</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Equipment-Specific Restart Sequence</strong>
+    <p>Follow the manufacturer-specific startup procedure for \${manufacturer} \${modelNumber}:</p>
+    <ul>
+      <li>Turn main disconnect to "ON" position</li>
+      <li>Verify control panel indicators show normal status</li>
+      <li>Clear any alarms present on the control panel</li>
+      <li>Initiate startup sequence per manufacturer's procedure</li>
+      <li>Record startup time: <input type="text" placeholder="HH:MM" style="width:80px" /></li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>System Functionality Verification</strong>
+    <p>Monitor critical parameters during the startup phase:</p>
+    <table>
+      <tr>
+        <th>Parameter</th>
+        <th>Expected Range</th>
+        <th>Actual Reading</th>
+        <th>Pass/Fail</th>
+      </tr>
+      <tr>
+        <td>Operating Voltage</td>
+        <td>Per equipment nameplate</td>
+        <td><input type="text" placeholder="Reading" style="width:100px" /></td>
+        <td><input type="checkbox" /></td>
+      </tr>
+      <tr>
+        <td>Operating Current</td>
+        <td>Within FLA rating</td>
+        <td><input type="text" placeholder="Reading" style="width:100px" /></td>
+        <td><input type="checkbox" /></td>
+      </tr>
+      <tr>
+        <td>Control System Status</td>
+        <td>Normal/No Alarms</td>
+        <td><input type="text" placeholder="Status" style="width:100px" /></td>
+        <td><input type="checkbox" /></td>
+      </tr>
+    </table>
+  </li>
+  
+  <li>
+    <strong>Load Transfer (if applicable)</strong>
+    <p>For equipment with redundant systems or bypass capabilities:</p>
+    <ul>
+      <li>Gradually transfer load from backup to primary equipment</li>
+      <li>Monitor load percentage: <input type="text" placeholder="% Load" style="width:80px" /></li>
+      <li>Verify stable operation at each load increment</li>
+      <li>Document final load distribution</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Performance Validation</strong>
+    <p>Confirm equipment is operating within normal parameters:</p>
+    <ul>
+      <li>Run equipment for minimum 15 minutes under normal load</li>
+      <li>Verify all operational setpoints are correct</li>
+      <li>Check for unusual noises, vibrations, or odors</li>
+      <li>Confirm all auxiliary systems are functioning</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Return to Normal Operation</strong>
+    <p>Complete recovery documentation and notifications:</p>
+    <ul>
+      <li>Document all readings and observations</li>
+      <li>Update equipment log book</li>
+      <li>Notify operations team of successful restoration</li>
+      <li>Clear any active alarms in monitoring systems</li>
+      <li>Restoration completed by: <input type="text" placeholder="Name" style="width:200px" /> at <input type="text" placeholder="Time" style="width:80px" /></li>
+    </ul>
+  </li>
+</ol>
 
 <h2>Section 07: Supporting Information</h2>
-- Equipment locations
-- Electrical panel locations
-- Disconnect switch locations
-- Spare parts inventory
+<h3>Critical Infrastructure Locations</h3>
+<table>
+  <tr>
+    <th>Infrastructure Element</th>
+    <th>Location Details</th>
+    <th>Access Requirements</th>
+  </tr>
+  <tr>
+    <td><strong>\${manufacturer} \${modelNumber} Location</strong></td>
+    <td><input type="text" placeholder="Enter exact location (Room/Row/Rack)" style="width:250px" /></td>
+    <td><input type="text" placeholder="Badge/Key required" style="width:150px" /></td>
+  </tr>
+  <tr>
+    <td><strong>Main Electrical Panel</strong></td>
+    <td><input type="text" placeholder="Panel designation and location" style="width:250px" /></td>
+    <td><input type="text" placeholder="Access requirements" style="width:150px" /></td>
+  </tr>
+  <tr>
+    <td><strong>Equipment Disconnect Switch</strong></td>
+    <td><input type="text" placeholder="Disconnect location" style="width:250px" /></td>
+    <td><input type="text" placeholder="Access requirements" style="width:150px" /></td>
+  </tr>
+  <tr>
+    <td><strong>Distribution Panel</strong></td>
+    <td><input type="text" placeholder="Panel ID and location" style="width:250px" /></td>
+    <td><input type="text" placeholder="Access requirements" style="width:150px" /></td>
+  </tr>
+  <tr>
+    <td><strong>Emergency Generator</strong></td>
+    <td><input type="text" placeholder="Generator location" style="width:250px" /></td>
+    <td><input type="text" placeholder="Access requirements" style="width:150px" /></td>
+  </tr>
+  <tr>
+    <td><strong>UPS System (if applicable)</strong></td>
+    <td><input type="text" placeholder="UPS location" style="width:250px" /></td>
+    <td><input type="text" placeholder="Access requirements" style="width:150px" /></td>
+  </tr>
+</table>
+
+<h3>Spare Parts Inventory</h3>
+<p>Critical spare parts for \${manufacturer} \${modelNumber} emergency response:</p>
+<table>
+  <tr>
+    <th>Part Description</th>
+    <th>Part Number</th>
+    <th>Quantity</th>
+    <th>Storage Location</th>
+  </tr>
+  <tr>
+    <td>Main Breaker/Fuses</td>
+    <td><input type="text" placeholder="Part number" style="width:150px" /></td>
+    <td><input type="text" placeholder="Qty" style="width:60px" /></td>
+    <td><input type="text" placeholder="Location" style="width:200px" /></td>
+  </tr>
+  <tr>
+    <td>Control Fuses</td>
+    <td><input type="text" placeholder="Part number" style="width:150px" /></td>
+    <td><input type="text" placeholder="Qty" style="width:60px" /></td>
+    <td><input type="text" placeholder="Location" style="width:200px" /></td>
+  </tr>
+  <tr>
+    <td>Control Board/Module</td>
+    <td><input type="text" placeholder="Part number" style="width:150px" /></td>
+    <td><input type="text" placeholder="Qty" style="width:60px" /></td>
+    <td><input type="text" placeholder="Location" style="width:200px" /></td>
+  </tr>
+  <tr>
+    <td>Power Supply Module</td>
+    <td><input type="text" placeholder="Part number" style="width:150px" /></td>
+    <td><input type="text" placeholder="Qty" style="width:60px" /></td>
+    <td><input type="text" placeholder="Location" style="width:200px" /></td>
+  </tr>
+  <tr>
+    <td>Contactors/Relays</td>
+    <td><input type="text" placeholder="Part number" style="width:150px" /></td>
+    <td><input type="text" placeholder="Qty" style="width:60px" /></td>
+    <td><input type="text" placeholder="Location" style="width:200px" /></td>
+  </tr>
+</table>
 
 <h3>PPE Requirements for Electrical Work</h3>
 Create a professional table with columns: PPE Category | Specification | When Required
@@ -635,7 +811,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
 
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp'
+      model: 'gemini-2.5-pro'
     });
     
     const result = await model.generateContent(prompt);

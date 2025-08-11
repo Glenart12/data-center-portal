@@ -231,7 +231,19 @@ export async function POST(request) {
         });
         
         if (!response.ok) {
-          throw new Error(`Failed to generate ${endpoint}: ${response.statusText}`);
+          const errorData = await response.json().catch(() => ({ error: response.statusText }));
+          console.error(`Failed to generate ${endpoint}:`, errorData);
+          
+          // Check for specific error types
+          if (response.status === 429 || errorData.error?.includes('busy') || errorData.error?.includes('quota')) {
+            throw new Error(`AI service is busy. Please wait 2-3 minutes and try again.`);
+          }
+          
+          if (errorData.error?.includes('API key') || errorData.error?.includes('API_KEY')) {
+            throw new Error(`AI service configuration error. Please contact support.`);
+          }
+          
+          throw new Error(`Failed to generate ${endpoint}: ${errorData.error || response.statusText}`);
         }
         
         const data = await response.json();

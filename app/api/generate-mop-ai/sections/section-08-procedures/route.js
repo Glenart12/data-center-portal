@@ -5,9 +5,12 @@ import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 
 export async function POST(request) {
   try {
+    console.log('Section 08 Procedures: Starting generation...');
     const { formData } = await request.json();
     const { manufacturer, modelNumber, system, workDescription } = formData;
     const sourceManager = new SourceManager();
+    
+    console.log('Section 08 Procedures: Equipment data:', { manufacturer, modelNumber, system });
     
     // Generate equipment-specific data recording tables
     const generateDataRecordingTable = (system, manufacturer, modelNumber) => {
@@ -894,8 +897,11 @@ export async function POST(request) {
 
     const procedurePrompt = getDynamicProcedurePrompt(system, workDescription, equipmentData);
     
+    console.log('Section 08 Procedures: Calling Gemini AI...');
     const result = await model.generateContent(procedurePrompt);
     let procedures = result.response.text();
+    
+    console.log('Section 08 Procedures: AI response received, length:', procedures.length);
     
     // Clean up any markdown code blocks from AI output
     procedures = procedures.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
@@ -948,8 +954,30 @@ ${operationalDataTable}
     <textarea style="width:100%; min-height:100px" placeholder="Document any deviations, issues, or additional notes for critical steps"></textarea>
 </div>`;
 
+    console.log('Section 08 Procedures: Successfully generated');
     return NextResponse.json({ html, sources: sourceManager.sources });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Section 08 Procedures Error:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Handle specific error types
+    if (error.message?.includes('429') || error.message?.includes('quota')) {
+      return NextResponse.json({ 
+        error: 'AI service is busy. Please wait a moment and try again.',
+        userMessage: 'The AI service is currently busy. Please wait 2-3 minutes and try again.'
+      }, { status: 429 });
+    }
+    
+    if (error.message?.includes('API key') || error.message?.includes('API_KEY')) {
+      return NextResponse.json({ 
+        error: 'Configuration error',
+        userMessage: 'AI service is not properly configured. Please contact support.'
+      }, { status: 500 });
+    }
+    
+    return NextResponse.json({ 
+      error: error.message,
+      userMessage: 'Unable to generate procedure section. Please try again.'
+    }, { status: 500 });
   }
 }
