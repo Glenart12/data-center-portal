@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { put } from '@vercel/blob';
 import { getEquipmentSpecs, getEmergencyPPE } from '@/lib/equipment-database';
+import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enhancement-adapter';
 
 // Import EOP sections
 import { getEOPHeader } from '@/lib/eop-sections/header';
@@ -304,6 +305,18 @@ Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded nu
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
 CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).`;
 
+    // Search Enhancement (Safe - returns original if disabled or fails)
+    let enhancedPrompt = prompt;
+    if (process.env.SEARCH_ENABLED === 'true') {
+      try {
+        enhancedPrompt = await enhancePromptWithSearchResults(prompt, formData.modelNumber, formData.manufacturer);
+        console.log('Search enhancement applied successfully');
+      } catch (error) {
+        console.log('Search enhancement skipped:', error.message);
+        // Use original prompt - no impact on existing functionality
+      }
+    }
+
     // Generate content using Gemini with optimized configuration
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.5-pro',
@@ -314,7 +327,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       }
     });
     
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent(enhancedPrompt);
     const response = await result.response;
     let generatedContent = response.text();
     

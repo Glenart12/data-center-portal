@@ -1,7 +1,10 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export default async function Home() {
+  // Await cookies to ensure proper async handling in Next.js 15
+  const cookieStore = await cookies();
   const session = await getSession();
   if (session) {
     redirect('/dashboard');
