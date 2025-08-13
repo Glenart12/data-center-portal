@@ -283,7 +283,18 @@ Generate ONLY the content that goes inside the container div - no DOCTYPE, html,
 Start with <h1>Emergency Operating Procedure (EOP)</h1> followed by the Quick Response header div, then proceed with sections using H2 headers.
 
 IMPORTANT: In Section 07, do NOT include PPE Requirements or Tools Required subsections - these are now in Section 03 where they're needed immediately.
-Include ALL 8 sections with complete, detailed content and INTERACTIVE INPUT FIELDS as specified above.
+
+CRITICAL: You MUST include ALL 8 sections in order:
+- Section 01: Equipment Identification
+- Section 02: Purpose & Scope  
+- Section 03: Immediate Actions
+- Section 04: Emergency Response Scenarios
+- Section 05: Communication & Coordination
+- Section 06: Recovery & Return to Normal
+- Section 07: Supporting Information
+- Section 08: EOP Approval & Review
+
+Generate ALL 8 sections with complete, detailed content and INTERACTIVE INPUT FIELDS. Do NOT stop after Section 07.
 
 CRITICAL FOR SECTION 03:
 - FIRST add Pre-Action Safety & Equipment Requirements subsection with:
@@ -303,7 +314,9 @@ CRITICAL FOR SECTION 04:
 
 Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded numbers).
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
-CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).`;
+CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).
+
+FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.`;
 
     // Search Enhancement (Safe - returns original if disabled or fails)
     let enhancedPrompt = prompt;
@@ -322,7 +335,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       model: 'gemini-2.5-pro',
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 12000,  // Sufficient for detailed EOP
+        maxOutputTokens: 20000,  // Increased to ensure all 8 sections are generated
         candidateCount: 1
       }
     });
