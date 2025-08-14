@@ -21,27 +21,34 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Build PROJECT_INSTRUCTIONS from modular sections
 function buildProjectInstructions(emergencyType) {
-  return [
-    getEOPHeader(emergencyType),
-    '',
-    getSection01Identification(emergencyType),
-    '',
-    getSection02PurposeScope(emergencyType),
-    '',
-    getSection03ImmediateActions(emergencyType),
-    '',
-    getSection04Scenarios(emergencyType),
-    '',
-    getSection05Communication(emergencyType),
-    '',
-    getSection06Recovery(emergencyType),
-    '',
-    getSection07Supporting(emergencyType),
-    '',
-    getSection08Approval(emergencyType),
-    '',
-    getFormattingInstructions(emergencyType)
-  ].join('\n');
+  try {
+    const sections = [
+      getEOPHeader(emergencyType),
+      '',
+      getSection01Identification(emergencyType),
+      '',
+      getSection02PurposeScope(emergencyType),
+      '',
+      getSection03ImmediateActions(emergencyType),
+      '',
+      getSection04Scenarios(emergencyType),
+      '',
+      getSection05Communication(emergencyType),
+      '',
+      getSection06Recovery(emergencyType),
+      '',
+      getSection07Supporting(emergencyType),
+      '',
+      getSection08Approval(emergencyType),
+      '',
+      getFormattingInstructions(emergencyType)
+    ];
+    console.log('Built sections array with', sections.length, 'elements');
+    return sections.join('\n');
+  } catch (error) {
+    console.error('Error building project instructions:', error);
+    throw error;
+  }
 }
 
 // PROJECT_INSTRUCTIONS will be built dynamically with emergency type
@@ -200,6 +207,15 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 
 export async function POST(request) {
   try {
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY is not configured');
+      return NextResponse.json({ 
+        error: 'Configuration error',
+        userMessage: 'AI service is not properly configured. Please check GEMINI_API_KEY.'
+      }, { status: 500 });
+    }
+    
     const body = await request.json();
     const { formData } = body;
     
@@ -221,12 +237,14 @@ export async function POST(request) {
     }
     
     console.log('Starting EOP generation for:', formData.manufacturer, formData.modelNumber);
+    console.log('Form data received:', JSON.stringify(formData, null, 2));
     
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
     
     // Build project instructions with the specific emergency type
     const PROJECT_INSTRUCTIONS = buildProjectInstructions(formData.emergencyType);
+    console.log('PROJECT_INSTRUCTIONS length:', PROJECT_INSTRUCTIONS.length);
     
     // Get equipment specifications from database
     const equipmentSpecs = getEquipmentSpecs(formData.manufacturer, formData.modelNumber);
@@ -335,14 +353,74 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       model: 'gemini-2.5-pro',
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 20000,  // Increased to ensure all 8 sections are generated
+        maxOutputTokens: 12000,  // Reverted to working value
         candidateCount: 1
       }
     });
     
-    const result = await model.generateContent(enhancedPrompt);
-    const response = await result.response;
-    let generatedContent = response.text();
+    console.log('Sending prompt to Gemini AI...');
+    console.log('Prompt length:', enhancedPrompt.length);
+    console.log('Enhanced prompt different from original:', enhancedPrompt !== prompt);
+    console.log('First 500 chars of prompt:', enhancedPrompt.substring(0, 500));
+    
+    // Add comprehensive error handling around AI call
+    let result, response, generatedContent;
+    try {
+      console.log('Calling model.generateContent...');
+      result = await model.generateContent(enhancedPrompt);
+      console.log('AI call completed, result received:', result ? 'Yes' : 'No');
+      
+      if (!result) {
+        throw new Error('No result returned from AI model');
+      }
+      
+      console.log('Getting response from result...');
+      response = await result.response;
+      console.log('Response object received:', response ? 'Yes' : 'No');
+      
+      if (!response) {
+        throw new Error('No response object from AI result');
+      }
+      
+      console.log('Extracting text from response...');
+      generatedContent = response.text();
+      console.log('Text extraction completed');
+      
+    } catch (aiError) {
+      console.error('AI Generation Error:', aiError);
+      console.error('Error type:', aiError.constructor.name);
+      console.error('Error message:', aiError.message);
+      console.error('Error stack:', aiError.stack);
+      
+      // Try with original prompt if enhanced prompt failed
+      if (enhancedPrompt !== prompt) {
+        console.log('Retrying with original prompt (no search enhancement)...');
+        try {
+          result = await model.generateContent(prompt);
+          response = await result.response;
+          generatedContent = response.text();
+          console.log('Retry successful with original prompt');
+        } catch (retryError) {
+          console.error('Retry also failed:', retryError.message);
+          throw new Error(`AI generation failed: ${aiError.message}`);
+        }
+      } else {
+        throw new Error(`AI generation failed: ${aiError.message}`);
+      }
+    }
+    
+    // Debug logging for generated content
+    console.log('AI Response received:', result && result.response ? 'Yes' : 'No');
+    console.log('Response text length:', generatedContent ? generatedContent.length : 0);
+    console.log('First 500 chars:', generatedContent ? generatedContent.substring(0, 500) : 'EMPTY');
+    console.log('Last 500 chars:', generatedContent ? generatedContent.substring(generatedContent.length - 500) : 'EMPTY');
+    
+    // Check if content was actually generated
+    if (!generatedContent || generatedContent.length < 100) {
+      console.error('Generated content is empty or too short');
+      console.error('Full response:', generatedContent);
+      throw new Error('AI failed to generate content');
+    }
     
     // Clean up the response
     generatedContent = generatedContent
@@ -450,6 +528,8 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
     
   } catch (error) {
     console.error('EOP generation error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     
     // Handle specific error types
     if (error.message?.includes('429') || error.message?.includes('quota')) {
