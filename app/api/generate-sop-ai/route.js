@@ -422,7 +422,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 15000, // Increased for 12 sections
+        maxOutputTokens: 32000, // Increased for complete 12 sections
         candidateCount: 1
       }
     });
@@ -444,7 +444,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
           model: 'gemini-2.5-flash',
           generationConfig: {
             temperature: 0.5,
-            maxOutputTokens: 12000
+            maxOutputTokens: 28000
           }
         });
         result = await retryModel.generateContent(enhancedPrompt);
