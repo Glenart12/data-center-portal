@@ -9,6 +9,12 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     serialNumber: '',
     location: '',
     customer: '',
+    siteName: '',
+    workPerformedBy: 'Self-Delivered',
+    subcontractorCompany: '',
+    subcontractorPersonnel: '',
+    subcontractorContact: '',
+    qualificationsRequired: '',
     address: {
       street: '',
       city: '',
@@ -118,9 +124,18 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
-        !formData.category || !formData.description || !formData.procedureType || !formData.customer) {
-      alert('Please fill in all required fields:\n• Customer\n• Manufacturer\n• Model Number\n• System\n• Category\n• Procedure Type\n• Work Description');
+        !formData.category || !formData.description || !formData.procedureType || 
+        !formData.customer || !formData.siteName) {
+      alert('Please fill in all required fields:\n• Customer\n• Site Name\n• Manufacturer\n• Model Number\n• System\n• Category\n• Procedure Type\n• Work Description');
       return;
+    }
+    
+    // Check subcontractor fields if Subcontractor is selected
+    if (formData.workPerformedBy === 'Subcontractor') {
+      if (!formData.subcontractorCompany || !formData.subcontractorPersonnel || !formData.subcontractorContact) {
+        alert('Please fill in all Subcontractor fields:\n• Company Name\n• Personnel Name\n• Contact Details');
+        return;
+      }
     }
 
     setIsGenerating(true);
@@ -306,22 +321,42 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
           </div>
 
           {/* Customer Information */}
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Customer *
-            </label>
-            <input
-              type="text"
-              value={formData.customer}
-              onChange={(e) => handleInputChange('customer', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-              placeholder="e.g., ABC Corporation"
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Customer *
+              </label>
+              <input
+                type="text"
+                value={formData.customer}
+                onChange={(e) => handleInputChange('customer', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., ABC Corporation"
+              />
+            </div>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Site Name *
+              </label>
+              <input
+                type="text"
+                value={formData.siteName}
+                onChange={(e) => handleInputChange('siteName', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Data Center West"
+              />
+            </div>
           </div>
 
           {/* Site Address Section */}
@@ -504,6 +539,123 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
           </div>
         </div>
 
+        {/* Work Performance Information */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#198754' }}>Work Performance</h3>
+          
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+              Work Performed By *
+            </label>
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  value="Self-Delivered"
+                  checked={formData.workPerformedBy === 'Self-Delivered'}
+                  onChange={(e) => {
+                    handleInputChange('workPerformedBy', e.target.value);
+                    handleInputChange('subcontractorCompany', '');
+                    handleInputChange('subcontractorPersonnel', '');
+                    handleInputChange('subcontractorContact', '');
+                  }}
+                  style={{ marginRight: '8px' }}
+                />
+                Self-Delivered
+              </label>
+              
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  value="Subcontractor"
+                  checked={formData.workPerformedBy === 'Subcontractor'}
+                  onChange={(e) => handleInputChange('workPerformedBy', e.target.value)}
+                  style={{ marginRight: '8px' }}
+                />
+                Subcontractor
+              </label>
+            </div>
+          </div>
+
+          {formData.workPerformedBy === 'Subcontractor' && (
+            <>
+              <div style={{ marginTop: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                  Subcontractor Company Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.subcontractorCompany}
+                  onChange={(e) => handleInputChange('subcontractorCompany', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="e.g., ABC Mechanical Services"
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '15px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                    Personnel Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.subcontractorPersonnel}
+                    onChange={(e) => handleInputChange('subcontractorPersonnel', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., John Smith"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                    Contact Details *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.subcontractorContact}
+                    onChange={(e) => handleInputChange('subcontractorContact', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., 555-1234 or john@abc.com"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <div style={{ marginTop: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Qualifications Required
+            </label>
+            <input
+              type="text"
+              value={formData.qualificationsRequired}
+              onChange={(e) => handleInputChange('qualificationsRequired', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px'
+              }}
+              placeholder="e.g., HVAC Certified, Electrical License, 5+ years experience"
+            />
+          </div>
+        </div>
+
         {/* Supporting Documents */}
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ marginBottom: '15px', color: '#198754' }}>Supporting Documents</h3>
@@ -607,7 +759,7 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
         }}>
           <strong>Note:</strong> The AI will automatically generate all 12 SOP sections including schedule information, 
           safety requirements, detailed procedures, approval requirements, and completion tracking based on the equipment information you provide.
-          {' '}To ensure reliable service, there&apos;s a 60-second cooldown between generations.
+          {' '}To ensure reliable service, there is a 60-second cooldown between generations.
         </div>
 
         {/* Action Buttons */}

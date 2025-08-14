@@ -49,13 +49,13 @@ Section 01: SOP Schedule Information
 - Author: <input type="text" placeholder="Enter Author Name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Date: ${new Date().toLocaleDateString('en-US')} (today's date)
 - Version: <input type="text" value="1.0" style="border: 1px solid #999; padding: 2px; width: 80px;">
-- CET Level Required to Perform Task: <input type="text" placeholder="CET Level" style="border: 1px solid #999; padding: 2px; width: 100px;">
+- CET Level Required to Perform Task: AUTO-POPULATE based on Level of Risk (LOR)
 - Author CET Level: <input type="text" placeholder="Author CET Level" style="border: 1px solid #999; padding: 2px; width: 100px;">
 - Frequency: Based on the procedure type provided
 
 Section 02: Site Information
 - Customer: [Customer name from form]
-- Site Name: [Site name or UPDATE NEEDED]
+- Site Name: [Site name from form - REQUIRED field]
 - Site Address: [Full site address or UPDATE NEEDED]
 DO NOT include Customer Address
 
@@ -65,6 +65,11 @@ MUST format EXACTLY as:
 <table class="info-table">
   <tr><td>Work Area:</td><td>[Work area or Data Hall 1]</td></tr>
   <tr><td>Affected Systems:</td><td>[Affected systems or Cooling System]</td></tr>
+  <tr><td>Work Performed By:</td><td>[Self-Delivered or Subcontractor from form]</td></tr>
+  <tr><td>Subcontractor Company Name:</td><td>[If Subcontractor selected, show company name; otherwise show "N/A"]</td></tr>
+  <tr><td>Subcontractor Personnel:</td><td>[If Subcontractor selected, show personnel name; otherwise show "N/A"]</td></tr>
+  <tr><td>Subcontractor Contact:</td><td>[If Subcontractor selected, show contact details; otherwise show "N/A"]</td></tr>
+  <tr><td>Qualifications Required:</td><td>[Qualifications from form or "Standard facility technician certification"]</td></tr>
 </table>
 <h3>Equipment Information:</h3>
 <table class="info-table">
@@ -201,8 +206,10 @@ Convert ALL subsections to table format:
     <th>Expected Result</th>
     <th>Actual Result</th>
     <th>Action if Not Met</th>
+    <th style="width: 60px;">Initials</th>
+    <th style="width: 80px;">Time</th>
   </tr>
-  <!-- Convert numbered list to table rows -->
+  <!-- Convert numbered list to table rows with empty Initials and Time cells -->
 </table>
 
 <h3>8.2 Detailed Procedure Steps</h3>
@@ -214,8 +221,10 @@ Convert ALL subsections to table format:
     <th>Source</th>
     <th>Recorded Value</th>
     <th>Action if Out of Range</th>
+    <th style="width: 60px;">Initials</th>
+    <th style="width: 80px;">Time</th>
   </tr>
-  <!-- Equipment-specific readings with sources: PIC5+/BMS/Physical Gauge -->
+  <!-- Equipment-specific readings with sources: PIC5+/BMS/Physical Gauge, empty Initials and Time cells -->
 </table>
 
 Section 09: Back-out Procedures
@@ -228,8 +237,10 @@ Move Section 8.3 Post-Procedure Verification content here as table:
     <th>Description</th>
     <th>Verification</th>
     <th>Action Required</th>
+    <th style="width: 60px;">Initials</th>
+    <th style="width: 80px;">Time</th>
   </tr>
-  <!-- Post-procedure verification steps -->
+  <!-- Post-procedure verification steps with empty Initials and Time cells -->
 </table>
 
 Section 10: SOP Approval
@@ -478,6 +489,14 @@ export async function POST(request) {
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
     
+    // Determine CET level based on risk level (same logic as MOP)
+    const cetRequired = {
+      1: "CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve",
+      2: "CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve",
+      3: "CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve",
+      4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
+    };
+    
     // Prepare the prompt for Gemini
     const prompt = `${SOP_INSTRUCTIONS}
 
@@ -494,6 +513,14 @@ Equipment Details:
 
 Customer Information:
 - Customer: ${formData.customer}
+- Site Name: ${formData.siteName || 'UPDATE NEEDED'}
+
+Work Performance:
+- Work Performed By: ${formData.workPerformedBy || 'Self-Delivered'}
+- Subcontractor Company Name: ${formData.subcontractorCompany || 'N/A'}
+- Subcontractor Personnel: ${formData.subcontractorPersonnel || 'N/A'}
+- Subcontractor Contact: ${formData.subcontractorContact || 'N/A'}
+- Qualifications Required: ${formData.qualificationsRequired || 'Standard facility technician certification'}
 
 Site Address:
 - Street: ${formData.address?.street || 'UPDATE NEEDED'}
@@ -505,25 +532,35 @@ CALCULATED VALUES:
 - Level of Risk (LOR): ${riskLevel} - ${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]}
 - Risk Justification: ${riskJustification}
 - Duration: ${duration}
+- CET Level Required: ${cetRequired[riskLevel]}
 
 Current Date: ${currentDate}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Start with <h1>Standard Operating Procedure (SOP)</h1> and proceed with all 12 sections using H2 headers.
 
+IMPORTANT TABLE STRUCTURE REQUIREMENTS:
+- Section 8.1 Pre-Procedure Checks: MUST have columns [Step, Description, Expected Result, Actual Result, Action if Not Met, Initials, Time]
+- Section 8.2 Detailed Procedure Steps: MUST have columns [Step, Description, Expected Range, Source, Recorded Value, Action if Out of Range, Initials, Time]
+- Section 9 Back-out Procedures: MUST have columns [Step, Description, Verification, Action Required, Initials, Time]
+- ALL Initials and Time cells MUST be empty for manual completion during execution
+
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early
 2. Section 01 MUST include calculated LOR: ${riskLevel} and Duration: ${duration}
-3. Section 01 MUST have editable input fields for Author, Version, CET Level Required, Author CET Level
-4. Section 02 MUST show Customer: ${formData.customer} ONLY (no Customer Address)
-5. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
-6. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
-7. Section 05 MUST base documentation on LOR ${riskLevel}
-8. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
-9. Section 07 MUST include Risk Matrix, Assumptions, and Decision Points in table format
-10. Section 08 MUST use tables for Pre-checks, Procedure Steps, with Source column
-11. Section 09 MUST be titled "Back-out Procedures" with verification table
-12. Section 11 MUST ONLY have Technician Sign-off (no other content)
+3. Section 01 MUST show CET Level Required as: "${cetRequired[riskLevel]}" with italic text "Based on risk level assessment"
+4. Section 01 MUST have editable input fields for Author, Version, Author CET Level
+5. Section 02 MUST show Customer: ${formData.customer} and Site Name: ${formData.siteName || 'UPDATE NEEDED'}
+6. Section 03 MUST show ALL work performance fields including subcontractor details and qualifications
+7. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
+8. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
+9. Section 05 MUST base documentation on LOR ${riskLevel}
+10. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
+11. Section 07 MUST include Risk Matrix, Assumptions, and Decision Points in table format
+12. Section 08 MUST use tables with Initials and Time columns for ALL subsections (8.1 and 8.2)
+13. Section 09 MUST be titled "Back-out Procedures" with table including Initials and Time columns
+14. Section 11 MUST ONLY have Technician Sign-off (no other content)
+15. ALL tables in Sections 8 and 9 MUST have empty Initials and Time cells for manual entry
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
