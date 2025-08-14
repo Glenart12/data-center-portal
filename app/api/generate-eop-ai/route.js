@@ -334,7 +334,9 @@ Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded nu
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
 CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).
 
-FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.`;
+FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.
+
+CRITICAL REQUIREMENT: You MUST generate ALL 8 sections completely. Do not stop early. Continue generating until Section 08 is fully complete with all subsections. Even if approaching token limits, prioritize completing all 8 sections over detail in early sections.`;
 
     // Search Enhancement (Safe - returns original if disabled or fails)
     let enhancedPrompt = prompt;
@@ -353,7 +355,7 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       model: 'gemini-2.5-pro',
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 12000,  // Reverted to working value
+        maxOutputTokens: 16000,  // Increased to ensure all 8 sections are generated
         candidateCount: 1
       }
     });
@@ -415,11 +417,30 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
     console.log('First 500 chars:', generatedContent ? generatedContent.substring(0, 500) : 'EMPTY');
     console.log('Last 500 chars:', generatedContent ? generatedContent.substring(generatedContent.length - 500) : 'EMPTY');
     
+    // Check if all sections are present
+    console.log('Response appears complete:', generatedContent.includes('Section 08'));
+    const sectionMatches = generatedContent.match(/Section \d+:/g) || [];
+    console.log('Number of sections found:', sectionMatches.length);
+    console.log('Sections found:', sectionMatches.join(', '));
+    
     // Check if content was actually generated
     if (!generatedContent || generatedContent.length < 100) {
       console.error('Generated content is empty or too short');
       console.error('Full response:', generatedContent);
       throw new Error('AI failed to generate content');
+    }
+    
+    // Validate that all 8 sections are present
+    if (!generatedContent.includes('Section 08')) {
+      console.error('WARNING: Section 08 not found in generated content!');
+      console.log('Last 1000 chars:', generatedContent.slice(-1000));
+      
+      // Check which sections are missing
+      const requiredSections = ['Section 01', 'Section 02', 'Section 03', 'Section 04', 'Section 05', 'Section 06', 'Section 07', 'Section 08'];
+      const missingSections = requiredSections.filter(section => !generatedContent.includes(section));
+      if (missingSections.length > 0) {
+        console.error('Missing sections:', missingSections.join(', '));
+      }
     }
     
     // Clean up the response
