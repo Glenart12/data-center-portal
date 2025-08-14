@@ -334,9 +334,7 @@ Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded nu
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
 CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).
 
-FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.
-
-CRITICAL REQUIREMENT: You MUST generate ALL 8 sections completely. Do not stop early. Continue generating until Section 08 is fully complete with all subsections. Even if approaching token limits, prioritize completing all 8 sections over detail in early sections.`;
+FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.`;
 
     // Search Enhancement (Safe - returns original if disabled or fails)
     let enhancedPrompt = prompt;
@@ -355,7 +353,7 @@ CRITICAL REQUIREMENT: You MUST generate ALL 8 sections completely. Do not stop e
       model: 'gemini-2.5-pro',
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 16000,  // Increased to ensure all 8 sections are generated
+        maxOutputTokens: 13000,  // Sufficient to generate all 8 sections
         candidateCount: 1
       }
     });
@@ -430,17 +428,9 @@ CRITICAL REQUIREMENT: You MUST generate ALL 8 sections completely. Do not stop e
       throw new Error('AI failed to generate content');
     }
     
-    // Validate that all 8 sections are present
+    // Simple check if Section 08 is present
     if (!generatedContent.includes('Section 08')) {
-      console.error('WARNING: Section 08 not found in generated content!');
-      console.log('Last 1000 chars:', generatedContent.slice(-1000));
-      
-      // Check which sections are missing
-      const requiredSections = ['Section 01', 'Section 02', 'Section 03', 'Section 04', 'Section 05', 'Section 06', 'Section 07', 'Section 08'];
-      const missingSections = requiredSections.filter(section => !generatedContent.includes(section));
-      if (missingSections.length > 0) {
-        console.error('Missing sections:', missingSections.join(', '));
-      }
+      console.log('WARNING: Section 08 not found in generated content');
     }
     
     // Clean up the response
