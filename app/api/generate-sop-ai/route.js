@@ -13,6 +13,13 @@ Generate a comprehensive, professional SOP document in HTML format with ALL 12 s
 IMPORTANT: You must generate EQUIPMENT-SPECIFIC procedures based on the exact manufacturer and model provided.
 Do NOT generate generic procedures. All steps, safety requirements, and technical details must be specific to the equipment.
 
+HEADER FORMAT (At the very top of document):
+- Title: Standard Operating Procedure (SOP)
+- Version: [Provided version]
+- Date: [Current date]
+- Author: [Provided author name]
+- Use green color (#198754) for the SOP header
+
 CRITICAL: You MUST include ALL 12 sections in order:
 - Section 01: SOP Schedule Information
 - Section 02: Site Information
@@ -22,51 +29,36 @@ CRITICAL: You MUST include ALL 12 sections in order:
 - Section 06: Safety Requirements
 - Section 07: SOP Risks & Assumptions
 - Section 08: SOP Details
-- Section 09: Back-out Procedures
+- Section 09: Escalation/Communication
 - Section 10: SOP Approval
 - Section 11: SOP Completion
-- Section 12: SOP Comments
+- Section 12: Comments
 
 SECTION-BY-SECTION REQUIREMENTS:
 
 Section 01: SOP Schedule Information
 - SOP Identifier: Generate unique ID (e.g., SOP-[SYSTEM]-[DATE]-[NUMBER])
 - Procedure Title: Clear, descriptive title including manufacturer and model
-- Frequency: Based on the procedure type provided
+- Level of Risk (LOR): Calculate based on task type + equipment model + frequency
+  * Low: Daily routine checks on non-critical equipment
+  * Medium: Weekly/monthly maintenance on redundant systems
+  * High: Quarterly/annual maintenance or critical system work
+  * Critical: Any work on single points of failure
+- Version: Display the provided version (editable field)
+- Author: Display the provided author name
+- Date: Current date
+- CET Level Required: Display the provided CET level (CET 1-4)
 - Duration: AUTO-DETERMINE based on the specific equipment model and procedure complexity
-- Personnel Required: AUTO-DETERMINE based on equipment type, manufacturer safety requirements, and procedure type
-- Criticality Level: AUTO-DETERMINE based on system type and potential impact
-- Scheduling Requirements: Time windows, coordination needs
-- Include a scheduling table with columns for Date, Time, Technician, Status
-
-DURATION GUIDELINES:
-- Daily Operations: 15-30 minutes for simple checks, 1-2 hours for comprehensive
-- Weekly Maintenance: 1-3 hours depending on equipment complexity
-- Monthly Maintenance: 2-4 hours for thorough inspection and maintenance
-- Quarterly/Annual: 4-8 hours for major maintenance
-- System Startup/Shutdown: 30 minutes to 2 hours based on system size
-
-PERSONNEL GUIDELINES:
-- Simple operations: 1 technician
-- Electrical work >480V: 2 qualified electricians
-- Heavy equipment (>50 lbs): 2 technicians
-- Critical systems: 2 technicians + supervisor
-- Manufacturer requirements: Follow specific OEM guidelines
-
-CRITICALITY DETERMINATION:
-- UPS/Power Systems: Critical
-- Cooling Systems (Primary): High to Critical
-- Cooling Systems (Redundant): Medium to High
-- Monitoring Systems: Low to Medium
-- Non-critical support: Low
+- Frequency: Based on the procedure type provided
+DO NOT include scheduling tables or scheduling requirements narrative
 
 Section 02: Site Information
+- Customer: Display the provided customer name
+- Customer Address: Display the provided customer address
 - Site Name: Data Center facility name
 - Site Address: Full address with street, city, state, ZIP
-- Site Contact: Primary contact information
-- Emergency Contact: Emergency contact details
-- Site Access Requirements: Badge, escort, clearance requirements
-- Site-Specific Hazards: Unique hazards at this location
+- Location: Equipment location within facility
+DO NOT include Emergency Contact, Site Access Requirements, or Site-Specific Hazards here (these move to Section 06)
 
 Section 03: SOP Overview
 - Purpose: Why this procedure is necessary
@@ -77,92 +69,99 @@ Section 03: SOP Overview
 - Dependencies: Prerequisites or related procedures
 
 Section 04: Effect of SOP on Critical Facility
-Create a comprehensive table with 15 critical systems showing:
-- System Name
-- Impact Level (None/Low/Medium/High)
-- Duration of Impact
-- Mitigation Measures
-Include systems like: Cooling, Power, UPS, Fire Suppression, BMS, Security, Network, etc.
+Create EXACT MOP/EOP format table with these 15 systems:
+| System | Yes | No | N/A |
+|--------|-----|-----|-----|
+| 1. Cooling System | | | |
+| 2. Electrical System | | | |
+| 3. UPS System | | | |
+| 4. Generator System | | | |
+| 5. Fire Protection | | | |
+| 6. BMS/EPMS | | | |
+| 7. Security System | | | |
+| 8. Network Infrastructure | | | |
+| 9. Water/Plumbing | | | |
+| 10. Access Control | | | |
+| 11. VESDA/Smoke Detection | | | |
+| 12. Fuel System | | | |
+| 13. Emergency Lighting | | | |
+| 14. HVAC Controls | | | |
+| 15. Communication Systems | | | |
+For daily checks, most should be "No" impact (non-intrusive)
 
 Section 05: SOP Supporting Documentation
-- Equipment Manuals: List relevant manuals with version/date
-- Technical Drawings: P&IDs, electrical diagrams, etc.
-- Vendor Documentation: Service bulletins, technical notes
-- Previous SOPs: Related or superseded procedures
-- Compliance Documents: Regulatory requirements
-- Training Materials: Required certifications or training
+RISK-BASED approach:
+- Low LOR: Minimal documentation (basic equipment reference)
+- Medium LOR: Standard manuals and procedures
+- High LOR: Complete technical documentation
+- Critical LOR: Full documentation package including schematics
+DO NOT require owner's manual for daily routine checks
+Include equipment-specific documentation when available
 
 Section 06: Safety Requirements
-- PPE Requirements: Specific PPE for this procedure
-- Lockout/Tagout: LOTO requirements if applicable
-- Arc Flash: Arc flash boundaries and PPE categories
-- Chemical Hazards: Any chemicals involved
-- Environmental Hazards: Temperature, noise, confined spaces
-- Emergency Procedures: What to do in case of emergency
+Format as TABLE with columns:
+| PPE Type | Specification | When Required |
+Include asset-specific requirements:
+- Hearing protection for chillers/generators
+- Arc-flash PPE for electrical work
+- Fall protection for elevated work
+- Chemical PPE for refrigerant handling
+ADD at bottom of section:
+- Emergency Contacts (moved from Section 02)
+- Site Access Requirements (moved from Section 02)
+- Site-Specific Hazards (moved from Section 02)
 
 Section 07: SOP Risks & Assumptions
+Match MOP format exactly:
 - Identified Risks: List all potential risks
 - Risk Mitigation: How each risk is mitigated
-- Assumptions: What conditions are assumed
+- Assumptions: What conditions are assumed (include weather for outdoor equipment)
 - Contingencies: What to do if assumptions are incorrect
 - Risk Assessment Matrix: Likelihood vs Impact table
-- Escalation Procedures: When and how to escalate issues
 
 Section 08: SOP Details
-EQUIPMENT-SPECIFIC STEP-BY-STEP PROCEDURES:
-- Pre-Procedure Checklist: Equipment-specific verification items
-- Detailed Steps: MUST BE SPECIFIC TO THE MANUFACTURER AND MODEL
-  * Include exact control panel locations for this model
-  * Reference specific part numbers and components
-  * Use manufacturer-specific terminology and procedures
-  * Include model-specific setpoints and operating ranges
-  * Reference exact display screens and menu paths for this equipment
-- Include verification points with model-specific expected values
-- Add manufacturer-specific warnings and cautions
-- Include expected readings/values FROM THE EQUIPMENT MANUAL
-- Add troubleshooting for THIS SPECIFIC MODEL'S common issues
-- Include manufacturer-recommended torque specs, pressures, temperatures
-- Post-Procedure Verification: Model-specific confirmation steps
+Format as numbered steps with structured approach:
+1. Pre-Procedure Checks
+2. Equipment Readings and Observations
+3. Post-Procedure Verification
 
-EXAMPLE OF SPECIFICITY:
-BAD: "Check the cooling system"
-GOOD: "On the Trane CVHF1000 control panel, navigate to Menu > System Status > Chiller Status and verify:
-- Evaporator pressure: 68-72 PSI
-- Condenser pressure: 225-235 PSI (ambient dependent)
-- Oil pressure differential: >18 PSI
-- Bearing temperature: <165°F"
+Create a TABLE for readings with columns:
+| Step | Description | Expected Range | Source | Computed/Manufacturer | Action if Out of Range |
+Where Source = BMS/PIC5+/Physical gauge/Display panel
 
-Section 09: Back-out Procedures
-- Back-out Triggers: When to initiate back-out
-- Back-out Steps: Detailed reversal procedures
-- System Restoration: How to return to original state
-- Verification: How to verify successful back-out
-- Time Requirements: How long back-out takes
-- Escalation: Who to notify if back-out fails
+Include equipment-specific steps:
+- Exact control panel locations for this model
+- Model-specific setpoints and operating ranges
+- Reference exact display screens and menu paths
+- Include manufacturer-recommended values
+Add troubleshooting as subsection 8.x (not main steps)
+
+Section 09: Escalation/Communication
+Format as TABLE:
+| Who | When | Trigger | Notes |
+Include:
+- Shift supervisor notification
+- Customer notification requirements
+- Vendor escalation paths
+- Emergency escalation procedures
 
 Section 10: SOP Approval
 Create an approval matrix table with:
-- Role (Operations Manager, Facility Manager, Safety Officer, Quality Assurance)
+- Role (Operations Manager, Facility Manager, Safety Officer, Customer Representative)
 - Name (input field)
 - Signature (input field)
 - Date (input field)
-- Comments (input field)
 
 Section 11: SOP Completion
-- Completion Checklist: Final verification items
-- Performance Metrics: KPIs for the procedure
-- Documentation Requirements: What records to keep
-- Notification Requirements: Who to inform upon completion
-- Lessons Learned: Space for improvement notes
-- Next Steps: Follow-up actions if any
+ONLY include:
+- Technician Sign-off table with Name, Signature, Date, Time fields
+REMOVE: completion checklist, performance metrics, lessons learned
 
-Section 12: SOP Comments
-- Revision History: Table with Version, Date, Author, Changes
-- General Comments: Space for additional notes
-- Improvement Suggestions: Areas for enhancement
-- Training Notes: Special training considerations
-- References: Links to related documents
-- Contact Information: Subject matter experts
+Section 12: Comments
+Include:
+- Revision History table: Version | Date | Author | Changes
+- General comments field (optional)
+REMOVE: Contact information section
 
 FORMATTING REQUIREMENTS:
 - Use professional green color theme (#198754 for headers, #20c997 for accents)
@@ -371,10 +370,18 @@ Equipment Details:
 - Frequency: ${formData.frequency || 'As per procedure type'}
 - Procedure Description: ${formData.description}
 
-AUTO-DETERMINE THESE BASED ON EQUIPMENT AND PROCEDURE:
-- Duration: Determine based on ${formData.manufacturer} ${formData.modelNumber} specifications and ${formData.procedureType}
-- Personnel Required: Determine based on ${formData.manufacturer} safety requirements and ${formData.procedureType}
-- Criticality Level: Determine based on ${formData.system} type and operational impact
+Document Information:
+- Version: ${formData.version || '1.0'}
+- Author: ${formData.author || 'UPDATE NEEDED'}
+- CET Level Required: ${formData.cetLevel || 'UPDATE NEEDED'}
+
+Customer Information:
+- Customer: ${formData.customer || 'UPDATE NEEDED'}
+- Customer Address:
+  * Street: ${formData.customerAddress?.street || 'UPDATE NEEDED'}
+  * City: ${formData.customerAddress?.city || 'UPDATE NEEDED'}
+  * State: ${formData.customerAddress?.state || 'UPDATE NEEDED'}
+  * ZIP Code: ${formData.customerAddress?.zipCode || 'UPDATE NEEDED'}
 
 Site Address:
 - Street: ${formData.address?.street || 'UPDATE NEEDED'}
@@ -382,26 +389,30 @@ Site Address:
 - State: ${formData.address?.state || 'UPDATE NEEDED'}
 - ZIP Code: ${formData.address?.zipCode || 'UPDATE NEEDED'}
 
+AUTO-DETERMINE THESE BASED ON EQUIPMENT AND PROCEDURE:
+- Level of Risk (LOR): Calculate based on ${formData.procedureType} + ${formData.manufacturer} ${formData.modelNumber} + ${formData.frequency || 'frequency'}
+- Duration: Determine based on ${formData.manufacturer} ${formData.modelNumber} specifications and ${formData.procedureType}
+
 Current Date: ${currentDate}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
-Start with <h1>Standard Operating Procedure (SOP)</h1> and then proceed with all 12 sections using H2 headers.
+Start with the document header showing Version, Date, Author, then <h1>Standard Operating Procedure (SOP)</h1> and proceed with all 12 sections using H2 headers.
 
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early
-2. Section 04 MUST include a table with 15 critical facility systems
-3. Section 08 MUST include EQUIPMENT-SPECIFIC step-by-step procedures for ${formData.manufacturer} ${formData.modelNumber}:
-   - Use exact control locations, display menus, and button sequences for this model
-   - Include manufacturer-specific part numbers and component names
-   - Reference specific technical values from the equipment manual
-   - Include model-specific error codes and their meanings
-   - Use the exact terminology from ${formData.manufacturer}'s documentation
-4. Include input fields, checkboxes, and UPDATE NEEDED markers where appropriate
-5. Use green color theme (#198754 for primary, #20c997 for accents) in inline styles
-6. Make all procedures specific to the equipment and procedure type provided
-7. Ensure Section 10 has an approval matrix table with input fields
-8. Ensure Section 11 has a completion checklist
-9. Ensure Section 12 includes revision history table
+2. Section 01 MUST use "Level of Risk (LOR)" NOT "Criticality Level"
+3. Section 02 MUST include Customer and Customer Address at the top
+4. Section 04 MUST include the EXACT 15-system table format as specified
+5. Section 06 MUST be formatted as a PPE table with Emergency Contacts at bottom
+6. Section 08 MUST include:
+   - Numbered steps format with Pre-checks, Readings, Post-verification
+   - Table with Source and Expected Range columns
+   - Equipment-specific procedures for ${formData.manufacturer} ${formData.modelNumber}
+   - Troubleshooting as subsection (not main steps)
+7. Section 09 MUST be "Escalation/Communication" with table format
+8. Section 11 MUST ONLY have Technician Sign-off (no checklist or metrics)
+9. Section 12 MUST have Revision History but NO contact information
+10. Use green color theme (#198754 for primary, #20c997 for accents) in inline styles
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
