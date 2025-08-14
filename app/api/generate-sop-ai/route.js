@@ -65,11 +65,20 @@ MUST format EXACTLY as:
 <table class="info-table">
   <tr><td>Work Area:</td><td>[Work area or Data Hall 1]</td></tr>
   <tr><td>Affected Systems:</td><td>[Affected systems or Cooling System]</td></tr>
-  <tr><td>Work Performed By:</td><td>[Self-Delivered or Subcontractor from form]</td></tr>
-  <tr><td>Subcontractor Company Name:</td><td>[If Subcontractor selected, show company name; otherwise show "N/A"]</td></tr>
-  <tr><td>Subcontractor Personnel:</td><td>[If Subcontractor selected, show personnel name; otherwise show "N/A"]</td></tr>
-  <tr><td>Subcontractor Contact:</td><td>[If Subcontractor selected, show contact details; otherwise show "N/A"]</td></tr>
-  <tr><td>Qualifications Required:</td><td>[Qualifications from form or "Standard facility technician certification"]</td></tr>
+  <tr>
+    <td>Work Performed By:</td>
+    <td>
+      <input type="checkbox" id="self-delivered" name="work-type"> 
+      <label for="self-delivered">Self-Delivered</label>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <input type="checkbox" id="subcontractor" name="work-type"> 
+      <label for="subcontractor">Subcontractor</label>
+    </td>
+  </tr>
+  <tr><td>If Subcontractor - Company Name:</td><td><input type="text" placeholder="Enter company name" style="border: 1px solid #999; padding: 2px; width: 250px;"></td></tr>
+  <tr><td>If Subcontractor - Personnel Name:</td><td><input type="text" placeholder="Enter personnel name" style="border: 1px solid #999; padding: 2px; width: 250px;"></td></tr>
+  <tr><td>If Subcontractor - Contact Details:</td><td><input type="text" placeholder="Enter contact details" style="border: 1px solid #999; padding: 2px; width: 250px;"></td></tr>
+  <tr><td>Qualifications Required:</td><td>[AUTO-POPULATED based on equipment and task - DO NOT use form data]</td></tr>
 </table>
 <h3>Equipment Information:</h3>
 <table class="info-table">
@@ -497,6 +506,36 @@ export async function POST(request) {
       4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
     };
     
+    // Determine qualifications based on equipment and task (similar to MOP logic)
+    let qualificationsRequired = "Standard facility technician certification";
+    
+    // Refrigerant work requires EPA certification
+    if (system.includes('chiller') || system.includes('crac') || system.includes('crah') || 
+        system.includes('cooling') || system.includes('hvac') || workDescription.includes('refrigerant')) {
+      qualificationsRequired = "EPA 608 Universal Certification, HVAC Technician License";
+    }
+    
+    // Electrical work requires electrical qualifications
+    if (system.includes('electrical') || system.includes('switchgear') || system.includes('ups') || 
+        system.includes('pdu') || workDescription.includes('electrical')) {
+      qualificationsRequired = "Qualified Electrical Worker, NFPA 70E Certification";
+    }
+    
+    // Generator work requires specific qualifications
+    if (system.includes('generator') || system.includes('genset')) {
+      qualificationsRequired = "Diesel Generator Technician Certification, Electrical License";
+    }
+    
+    // Critical work requires higher qualifications
+    if (riskLevel >= 3) {
+      qualificationsRequired += ", 5+ years data center experience";
+    }
+    
+    // Annual/complex procedures require manufacturer certification
+    if (procedureType.includes('annual') || procedureType.includes('major')) {
+      qualificationsRequired += `, ${formData.manufacturer} Certified Technician (preferred)`;
+    }
+    
     // Prepare the prompt for Gemini
     const prompt = `${SOP_INSTRUCTIONS}
 
@@ -515,12 +554,8 @@ Customer Information:
 - Customer: ${formData.customer}
 - Site Name: ${formData.siteName || 'UPDATE NEEDED'}
 
-Work Performance:
-- Work Performed By: ${formData.workPerformedBy || 'Self-Delivered'}
-- Subcontractor Company Name: ${formData.subcontractorCompany || 'N/A'}
-- Subcontractor Personnel: ${formData.subcontractorPersonnel || 'N/A'}
-- Subcontractor Contact: ${formData.subcontractorContact || 'N/A'}
-- Qualifications Required: ${formData.qualificationsRequired || 'Standard facility technician certification'}
+Auto-Populated Values:
+- Qualifications Required: ${qualificationsRequired}
 
 Site Address:
 - Street: ${formData.address?.street || 'UPDATE NEEDED'}
@@ -551,16 +586,17 @@ CRITICAL REQUIREMENTS:
 3. Section 01 MUST show CET Level Required as: "${cetRequired[riskLevel]}" with italic text "Based on risk level assessment"
 4. Section 01 MUST have editable input fields for Author, Version, Author CET Level
 5. Section 02 MUST show Customer: ${formData.customer} and Site Name: ${formData.siteName || 'UPDATE NEEDED'}
-6. Section 03 MUST show ALL work performance fields including subcontractor details and qualifications
-7. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
-8. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
-9. Section 05 MUST base documentation on LOR ${riskLevel}
-10. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
-11. Section 07 MUST include Risk Matrix, Assumptions, and Decision Points in table format
-12. Section 08 MUST use tables with Initials and Time columns for ALL subsections (8.1 and 8.2)
-13. Section 09 MUST be titled "Back-out Procedures" with table including Initials and Time columns
-14. Section 11 MUST ONLY have Technician Sign-off (no other content)
-15. ALL tables in Sections 8 and 9 MUST have empty Initials and Time cells for manual entry
+6. Section 03 MUST show fillable checkboxes for Work Performed By and input fields for subcontractor details
+7. Section 03 MUST auto-populate Qualifications Required as: "${qualificationsRequired}"
+8. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
+9. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
+10. Section 05 MUST base documentation on LOR ${riskLevel}
+11. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
+12. Section 07 MUST include Risk Matrix, Assumptions, and Decision Points in table format
+13. Section 08 MUST use tables with Initials and Time columns for ALL subsections (8.1 and 8.2)
+14. Section 09 MUST be titled "Back-out Procedures" with table including Initials and Time columns
+15. Section 11 MUST ONLY have Technician Sign-off (no other content)
+16. ALL tables in Sections 8 and 9 MUST have empty Initials and Time cells for manual entry
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
