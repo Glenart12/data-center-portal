@@ -419,7 +419,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
 
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.3,
         maxOutputTokens: 15000, // Increased for 12 sections
@@ -441,7 +441,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       console.log('Retrying with simpler configuration...');
       try {
         const retryModel = genAI.getGenerativeModel({ 
-          model: 'gemini-2.5-pro',
+          model: 'gemini-2.5-flash',
           generationConfig: {
             temperature: 0.5,
             maxOutputTokens: 12000
