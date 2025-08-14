@@ -218,7 +218,17 @@ Convert ALL subsections to table format:
     <th style="width: 60px;">Initials</th>
     <th style="width: 80px;">Time</th>
   </tr>
-  <!-- Convert numbered list to table rows with empty Initials and Time cells -->
+  <!-- For each row, format as:
+  <tr>
+    <td>1</td>
+    <td>[Description]</td>
+    <td>[Expected Result]</td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+    <td>[Action if Not Met]</td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  -->
 </table>
 
 <h3>8.2 Detailed Procedure Steps</h3>
@@ -233,7 +243,18 @@ Convert ALL subsections to table format:
     <th style="width: 60px;">Initials</th>
     <th style="width: 80px;">Time</th>
   </tr>
-  <!-- Equipment-specific readings with sources: PIC5+/BMS/Physical Gauge, empty Initials and Time cells -->
+  <!-- For each row, format as:
+  <tr>
+    <td>1</td>
+    <td>[Description]</td>
+    <td>[Expected Range]</td>
+    <td>[Source: PIC5+/BMS/Physical Gauge]</td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+    <td>[Action if Out of Range]</td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  -->
 </table>
 
 Section 09: Back-out Procedures
@@ -249,7 +270,16 @@ Move Section 8.3 Post-Procedure Verification content here as table:
     <th style="width: 60px;">Initials</th>
     <th style="width: 80px;">Time</th>
   </tr>
-  <!-- Post-procedure verification steps with empty Initials and Time cells -->
+  <!-- For each row, format as:
+  <tr>
+    <td>1</td>
+    <td>[Description]</td>
+    <td>[Verification]</td>
+    <td>[Action Required]</td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  -->
 </table>
 
 Section 10: SOP Approval
@@ -578,7 +608,7 @@ IMPORTANT TABLE STRUCTURE REQUIREMENTS:
 - Section 8.1 Pre-Procedure Checks: MUST have columns [Step, Description, Expected Result, Actual Result, Action if Not Met, Initials, Time]
 - Section 8.2 Detailed Procedure Steps: MUST have columns [Step, Description, Expected Range, Source, Recorded Value, Action if Out of Range, Initials, Time]
 - Section 9 Back-out Procedures: MUST have columns [Step, Description, Verification, Action Required, Initials, Time]
-- ALL Initials and Time cells MUST be empty for manual completion during execution
+- ALL Initials and Time cells MUST contain input fields: <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
 
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early
@@ -596,7 +626,7 @@ CRITICAL REQUIREMENTS:
 13. Section 08 MUST use tables with Initials and Time columns for ALL subsections (8.1 and 8.2)
 14. Section 09 MUST be titled "Back-out Procedures" with table including Initials and Time columns
 15. Section 11 MUST ONLY have Technician Sign-off (no other content)
-16. ALL tables in Sections 8 and 9 MUST have empty Initials and Time cells for manual entry
+16. ALL tables in Sections 8 and 9 MUST have Initials and Time cells with input fields: <input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;">
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
