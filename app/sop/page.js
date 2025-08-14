@@ -8,6 +8,7 @@ import SOPGenerationModal from '../components/SOPGenerationModal';
 
 function SopPage() {
   const [files, setFiles] = useState([]);
+  const [filesData, setFilesData] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPDF, setSelectedPDF] = useState(null);
@@ -19,7 +20,8 @@ function SopPage() {
       .then(res => res.json())
       .then(data => {
         setFiles(data.files || []);
-        setFilteredFiles(data.files || []);
+        setFilesData(data.filesWithUrls || []);
+        setFilteredFiles(data.filesWithUrls || []);
       })
       .catch(err => console.error('Error fetching files:', err));
   }, []);
@@ -27,19 +29,19 @@ function SopPage() {
   // Filter files when search term changes
   useEffect(() => {
     if (searchTerm.trim() === '') {
-      setFilteredFiles(files);
+      setFilteredFiles(filesData);
     } else {
-      const filtered = files.filter(filename =>
-        filename.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = filesData.filter(file =>
+        file.filename.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredFiles(filtered);
     }
-  }, [files, searchTerm]);
+  }, [filesData, searchTerm]);
 
-  const handlePDFClick = (filename) => {
+  const handlePDFClick = (fileData) => {
     setSelectedPDF({
-      url: `/sops/${filename}`,
-      name: filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
+      url: fileData.url,
+      name: fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
     });
     setIsModalOpen(true);
   };
@@ -259,8 +261,8 @@ function SopPage() {
               <p style={{ margin: 0, fontSize: '16px' }}>Upload PDFs to get started</p>
             </div>
           ) : (
-            filteredFiles.map((filename) => (
-              <div key={filename} style={{ 
+            filteredFiles.map((fileData) => (
+              <div key={fileData.filename} style={{ 
                 border: '1px solid #e0e0e0', 
                 padding: '25px', 
                 borderRadius: '12px',
@@ -270,7 +272,7 @@ function SopPage() {
                 transition: 'all 0.3s ease',
                 position: 'relative'
               }}
-              onClick={() => handlePDFClick(filename)}
+              onClick={() => handlePDFClick(fileData)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)';
                 e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
@@ -296,7 +298,7 @@ function SopPage() {
                     lineHeight: '1.4',
                     flex: 1
                   }}>
-                    {filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')}
+                    {fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')}
                   </h3>
                 </div>
                 
@@ -308,7 +310,7 @@ function SopPage() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handlePDFClick(filename);
+                      handlePDFClick(fileData);
                     }}
                     style={{
                       padding: '10px 15px',
@@ -335,7 +337,7 @@ function SopPage() {
                     Preview
                   </button>
                   <a 
-                    href={`/sops/${filename}`} 
+                    href={fileData.url} 
                     download
                     onClick={(e) => e.stopPropagation()}
                     style={{
@@ -372,14 +374,14 @@ function SopPage() {
                   position: 'absolute',
                   top: '15px',
                   right: '15px',
-                  backgroundColor: getFileTypeColor(filename),
+                  backgroundColor: getFileTypeColor(fileData.filename),
                   color: 'white',
                   padding: '4px 8px',
                   borderRadius: '4px',
                   fontSize: '12px',
                   fontWeight: 'bold'
                 }}>
-                  {getFileTypeLabel(filename)}
+                  {getFileTypeLabel(fileData.filename)}
                 </div>
               </div>
             ))
