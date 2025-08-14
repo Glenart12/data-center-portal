@@ -336,9 +336,9 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
 
 FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.`;
 
-    // Search Enhancement (TEMPORARILY DISABLED for stability)
+    // Search Enhancement
     let enhancedPrompt = prompt;
-    if (false) {  // Temporarily disable search to get basic generation working
+    if (process.env.SEARCH_ENABLED === 'true') {
       try {
         enhancedPrompt = await enhancePromptWithSearchResults(prompt, formData.modelNumber, formData.manufacturer);
         console.log('Search enhancement applied successfully');
