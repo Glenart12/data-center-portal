@@ -4,6 +4,7 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
+import SOPGenerationModal from '../components/SOPGenerationModal';
 
 function SopPage() {
   const [files, setFiles] = useState([]);
@@ -11,6 +12,7 @@ function SopPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/files/sops')
@@ -183,7 +185,7 @@ function SopPage() {
           </div>
         )}
         
-        {/* Upload Button Only */}
+        {/* Upload and Generate Buttons */}
         <div style={{ 
           display: 'flex', 
           gap: '15px', 
@@ -195,6 +197,41 @@ function SopPage() {
           <div style={{ minWidth: '180px', height: '48px' }}>
             <UploadButton type="sops" />
           </div>
+          <button
+            onClick={() => setIsGenerationModalOpen(true)}
+            style={{
+              minWidth: '180px',
+              height: '48px',
+              padding: '12px 24px',
+              backgroundColor: '#198754',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#146c43';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#198754';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>📋</span>
+            Generate SOP
+          </button>
         </div>
 
         {/* File Grid */}
@@ -356,6 +393,12 @@ function SopPage() {
         onClose={closeModal}
         pdfUrl={selectedPDF?.url}
         pdfName={selectedPDF?.name}
+      />
+
+      {/* SOP Generation Modal */}
+      <SOPGenerationModal
+        isOpen={isGenerationModalOpen}
+        onClose={() => setIsGenerationModalOpen(false)}
       />
     </div>
   );
