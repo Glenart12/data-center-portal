@@ -353,7 +353,7 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       model: 'gemini-1.5-flash',  // Using stable model version
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 11500,  // Increased to fit Section 08
+        maxOutputTokens: 12500,  // Increased to complete Section 08
         candidateCount: 1
       }
     });
