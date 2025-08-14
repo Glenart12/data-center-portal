@@ -336,9 +336,9 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
 
 FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP Approval & Review) with approval matrix, revision history, and review dates. The document MUST NOT end at Section 07.`;
 
-    // Search Enhancement (Safe - returns original if disabled or fails)
+    // Search Enhancement (TEMPORARILY DISABLED for stability)
     let enhancedPrompt = prompt;
-    if (process.env.SEARCH_ENABLED === 'true') {
+    if (false) {  // Temporarily disable search to get basic generation working
       try {
         enhancedPrompt = await enhancePromptWithSearchResults(prompt, formData.modelNumber, formData.manufacturer);
         console.log('Search enhancement applied successfully');
@@ -348,12 +348,12 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       }
     }
 
-    // Generate content using Gemini with optimized configuration
+    // Generate content using Gemini with STABLE configuration
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-pro',
+      model: 'gemini-1.5-flash',  // Using stable model version
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 13000,  // Sufficient to generate all 8 sections
+        maxOutputTokens: 10000,  // Reduced for stability
         candidateCount: 1
       }
     });
@@ -392,19 +392,22 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       console.error('Error message:', aiError.message);
       console.error('Error stack:', aiError.stack);
       
-      // Try with original prompt if enhanced prompt failed
-      if (enhancedPrompt !== prompt) {
-        console.log('Retrying with original prompt (no search enhancement)...');
-        try {
-          result = await model.generateContent(prompt);
-          response = await result.response;
-          generatedContent = response.text();
-          console.log('Retry successful with original prompt');
-        } catch (retryError) {
-          console.error('Retry also failed:', retryError.message);
-          throw new Error(`AI generation failed: ${aiError.message}`);
-        }
-      } else {
+      // Try with simpler configuration on retry
+      console.log('Retrying with simpler configuration...');
+      try {
+        const retryModel = genAI.getGenerativeModel({ 
+          model: 'gemini-1.5-flash',  // Use stable model for retry
+          generationConfig: {
+            temperature: 0.5,  // Slightly higher temperature
+            maxOutputTokens: 8000  // Further reduced for retry
+          }
+        });
+        result = await retryModel.generateContent(prompt);
+        response = await result.response;
+        generatedContent = response.text();
+        console.log('Retry successful with simpler configuration');
+      } catch (retryError) {
+        console.error('Retry also failed:', retryError.message);
         throw new Error(`AI generation failed: ${aiError.message}`);
       }
     }
