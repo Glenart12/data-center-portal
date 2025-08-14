@@ -353,7 +353,7 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       model: 'gemini-1.5-flash',  // Using stable model version
       generationConfig: {
         temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 10000,  // Reduced for stability
+        maxOutputTokens: 11500,  // Increased to fit Section 08
         candidateCount: 1
       }
     });
@@ -399,7 +399,7 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
           model: 'gemini-1.5-flash',  // Use stable model for retry
           generationConfig: {
             temperature: 0.5,  // Slightly higher temperature
-            maxOutputTokens: 8000  // Further reduced for retry
+            maxOutputTokens: 10000  // Increased for retry to fit Section 08
           }
         });
         result = await retryModel.generateContent(prompt);
