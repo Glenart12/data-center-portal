@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { put } from '@vercel/blob';
+import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enhancement-adapter';
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -404,6 +405,18 @@ CRITICAL REQUIREMENTS:
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
+    // Search Enhancement
+    let enhancedPrompt = prompt;
+    if (process.env.SEARCH_ENABLED === 'true') {
+      try {
+        enhancedPrompt = await enhancePromptWithSearchResults(prompt, formData.modelNumber, formData.manufacturer);
+        console.log('Search enhancement applied successfully');
+      } catch (error) {
+        console.log('Search enhancement skipped:', error.message);
+        // Use original prompt if search fails
+      }
+    }
+
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.5-pro',
@@ -418,7 +431,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     
     let result, response, generatedContent;
     try {
-      result = await model.generateContent(prompt);
+      result = await model.generateContent(enhancedPrompt);
       response = await result.response;
       generatedContent = response.text();
     } catch (aiError) {
@@ -434,7 +447,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
             maxOutputTokens: 12000
           }
         });
-        result = await retryModel.generateContent(prompt);
+        result = await retryModel.generateContent(enhancedPrompt);
         response = await result.response;
         generatedContent = response.text();
       } catch (retryError) {
