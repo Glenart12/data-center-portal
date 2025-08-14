@@ -9,12 +9,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     serialNumber: '',
     location: '',
     customer: '',
-    customerAddress: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: ''
-    },
     address: {
       street: '',
       city: '',
@@ -25,10 +19,7 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     category: '',
     description: '',
     procedureType: '',
-    frequency: '',
-    version: '1.0',
-    author: '',
-    cetLevel: ''
+    frequency: ''
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -83,15 +74,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     }));
   };
 
-  const handleCustomerAddressChange = (addressField, value) => {
-    setFormData(prev => ({
-      ...prev,
-      customerAddress: {
-        ...prev.customerAddress,
-        [addressField]: value
-      }
-    }));
-  };
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files);
@@ -342,77 +324,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             />
           </div>
 
-          {/* Customer Address Section */}
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#333' }}>
-              Customer Address
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 80px', gap: '15px', marginBottom: '15px' }}>
-              <div>
-                <input
-                  type="text"
-                  value={formData.customerAddress.street}
-                  onChange={(e) => handleCustomerAddressChange('street', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                  placeholder="Street Address"
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  value={formData.customerAddress.city}
-                  onChange={(e) => handleCustomerAddressChange('city', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                  placeholder="City"
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  value={formData.customerAddress.state}
-                  onChange={(e) => handleCustomerAddressChange('state', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    textTransform: 'uppercase'
-                  }}
-                  placeholder="State"
-                  maxLength="2"
-                />
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '15px' }}>
-              <div>
-                <input
-                  type="text"
-                  value={formData.customerAddress.zipCode}
-                  onChange={(e) => handleCustomerAddressChange('zipCode', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                  placeholder="ZIP Code"
-                  maxLength="10"
-                />
-              </div>
-              <div></div>
-            </div>
-          </div>
-
           {/* Site Address Section */}
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#333' }}>
@@ -520,68 +431,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
                 }}
                 placeholder="e.g., Routine Operations"
               />
-            </div>
-          </div>
-
-          {/* Additional SOP-specific fields */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Version
-              </label>
-              <input
-                type="text"
-                value={formData.version}
-                onChange={(e) => handleInputChange('version', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., 1.0"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Author
-              </label>
-              <input
-                type="text"
-                value={formData.author}
-                onChange={(e) => handleInputChange('author', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., John Smith"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                CET Level Required
-              </label>
-              <select
-                value={formData.cetLevel}
-                onChange={(e) => handleInputChange('cetLevel', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: 'white'
-                }}
-              >
-                <option value="">Select Level</option>
-                <option value="CET 1">CET 1</option>
-                <option value="CET 2">CET 2</option>
-                <option value="CET 3">CET 3</option>
-                <option value="CET 4">CET 4</option>
-              </select>
             </div>
           </div>
 
