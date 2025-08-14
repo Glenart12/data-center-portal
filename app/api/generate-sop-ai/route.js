@@ -9,6 +9,9 @@ const SOP_INSTRUCTIONS = `
 You are an expert data center operations engineer creating a Standard Operating Procedure (SOP) document.
 Generate a comprehensive, professional SOP document in HTML format with ALL 12 sections listed below.
 
+IMPORTANT: You must generate EQUIPMENT-SPECIFIC procedures based on the exact manufacturer and model provided.
+Do NOT generate generic procedures. All steps, safety requirements, and technical details must be specific to the equipment.
+
 CRITICAL: You MUST include ALL 12 sections in order:
 - Section 01: SOP Schedule Information
 - Section 02: Site Information
@@ -27,12 +30,34 @@ SECTION-BY-SECTION REQUIREMENTS:
 
 Section 01: SOP Schedule Information
 - SOP Identifier: Generate unique ID (e.g., SOP-[SYSTEM]-[DATE]-[NUMBER])
-- Procedure Title: Clear, descriptive title
-- Frequency: How often the procedure is performed
-- Duration: Estimated time to complete
-- Personnel Required: Number and type of personnel needed
+- Procedure Title: Clear, descriptive title including manufacturer and model
+- Frequency: Based on the procedure type provided
+- Duration: AUTO-DETERMINE based on the specific equipment model and procedure complexity
+- Personnel Required: AUTO-DETERMINE based on equipment type, manufacturer safety requirements, and procedure type
+- Criticality Level: AUTO-DETERMINE based on system type and potential impact
 - Scheduling Requirements: Time windows, coordination needs
 - Include a scheduling table with columns for Date, Time, Technician, Status
+
+DURATION GUIDELINES:
+- Daily Operations: 15-30 minutes for simple checks, 1-2 hours for comprehensive
+- Weekly Maintenance: 1-3 hours depending on equipment complexity
+- Monthly Maintenance: 2-4 hours for thorough inspection and maintenance
+- Quarterly/Annual: 4-8 hours for major maintenance
+- System Startup/Shutdown: 30 minutes to 2 hours based on system size
+
+PERSONNEL GUIDELINES:
+- Simple operations: 1 technician
+- Electrical work >480V: 2 qualified electricians
+- Heavy equipment (>50 lbs): 2 technicians
+- Critical systems: 2 technicians + supervisor
+- Manufacturer requirements: Follow specific OEM guidelines
+
+CRITICALITY DETERMINATION:
+- UPS/Power Systems: Critical
+- Cooling Systems (Primary): High to Critical
+- Cooling Systems (Redundant): Medium to High
+- Monitoring Systems: Low to Medium
+- Non-critical support: Low
 
 Section 02: Site Information
 - Site Name: Data Center facility name
@@ -83,14 +108,28 @@ Section 07: SOP Risks & Assumptions
 - Escalation Procedures: When and how to escalate issues
 
 Section 08: SOP Details
-COMPREHENSIVE STEP-BY-STEP PROCEDURES:
-- Pre-Procedure Checklist: Verification before starting
-- Detailed Steps: Numbered, clear, actionable steps
-- Include verification points after critical steps
-- Add caution/warning boxes for critical steps
-- Include expected readings/values
-- Add troubleshooting guidance for common issues
-- Post-Procedure Verification: Confirmation of success
+EQUIPMENT-SPECIFIC STEP-BY-STEP PROCEDURES:
+- Pre-Procedure Checklist: Equipment-specific verification items
+- Detailed Steps: MUST BE SPECIFIC TO THE MANUFACTURER AND MODEL
+  * Include exact control panel locations for this model
+  * Reference specific part numbers and components
+  * Use manufacturer-specific terminology and procedures
+  * Include model-specific setpoints and operating ranges
+  * Reference exact display screens and menu paths for this equipment
+- Include verification points with model-specific expected values
+- Add manufacturer-specific warnings and cautions
+- Include expected readings/values FROM THE EQUIPMENT MANUAL
+- Add troubleshooting for THIS SPECIFIC MODEL'S common issues
+- Include manufacturer-recommended torque specs, pressures, temperatures
+- Post-Procedure Verification: Model-specific confirmation steps
+
+EXAMPLE OF SPECIFICITY:
+BAD: "Check the cooling system"
+GOOD: "On the Trane CVHF1000 control panel, navigate to Menu > System Status > Chiller Status and verify:
+- Evaporator pressure: 68-72 PSI
+- Condenser pressure: 225-235 PSI (ambient dependent)
+- Oil pressure differential: >18 PSI
+- Bearing temperature: <165°F"
 
 Section 09: Back-out Procedures
 - Back-out Triggers: When to initiate back-out
@@ -328,11 +367,13 @@ Equipment Details:
 - System: ${formData.system}
 - Category: ${formData.category}
 - Procedure Type: ${formData.procedureType}
-- Frequency: ${formData.frequency || 'UPDATE NEEDED'}
-- Duration: ${formData.duration || 'UPDATE NEEDED'}
-- Personnel Required: ${formData.personnelRequired || 'UPDATE NEEDED'}
-- Criticality Level: ${formData.criticalityLevel || 'UPDATE NEEDED'}
+- Frequency: ${formData.frequency || 'As per procedure type'}
 - Procedure Description: ${formData.description}
+
+AUTO-DETERMINE THESE BASED ON EQUIPMENT AND PROCEDURE:
+- Duration: Determine based on ${formData.manufacturer} ${formData.modelNumber} specifications and ${formData.procedureType}
+- Personnel Required: Determine based on ${formData.manufacturer} safety requirements and ${formData.procedureType}
+- Criticality Level: Determine based on ${formData.system} type and operational impact
 
 Site Address:
 - Street: ${formData.address?.street || 'UPDATE NEEDED'}
@@ -348,7 +389,12 @@ Start with <h1>Standard Operating Procedure (SOP)</h1> and then proceed with all
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early
 2. Section 04 MUST include a table with 15 critical facility systems
-3. Section 08 MUST include detailed step-by-step procedures specific to ${formData.procedureType} for ${formData.manufacturer} ${formData.modelNumber}
+3. Section 08 MUST include EQUIPMENT-SPECIFIC step-by-step procedures for ${formData.manufacturer} ${formData.modelNumber}:
+   - Use exact control locations, display menus, and button sequences for this model
+   - Include manufacturer-specific part numbers and component names
+   - Reference specific technical values from the equipment manual
+   - Include model-specific error codes and their meanings
+   - Use the exact terminology from ${formData.manufacturer}'s documentation
 4. Include input fields, checkboxes, and UPDATE NEEDED markers where appropriate
 5. Use green color theme (#198754 for primary, #20c997 for accents) in inline styles
 6. Make all procedures specific to the equipment and procedure type provided

@@ -14,6 +14,7 @@ function SopPage() {
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
+  const [deletingFile, setDeletingFile] = useState(null);
 
   useEffect(() => {
     fetch('/api/files/sops')
@@ -39,8 +40,13 @@ function SopPage() {
   }, [filesData, searchTerm]);
 
   const handlePDFClick = (fileData) => {
+    // For HTML files from blob storage, use the serve-html API
+    const url = fileData.url && fileData.filename.endsWith('.html')
+      ? `/api/serve-html?url=${encodeURIComponent(fileData.url)}`
+      : fileData.url;
+    
     setSelectedPDF({
-      url: fileData.url,
+      url: url,
       name: fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
     });
     setIsModalOpen(true);
@@ -57,6 +63,48 @@ function SopPage() {
 
   const clearSearch = () => {
     setSearchTerm('');
+  };
+
+  const handleDelete = async (filename, e) => {
+    e.stopPropagation(); // Prevent card click
+    
+    // Confirmation dialog
+    if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+      return;
+    }
+
+    setDeletingFile(filename);
+
+    try {
+      const response = await fetch('/api/delete-file', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename,
+          type: 'sops'
+        })
+      });
+
+      if (response.ok) {
+        // Refresh the file list
+        const res = await fetch('/api/files/sops');
+        const data = await res.json();
+        setFiles(data.files || []);
+        setFilesData(data.filesWithUrls || []);
+        setFilteredFiles(data.filesWithUrls || []);
+        alert('File deleted successfully');
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete file: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete file');
+    } finally {
+      setDeletingFile(null);
+    }
   };
 
   const getFileTypeColor = (filename) => {
@@ -367,6 +415,37 @@ function SopPage() {
                   >
                     Download
                   </a>
+                  <button
+                    onClick={(e) => handleDelete(fileData.filename, e)}
+                    disabled={deletingFile === fileData.filename}
+                    style={{
+                      padding: '10px 15px',
+                      backgroundColor: deletingFile === fileData.filename ? '#ccc' : '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      cursor: deletingFile === fileData.filename ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                      fontWeight: '500',
+                      flex: 1
+                    }}
+                    onMouseEnter={(e) => {
+                      if (deletingFile !== fileData.filename) {
+                        e.currentTarget.style.backgroundColor = '#bb2d3b';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (deletingFile !== fileData.filename) {
+                        e.currentTarget.style.backgroundColor = '#dc3545';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }
+                    }}
+                  >
+                    {deletingFile === fileData.filename ? 'Deleting...' : 'Delete'}
+                  </button>
                 </div>
 
                 {/* File Type Badge */}

@@ -18,10 +18,7 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     category: '',
     description: '',
     procedureType: '',
-    frequency: '',
-    duration: '',
-    personnelRequired: '',
-    criticalityLevel: ''
+    frequency: ''
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -466,66 +463,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Estimated Duration
-              </label>
-              <input
-                type="text"
-                value={formData.duration}
-                onChange={(e) => handleInputChange('duration', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., 2 hours"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Personnel Required
-              </label>
-              <input
-                type="text"
-                value={formData.personnelRequired}
-                onChange={(e) => handleInputChange('personnelRequired', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., 2 technicians"
-              />
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Criticality Level
-            </label>
-            <select
-              value={formData.criticalityLevel}
-              onChange={(e) => handleInputChange('criticalityLevel', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                backgroundColor: 'white'
-              }}
-            >
-              <option value="">Select Criticality</option>
-              <option value="Low">Low - Minimal impact on operations</option>
-              <option value="Medium">Medium - Some operational impact</option>
-              <option value="High">High - Significant operational impact</option>
-              <option value="Critical">Critical - Service affecting</option>
-            </select>
-          </div>
 
           <div>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
