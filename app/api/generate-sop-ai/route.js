@@ -1139,7 +1139,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     const existingFiles = await list({ prefix: 'sops/' });
     
     // Extract work description from form data
-    const workDescription = formData.description || formData.procedureType || formData.category || 'STANDARD_PROCEDURE';
+    workDescription = formData.description || formData.procedureType || formData.category || 'STANDARD_PROCEDURE';
     
     // Get the next version number
     const version = getNextVersion(
