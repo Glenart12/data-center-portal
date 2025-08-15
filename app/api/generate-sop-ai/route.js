@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { put } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enhancement-adapter';
+import { sanitizeForFilename, getNextVersion } from '@/lib/sop-version-manager';
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -1134,13 +1135,28 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .replace('__SOP_TITLE__', sopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
-    // Generate filename
-    const date = new Date().toISOString().split('T')[0];
-    const timestamp = Date.now();
-    const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const safeProcedure = formData.procedureType.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const filename = `SOP_${safeManufacturer}_${safeModel}_${safeProcedure}_${date}_${timestamp}.html`;
+    // Get existing SOPs to determine version
+    const existingFiles = await list({ prefix: 'sops/' });
+    
+    // Extract work description from form data
+    const workDescription = formData.description || formData.procedureType || formData.category || 'STANDARD_PROCEDURE';
+    
+    // Get the next version number
+    const version = getNextVersion(
+      existingFiles.blobs,
+      formData.manufacturer || '',
+      formData.modelNumber || formData.model || '',
+      formData.serialNumber || formData.serial || '',
+      workDescription
+    );
+    
+    // Generate consistent versioned filename
+    const cleanManufacturer = sanitizeForFilename(formData.manufacturer || '');
+    const cleanModel = sanitizeForFilename(formData.modelNumber || formData.model || '');
+    const cleanSerial = sanitizeForFilename(formData.serialNumber || formData.serial || '');
+    const cleanWorkDesc = sanitizeForFilename(workDescription);
+    
+    const filename = `SOP_${cleanManufacturer}_${cleanModel}_${cleanSerial}_${cleanWorkDesc}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`sops/${filename}`, completeHtml, {

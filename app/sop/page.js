@@ -122,6 +122,11 @@ function SopPage() {
     return extension;
   };
 
+  const extractVersion = (filename) => {
+    const match = filename.match(/V(\d+)\.html/i);
+    return match ? match[1] : '1';
+  };
+
   return (
     <div style={{
       padding: '40px 20px',
@@ -387,7 +392,7 @@ function SopPage() {
                   </button>
                   <a 
                     href={fileData.url} 
-                    download
+                    download={fileData.filename}
                     onClick={(e) => e.stopPropagation()}
                     style={{
                       padding: '10px 15px',
@@ -447,6 +452,21 @@ function SopPage() {
                   >
                     {deletingFile === fileData.filename ? 'Deleting...' : 'Delete'}
                   </button>
+                </div>
+
+                {/* Version Badge */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '15px',
+                  left: '15px',
+                  backgroundColor: '#198754',
+                  color: 'white',
+                  padding: '4px 10px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}>
+                  V{extractVersion(fileData.filename)}
                 </div>
 
                 {/* File Type Badge */}

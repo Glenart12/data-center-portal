@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 import { SourceManager } from '@/lib/mop-knowledge/source-manager'; // Fixed import
+import { sanitizeForFilename, getNextVersion } from '@/lib/mop-version-manager';
 
 const SECTION_ENDPOINTS = [
   'section-01-schedule',
@@ -306,13 +307,28 @@ export async function POST(request) {
       .replace('{{SECTIONS}}', sectionsHtml)
       .replace('{{SCRIPTS}}', scripts);
     
-    // Generate filename
-    const date = new Date().toISOString().split('T')[0];
-    const timestamp = Date.now();
-    const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const safeSystem = formData.system.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const safeCategory = formData.category.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const filename = `MOP_${safeManufacturer}_${safeSystem}_${safeCategory}_${date}_${timestamp}.html`;
+    // Get existing MOPs to determine version
+    const existingFiles = await list({ prefix: 'mops/' });
+    
+    // Extract work description from form data
+    const workDescription = formData.workDescription || formData.category || formData.system || 'MAINTENANCE';
+    
+    // Get the next version number
+    const version = getNextVersion(
+      existingFiles.blobs,
+      formData.manufacturer || '',
+      formData.modelNumber || formData.model || '',
+      formData.serialNumber || formData.serial || '',
+      workDescription
+    );
+    
+    // Generate consistent versioned filename
+    const cleanManufacturer = sanitizeForFilename(formData.manufacturer || '');
+    const cleanModel = sanitizeForFilename(formData.modelNumber || formData.model || '');
+    const cleanSerial = sanitizeForFilename(formData.serialNumber || formData.serial || '');
+    const cleanWorkDesc = sanitizeForFilename(workDescription);
+    
+    const filename = `MOP_${cleanManufacturer}_${cleanModel}_${cleanSerial}_${cleanWorkDesc}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`mops/${filename}`, completeHtml, {

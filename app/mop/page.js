@@ -173,6 +173,11 @@ function MopPage() {
     return extension;
   };
 
+  const extractVersion = (filename) => {
+    const match = filename.match(/V(\d+)\.html/i);
+    return match ? match[1] : '1';
+  };
+
   return (
     <div style={{
       padding: '40px 20px',
@@ -525,6 +530,21 @@ function MopPage() {
                     >
                       Download
                     </a>
+                  </div>
+
+                  {/* Version Badge */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '15px',
+                    left: '15px',
+                    backgroundColor: '#0f3456',
+                    color: 'white',
+                    padding: '4px 10px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    V{extractVersion(filename)}
                   </div>
 
                   {/* File Type Badge */}
