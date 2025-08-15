@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getEquipmentData } from '@/lib/mop-knowledge/enhanced-equipment-database';
 import { ENHANCED_PPE_REQUIREMENTS } from '@/lib/mop-knowledge/enhanced-safety-standards';
 import { getRelevantEOPs } from '@/lib/mop-knowledge/eop-references';
@@ -14,13 +14,34 @@ async function researchLocalEmergencyContacts(address) {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-pro",
+      model: 'gemini-2.0-flash-exp',
       generationConfig: {
-        temperature: 0.1,
-        topP: 0.1,
-        topK: 1,
-        maxOutputTokens: 2048,
-      }
+        temperature: 0.7,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 30000,
+      },
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ],
+      tools: [{
+        googleSearch: {}
+      }]
     });
 
     const prompt = `Research and provide ACTUAL phone numbers and addresses for local emergency services in ${address.city}, ${address.state} ${address.zipCode}. Look up real hospitals, real fire/police non-emergency numbers, and real utility companies serving this area. Only use 'XXX-XXX-XXXX' placeholders if you cannot find real information after searching.

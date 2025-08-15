@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { put } from '@vercel/blob';
 import { getEquipmentSpecs, getEmergencyPPE } from '@/lib/equipment-database';
 import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enhancement-adapter';
@@ -350,12 +350,34 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
 
     // Generate content using Gemini with STABLE configuration
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',  // Using stable model version
+      model: 'gemini-2.0-flash-exp',
       generationConfig: {
-        temperature: 0.3,  // Lower for more consistent, factual output
-        maxOutputTokens: 12500,  // Increased to complete Section 08
-        candidateCount: 1
-      }
+        temperature: 0.7,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 30000,
+      },
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ],
+      tools: [{
+        googleSearch: {}
+      }]
     });
     
     console.log('Sending prompt to Gemini AI...');
@@ -396,11 +418,34 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       console.log('Retrying with simpler configuration...');
       try {
         const retryModel = genAI.getGenerativeModel({ 
-          model: 'gemini-1.5-flash',  // Use stable model for retry
+          model: 'gemini-2.0-flash-exp',
           generationConfig: {
-            temperature: 0.5,  // Slightly higher temperature
-            maxOutputTokens: 10000  // Increased for retry to fit Section 08
-          }
+            temperature: 0.7,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 30000,
+          },
+          safetySettings: [
+            {
+              category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+          ],
+          tools: [{
+            googleSearch: {}
+          }]
         });
         result = await retryModel.generateContent(prompt);
         response = await result.response;
