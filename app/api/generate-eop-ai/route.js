@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { put } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 import { getEquipmentSpecs, getEmergencyPPE } from '@/lib/equipment-database';
 import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enhancement-adapter';
+import { getNextVersion, generateVersionedFilename } from '@/lib/eop-version-manager';
 
 // Import EOP sections
 import { getEOPHeader } from '@/lib/eop-sections/header';
@@ -509,63 +510,52 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       .replace('__EOP_TITLE__', eopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
-    // Extract EOP Identifier from generated content for filename
+    // Get existing EOP files to determine version
     let filename = '';
     try {
-      // Try multiple regex patterns to extract EOP Identifier
-      const identifierPatterns = [
-        // Specific pattern for <b> or <strong> tags
-        /EOP Identifier:<\/(?:b|strong|span)>\s*([A-Z0-9\-_]+)/i,
-        // Broader pattern for any HTML tags after EOP Identifier:
-        /EOP Identifier:.*?>\s*([A-Z0-9\-_]+)/i,
-        // Even broader pattern that handles multiple tags and whitespace
-        /EOP Identifier:[^>]*>.*?([A-Z0-9\-_]{3,})/i,
-        // Simple pattern without HTML tags
-        /EOP Identifier:\s*([A-Z0-9\-_]+)/i
-      ];
+      // List existing EOP files from blob storage
+      const { blobs } = await list({ prefix: 'eops/' });
+      const existingFiles = blobs.map(blob => {
+        // Extract filename from pathname
+        const parts = blob.pathname.split('/');
+        return parts[parts.length - 1];
+      });
       
-      let eopIdentifier = '';
-      let matchedPattern = -1;
+      console.log('Found existing EOP files:', existingFiles.length);
       
-      for (let i = 0; i < identifierPatterns.length; i++) {
-        const identifierMatch = completeHtml.match(identifierPatterns[i]);
-        if (identifierMatch && identifierMatch[1] && identifierMatch[1].trim().length >= 3) {
-          eopIdentifier = identifierMatch[1].trim();
-          matchedPattern = i;
-          break;
-        }
-      }
+      // Get next version number for this equipment and emergency type
+      const nextVersion = getNextVersion(
+        existingFiles,
+        formData.manufacturer,
+        formData.modelNumber,
+        formData.serialNumber || '',
+        formData.emergencyType
+      );
       
-      if (eopIdentifier) {
-        console.log(`Extracted EOP Identifier using pattern ${matchedPattern}:`, eopIdentifier);
-        
-        // Sanitize the identifier to remove invalid filename characters
-        const sanitizedIdentifier = eopIdentifier
-          .replace(/[<>:"/\\|?*]/g, '_')  // Replace invalid Windows filename characters
-          .replace(/\s+/g, '_')          // Replace spaces with underscores
-          .replace(/[^\w\-_.]/g, '')     // Keep only alphanumeric, dash, underscore, dot
-          .replace(/_{2,}/g, '_')        // Replace multiple underscores with single
-          .trim();
-        
-        filename = `${sanitizedIdentifier}.html`;
-      } else {
-        // Fallback to current naming convention
-        const date = new Date().toISOString().split('T')[0];
-        const timestamp = Date.now();
-        const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-        const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-        filename = `EOP_${safeManufacturer}_${safeModel}_${date}_${timestamp}.html`;
-        console.log('No EOP Identifier found, using current naming convention:', filename);
-      }
-    } catch (parseError) {
-      console.error('Error parsing EOP Identifier:', parseError);
-      // Fallback to current naming convention
-      const date = new Date().toISOString().split('T')[0];
-      const timestamp = Date.now();
-      const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-      const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-      filename = `EOP_${safeManufacturer}_${safeModel}_${date}_${timestamp}.html`;
-      console.log('Error extracting identifier, using current naming convention:', filename);
+      console.log('Next version number:', nextVersion);
+      
+      // Generate versioned filename
+      filename = generateVersionedFilename(
+        formData.manufacturer,
+        formData.modelNumber,
+        formData.serialNumber || '',
+        formData.emergencyType,
+        nextVersion
+      );
+      
+      console.log('Generated versioned filename:', filename);
+      
+    } catch (versionError) {
+      console.error('Error determining version:', versionError);
+      // Fallback to V1 if there's an error
+      filename = generateVersionedFilename(
+        formData.manufacturer,
+        formData.modelNumber,
+        formData.serialNumber || '',
+        formData.emergencyType,
+        1
+      );
+      console.log('Using fallback filename:', filename);
     }
 
     // Save to blob storage

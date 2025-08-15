@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import EOPGenerationModal from '../components/EOPGenerationModal';
+import { extractEOPMetadata, groupEOPsByEquipment } from '@/lib/eop-version-manager';
 
 function EopPage() {
   const [files, setFiles] = useState([]);
@@ -271,10 +272,10 @@ function EopPage() {
             color: '#dc3545'
           }}>
             {filteredFiles.length === 0 ? (
-              <span>No documents found matching "{searchTerm}"</span>
+              <span>No documents found matching &quot;{searchTerm}&quot;</span>
             ) : (
               <span>
-                Found {filteredFiles.length} document{filteredFiles.length !== 1 ? 's' : ''} matching "{searchTerm}"
+                Found {filteredFiles.length} document{filteredFiles.length !== 1 ? 's' : ''} matching &quot;{searchTerm}&quot;
               </span>
             )}
           </div>
@@ -345,6 +346,10 @@ function EopPage() {
               const downloadUrl = fileData?.url || `/eops/${filename}`;
               const displayName = filename.replace('.pdf', '').replace('.txt', '').replace('.html', '');
               
+              // Extract version information
+              const metadata = extractEOPMetadata(filename);
+              const versionDisplay = metadata.version ? `V${metadata.version}` : '';
+              
               return (
                 <div key={filename} style={{ 
                   border: '1px solid #e0e0e0', 
@@ -414,22 +419,33 @@ function EopPage() {
                     paddingRight: '40px' // Make room for delete button
                   }}>
                     <span style={{ fontSize: '32px', color: '#dc3545', flexShrink: 0 }}>🚨</span>
-                    <h3 style={{ 
-                      margin: 0, 
-                      fontSize: '18px', 
-                      color: '#333',
-                      lineHeight: '1.4',
-                      flex: 1,
-                      overflow: 'hidden',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      wordBreak: 'break-word'
-                    }}
-                    title={displayName} // Show full name on hover
-                    >
-                      {displayName}
-                    </h3>
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ 
+                        margin: 0, 
+                        fontSize: '18px', 
+                        color: '#333',
+                        lineHeight: '1.4',
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        wordBreak: 'break-word'
+                      }}
+                      title={displayName} // Show full name on hover
+                      >
+                        {displayName}
+                      </h3>
+                      {metadata.manufacturer && metadata.emergencyType && (
+                        <p style={{
+                          margin: '5px 0 0 0',
+                          fontSize: '13px',
+                          color: '#666',
+                          fontStyle: 'italic'
+                        }}>
+                          {metadata.manufacturer} {metadata.model} - {metadata.emergencyType.replace(/_/g, ' ')}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   
                   <div style={{ 
@@ -499,19 +515,37 @@ function EopPage() {
                     </a>
                   </div>
 
-                  {/* File Type Badge */}
+                  {/* File Type and Version Badges */}
                   <div style={{
                     position: 'absolute',
                     bottom: '15px',
                     right: '15px',
-                    backgroundColor: getFileTypeColor(filename),
-                    color: 'white',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontWeight: 'bold'
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'center'
                   }}>
-                    {getFileTypeLabel(filename)}
+                    {versionDisplay && (
+                      <div style={{
+                        backgroundColor: '#17a2b8',
+                        color: 'white',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}>
+                        {versionDisplay}
+                      </div>
+                    )}
+                    <div style={{
+                      backgroundColor: getFileTypeColor(filename),
+                      color: 'white',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 'bold'
+                    }}>
+                      {getFileTypeLabel(filename)}
+                    </div>
                   </div>
                 </div>
               );
