@@ -220,21 +220,30 @@ export async function POST(request) {
     const body = await request.json();
     const { formData } = body;
     
-    // Validate required fields
-    if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.component || !formData?.emergencyType) {
-      return NextResponse.json({ 
-        error: 'Missing required fields',
-        userMessage: 'Please fill in all required fields'
-      }, { status: 400 });
+    // Validate required fields with detailed error messages
+    const requiredFields = {
+      manufacturer: 'Manufacturer',
+      modelNumber: 'Model Number',
+      system: 'System',
+      component: 'Component/Equipment Type',
+      emergencyType: 'Emergency Type'
+    };
+    
+    for (const [field, displayName] of Object.entries(requiredFields)) {
+      if (!formData[field] || formData[field].toString().trim() === '') {
+        return NextResponse.json({ 
+          error: `${displayName} is required`,
+          userMessage: `${displayName} is required and cannot be empty`
+        }, { status: 400 });
+      }
     }
-
-    // Additional specific validation for component
-    if (!formData?.component) {
-      return NextResponse.json({ 
-        error: 'Component/Equipment Type is required',
-        userMessage: 'Component/Equipment Type is required'
-      }, { status: 400 });
+    
+    // Sanitize inputs to ensure consistent handling
+    formData.manufacturer = formData.manufacturer.toString().trim();
+    formData.modelNumber = formData.modelNumber.toString().trim();
+    formData.emergencyType = formData.emergencyType.toString().trim();
+    if (formData.serialNumber) {
+      formData.serialNumber = formData.serialNumber.toString().trim();
     }
     
     console.log('Starting EOP generation for:', formData.manufacturer, formData.modelNumber);
@@ -514,7 +523,21 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
     let filename = '';
     try {
       // List existing EOP files from blob storage
-      const { blobs } = await list({ prefix: 'eops/' });
+      const listResult = await list({ prefix: 'eops/' });
+      console.log('List result:', listResult);
+      
+      // Also try without prefix to see all files
+      const allFilesResult = await list({ limit: 1000 });
+      const allEopFiles = allFilesResult.blobs.filter(blob => 
+        blob.pathname.includes('EOP_') || blob.pathname.startsWith('eops/')
+      );
+      console.log('All EOP files found (including without prefix):', allEopFiles.map(b => b.pathname));
+      
+      // Use the files we found (prefer with prefix, fallback to filtered)
+      const blobs = listResult.blobs && listResult.blobs.length > 0 
+        ? listResult.blobs 
+        : allEopFiles;
+        
       const existingFiles = blobs.map(blob => {
         // Extract filename from pathname
         const parts = blob.pathname.split('/');
@@ -522,19 +545,21 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       });
       
       console.log('Found existing EOP files:', existingFiles.length);
+      console.log('Existing EOP filenames:', existingFiles);
       
       // Get next version number for this equipment and emergency type
+      // Use already sanitized values from formData
       const nextVersion = getNextVersion(
         existingFiles,
-        formData.manufacturer,
-        formData.modelNumber,
+        formData.manufacturer,  // Already trimmed above
+        formData.modelNumber,   // Already trimmed above
         formData.serialNumber || '',
-        formData.emergencyType
+        formData.emergencyType  // Already trimmed above
       );
       
       console.log('Next version number:', nextVersion);
       
-      // Generate versioned filename
+      // Generate versioned filename using same sanitized values
       filename = generateVersionedFilename(
         formData.manufacturer,
         formData.modelNumber,
@@ -547,12 +572,12 @@ FINAL CHECK: Ensure you have generated ALL 8 sections including Section 08 (EOP 
       
     } catch (versionError) {
       console.error('Error determining version:', versionError);
-      // Fallback to V1 if there's an error
+      // Fallback to V1 if there's an error - use same sanitized values
       filename = generateVersionedFilename(
-        formData.manufacturer,
-        formData.modelNumber,
+        formData.manufacturer,  // Already sanitized
+        formData.modelNumber,   // Already sanitized
         formData.serialNumber || '',
-        formData.emergencyType,
+        formData.emergencyType, // Already sanitized
         1
       );
       console.log('Using fallback filename:', filename);
