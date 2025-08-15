@@ -47,7 +47,8 @@ function SopPage() {
     
     setSelectedPDF({
       url: url,
-      name: fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
+      name: fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', ''),
+      fullFilename: fileData.filename  // Pass the full filename with extension
     });
     setIsModalOpen(true);
   };
@@ -474,6 +475,7 @@ function SopPage() {
         onClose={closeModal}
         pdfUrl={selectedPDF?.url}
         pdfName={selectedPDF?.name}
+        fullFilename={selectedPDF?.fullFilename}
       />
 
       {/* SOP Generation Modal */}

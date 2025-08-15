@@ -66,7 +66,8 @@ function EopPage() {
     
     setSelectedPDF({
       url: url,
-      name: filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')
+      name: filename.replace('.pdf', '').replace('.txt', '').replace('.html', ''),
+      fullFilename: filename  // Pass the full filename with extension
     });
     setIsModalOpen(true);
   };
@@ -560,6 +561,7 @@ function EopPage() {
         onClose={closeModal}
         pdfUrl={selectedPDF?.url}
         pdfName={selectedPDF?.name}
+        fullFilename={selectedPDF?.fullFilename}
       />
 
       <EOPGenerationModal

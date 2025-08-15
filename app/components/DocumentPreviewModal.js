@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName }) {
+export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName, fullFilename }) {
   const [iframeUrl, setIframeUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -238,9 +238,46 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
           minHeight: '60px'
         }}>
           {pdfUrl && (
-            <a
-              href={pdfUrl}
-              download
+            <button
+              onClick={async () => {
+                try {
+                  // For HTML files from serve-html API, we need to fetch the content
+                  if (pdfUrl.includes('/api/serve-html')) {
+                    const response = await fetch(pdfUrl);
+                    const htmlContent = await response.text();
+                    
+                    // Create a blob with the HTML content
+                    const blob = new Blob([htmlContent], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create download link with proper filename
+                    const link = document.createElement('a');
+                    link.href = url;
+                    // Use fullFilename if available, otherwise construct from pdfName
+                    const downloadName = fullFilename || (pdfName + '.html');
+                    link.download = downloadName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                  } else {
+                    // For regular files, use standard download
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    // Use fullFilename if available, otherwise use pdfName
+                    const downloadName = fullFilename || pdfName;
+                    link.download = downloadName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }
+                } catch (error) {
+                  console.error('Download error:', error);
+                  alert('Failed to download file');
+                }
+              }}
               style={{
                 padding: '10px 20px',
                 backgroundColor: '#28a745',
@@ -268,7 +305,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName 
               }}
             >
               Download {isHtml ? 'HTML' : isPdf ? 'PDF' : isTxt ? 'Text' : 'Document'}
-            </a>
+            </button>
           )}
           <button
             onClick={onClose}
