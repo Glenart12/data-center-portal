@@ -6,6 +6,294 @@ import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enha
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Helper Functions for Intelligent SOP Generation
+
+// Determine if task is intrusive or non-intrusive
+function determineTaskType(workDescription) {
+  const nonIntrusiveKeywords = [
+    'daily', 'check', 'observation', 'monitoring', 'visual', 
+    'reading', 'BMS', 'review', 'log', 'record', 'inspect visually',
+    'routine inspection', 'parameter recording', 'control panel'
+  ];
+  
+  const intrusiveKeywords = [
+    'maintenance', 'repair', 'replace', 'isolation', 'LOTO', 
+    'shutdown', 'startup', 'gauge', 'connect', 'open panel', 
+    'service', 'clean', 'test', 'calibrate', 'adjust', 'install',
+    'remove', 'drain', 'fill', 'torque', 'measure resistance'
+  ];
+  
+  const lowerDesc = workDescription.toLowerCase();
+  
+  // Check for intrusive indicators first (higher priority)
+  for (const keyword of intrusiveKeywords) {
+    if (lowerDesc.includes(keyword)) return 'intrusive';
+  }
+  
+  // Then check for non-intrusive
+  for (const keyword of nonIntrusiveKeywords) {
+    if (lowerDesc.includes(keyword)) return 'non-intrusive';
+  }
+  
+  return 'intrusive'; // Default to intrusive for safety
+}
+
+// Determine personnel required based on task type
+function calculatePersonnelRequired(taskType, isSubcontractor) {
+  let basePersonnel = taskType === 'non-intrusive' ? 1 : 2;
+  let escortRequired = isSubcontractor ? 1 : 0;
+  
+  return {
+    facilities: basePersonnel,
+    escort: escortRequired,
+    total: basePersonnel + escortRequired
+  };
+}
+
+// Generate PPE requirements based on task type and system
+function generatePPE(taskType, systemType, workDescription) {
+  const basePPE = [
+    { item: 'Safety Glasses', spec: 'ANSI Z87.1 compliant', when: 'Always in mechanical rooms' },
+    { item: 'Steel-Toe Safety Boots', spec: 'ANSI Z41 PT99 compliant', when: 'Always in mechanical rooms' }
+  ];
+  
+  const lowerSystem = systemType.toLowerCase();
+  const lowerDesc = workDescription.toLowerCase();
+  
+  if (taskType === 'non-intrusive') {
+    // Minimal PPE for observation only
+    basePPE.push(
+      { item: 'Hearing Protection', spec: 'NRR 25 dB earplugs/muffs', when: 'If prolonged exposure near operating equipment' }
+    );
+    // NO GLOVES for control panel only work
+  } else {
+    // Full PPE for intrusive work
+    basePPE.push(
+      { item: 'Work Gloves', spec: 'Cut-resistant, chemical-resistant', when: 'When handling tools or equipment' },
+      { item: 'Hearing Protection', spec: 'NRR 25 dB or higher', when: 'When working near operating equipment' }
+    );
+    
+    // Add electrical PPE if needed
+    if (lowerSystem.includes('electrical') || lowerSystem.includes('ups') || 
+        lowerSystem.includes('switchgear') || lowerDesc.includes('electrical')) {
+      basePPE.push(
+        { item: 'Arc Flash PPE', spec: 'Category 2 minimum', when: 'When working on electrical systems' },
+        { item: 'Insulated Gloves', spec: 'Class 0 voltage rated', when: 'When working on live electrical components' }
+      );
+    }
+    
+    // Add refrigerant PPE if needed
+    if (lowerSystem.includes('chiller') || lowerSystem.includes('crac') || 
+        lowerSystem.includes('cooling') || lowerDesc.includes('refrigerant')) {
+      basePPE.push(
+        { item: 'Chemical Gloves', spec: 'Nitrile or neoprene', when: 'When handling refrigerants' },
+        { item: 'Safety Goggles', spec: 'Chemical splash protection', when: 'When working with refrigerant systems' }
+      );
+    }
+  }
+  
+  return basePPE;
+}
+
+// Generate required tools based on task type and manufacturer
+function generateRequiredTools(taskType, manufacturer, systemType, personnelCount) {
+  const tools = [];
+  const lowerSystem = systemType.toLowerCase();
+  
+  if (taskType === 'non-intrusive') {
+    // Minimal tools for observation/reading only
+    tools.push(
+      { tool: 'Flashlight/Headlamp', spec: 'High-lumen LED', available: true },
+      { tool: 'Clipboard and Pen', spec: 'For recording readings', available: true }
+    );
+    
+    // Add communication device if single person
+    if (personnelCount === 1) {
+      tools.push({ tool: 'Site Radio/Communication Device', spec: 'Two-way radio or mobile phone', available: true });
+    }
+    
+    // Controller access based on manufacturer
+    if (manufacturer.toLowerCase().includes('carrier')) {
+      tools.push({ tool: 'ComfortLINK™ Access', spec: 'Operator password (no physical key required)', available: true });
+    } else if (manufacturer.toLowerCase().includes('trane')) {
+      tools.push({ tool: 'Tracer™ SC+ Access', spec: 'Login credentials required', available: true });
+    } else if (manufacturer.toLowerCase().includes('york')) {
+      tools.push({ tool: 'YorkTalk™ Access', spec: 'Operator login credentials', available: true });
+    } else if (manufacturer.toLowerCase().includes('liebert')) {
+      tools.push({ tool: 'iCOM™ Access', spec: 'Display panel access code', available: true });
+    } else {
+      tools.push({ tool: 'BMS/Control Panel Access', spec: 'Login credentials required', available: true });
+    }
+    // DO NOT include: Infrared Thermometer, Multimeter, Manifold Gauges, Hand tools for non-intrusive
+    
+  } else {
+    // Full tool set for intrusive work
+    tools.push(
+      { tool: 'Digital Multimeter', spec: 'CAT III 1000V rated', available: true },
+      { tool: 'Basic Hand Tools', spec: 'Screwdrivers, wrenches, pliers', available: true },
+      { tool: 'Flashlight/Headlamp', spec: 'High-lumen LED', available: true }
+    );
+    
+    // Add HVAC specific tools
+    if (lowerSystem.includes('chiller') || lowerSystem.includes('crac') || 
+        lowerSystem.includes('cooling') || lowerSystem.includes('hvac')) {
+      tools.push(
+        { tool: 'HVAC Manifold Gauge Set', spec: 'For refrigerant type in system', available: true },
+        { tool: 'Infrared Thermometer', spec: '-50°F to 1000°F range', available: true },
+        { tool: 'Refrigerant Recovery Equipment', spec: 'EPA certified', available: false }
+      );
+    }
+    
+    // Add electrical tools
+    if (lowerSystem.includes('electrical') || lowerSystem.includes('ups') || 
+        lowerSystem.includes('switchgear') || lowerSystem.includes('pdu')) {
+      tools.push(
+        { tool: 'LOTO Kit', spec: 'Locks, tags, and verification device', available: true },
+        { tool: 'Voltage Detector', spec: 'Non-contact voltage tester', available: true },
+        { tool: 'Insulated Tools', spec: '1000V rated tool set', available: true }
+      );
+    }
+    
+    // Add generator specific tools
+    if (lowerSystem.includes('generator')) {
+      tools.push(
+        { tool: 'Coolant Hydrometer', spec: 'For coolant testing', available: true },
+        { tool: 'Battery Hydrometer', spec: 'For battery specific gravity', available: true },
+        { tool: 'Fuel Sample Kit', spec: 'For fuel quality testing', available: false }
+      );
+    }
+  }
+  
+  return tools;
+}
+
+// Generate site-specific hazards based on task type and equipment
+function generateHazards(taskType, equipmentType, workDescription) {
+  const hazards = [];
+  const lowerEquip = equipmentType.toLowerCase();
+  const lowerDesc = workDescription.toLowerCase();
+  
+  // Always present hazards (area hazards)
+  hazards.push(
+    { type: 'Rotating Machinery', desc: 'Compressors, pumps, fans operating', control: 'Keep clear of moving parts, maintain safe distance' },
+    { type: 'Hot Surfaces', desc: 'Discharge lines, motor surfaces >140°F', control: 'No direct contact, use IR thermometer for readings' },
+    { type: 'Noise Exposure', desc: 'Operating equipment >85 dB', control: 'Wear hearing protection when required' },
+    { type: 'Slips/Trips/Falls', desc: 'Wet floors, equipment bases, raised platforms', control: 'Watch for hazards, clean spills immediately' }
+  );
+  
+  // Only add these for intrusive work
+  if (taskType === 'intrusive') {
+    hazards.push(
+      { type: 'Electrical Shock', desc: '480V/208V electrical systems', control: 'Follow LOTO procedures, verify zero energy' },
+      { type: 'Pressurized Systems', desc: 'Refrigerant lines (300+ PSI)', control: 'Depressurize before opening, wear PPE' },
+      { type: 'Chemical Exposure', desc: 'Refrigerants, oils, treatment chemicals', control: 'Use appropriate PPE, ensure ventilation' }
+    );
+    
+    // Add confined space if applicable
+    if (lowerDesc.includes('tank') || lowerDesc.includes('vessel') || lowerDesc.includes('confined')) {
+      hazards.push(
+        { type: 'Confined Space', desc: 'Limited entry/exit, potential atmosphere hazards', control: 'Follow confined space procedures, use gas monitor' }
+      );
+    }
+  }
+  
+  // Equipment-specific hazards
+  if (lowerEquip.includes('chiller')) {
+    hazards.push(
+      { type: 'Refrigerant Release', desc: 'R-134a/R-410A under pressure', control: 'Monitor for leaks, ensure ventilation' }
+    );
+  }
+  
+  if (lowerEquip.includes('generator')) {
+    hazards.push(
+      { type: 'Carbon Monoxide', desc: 'Exhaust gases in enclosed space', control: 'Ensure proper ventilation, use CO monitor' },
+      { type: 'Fuel Hazards', desc: 'Diesel fuel - flammable', control: 'No ignition sources, spill containment ready' }
+    );
+  }
+  
+  return hazards;
+}
+
+// Generate back-out procedures based on task type
+function generateBackoutProcedures(taskType, systemType) {
+  const lowerSystem = systemType.toLowerCase();
+  
+  if (taskType === 'non-intrusive') {
+    return [
+      { 
+        condition: 'Active alarms present on control panel',
+        action: 'Document alarm codes and descriptions, notify Operations Manager, do not attempt to clear',
+        verification: 'Screenshot or photo of alarm panel taken',
+        required: 'Escalation to Operations Manager within 15 minutes'
+      },
+      {
+        condition: 'Abnormal readings outside expected ranges',
+        action: 'Verify readings twice, document values with timestamp, escalate to Lead Technician',
+        verification: 'Readings documented in SOP form',
+        required: 'Lead Tech notification if >20% deviation from normal'
+      },
+      {
+        condition: 'Unusual noise, vibration, or odor detected',
+        action: 'Mark specific location, secure area if safety concern, notify Operations immediately',
+        verification: 'Area marked and documented',
+        required: 'Immediate notification if safety concern'
+      },
+      {
+        condition: 'Visible leaks or damage observed',
+        action: 'Document location/severity with photos, place drip containment if safe, notify Operations',
+        verification: 'Photos taken and containment placed',
+        required: 'Operations notified for repair scheduling'
+      },
+      {
+        condition: 'Unable to access BMS or control panel',
+        action: 'Check credentials, verify network connectivity, contact IT support if needed',
+        verification: 'Access attempt documented',
+        required: 'IT ticket submitted if access issue persists'
+      }
+    ];
+  } else {
+    // Intrusive work back-out procedures
+    const procedures = [
+      {
+        condition: 'System fails to start after maintenance',
+        action: 'Check all connections, verify control settings, review alarm history',
+        verification: 'All connections verified secure',
+        required: 'Escalate to manufacturer support if needed'
+      },
+      {
+        condition: 'Abnormal vibration or noise after service',
+        action: 'Stop equipment immediately, check mounting and alignment',
+        verification: 'Equipment stopped safely',
+        required: 'Do not restart until issue resolved'
+      },
+      {
+        condition: 'Refrigerant leak detected during service',
+        action: 'Isolate section, evacuate area if major, begin recovery procedures',
+        verification: 'Area evacuated and ventilated',
+        required: 'Environmental spill response if >10 lbs'
+      },
+      {
+        condition: 'Electrical fault or arc flash',
+        action: 'De-energize immediately, assess personnel, initiate emergency response',
+        verification: 'Power secured at main disconnect',
+        required: 'Call 911 if injuries, notify Safety Officer'
+      }
+    ];
+    
+    // Add system-specific procedures
+    if (lowerSystem.includes('ups')) {
+      procedures.push({
+        condition: 'UPS fails to transfer to bypass',
+        action: 'Initiate manual bypass procedure, notify critical load customers',
+        verification: 'Manual bypass engaged successfully',
+        required: 'Customer notification within 5 minutes'
+      });
+    }
+    
+    return procedures;
+  }
+}
+
 const SOP_INSTRUCTIONS = `
 You are an expert data center operations engineer creating a Standard Operating Procedure (SOP) document.
 Generate a comprehensive, professional SOP document in HTML format with ALL 12 sections listed below.
@@ -88,10 +376,11 @@ MUST format EXACTLY as:
 </table>
 <h3>Personnel Required:</h3>
 <table class="info-table">
-  <tr><td># of Facilities Personnel:</td><td><input type="text" value="2" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
+  <tr><td># of Facilities Personnel:</td><td><input type="text" value="[DYNAMIC based on task type]" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
   <tr><td># of Contractors #1:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
   <tr><td># of Contractors #2:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
   <tr><td># of Customers:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
+  <tr><td>Note:</td><td>[Add note if task is non-intrusive about single technician]</td></tr>
 </table>
 
 Section 04: Effect of SOP on Critical Facility
@@ -164,6 +453,37 @@ Section 06: Safety Requirements
     <td><input type="text" placeholder="Name" style="border: 1px solid #999; padding: 2px;"></td>
     <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
   </tr>
+  <tr>
+    <td>Facility Manager</td>
+    <td><input type="text" placeholder="Name" style="border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  <tr>
+    <td>Lead Technician On-Call</td>
+    <td><input type="text" placeholder="Name" style="border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  <tr>
+    <td>HVAC Service Provider</td>
+    <td><input type="text" placeholder="Company" style="border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  <tr>
+    <td>Electrical Contractor</td>
+    <td><input type="text" placeholder="Company" style="border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  <tr>
+    <td>Environmental Spill Response</td>
+    <td><input type="text" placeholder="Company" style="border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  <tr>
+    <td>Customer NOC</td>
+    <td><input type="text" placeholder="Name" style="border: 1px solid #999; padding: 2px;"></td>
+    <td><input type="text" placeholder="Phone" style="border: 1px solid #999; padding: 2px;"></td>
+  </tr>
+  <!-- Add manufacturer-specific support if applicable -->
 </table>
 
 <h3>Site-Specific Hazards</h3>
@@ -177,6 +497,35 @@ Section 06: Safety Requirements
 </table>
 
 Section 07: SOP Risks & Assumptions
+<h3>System Redundancy Assessment</h3>
+<table class="info-table">
+  <tr>
+    <td>System Redundancy Level:</td>
+    <td>
+      <select style="border: 1px solid #999; padding: 2px;">
+        <option>Unknown</option>
+        <option>None</option>
+        <option>N+1</option>
+        <option>N+2</option>
+        <option>2N</option>
+      </select>
+    </td>
+  </tr>
+  <tr><td>Total Units in System:</td><td><input type="text" placeholder="e.g., 4" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
+  <tr><td>Units Required for Full Load:</td><td><input type="text" placeholder="e.g., 3" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
+  <tr>
+    <td>Impact if This Unit Fails:</td>
+    <td>
+      <select style="border: 1px solid #999; padding: 2px; width: 350px;">
+        <option>No immediate impact (redundancy available)</option>
+        <option>Reduced redundancy but load maintained</option>
+        <option>Partial load loss possible</option>
+        <option>Critical load loss likely</option>
+      </select>
+    </td>
+  </tr>
+</table>
+
 <h3>Risk Analysis Matrix</h3>
 <table>
   <tr>
@@ -488,7 +837,26 @@ export async function POST(request) {
     
     console.log('Starting SOP generation for:', formData.manufacturer, formData.modelNumber);
     
-    // Determine LOR based on same logic as MOP generation
+    // Determine task type (intrusive vs non-intrusive)
+    const taskType = determineTaskType(formData.description || '');
+    console.log('Task type determined:', taskType);
+    
+    // Calculate personnel requirements
+    const personnel = calculatePersonnelRequired(taskType, false);
+    
+    // Generate dynamic PPE requirements
+    const ppeRequirements = generatePPE(taskType, formData.system || '', formData.description || '');
+    
+    // Generate required tools
+    const requiredTools = generateRequiredTools(taskType, formData.manufacturer || '', formData.system || '', personnel.facilities);
+    
+    // Generate site-specific hazards
+    const siteHazards = generateHazards(taskType, formData.system || '', formData.description || '');
+    
+    // Generate back-out procedures
+    const backoutProcedures = generateBackoutProcedures(taskType, formData.system || '');
+    
+    // Determine LOR based on task type and system criticality
     let riskLevel = 2;
     let riskJustification = "Single system affected with redundancy available";
     
@@ -496,7 +864,10 @@ export async function POST(request) {
     const system = formData.system?.toLowerCase() || '';
     const procedureType = formData.procedureType?.toLowerCase() || '';
     
-    if (workDescription.includes('electrical') && system.includes('switchgear')) {
+    if (taskType === 'non-intrusive') {
+      riskLevel = 1;
+      riskJustification = "Read-only observation of operating parameters via BMS/control panel. No physical intervention or system changes.";
+    } else if (workDescription.includes('electrical') && system.includes('switchgear')) {
       riskLevel = 4;
       riskJustification = "Main switchgear work affects entire facility";
     } else if (system.includes('chiller') && (workDescription.includes('major') || procedureType.includes('annual'))) {
@@ -508,9 +879,9 @@ export async function POST(request) {
     } else if (system.includes('ups')) {
       riskLevel = 3;
       riskJustification = "Critical power protection system";
-    } else if (procedureType.includes('daily') || procedureType.includes('routine')) {
-      riskLevel = 1;
-      riskJustification = "Routine non-intrusive checks";
+    } else {
+      riskLevel = 2;
+      riskJustification = "Intrusive work requiring system interaction. Proper isolation and safety procedures required.";
     }
     
     // Auto-calculate duration based on procedure type
@@ -566,6 +937,30 @@ export async function POST(request) {
       qualificationsRequired += `, ${formData.manufacturer} Certified Technician (preferred)`;
     }
     
+    // Format dynamic content for prompt
+    const ppeTable = ppeRequirements.map(ppe => 
+      `<tr><td>${ppe.item}</td><td>${ppe.spec}</td><td>${ppe.when}</td></tr>`
+    ).join('\n');
+    
+    const toolsTable = requiredTools.map(tool => 
+      `<tr><td>${tool.tool}</td><td>${tool.spec}</td><td><input type="checkbox" ${tool.available ? 'checked' : ''}> Available</td></tr>`
+    ).join('\n');
+    
+    const hazardsTable = siteHazards.map(hazard => 
+      `<tr><td>${hazard.type}</td><td>${hazard.desc}</td><td>${hazard.control}</td></tr>`
+    ).join('\n');
+    
+    const backoutTable = backoutProcedures.map((proc, idx) => 
+      `<tr>
+        <td>${idx + 1}</td>
+        <td>${proc.condition}</td>
+        <td>${proc.verification}</td>
+        <td>${proc.required}</td>
+        <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+        <td><input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;"></td>
+      </tr>`
+    ).join('\n');
+    
     // Prepare the prompt for Gemini
     const prompt = `${SOP_INSTRUCTIONS}
 
@@ -579,6 +974,7 @@ Equipment Details:
 - Procedure Type: ${formData.procedureType}
 - Frequency: ${formData.frequency || 'As per procedure type'}
 - Procedure Description: ${formData.description}
+- Task Type: ${taskType.toUpperCase()}
 
 Customer Information:
 - Customer: ${formData.customer}
@@ -586,6 +982,7 @@ Customer Information:
 
 Auto-Populated Values:
 - Qualifications Required: ${qualificationsRequired}
+- Personnel Required: ${personnel.facilities} Facilities Personnel${taskType === 'non-intrusive' ? ' (Single technician sufficient for non-intrusive observation)' : ''}
 
 Site Address:
 - Street: ${formData.address?.street || 'UPDATE NEEDED'}
@@ -600,6 +997,20 @@ CALCULATED VALUES:
 - CET Level Required: ${cetRequired[riskLevel]}
 
 Current Date: ${currentDate}
+
+DYNAMIC CONTENT TO INCLUDE:
+
+PPE Requirements (Use this exact table in Section 6):
+${ppeTable}
+
+Required Tools (Use this exact table in Section 6):
+${toolsTable}
+
+Site-Specific Hazards (Use this exact table in Section 6):
+${hazardsTable}
+
+Back-out Procedures (Use this exact content in Section 9):
+${backoutTable}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Start with <h1>Standard Operating Procedure (SOP)</h1> and proceed with all 12 sections using H2 headers.
@@ -616,17 +1027,25 @@ CRITICAL REQUIREMENTS:
 3. Section 01 MUST show CET Level Required as: "${cetRequired[riskLevel]}" with italic text "Based on risk level assessment"
 4. Section 01 MUST have editable input fields for Author, Version, Author CET Level
 5. Section 02 MUST show Customer: ${formData.customer} and Site Name: ${formData.siteName || 'UPDATE NEEDED'}
-6. Section 03 MUST show fillable checkboxes for Work Performed By and input fields for subcontractor details
-7. Section 03 MUST auto-populate Qualifications Required as: "${qualificationsRequired}"
-8. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
-9. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
-10. Section 05 MUST base documentation on LOR ${riskLevel}
-11. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
-12. Section 07 MUST include Risk Matrix, Assumptions, and Decision Points in table format
-13. Section 08 MUST use tables with Initials and Time columns for ALL subsections (8.1 and 8.2)
-14. Section 09 MUST be titled "Back-out Procedures" with table including Initials and Time columns
-15. Section 11 MUST ONLY have Technician Sign-off (no other content)
-16. ALL tables in Sections 8 and 9 MUST have Initials and Time cells with input fields: <input type="text" style="width: 95%; border: 1px solid #999; padding: 2px;">
+6. Section 03 MUST show:
+   - Fillable checkboxes for Work Performed By and input fields for subcontractor details
+   - Auto-populate Qualifications Required as: "${qualificationsRequired}"
+   - Personnel count: ${personnel.facilities} for Facilities Personnel
+   - Add note: "${taskType === 'non-intrusive' ? 'Single technician sufficient for non-intrusive observation tasks. Add escort if subcontractor performs work.' : ''}"
+7. Section 06 MUST use the EXACT dynamic content provided:
+   - PPE table with the specific items provided above
+   - Tools table with the specific tools provided above
+   - Emergency contacts in EOP format with all 8 contact types
+   - Site hazards table with the specific hazards provided above
+8. Section 07 MUST include:
+   - System Redundancy Assessment table with dropdowns and input fields
+   - Risk justification: "${riskJustification}"
+9. Section 08 MUST:
+   - For non-intrusive tasks: Focus on reading from BMS/control panel only, NO physical measurements
+   - For intrusive tasks: Include full maintenance procedures with physical tools
+   - Use tables with input fields in Initials and Time columns
+10. Section 09 MUST use the EXACT back-out procedures provided in the dynamic content
+11. ALL tables in Sections 8 and 9 MUST have Initials and Time cells with input fields
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
