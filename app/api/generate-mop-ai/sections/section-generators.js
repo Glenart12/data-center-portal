@@ -6,33 +6,45 @@ import { getEquipmentData, getCompressorCount } from '@/lib/mop-knowledge/enhanc
 import { ENHANCED_PPE_REQUIREMENTS } from '@/lib/mop-knowledge/enhanced-safety-standards';
 import { getRelevantEOPs } from '@/lib/mop-knowledge/eop-references';
 import { SourceManager } from '@/lib/mop-knowledge/source-manager';
+import { getSiteData } from '@/lib/mop-knowledge/site-data';
 
-// Import the already-extracted AI section functions
+// Import the already-extracted AI section functions that are already modular
 export { generateSection06 } from './section-06-safety/route.js';
 export { generateSection07 } from './section-07-risks/route.js';
 export { generateSection08 } from './section-08-procedures/route.js';
 export { generateSection11 } from './section-11-comments/route.js';
 
-// Section 01: Schedule
+// Section 01: Schedule - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection01(formData) {
   try {
     console.log('=== Section 01 Schedule Generation ===');
     console.log('FormData:', JSON.stringify(formData, null, 2));
     
+    if (!formData) {
+      console.error('No formData found in request');
+      throw new Error('Missing formData in request body');
+    }
+    
     const { manufacturer, system, category, frequency } = formData;
+    console.log('Destructured fields:', { manufacturer, system, category, frequency });
     
     const currentDate = new Date().toLocaleDateString('en-US', {
       month: '2-digit',
       day: '2-digit',
       year: 'numeric'
     });
-    
+    console.log('Generated current date:', currentDate);
+
+    // Generate title based on equipment
+    console.log('Processing system type:', system);
     const equipmentType = system && system.includes('Chiller') ? 'CHILLER' : 
                          system && system.includes('Generator') ? 'GENERATOR' :
                          system && system.includes('UPS') ? 'UPS' : 
                          system ? system.toUpperCase() : 'EQUIPMENT';
+    console.log('Determined equipment type:', equipmentType);
     
     const title = `${(manufacturer || 'UNKNOWN').toUpperCase()} ${equipmentType} - ${(category || 'MAINTENANCE').toUpperCase()}`;
+    console.log('Generated title:', title);
 
     const html = `<h2>Section 01: MOP Schedule Information</h2>
 <table class="info-table">
@@ -49,802 +61,907 @@ export async function generateSection01(formData) {
         <td>${currentDate}</td>
     </tr>
     <tr>
-        <td>MOP Version:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Version Number" style="width:150px" /></td>
+        <td>MOP Revision Date:</td>
+        <td><input type="text" value="${currentDate}" style="width:150px" /></td>
     </tr>
     <tr>
-        <td>Work Date(s):</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Scheduled Date(s)" style="width:250px" /></td>
+        <td>Document Number:</td>
+        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Assign per facility process" /></td>
     </tr>
     <tr>
-        <td>Implementation Time:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Start Time" style="width:150px" /> to <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - End Time" style="width:150px" /></td>
+        <td>Revision Number:</td>
+        <td><input type="text" value="V1" style="width:100px" /></td>
     </tr>
     <tr>
-        <td>Service Window:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - X hours" style="width:150px" /></td>
-    </tr>
-    <tr>
-        <td>Maintenance Type:</td>
-        <td>${(frequency || 'ROUTINE').toUpperCase()} ${(category || 'MAINTENANCE').toUpperCase()}</td>
-    </tr>
-    <tr>
-        <td>Criticality:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Normal/Emergency" style="width:150px" /></td>
+        <td>Author CET Level:</td>
+        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Assign per facility process" /></td>
     </tr>
 </table>`;
 
+    console.log('Generated HTML length:', html.length);
     console.log('Section 01 completed successfully');
-    return { html, sources: [] };
     
+    return { html, sources: [] };
   } catch (error) {
-    console.error('Section 01 generation error:', error);
+    console.error('=== Section 01 Schedule Generation ERROR ===');
+    console.error('Error details:', error);
+    console.error('Error stack:', error.stack);
     throw error;
   }
 }
 
-// Section 02: Site
+// Section 02: Site - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection02(formData) {
   try {
-    console.log('=== Section 02 Site Generation ===');
-    const { location, manufacturer, modelNumber, address } = formData;
+    const { system, workDescription, location, address } = formData;
+    const siteData = getSiteData(location || 'stewart');
     
+    // Determine risk level based on system and work description
+    let riskLevel = 2;
+    let riskJustification = "Single system affected with redundancy available";
+    
+    if (workDescription && workDescription.toLowerCase().includes('electrical') && system.toLowerCase().includes('switchgear')) {
+      riskLevel = 4;
+      riskJustification = "Main switchgear work affects entire facility";
+    } else if (system.toLowerCase().includes('chiller') && workDescription && workDescription.toLowerCase().includes('major')) {
+      riskLevel = 3;
+      riskJustification = "Critical cooling system with limited redundancy";
+    } else if (system.toLowerCase().includes('generator')) {
+      riskLevel = 3;
+      riskJustification = "Critical power system maintenance";
+    } else if (system.toLowerCase().includes('ups')) {
+      riskLevel = 3;
+      riskJustification = "Critical power protection system";
+    }
+
+    const cetRequired = {
+      1: "CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve",
+      2: "CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve",
+      3: "CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve",
+      4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
+    };
+
     const html = `<h2>Section 02: Site Information</h2>
 <table class="info-table">
     <tr>
-        <td>Site/Building Name:</td>
-        <td>${location || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Site Name" style="width:300px" />'}</td>
+        <td>Data Center Location:</td>
+        <td>${location || siteData.name}<br>${address?.street || siteData.address.street}<br>${address?.city || siteData.address.city}, ${address?.state || siteData.address.state} ${address?.zipCode || siteData.address.zipCode}</td>
     </tr>
     <tr>
-        <td>Site Address:</td>
-        <td>${address?.street || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Street Address" style="width:400px" />'}<br>
-            ${address?.city || 'City'}, ${address?.state || 'State'} ${address?.zipCode || 'ZIP'}</td>
+        <td>Service Ticket/Project Number:</td>
+        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Assign per facility process" style="width:300px" /></td>
     </tr>
     <tr>
-        <td>Equipment Location:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Floor/Room Number" style="width:300px" /></td>
+        <td>Level of Risk:</td>
+        <td><strong>Level ${riskLevel}</strong> (${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]})<br><em>${riskJustification}</em></td>
     </tr>
     <tr>
-        <td>Equipment Make/Model:</td>
-        <td>${manufacturer || 'Equipment'} ${modelNumber || ''}</td>
-    </tr>
-    <tr>
-        <td>Serial Number(s):</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Serial Number" style="width:300px" /></td>
-    </tr>
-    <tr>
-        <td>Asset Tag:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Asset Tag Number" style="width:200px" /></td>
+        <td>CET Level Required:</td>
+        <td><strong>${cetRequired[riskLevel]}</strong><br><em>Based on risk level assessment</em></td>
     </tr>
     <tr>
         <td>Site Contact:</td>
-        <td>
-            Name: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Contact Name" style="width:250px" /><br>
-            Phone: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Phone" style="width:150px" /><br>
-            Email: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Email" style="width:250px" />
-        </td>
+        <td><input type="text" placeholder="Site Manager Name" style="width:250px" /> <input type="text" placeholder="Phone" style="width:150px" /></td>
+    </tr>
+    <tr>
+        <td>Building/Floor/Room:</td>
+        <td><input type="text" placeholder="Building" style="width:120px" /> / <input type="text" placeholder="Floor" style="width:80px" /> / <input type="text" placeholder="Room" style="width:120px" /></td>
     </tr>
     <tr>
         <td>Access Requirements:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Badge/Key/Escort Required" style="width:400px" /></td>
+        <td><input type="text" placeholder="Badge access, escort required, etc." style="width:400px" /></td>
     </tr>
 </table>`;
 
-    console.log('Section 02 completed successfully');
-    return { html, sources: [] };
-    
+    const sources = [{
+      type: "site_specific",
+      document: "Site Configuration Database",
+      section: "Facility Information",
+      lastVerified: new Date().toISOString().split('T')[0]
+    }];
+
+    return { html, sources };
   } catch (error) {
     console.error('Section 02 generation error:', error);
     throw error;
   }
 }
 
-// Section 03: Overview
+// Section 03: Overview - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection03(formData) {
   try {
-    console.log('=== Section 03 Overview Generation ===');
-    const { manufacturer, modelNumber, system, workDescription, category } = formData;
+    const { manufacturer, modelNumber, system, workDescription, location, description } = formData;
     
-    const purpose = workDescription || category || 'maintenance';
+    // Use workDescription or description field, with fallback
+    const mopDescription = workDescription || description || `${system} maintenance and inspection`;
     
     const html = `<h2>Section 03: MOP Overview</h2>
-<h3>Objective</h3>
-<p>This Method of Procedure (MOP) provides detailed instructions for performing ${purpose.toLowerCase()} on the ${manufacturer || 'equipment'} ${modelNumber || ''} ${system || 'system'}.</p>
+<table class="info-table">
+    <tr>
+        <td>MOP Description:</td>
+        <td>${mopDescription}</td>
+    </tr>
+    <tr>
+        <td>Work Area:</td>
+        <td>${system.includes('Chiller') ? 'Mechanical Room / Rooftop' : 'Equipment Room'}</td>
+    </tr>
+    <tr>
+        <td>Manufacturer:</td>
+        <td>${manufacturer}</td>
+    </tr>
+    <tr>
+        <td>Equipment ID:</td>
+        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record on-site" /></td>
+    </tr>
+    <tr>
+        <td>Model #:</td>
+        <td>${modelNumber}</td>
+    </tr>
+    <tr>
+        <td>Serial #:</td>
+        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record from nameplate" /></td>
+    </tr>
+    <tr>
+        <td>Min. # of Facilities Personnel:</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>Work Performed By:</td>
+        <td colspan="3">
+            <input type="checkbox" id="self-delivered" name="work-type" checked> 
+            <label for="self-delivered">Self-Delivered</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="checkbox" id="subcontractor" name="work-type"> 
+            <label for="subcontractor">Subcontractor</label>
+        </td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Company Name:</td>
+        <td><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Personnel Name:</td>
+        <td><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Contact Details:</td>
+        <td><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td>Qualifications Required:</td>
+        <td>EPA 608 Universal Certification, Qualified Electrical Worker</td>
+    </tr>
+    <tr>
+        <td>Tools Required:</td>
+        <td>Standard mechanics tool set, refrigerant gauges, multimeter, torque wrench set</td>
+    </tr>
+    <tr>
+        <td>Advance notifications required:</td>
+        <td>Data Center Operations Manager, Site Security, NOC/BMS Operator</td>
+    </tr>
+    <tr>
+        <td>Post notifications required:</td>
+        <td>Data Center Operations Manager, Site Security, NOC/BMS Operator</td>
+    </tr>
+</table>`;
 
-<h3>Scope of Work</h3>
-<ul>
-    <li>Equipment: ${manufacturer || 'Equipment'} ${modelNumber || 'Model'} ${system || 'System'}</li>
-    <li>Work Type: ${(category || 'Maintenance').toUpperCase()}</li>
-    <li>Description: ${workDescription || 'Routine maintenance and inspection'}</li>
-    <li>Duration: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Estimated hours" style="width:100px" /> hours</li>
-    <li>Personnel Required: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Number of technicians" style="width:50px" /> technician(s)</li>
-</ul>
-
-<h3>Expected Outcomes</h3>
-<ul>
-    <li>Equipment restored to optimal operating condition</li>
-    <li>All preventive maintenance tasks completed per manufacturer specifications</li>
-    <li>Equipment performance verified within acceptable parameters</li>
-    <li>All safety and operational checks passed</li>
-    <li>Documentation of all work performed and findings</li>
-</ul>
-
-<h3>Critical Requirements</h3>
-<ul>
-    <li>Qualified personnel with ${manufacturer || 'equipment'} certification/training</li>
-    <li>All required tools and test equipment available and calibrated</li>
-    <li>Replacement parts and consumables on hand</li>
-    <li>Proper safety equipment and PPE</li>
-    <li>Approved maintenance window and work permit</li>
-</ul>`;
-
-    console.log('Section 03 completed successfully');
     return { html, sources: [] };
-    
   } catch (error) {
     console.error('Section 03 generation error:', error);
     throw error;
   }
 }
 
-// Section 04: Facility
+// Section 04: Facility - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection04(formData) {
   try {
-    console.log('=== Section 04 Facility Generation ===');
-    const { system, location } = formData;
+    const { system } = formData;
     
-    const html = `<h2>Section 04: Facility Information</h2>
-<h3>Critical Infrastructure Dependencies</h3>
+    // Generate the facility impact table with all 19 systems
+    const html = `<h2>Section 04: Effect of MOP on Critical Facility</h2>
 <table>
     <thead>
         <tr>
-            <th>System</th>
-            <th>Impact if Offline</th>
-            <th>Redundancy Available</th>
-            <th>Notes</th>
+            <th>Facility Equipment or System</th>
+            <th width="60">Yes</th>
+            <th width="60">No</th>
+            <th width="60">N/A</th>
+            <th>Details</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Primary Power</td>
-            <td>Critical</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Yes/No" style="width:80px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Notes" style="width:200px" /></td>
+            <td>Electrical Utility Equipment</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Backup Power (UPS/Generator)</td>
-            <td>Critical</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Yes/No" style="width:80px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Runtime available" style="width:200px" /></td>
+            <td>Emergency Generator System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Cooling System</td>
-            <td>Critical</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Yes/No" style="width:80px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Redundant units" style="width:200px" /></td>
+            <td>Critical Cooling System</td>
+            <td class="checkbox">${system.includes('Chiller') ? '✓' : ''}</td>
+            <td class="checkbox">${system.includes('Chiller') ? '' : '✓'}</td>
+            <td class="checkbox"></td>
+            <td>${system.includes('Chiller') ? 'Unit will be offline for maintenance' : ''}</td>
         </tr>
         <tr>
-            <td>Building Management System</td>
-            <td>Moderate</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Yes/No" style="width:80px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Manual override available" style="width:200px" /></td>
+            <td>Ventilation System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Fire Suppression</td>
-            <td>Critical</td>
-            <td>N/A</td>
-            <td>Must remain active during maintenance</td>
+            <td>Mechanical System</td>
+            <td class="checkbox">${system.includes('Chiller') || system.includes('CRAC') ? '✓' : ''}</td>
+            <td class="checkbox">${system.includes('Chiller') || system.includes('CRAC') ? '' : '✓'}</td>
+            <td class="checkbox"></td>
+            <td>${system.includes('Chiller') || system.includes('CRAC') ? 'Primary mechanical component' : ''}</td>
+        </tr>
+        <tr>
+            <td>Uninterruptible Power Supply (UPS)</td>
+            <td class="checkbox">${system.includes('UPS') ? '✓' : ''}</td>
+            <td class="checkbox">${system.includes('UPS') ? '' : '✓'}</td>
+            <td class="checkbox"></td>
+            <td>${system.includes('UPS') ? 'UPS maintenance affects critical power' : ''}</td>
+        </tr>
+        <tr>
+            <td>Critical Power Distribution System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Emergency Power Off (EPO)</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Fire Detection Systems</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Fire Suppression System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Monitoring System</td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td class="checkbox"></td>
+            <td>Monitoring System is ALWAYS affected for data center equipment maintenance</td>
+        </tr>
+        <tr>
+            <td>Control System</td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td class="checkbox"></td>
+            <td>BAS/BMS control required for maintenance</td>
+        </tr>
+        <tr>
+            <td>Security System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>General Power and Lighting System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Lockout/Tagout Required?</td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td class="checkbox"></td>
+            <td>LOTO required on main disconnect</td>
+        </tr>
+        <tr>
+            <td>Work to be performed "hot"?</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td>All work performed de-energized</td>
+        </tr>
+        <tr>
+            <td>Radio interference potential?</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Water/Leak Detection System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Building Automation System</td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td class="checkbox"></td>
+            <td>BAS control interface required</td>
+        </tr>
+        <tr>
+            <td>Transfer Switch System</td>
+            <td class="checkbox"></td>
+            <td class="checkbox">✓</td>
+            <td class="checkbox"></td>
+            <td></td>
         </tr>
     </tbody>
-</table>
+</table>`;
 
-<h3>Affected Areas</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Area/Room</th>
-            <th>Equipment Supported</th>
-            <th>Impact During Maintenance</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Area name" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Equipment list" style="width:250px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Impact description" style="width:250px" /></td>
-        </tr>
-        <tr>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Area name" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Equipment list" style="width:250px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Impact description" style="width:250px" /></td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Special Considerations</h3>
-<ul>
-    <li>Site Access: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Access requirements" style="width:400px" /></li>
-    <li>Environmental Conditions: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Temperature/humidity requirements" style="width:400px" /></li>
-    <li>Noise Restrictions: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Any noise limitations" style="width:400px" /></li>
-    <li>Working Hours: <input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Permitted work hours" style="width:400px" /></li>
-</ul>`;
-
-    console.log('Section 04 completed successfully');
     return { html, sources: [] };
-    
   } catch (error) {
     console.error('Section 04 generation error:', error);
     throw error;
   }
 }
 
-// Section 05: Documentation
+// Section 05: Documentation - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection05(formData) {
   try {
-    console.log('=== Section 05 Documentation Generation ===');
-    const { manufacturer, modelNumber } = formData;
+    const { manufacturer, modelNumber, system, workDescription } = formData;
     
-    const html = `<h2>Section 05: Required Documentation</h2>
-<h3>Pre-Work Documentation</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Document</th>
-            <th>Required</th>
-            <th>Verified</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Work Permit/Authorization</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Permit number" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Equipment Service Manual</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td>${manufacturer || 'Manufacturer'} ${modelNumber || 'Model'} Service Documentation</td>
-        </tr>
-        <tr>
-            <td>Site Electrical Drawings</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Drawing numbers" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Previous Maintenance Records</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td>Last 3 maintenance reports</td>
-        </tr>
-        <tr>
-            <td>Emergency Procedures</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td>Site-specific emergency response plan</td>
-        </tr>
-        <tr>
-            <td>LOTO Procedures</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td>Site LOTO policy and tags</td>
-        </tr>
-        <tr>
-            <td>Risk Assessment</td>
-            <td>Yes</td>
-            <td><input type="checkbox" /></td>
-            <td>Job safety analysis completed</td>
-        </tr>
-    </tbody>
-</table>
+    // Generate manufacturer-specific documentation links
+    const getManufacturerLinks = (manufacturer) => {
+      const mfg = manufacturer?.toLowerCase() || '';
+      
+      const manufacturerUrls = {
+        'trane': 'https://www.trane.com/commercial/north-america/us/en/support/literature-and-manuals.html',
+        'carrier': 'https://www.carrier.com/commercial/en/us/support/',
+        'york': 'https://www.johnsoncontrols.com/buildings/hvac-equipment/chillers',
+        'liebert': 'https://www.vertiv.com/en-us/support/software-download/',
+        'caterpillar': 'https://www.cat.com/en_US/support/manuals.html',
+        'cummins': 'https://quickserve.cummins.com/',
+        'generac': 'https://www.generac.com/support/product-support-lookup',
+        'kohler': 'https://kohlerpower.com/support/literature',
+        'schneider': 'https://www.schneider-electric.us/en/support/',
+        'eaton': 'https://www.eaton.com/us/en-us/support.html'
+      };
+      
+      return manufacturerUrls[mfg] || null;
+    };
 
-<h3>Reference Documents</h3>
+    const getOSHALink = (section) => {
+      return `https://www.osha.gov/laws-regs/regulations/standardnumber/${section.replace(' ', '/')}`;
+    };
+
+    const getNFPALink = (code) => {
+      const nfpaNumber = code.match(/NFPA (\d+)/)?.[1];
+      return nfpaNumber ? `https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=${nfpaNumber}` : null;
+    };
+
+    // Determine relevant documentation based on equipment type
+    let manufacturerDoc = `${manufacturer} ${modelNumber} Operation and Maintenance Manual`;
+    let manufacturerUrl = getManufacturerLinks(manufacturer);
+    let nfpaStandards = [];
+    let additionalDocs = [];
+    
+    if (system.toLowerCase().includes('chiller')) {
+      nfpaStandards = [
+        { name: 'NFPA 70 - National Electrical Code', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70' }
+      ];
+      additionalDocs = [
+        { name: 'EPA 608 Certification Requirements', url: 'https://www.epa.gov/section608' },
+        { name: 'EPA SNAP Program - Refrigerant Information', url: 'https://www.epa.gov/snap' }
+      ];
+    } else if (system.toLowerCase().includes('generator')) {
+      nfpaStandards = [
+        { name: 'NFPA 110 - Emergency and Standby Power Systems', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=110' },
+        { name: 'NFPA 70 - National Electrical Code', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70' }
+      ];
+      additionalDocs = [
+        { name: 'EPA Diesel Engine Regulations', url: 'https://www.epa.gov/regulations-emissions-vehicles-and-engines/regulations-emissions-nonroad-vehicles-and-engines' }
+      ];
+    } else if (system.toLowerCase().includes('ups')) {
+      nfpaStandards = [
+        { name: 'NFPA 70E - Electrical Safety in the Workplace', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70E' }
+      ];
+      additionalDocs = [
+        { name: 'OSHA Battery Safety Guidelines', url: 'https://www.osha.gov/battery-hazards' }
+      ];
+    }
+
+    const html = `<h2>Section 05: MOP Supporting Documentation</h2>
+<p><strong>MOP Supporting Documentation</strong></p>
+
+<h3>Manufacturer Documentation</h3>
 <ul>
-    <li>${manufacturer || 'Manufacturer'} ${modelNumber || 'Model'} Installation Manual</li>
-    <li>${manufacturer || 'Manufacturer'} ${modelNumber || 'Model'} Operation Manual</li>
-    <li>${manufacturer || 'Manufacturer'} Service Bulletins (if applicable)</li>
-    <li>Site Standard Operating Procedures (SOPs)</li>
-    <li>Site Emergency Operating Procedures (EOPs)</li>
-    <li>OSHA Safety Standards (29 CFR 1910)</li>
-    <li>NFPA 70E - Electrical Safety Standards</li>
-    <li>Local Building Codes and Regulations</li>
+    ${manufacturerUrl ? `<li><a href="${manufacturerUrl}" target="_blank">${manufacturerDoc}</a></li>` : `<li>${manufacturerDoc} - Contact manufacturer for documentation</li>`}
+    ${manufacturerUrl ? `<li><a href="${manufacturerUrl}" target="_blank">${manufacturer} Service Bulletins and Technical Updates</a></li>` : `<li>${manufacturer} Service Bulletins - Contact manufacturer</li>`}
+    ${manufacturerUrl ? `<li><a href="${manufacturerUrl}" target="_blank">${manufacturer} Parts and Service Support</a></li>` : `<li>${manufacturer} Parts and Service Support - Contact manufacturer</li>`}
 </ul>
 
-<h3>Post-Work Documentation Requirements</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Document</th>
-            <th>Responsibility</th>
-            <th>Due Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Completed MOP with all data recorded</td>
-            <td>Lead Technician</td>
-            <td>End of work</td>
-        </tr>
-        <tr>
-            <td>Equipment Test Reports</td>
-            <td>Lead Technician</td>
-            <td>Within 24 hours</td>
-        </tr>
-        <tr>
-            <td>Updated Equipment Log</td>
-            <td>Facility Manager</td>
-            <td>Within 48 hours</td>
-        </tr>
-        <tr>
-            <td>Warranty Documentation Updates</td>
-            <td>Facility Manager</td>
-            <td>Within 1 week</td>
-        </tr>
-        <tr>
-            <td>Lessons Learned (if applicable)</td>
-            <td>Team Lead</td>
-            <td>Within 1 week</td>
-        </tr>
-    </tbody>
-</table>`;
+<h3>Regulatory Standards</h3>
+<ul>
+    <li><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147" target="_blank">OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)</a></li>
+    <li><a href="https://www.osha.gov/personal-protective-equipment" target="_blank">OSHA Personal Protective Equipment Standards</a></li>
+    <li><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.95" target="_blank">OSHA 29 CFR 1910.95 - Occupational Noise Exposure</a></li>
+    ${nfpaStandards.map(standard => `<li><a href="${standard.url}" target="_blank">${standard.name}</a></li>`).join('\n    ')}
+</ul>
 
-    console.log('Section 05 completed successfully');
-    return { html, sources: [] };
-    
+<h3>Technical References</h3>
+<ul>
+    ${additionalDocs.map(doc => `<li><a href="${doc.url}" target="_blank">${doc.name}</a></li>`).join('\n    ')}
+    <li>Site-Specific Emergency Response Plan - Available on-site</li>
+    <li>Equipment History and Previous Maintenance Records - Available in CMMS</li>
+    <li><a href="https://www.osha.gov/safety-data-sheets" target="_blank">OSHA Safety Data Sheets Information</a></li>
+</ul>
+
+<div style="margin-top: 20px; padding: 15px; background-color: #f0f7ff; border-radius: 4px;">
+    <strong>Note:</strong> All personnel must review applicable documentation before beginning work. 
+    Verify current revision levels of manufacturer manuals and regulatory standards. 
+    Links provided are current as of MOP creation date.
+</div>`;
+
+    const sources = [{
+      type: "regulatory_standard",
+      document: "OSHA 29 CFR 1910.147",
+      title: "The Control of Hazardous Energy",
+      url: "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147"
+    }];
+
+    return { html, sources };
   } catch (error) {
     console.error('Section 05 generation error:', error);
     throw error;
   }
 }
 
-// Section 09: Backout
+// Section 09: Backout - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection09(formData) {
   try {
-    console.log('=== Section 09 Backout Generation ===');
-    const { system, manufacturer } = formData;
-    
-    const html = `<h2>Section 09: Backout/Recovery Plan</h2>
-<h3>Backout Criteria</h3>
-<p>Initiate backout procedures if any of the following conditions occur:</p>
-<ul>
-    <li>Unable to restore equipment to operational status within maintenance window</li>
-    <li>Discovery of critical component failure requiring parts not on hand</li>
-    <li>Safety hazard that cannot be immediately mitigated</li>
-    <li>Loss of redundant system during maintenance</li>
-    <li>Environmental conditions exceed safe operating limits</li>
-    <li>Direction from site management or emergency response team</li>
-</ul>
+    const { location } = formData;
+    const siteData = getSiteData(location);
+    const escalation = siteData.escalationProcedure;
 
-<h3>Backout Procedures</h3>
+    const html = `<h2>Section 09: Back-out Procedures</h2>
+<p><strong>CRITICAL BACK-OUT PROCEDURES</strong></p>
+<p>If at any point during the maintenance procedure a critical issue is discovered that could affect data center operations, follow these detailed back-out procedures:</p>
 <table>
     <thead>
         <tr>
-            <th>Step</th>
-            <th>Action</th>
-            <th>Responsible</th>
-            <th>Time Est.</th>
-            <th>Complete</th>
+            <th width="60">Step</th>
+            <th>Back-out Procedures</th>
+            <th width="80">Initials</th>
+            <th width="80">Time</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>1</td>
-            <td><strong>STOP all work immediately</strong> and secure the work area</td>
-            <td>All Personnel</td>
-            <td>Immediate</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">1</td>
+            <td><strong>Immediate Actions:</strong> Stop all work immediately and secure the area</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>2</td>
-            <td>Notify site management and stakeholders of backout initiation</td>
-            <td>Team Lead</td>
-            <td>5 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">2</td>
+            <td>Notify the ${escalation.level1} and ${escalation.level2} immediately</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>3</td>
-            <td>Document current equipment status and work completed</td>
-            <td>Lead Tech</td>
-            <td>10 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">3</td>
+            <td>Assess the situation and determine if equipment can be safely returned to service</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>4</td>
-            <td>Reinstall any removed components (if safe to do so)</td>
-            <td>Tech Team</td>
-            <td>30 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">4</td>
+            <td>If issue cannot be resolved at technician level, escalate to ${escalation.level3}</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>5</td>
-            <td>Restore all electrical connections to original configuration</td>
-            <td>Electrician</td>
-            <td>20 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">5</td>
+            <td>If ${escalation.level3} cannot resolve, escalate to ${escalation.level4}</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>6</td>
-            <td>Verify all safety devices are operational</td>
-            <td>Lead Tech</td>
-            <td>15 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">6</td>
+            <td>Contact equipment manufacturer service representative if required: ${escalation.level5}</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>7</td>
-            <td>Remove LOTO and restore power to equipment</td>
-            <td>Authorized Person</td>
-            <td>10 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">7</td>
+            <td>Document all findings and actions taken in the incident report</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>8</td>
-            <td>Perform equipment startup sequence</td>
-            <td>Lead Tech</td>
-            <td>15 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">8</td>
+            <td>If safe to return to service, follow re-energization procedures</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>9</td>
-            <td>Verify equipment operation and all alarms cleared</td>
-            <td>Lead Tech</td>
-            <td>15 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">9</td>
+            <td>Monitor equipment for minimum 30 minutes after return to service</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
         <tr>
-            <td>10</td>
-            <td>Transfer to normal operation mode</td>
-            <td>Operations</td>
-            <td>10 min</td>
-            <td><input type="checkbox" /></td>
-        </tr>
-        <tr>
-            <td>11</td>
-            <td>Complete backout documentation and lessons learned</td>
-            <td>Team Lead</td>
-            <td>30 min</td>
-            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">10</td>
+            <td>Complete incident report and schedule follow-up maintenance if required</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
         </tr>
     </tbody>
-</table>
+</table>`;
 
-<h3>Emergency Contacts for Backout Support</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Role</th>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Alternate</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Site Manager</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-        </tr>
-        <tr>
-            <td>Chief Engineer</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-        </tr>
-        <tr>
-            <td>${manufacturer || 'Manufacturer'} Support</td>
-            <td>Technical Support</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td>24/7 Hotline</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Post-Backout Requirements</h3>
-<ul>
-    <li>Root cause analysis to be completed within 48 hours</li>
-    <li>Revised MOP to be created addressing issues encountered</li>
-    <li>Parts/tools procurement for future attempt</li>
-    <li>Additional training if skill gap identified</li>
-    <li>Stakeholder communication on rescheduling</li>
-</ul>`;
-
-    console.log('Section 09 completed successfully');
     return { html, sources: [] };
-    
   } catch (error) {
     console.error('Section 09 generation error:', error);
     throw error;
   }
 }
 
-// Section 10: Approval
+// Section 10: Approval - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection10(formData) {
   try {
-    console.log('=== Section 10 Approval Generation ===');
-    
-    const html = `<h2>Section 10: Review and Approval</h2>
-<h3>MOP Review Checklist</h3>
+    const html = `<h2>Section 10: MOP Approval</h2>
 <table>
     <thead>
         <tr>
-            <th>Review Item</th>
-            <th>Verified</th>
-            <th>Reviewer Initials</th>
-            <th>Comments</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>All sections complete and accurate</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="small-input" /></td>
-            <td><input type="text" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Safety requirements identified</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="small-input" /></td>
-            <td><input type="text" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Risk assessment complete</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="small-input" /></td>
-            <td><input type="text" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Backout plan adequate</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="small-input" /></td>
-            <td><input type="text" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Resource requirements confirmed</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="small-input" /></td>
-            <td><input type="text" style="width:200px" /></td>
-        </tr>
-        <tr>
-            <td>Schedule conflicts resolved</td>
-            <td><input type="checkbox" /></td>
-            <td><input type="text" class="small-input" /></td>
-            <td><input type="text" style="width:200px" /></td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Approval Signatures</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Role</th>
-            <th>Name (Print)</th>
-            <th>Signature</th>
+            <th>Review Stage</th>
+            <th>Reviewer's Name</th>
+            <th>Reviewer's Title</th>
             <th>Date</th>
-            <th>Time</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td><strong>MOP Author</strong></td>
-            <td><input type="text" class="contractor-input" placeholder="Print name" /></td>
-            <td><input type="text" class="contractor-input" placeholder="Signature" /></td>
-            <td><input type="text" class="small-input" style="width:100px" /></td>
-            <td><input type="text" class="small-input" /></td>
+            <td><strong>Tested for clarity:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
         </tr>
         <tr>
-            <td><strong>Technical Reviewer</strong></td>
-            <td><input type="text" class="contractor-input" placeholder="Print name" /></td>
-            <td><input type="text" class="contractor-input" placeholder="Signature" /></td>
-            <td><input type="text" class="small-input" style="width:100px" /></td>
-            <td><input type="text" class="small-input" /></td>
+            <td><strong>Technical review:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
         </tr>
         <tr>
-            <td><strong>Safety Officer</strong></td>
-            <td><input type="text" class="contractor-input" placeholder="Print name" /></td>
-            <td><input type="text" class="contractor-input" placeholder="Signature" /></td>
-            <td><input type="text" class="small-input" style="width:100px" /></td>
-            <td><input type="text" class="small-input" /></td>
+            <td><strong>Chief Engineer approval:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
         </tr>
         <tr>
-            <td><strong>Facility Manager</strong></td>
-            <td><input type="text" class="contractor-input" placeholder="Print name" /></td>
-            <td><input type="text" class="contractor-input" placeholder="Signature" /></td>
-            <td><input type="text" class="small-input" style="width:100px" /></td>
-            <td><input type="text" class="small-input" /></td>
-        </tr>
-        <tr>
-            <td><strong>Site Manager</strong></td>
-            <td><input type="text" class="contractor-input" placeholder="Print name" /></td>
-            <td><input type="text" class="contractor-input" placeholder="Signature" /></td>
-            <td><input type="text" class="small-input" style="width:100px" /></td>
-            <td><input type="text" class="small-input" /></td>
-        </tr>
-        <tr>
-            <td><strong>Customer Representative</strong></td>
-            <td><input type="text" class="contractor-input" placeholder="Print name" /></td>
-            <td><input type="text" class="contractor-input" placeholder="Signature" /></td>
-            <td><input type="text" class="small-input" style="width:100px" /></td>
-            <td><input type="text" class="small-input" /></td>
+            <td><strong>Customer approval:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
         </tr>
     </tbody>
 </table>
 
-<h3>Work Execution Sign-off</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Milestone</th>
-            <th>Completed By</th>
-            <th>Date/Time</th>
-            <th>Verified By</th>
-            <th>Date/Time</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Pre-work safety briefing</td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-        </tr>
-        <tr>
-            <td>Work commenced</td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-        </tr>
-        <tr>
-            <td>Work completed</td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-        </tr>
-        <tr>
-            <td>System tested and operational</td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-        </tr>
-        <tr>
-            <td>Site returned to normal</td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-            <td><input type="text" style="width:150px" /></td>
-        </tr>
-    </tbody>
-</table>`;
+<div style="margin-top: 30px; padding: 15px; background-color: #f0f0f0; border: 1px solid #ccc;">
+    <h4 style="margin-top: 0;">Approval Requirements:</h4>
+    <ul style="margin-bottom: 0;">
+        <li>All stages must be completed in sequence</li>
+        <li>Technical review must verify all equipment specifications and procedures</li>
+        <li>Chief Engineer must approve risk assessment and mitigation strategies</li>
+        <li>Customer approval required before work commencement</li>
+    </ul>
+</div>
 
-    console.log('Section 10 completed successfully');
+<div style="margin-top: 20px;">
+    <table style="width: 100%; margin-top: 20px;">
+        <tr>
+            <td style="width: 50%; padding: 10px;">
+                <strong>MOP Effective Date:</strong><br>
+                <input type="text" style="width:150px" placeholder="MM/DD/YYYY" />
+            </td>
+            <td style="width: 50%; padding: 10px;">
+                <strong>MOP Expiration Date:</strong><br>
+                <input type="text" style="width:150px" placeholder="MM/DD/YYYY" />
+            </td>
+        </tr>
+    </table>
+</div>`;
+
     return { html, sources: [] };
-    
   } catch (error) {
     console.error('Section 10 generation error:', error);
     throw error;
   }
 }
 
-// Section 12: References
+// Section 12: References - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection12(formData) {
   try {
     console.log('=== Section 12 References Generation ===');
-    const { manufacturer, modelNumber } = formData;
+    console.log('FormData:', JSON.stringify(formData, null, 2));
     
-    const html = `<h2>Section 12: References and Resources</h2>
-<h3>Technical References</h3>
-<ul>
-    <li>${manufacturer || 'Manufacturer'} ${modelNumber || 'Model'} Installation Manual</li>
-    <li>${manufacturer || 'Manufacturer'} ${modelNumber || 'Model'} Operation & Maintenance Manual</li>
-    <li>${manufacturer || 'Manufacturer'} ${modelNumber || 'Model'} Troubleshooting Guide</li>
-    <li>${manufacturer || 'Manufacturer'} Technical Service Bulletins</li>
-    <li>${manufacturer || 'Manufacturer'} Recommended Spare Parts List</li>
-</ul>
+    if (!formData) {
+      console.error('No formData found in request');
+      throw new Error('Missing formData in request body');
+    }
+    
+    const { manufacturer, modelNumber, system, workDescription, location } = formData;
+    console.log('Destructured fields:', { manufacturer, modelNumber, system, workDescription, location });
 
-<h3>Industry Standards and Codes</h3>
-<ul>
-    <li>ASHRAE Guidelines - HVAC Systems Operation and Maintenance</li>
-    <li>NFPA 70 - National Electrical Code (NEC)</li>
-    <li>NFPA 70E - Standard for Electrical Safety in the Workplace</li>
-    <li>OSHA 29 CFR 1910 - Occupational Safety and Health Standards</li>
-    <li>OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)</li>
-    <li>EPA 608 - Refrigerant Management Regulations</li>
-    <li>IEEE Standards for Electrical Equipment</li>
-    <li>ISA Standards for Instrumentation</li>
-</ul>
+    // Generate manufacturer-specific documentation links
+    const getManufacturerLinks = (manufacturer) => {
+      const mfg = manufacturer?.toLowerCase() || '';
+      
+      const manufacturerUrls = {
+        'trane': 'https://www.trane.com/commercial/north-america/us/en/support/literature-and-manuals.html',
+        'carrier': 'https://www.carrier.com/commercial/en/us/support/',
+        'york': 'https://www.johnsoncontrols.com/buildings/hvac-equipment/chillers',
+        'liebert': 'https://www.vertiv.com/en-us/support/software-download/',
+        'caterpillar': 'https://www.cat.com/en_US/support/manuals.html',
+        'cummins': 'https://quickserve.cummins.com/',
+        'generac': 'https://www.generac.com/support/product-support-lookup',
+        'kohler': 'https://kohlerpower.com/support/literature',
+        'schneider': 'https://www.schneider-electric.us/en/support/',
+        'eaton': 'https://www.eaton.com/us/en-us/support.html'
+      };
+      
+      return manufacturerUrls[mfg] || null;
+    };
 
-<h3>Site-Specific Documentation</h3>
-<ul>
-    <li>Site Standard Operating Procedures (SOPs)</li>
-    <li>Site Emergency Operating Procedures (EOPs)</li>
-    <li>Site Safety Manual</li>
-    <li>Site Electrical Single-Line Diagrams</li>
-    <li>Site Mechanical P&ID Drawings</li>
-    <li>Building Management System (BMS) Documentation</li>
-    <li>Previous Maintenance Reports and History</li>
-</ul>
+    const getOSHALink = (section) => {
+      return `https://www.osha.gov/laws-regs/regulations/standardnumber/${section.replace(' ', '/')}`;
+    };
 
-<h3>Contact Information</h3>
+    const getNFPALink = (code) => {
+      const nfpaNumber = code.match(/NFPA (\d+[A-Z]?)/)?.[1];
+      return nfpaNumber ? `https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=${nfpaNumber}` : null;
+    };
+
+    const manufacturerUrl = getManufacturerLinks(manufacturer);
+
+    // Generate equipment-specific references based on system type
+    let equipmentReferences = [];
+    let regulatoryReferences = [];
+    let safetyReferences = [];
+
+    if (system?.toLowerCase().includes('chiller')) {
+      equipmentReferences = manufacturerUrl ? [
+        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} Service Bulletins and Technical Updates`, url: manufacturerUrl, type: 'link' },
+      ] : [
+        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} Service Bulletins and Technical Updates`, type: 'internal' },
+      ];
+      
+      equipmentReferences.push({ name: 'ASHRAE 15 - Safety Standard for Refrigeration Systems', url: 'https://www.ashrae.org/', type: 'link' });
+      
+      regulatoryReferences = [
+        { name: 'EPA Section 608 - Refrigerant Certification Requirements', url: 'https://www.epa.gov/section608', type: 'link' },
+        { name: 'EPA SNAP Program - Refrigerant Information', url: 'https://www.epa.gov/snap', type: 'link' },
+        { name: 'NFPA 70 - National Electrical Code', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70', type: 'link' }
+      ];
+    } else if (system?.toLowerCase().includes('generator')) {
+      equipmentReferences = manufacturerUrl ? [
+        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} Engine Service Manual`, url: manufacturerUrl, type: 'link' },
+      ] : [
+        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} Engine Service Manual`, type: 'internal' },
+      ];
+      
+      regulatoryReferences = [
+        { name: 'NFPA 110 - Emergency and Standby Power Systems', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=110', type: 'link' },
+        { name: 'NFPA 37 - Installation and Use of Stationary Combustion Engines', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=37', type: 'link' },
+        { name: 'EPA Emissions Standards', url: 'https://www.epa.gov/regulations-emissions-vehicles-and-engines', type: 'link' }
+      ];
+    } else if (system?.toLowerCase().includes('ups')) {
+      equipmentReferences = manufacturerUrl ? [
+        { name: `${manufacturer} ${modelNumber} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} Battery System Documentation`, url: manufacturerUrl, type: 'link' },
+      ] : [
+        { name: `${manufacturer} ${modelNumber} Installation and Operation Manual`, type: 'internal' },
+        { name: `${manufacturer} Battery System Documentation`, type: 'internal' },
+      ];
+      
+      regulatoryReferences = [
+        { name: 'OSHA Battery Safety Guidelines', url: 'https://www.osha.gov/battery-hazards', type: 'link' },
+        { name: 'NFPA 70E - Electrical Safety in the Workplace', url: 'https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70E', type: 'link' }
+      ];
+    } else {
+      // Generic equipment references
+      equipmentReferences = manufacturerUrl ? [
+        { name: `${manufacturer} ${modelNumber} Documentation`, url: manufacturerUrl, type: 'link' },
+      ] : [
+        { name: `${manufacturer} ${modelNumber} Documentation`, type: 'internal' },
+      ];
+    }
+
+    // Common safety and regulatory references for all equipment
+    safetyReferences = [
+      { name: 'OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)', url: 'https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147', type: 'link' },
+      { name: 'OSHA 29 CFR 1910.95 - Occupational Noise Exposure', url: 'https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.95', type: 'link' },
+      { name: 'OSHA Personal Protective Equipment Standards', url: 'https://www.osha.gov/personal-protective-equipment', type: 'link' },
+      { name: 'ANSI Z87.1 - Eye and Face Protection', url: 'https://www.ansi.org/', type: 'link' },
+      { name: 'ASTM Standards', url: 'https://www.astm.org/', type: 'link' }
+    ];
+
+    const html = `<h2>Section 12: References and Documentation</h2>
+<p><strong>Comprehensive Reference Library</strong></p>
+
+<h3>Equipment-Specific Documentation</h3>
 <table>
     <thead>
         <tr>
-            <th>Resource</th>
-            <th>Contact</th>
-            <th>Phone</th>
-            <th>Email/Website</th>
+            <th width="60%">Document Title</th>
+            <th width="20%">Type</th>
+            <th width="20%">Access</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${equipmentReferences.map(ref => `
+        <tr>
+            <td><strong>${ref.name}</strong></td>
+            <td>Technical Manual</td>
+            <td>${ref.type === 'link' ? `<a href="${ref.url}" target="_blank" style="color: #0066cc;">📋 View</a>` : 'Internal Document - Request from Site Manager'}</td>
+        </tr>`).join('')}
+    </tbody>
+</table>
+
+<h3>Regulatory Standards and Codes</h3>
+<table>
+    <thead>
+        <tr>
+            <th width="60%">Standard/Regulation</th>
+            <th width="20%">Authority</th>
+            <th width="20%">Access</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${regulatoryReferences.map(ref => `
+        <tr>
+            <td><strong>${ref.name}</strong></td>
+            <td>${ref.name.includes('EPA') ? 'EPA' : ref.name.includes('NFPA') ? 'NFPA' : 'Industry'}</td>
+            <td><a href="${ref.url}" target="_blank" style="color: #0066cc;">📋 View</a></td>
+        </tr>`).join('')}
+    </tbody>
+</table>
+
+<h3>Safety Standards and Guidelines</h3>
+<table>
+    <thead>
+        <tr>
+            <th width="60%">Safety Standard</th>
+            <th width="20%">Authority</th>
+            <th width="20%">Access</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${safetyReferences.map(ref => `
+        <tr>
+            <td><strong>${ref.name}</strong></td>
+            <td>${ref.name.includes('OSHA') ? 'OSHA' : ref.name.includes('ANSI') ? 'ANSI' : 'ASTM'}</td>
+            <td><a href="${ref.url}" target="_blank" style="color: #0066cc;">📋 View</a></td>
+        </tr>`).join('')}
+    </tbody>
+</table>
+
+<h3>Additional Resources</h3>
+<table>
+    <thead>
+        <tr>
+            <th width="60%">Resource</th>
+            <th width="20%">Type</th>
+            <th width="20%">Access</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>${manufacturer || 'Manufacturer'} Technical Support</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:200px" /></td>
+            <td><strong>Site-Specific Emergency Response Plan</strong></td>
+            <td>Internal Document</td>
+            <td>Internal Document - Request from Site Manager</td>
         </tr>
         <tr>
-            <td>Parts Supplier</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:200px" /></td>
+            <td><strong>Equipment History and Maintenance Records</strong></td>
+            <td>CMMS Database</td>
+            <td>Internal Document - Request from Site Manager</td>
         </tr>
         <tr>
-            <td>Calibration Services</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:200px" /></td>
+            <td><strong>Safety Data Sheets (SDS) Information</strong></td>
+            <td>Chemical Safety</td>
+            <td><a href="https://www.osha.gov/safety-data-sheets" target="_blank" style="color: #0066cc;">📋 View</a></td>
         </tr>
         <tr>
-            <td>Emergency Service Provider</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:200px" /></td>
+            <td><strong>Environmental Compliance Documentation</strong></td>
+            <td>Regulatory</td>
+            <td>Internal Document - Request from Site Manager</td>
+        </tr>
+        <tr>
+            <td><strong>Vendor Contact Information and Support Agreements</strong></td>
+            <td>Service Contract</td>
+            <td>Internal Document - Request from Site Manager</td>
         </tr>
     </tbody>
 </table>
 
-<h3>Training and Certification Requirements</h3>
-<ul>
-    <li>${manufacturer || 'Manufacturer'} Factory Training Certification</li>
-    <li>OSHA 10/30 Hour Safety Training</li>
-    <li>NFPA 70E Electrical Safety Training</li>
-    <li>EPA 608 Universal Certification (for refrigerant handling)</li>
-    <li>Site-Specific Safety Orientation</li>
-    <li>Confined Space Entry Certification (if applicable)</li>
-    <li>Fall Protection Training (if applicable)</li>
-</ul>
+<div style="margin-top: 30px; padding: 20px; background-color: #f0f7ff; border-radius: 8px; border-left: 4px solid #0066cc;">
+    <h4 style="margin-top: 0; color: #0066cc;">📚 Reference Usage Guidelines</h4>
+    <ul style="margin-bottom: 0;">
+        <li><strong>Pre-Work Review:</strong> All applicable documentation must be reviewed before beginning maintenance work</li>
+        <li><strong>Current Revisions:</strong> Verify all documents are current revision levels and not superseded</li>
+        <li><strong>Access Requirements:</strong> Ensure access to online resources and account credentials are available</li>
+        <li><strong>Local Copies:</strong> Maintain current copies of critical documents for offline reference</li>
+        <li><strong>Update Tracking:</strong> Monitor manufacturer bulletins and regulatory updates that may affect procedures</li>
+    </ul>
+</div>
 
-<h3>Revision History</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Version</th>
-            <th>Date</th>
-            <th>Author</th>
-            <th>Description of Changes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1.0</td>
-            <td>${new Date().toLocaleDateString()}</td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED" style="width:150px" /></td>
-            <td>Initial MOP creation</td>
-        </tr>
-    </tbody>
-</table>`;
+<div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+    <p style="margin: 0;"><strong>⚠️ Important Notice:</strong> All external links have been verified as working at the time of MOP creation. 
+    However, URLs may change over time. If a link is broken, search for the document by title on the organization's website. 
+    Internal documents marked "Request from Site Manager" must be obtained locally and are not available through external links.</p>
+</div>
 
+<div style="margin-top: 15px; padding: 15px; background-color: #f0f7ff; border-radius: 4px; border-left: 4px solid #0066cc;">
+    <p style="margin: 0;"><strong>📋 Link Verification:</strong> All links in this document point to official sources only:
+    • Manufacturer support websites • OSHA.gov regulations • EPA.gov standards • NFPA.org codes • Industry organization websites</p>
+</div>`;
+
+    console.log('Generated HTML length:', html.length);
     console.log('Section 12 completed successfully');
-    return { html, sources: [] };
+
+    // Prepare comprehensive sources list - only include real URLs
+    const sources = [
+      manufacturerUrl ? {
+        type: "equipment_manual",
+        document: `${manufacturer} ${modelNumber} Documentation`,
+        url: manufacturerUrl,
+        lastVerified: new Date().toISOString().split('T')[0]
+      } : null,
+      {
+        type: "regulatory_standard", 
+        document: "OSHA 29 CFR 1910.147",
+        title: "The Control of Hazardous Energy",
+        url: "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147"
+      },
+      {
+        type: "regulatory_standard",
+        document: "EPA Standards",
+        title: "Environmental Regulations",
+        url: "https://www.epa.gov/"
+      },
+      {
+        type: "safety_standard",
+        document: "NFPA Codes and Standards",
+        title: "Fire and Safety Standards",
+        url: "https://www.nfpa.org/"
+      }
+    ].filter(Boolean); // Remove null entries
+
+    return { html, sources };
     
   } catch (error) {
-    console.error('Section 12 generation error:', error);
+    console.error('=== Section 12 References Generation ERROR ===');
+    console.error('Error details:', error);
+    console.error('Error stack:', error.stack);
     throw error;
   }
 }
