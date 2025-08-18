@@ -47,44 +47,26 @@ export default function Header() {
           gap: '16px',
           flex: '0 0 auto'
         }}>
-          {/* Modern Logo Container */}
+          {/* Logo Container - No background color */}
           <div style={{
-            width: '48px',
-            height: '48px',
-            background: 'linear-gradient(135deg, #00d4ff 0%, #0070f3 100%)',
-            borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(0, 112, 243, 0.3)',
-            position: 'relative',
-            overflow: 'hidden'
+            position: 'relative'
           }}>
-            {/* Animated background effect */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%)',
-              animation: 'shimmer 3s infinite'
-            }} />
             <img 
               src="/Cream_LogoWordMark-1 (1)-cropped.svg" 
               alt="Logo" 
               style={{ 
-                width: '28px',
-                height: '28px',
+                height: '80px',
+                width: 'auto',
                 objectFit: 'contain',
-                position: 'relative',
-                zIndex: 1,
                 filter: 'brightness(0) invert(1)'
               }}
               onError={(e) => {
                 // If logo doesn't exist, show initials
                 e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span style="color: white; font-weight: bold; font-size: 18px; z-index: 1; position: relative;">AP</span>';
+                e.target.parentNode.innerHTML = '<span style="color: white; font-weight: bold; font-size: 36px;">AP</span>';
               }}
             />
           </div>
@@ -263,25 +245,86 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Add keyframe animation styles */}
+      {/* Add responsive styles */}
       <style jsx>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
         
-        /* Responsive design */
-        @media (max-width: 768px) {
-          nav {
-            display: none !important;
-          }
-        }
-        
+        /* Tablet responsive design */
         @media (max-width: 1024px) {
           nav a {
             min-width: 70px !important;
             padding: 10px 18px !important;
             font-size: 14px !important;
+          }
+        }
+        
+        /* Mobile responsive design */
+        @media (max-width: 768px) {
+          header > div {
+            flex-direction: column !important;
+            gap: 16px !important;
+            padding: 12px !important;
+          }
+          
+          header > div > div:first-child {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          header > div > div:first-child img {
+            height: 60px !important;
+          }
+          
+          header > div > div:first-child h1 {
+            font-size: 18px !important;
+            text-align: center !important;
+          }
+          
+          nav {
+            width: 100% !important;
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+          }
+          
+          nav a {
+            min-width: 60px !important;
+            padding: 8px 12px !important;
+            font-size: 13px !important;
+          }
+          
+          header > div > div:last-child {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          header > div > div:last-child > div:first-child {
+            display: none !important;
+          }
+        }
+        
+        /* Small mobile responsive design */
+        @media (max-width: 480px) {
+          header > div > div:first-child {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          
+          header > div > div:first-child img {
+            height: 50px !important;
+          }
+          
+          header > div > div:first-child h1 {
+            font-size: 16px !important;
+          }
+          
+          nav a {
+            min-width: 50px !important;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
           }
         }
       `}</style>
