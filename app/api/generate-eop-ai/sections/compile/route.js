@@ -3,21 +3,46 @@ import { put, list } from '@vercel/blob';
 import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 import { sanitizeForFilename, getNextVersion, abbreviateTask } from '@/lib/mop-version-manager';
 
-// Import all section generation functions
+// Import available section generation functions
 import {
   generateSection01,
   generateSection02,
   generateSection03,
   generateSection04,
   generateSection05,
-  generateSection06,
-  generateSection07,
-  generateSection08,
   generateSection09,
   generateSection10,
-  generateSection11,
   generateSection12
 } from '../section-generators.js';
+
+// Placeholder functions for sections not yet implemented
+const generateSection06 = async (formData) => {
+  return { 
+    html: '<h2>Section 06: Safety Requirements</h2><p>This section is under development.</p>', 
+    sources: [] 
+  };
+};
+
+const generateSection07 = async (formData) => {
+  return { 
+    html: '<h2>Section 07: Risk Assessment</h2><p>This section is under development.</p>', 
+    sources: [] 
+  };
+};
+
+const generateSection08 = async (formData) => {
+  return { 
+    html: '<h2>Section 08: Emergency Procedures</h2><p>This section is under development.</p>', 
+    sources: [] 
+  };
+};
+
+const generateSection11 = async (formData) => {
+  return { 
+    html: '<h2>Section 11: Additional Comments</h2><p>This section is under development.</p>', 
+    sources: [] 
+  };
+};
 
 // Map section names to generator functions
 const SECTION_GENERATORS = [

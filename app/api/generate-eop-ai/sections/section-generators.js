@@ -8,11 +8,8 @@ import { getRelevantEOPs } from '@/lib/mop-knowledge/eop-references';
 import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 import { getSiteData } from '@/lib/mop-knowledge/site-data';
 
-// Import the already-extracted AI section functions that are already modular
-export { generateSection06 } from './section-06-safety/route.js';
-export { generateSection07 } from './section-07-risks/route.js';
-export { generateSection08 } from './section-08-procedures/route.js';
-export { generateSection11 } from './section-11-comments/route.js';
+// Note: Section 06, 07, 08, and 11 are not yet implemented for EOP
+// These would need to be created as separate route files or inline functions
 
 // Section 01: Schedule - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection01(formData) {
