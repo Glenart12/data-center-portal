@@ -110,7 +110,7 @@ function SopPage() {
 
   const getFileTypeColor = (filename) => {
     if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
-    if (filename.toLowerCase().endsWith('.html')) return '#17a2b8';
+    if (filename.toLowerCase().endsWith('.html')) return '#28a745';
     return '#6c757d'; // Default for .txt and others
   };
 
@@ -142,7 +142,7 @@ function SopPage() {
       }}>
         <h1 style={{
           fontSize: '2.5em',
-          color: '#0f3456',
+          color: '#28a745',
           marginBottom: '10px',
           fontWeight: 'bold'
         }}>
@@ -229,7 +229,7 @@ function SopPage() {
             padding: '10px',
             backgroundColor: '#e8f4f8',
             borderRadius: '8px',
-            color: '#0f3456'
+            color: '#28a745'
           }}>
             {filteredFiles.length === 0 ? (
               <span>No documents found matching "{searchTerm}"</span>
@@ -259,7 +259,7 @@ function SopPage() {
               minWidth: '180px',
               height: '48px',
               padding: '12px 24px',
-              backgroundColor: '#198754',
+              backgroundColor: '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -275,12 +275,12 @@ function SopPage() {
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#146c43';
+              e.currentTarget.style.backgroundColor = '#218838';
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#198754';
+              e.currentTarget.style.backgroundColor = '#28a745';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
             }}
@@ -311,7 +311,7 @@ function SopPage() {
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '64px' }}>📋</span>
               </div>
-              <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#0f3456' }}>No SOP files found</p>
+              <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#28a745' }}>No SOP files found</p>
               <p style={{ margin: 0, fontSize: '16px' }}>Upload PDFs to get started</p>
             </div>
           ) : (
@@ -330,7 +330,7 @@ function SopPage() {
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)';
                 e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
-                e.currentTarget.style.borderColor = '#0f3456';
+                e.currentTarget.style.borderColor = '#28a745';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
@@ -338,11 +338,52 @@ function SopPage() {
                 e.currentTarget.style.borderColor = '#e0e0e0';
               }}
               >
+                {/* Delete Button - Only show for Blob storage files */}
+                {fileData.source === 'blob' && (
+                  <button
+                    onClick={(e) => handleDelete(fileData.filename, e)}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: '#dc3545',
+                      cursor: 'pointer',
+                      fontSize: '20px',
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease',
+                      opacity: 0.7,
+                      zIndex: 10
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dc3545';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#dc3545';
+                      e.currentTarget.style.opacity = '0.7';
+                    }}
+                    disabled={deletingFile === fileData.filename}
+                    title="Delete file"
+                  >
+                    {deletingFile === fileData.filename ? '⟳' : '×'}
+                  </button>
+                )}
+
                 <div style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
                   marginBottom: '15px',
-                  gap: '10px'
+                  gap: '10px',
+                  paddingRight: '40px' // Make room for delete button
                 }}>
                   <span style={{ fontSize: '32px', color: '#ffa500' }}>📋</span>
                   <h3 style={{ 
@@ -350,7 +391,11 @@ function SopPage() {
                     fontSize: '18px', 
                     color: '#333',
                     lineHeight: '1.4',
-                    flex: 1
+                    flex: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%'
                   }}>
                     {fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')}
                   </h3>
@@ -421,40 +466,6 @@ function SopPage() {
                   >
                     Download
                   </a>
-                  {/* Only show delete button for Blob storage files */}
-                  {fileData.source === 'blob' && (
-                    <button
-                      onClick={(e) => handleDelete(fileData.filename, e)}
-                      disabled={deletingFile === fileData.filename}
-                      style={{
-                        padding: '10px 15px',
-                        backgroundColor: deletingFile === fileData.filename ? '#ccc' : '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        cursor: deletingFile === fileData.filename ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-                        fontWeight: '500',
-                        flex: 1
-                      }}
-                      onMouseEnter={(e) => {
-                        if (deletingFile !== fileData.filename) {
-                          e.currentTarget.style.backgroundColor = '#bb2d3b';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (deletingFile !== fileData.filename) {
-                          e.currentTarget.style.backgroundColor = '#dc3545';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }
-                      }}
-                    >
-                      {deletingFile === fileData.filename ? 'Deleting...' : 'Delete'}
-                    </button>
-                  )}
                 </div>
 
                 {/* Version Badge */}
@@ -462,7 +473,7 @@ function SopPage() {
                   position: 'absolute',
                   bottom: '15px',
                   left: '15px',
-                  backgroundColor: '#198754',
+                  backgroundColor: '#28a745',
                   color: 'white',
                   padding: '4px 10px',
                   borderRadius: '4px',

@@ -156,7 +156,7 @@ function EopPage() {
 
   const getFileTypeColor = (filename) => {
     if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
-    if (filename.toLowerCase().endsWith('.html')) return '#17a2b8';
+    if (filename.toLowerCase().endsWith('.html')) return '#dc3545';
     return '#6c757d'; // Default for .txt and others
   };
 
@@ -183,7 +183,7 @@ function EopPage() {
       }}>
         <h1 style={{
           fontSize: '2.5em',
-          color: '#0f3456',
+          color: '#dc3545',
           marginBottom: '10px',
           fontWeight: 'bold'
         }}>
@@ -529,7 +529,7 @@ function EopPage() {
                   }}>
                     {versionDisplay && (
                       <div style={{
-                        backgroundColor: '#17a2b8',
+                        backgroundColor: '#dc3545',
                         color: 'white',
                         padding: '4px 8px',
                         borderRadius: '4px',

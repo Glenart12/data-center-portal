@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import MOPGenerationModal from '../components/MOPGenerationModal';
-import MOPTemplateModal from '../components/MOPTemplateModal';
 
 function MopPage() {
   const [files, setFiles] = useState([]);
@@ -15,7 +14,6 @@ function MopPage() {
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
-  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [deletingFile, setDeletingFile] = useState(null);
 
   useEffect(() => {
@@ -84,9 +82,6 @@ function MopPage() {
     fetchFiles();
   };
 
-  const closeTemplateModal = () => {
-    setIsTemplateModalOpen(false);
-  };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -161,7 +156,7 @@ function MopPage() {
 
   const getFileTypeColor = (filename) => {
     if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
-    if (filename.toLowerCase().endsWith('.html')) return '#17a2b8';
+    if (filename.toLowerCase().endsWith('.html')) return '#0f3456';
     return '#6c757d'; // Default for .txt and others
   };
 
@@ -320,27 +315,6 @@ function MopPage() {
           >
             <span style={emojiStyle}>✨</span>
             <span>Generate MOP</span>
-          </button>
-
-          <button
-            onClick={() => setIsTemplateModalOpen(true)}
-            style={{
-              ...buttonStyle,
-              backgroundColor: '#6f42c1',
-              color: 'white',
-              boxShadow: '0 2px 10px rgba(111, 66, 193, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(111, 66, 193, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 10px rgba(111, 66, 193, 0.3)';
-            }}
-          >
-            <span style={emojiStyle}>📋</span>
-            <span>MOP Template</span>
           </button>
 
           <div style={{ minWidth: '180px', height: '48px' }}>
@@ -584,10 +558,6 @@ function MopPage() {
         onClose={closeGenerateModal}
       />
 
-      <MOPTemplateModal
-        isOpen={isTemplateModalOpen}
-        onClose={closeTemplateModal}
-      />
     </div>
   );
 }
