@@ -471,7 +471,7 @@ function SopPage() {
                 {/* Version Badge */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '15px',
+                  bottom: '50px',
                   left: '15px',
                   backgroundColor: '#28a745',
                   color: 'white',
@@ -486,7 +486,7 @@ function SopPage() {
                 {/* File Type Badge */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '15px',
+                  bottom: '50px',
                   right: '15px',
                   backgroundColor: getFileTypeColor(fileData.filename),
                   color: 'white',

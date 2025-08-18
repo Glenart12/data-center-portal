@@ -518,37 +518,36 @@ function EopPage() {
                     </a>
                   </div>
 
-                  {/* File Type and Version Badges */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '15px',
-                    right: '15px',
-                    display: 'flex',
-                    gap: '8px',
-                    alignItems: 'center'
-                  }}>
-                    {versionDisplay && (
-                      <div style={{
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
-                        {versionDisplay}
-                      </div>
-                    )}
+                  {/* Version Badge */}
+                  {versionDisplay && (
                     <div style={{
-                      backgroundColor: getFileTypeColor(filename),
+                      position: 'absolute',
+                      bottom: '50px',
+                      left: '15px',
+                      backgroundColor: '#dc3545',
                       color: 'white',
-                      padding: '4px 8px',
+                      padding: '4px 10px',
                       borderRadius: '4px',
                       fontSize: '12px',
                       fontWeight: 'bold'
                     }}>
-                      {getFileTypeLabel(filename)}
+                      {versionDisplay}
                     </div>
+                  )}
+
+                  {/* File Type Badge */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '50px',
+                    right: '15px',
+                    backgroundColor: getFileTypeColor(filename),
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    {getFileTypeLabel(filename)}
                   </div>
                 </div>
               );
