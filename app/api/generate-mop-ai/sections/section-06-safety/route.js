@@ -108,14 +108,10 @@ Research this information thoroughly - these are real emergency contacts that ma
   }
 }
 
-export async function POST(request) {
+export async function generateSection06(formData) {
   try {
-    console.log('=== Section 06 Safety Route ===');
-    const requestBody = await request.json();
-    console.log('Raw request body:', JSON.stringify(requestBody, null, 2));
-    
-    const { formData } = requestBody;
-    console.log('Extracted formData:', JSON.stringify(formData, null, 2));
+    console.log('=== Section 06 Safety Generation ===');
+    console.log('FormData:', JSON.stringify(formData, null, 2));
     
     if (!formData) {
       console.error('No formData found in request');
@@ -430,15 +426,26 @@ ${emergencyContacts ? `
     console.log('Generated HTML length:', html.length);
     console.log('Section 06 completed successfully');
     
-    return NextResponse.json({ 
+    return { 
       html, 
       sources: [] 
-    });
+    };
     
   } catch (error) {
-    console.error('=== Section 06 Safety Route ERROR ===');
+    console.error('=== Section 06 Safety Generation ERROR ===');
     console.error('Error details:', error);
     console.error('Error stack:', error.stack);
+    throw error;
+  }
+}
+
+export async function POST(request) {
+  try {
+    const { formData } = await request.json();
+    const result = await generateSection06(formData);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Section 06 route error:', error);
     return NextResponse.json({ 
       error: 'Failed to generate safety section',
       details: error.message,

@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-export async function POST(request) {
+export async function generateSection07(formData) {
   try {
-    const { formData } = await request.json();
     const { manufacturer, modelNumber, system, workDescription } = formData;
     
     // Use AI to generate comprehensive risks and assumptions
@@ -176,7 +175,18 @@ export async function POST(request) {
     <li>If estimated completion time exceeds approved window - Notify management for extension approval</li>
 </ul>`;
 
-    return NextResponse.json({ html, sources: [] });
+    return { html, sources: [] };
+  } catch (error) {
+    console.error('Section 07 generation error:', error);
+    throw error;
+  }
+}
+
+export async function POST(request) {
+  try {
+    const { formData } = await request.json();
+    const result = await generateSection07(formData);
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

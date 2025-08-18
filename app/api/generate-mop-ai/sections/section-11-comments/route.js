@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-export async function POST(request) {
+export async function generateSection11(formData) {
   try {
-    const { formData } = await request.json();
     const { manufacturer, modelNumber, system, workDescription } = formData;
     
     // Use AI to generate relevant comments
@@ -96,7 +95,18 @@ ${generatedComments}
               placeholder="Space for technician notes, observations, or recommendations for future maintenance..."></textarea>
 </div>`;
 
-    return NextResponse.json({ html, sources: [] });
+    return { html, sources: [] };
+  } catch (error) {
+    console.error('Section 11 generation error:', error);
+    throw error;
+  }
+}
+
+export async function POST(request) {
+  try {
+    const { formData } = await request.json();
+    const result = await generateSection11(formData);
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

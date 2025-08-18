@@ -3,10 +3,9 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getCompressorCount } from '@/lib/mop-knowledge/enhanced-equipment-database';
 import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 
-export async function POST(request) {
+export async function generateSection08(formData) {
   try {
     console.log('Section 08 Procedures: Starting generation...');
-    const { formData } = await request.json();
     const { manufacturer, modelNumber, system, workDescription } = formData;
     const sourceManager = new SourceManager();
     
@@ -984,10 +983,21 @@ ${operationalDataTable}
 </div>`;
 
     console.log('Section 08 Procedures: Successfully generated');
-    return NextResponse.json({ html, sources: sourceManager.sources });
+    return { html, sources: sourceManager.sources };
   } catch (error) {
     console.error('Section 08 Procedures Error:', error);
     console.error('Error stack:', error.stack);
+    throw error;
+  }
+}
+
+export async function POST(request) {
+  try {
+    const { formData } = await request.json();
+    const result = await generateSection08(formData);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Section 08 Procedures Route Error:', error);
     
     // Handle specific error types
     if (error.message?.includes('429') || error.message?.includes('quota')) {

@@ -1,21 +1,38 @@
 import { NextResponse } from 'next/server';
 import { put, list } from '@vercel/blob';
-import { SourceManager } from '@/lib/mop-knowledge/source-manager'; // Fixed import
+import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 import { sanitizeForFilename, getNextVersion } from '@/lib/mop-version-manager';
 
-const SECTION_ENDPOINTS = [
-  'section-01-schedule',
-  'section-02-site', 
-  'section-03-overview',
-  'section-04-facility',
-  'section-05-documentation',
-  'section-06-safety',
-  'section-07-risks',
-  'section-08-procedures',
-  'section-09-backout',
-  'section-10-approval',
-  'section-11-comments',
-  'section-12-references'
+// Import all section generation functions
+import {
+  generateSection01,
+  generateSection02,
+  generateSection03,
+  generateSection04,
+  generateSection05,
+  generateSection06,
+  generateSection07,
+  generateSection08,
+  generateSection09,
+  generateSection10,
+  generateSection11,
+  generateSection12
+} from '../section-generators.js';
+
+// Map section names to generator functions
+const SECTION_GENERATORS = [
+  { name: 'section-01-schedule', generator: generateSection01 },
+  { name: 'section-02-site', generator: generateSection02 },
+  { name: 'section-03-overview', generator: generateSection03 },
+  { name: 'section-04-facility', generator: generateSection04 },
+  { name: 'section-05-documentation', generator: generateSection05 },
+  { name: 'section-06-safety', generator: generateSection06 },
+  { name: 'section-07-risks', generator: generateSection07 },
+  { name: 'section-08-procedures', generator: generateSection08 },
+  { name: 'section-09-backout', generator: generateSection09 },
+  { name: 'section-10-approval', generator: generateSection10 },
+  { name: 'section-11-comments', generator: generateSection11 },
+  { name: 'section-12-references', generator: generateSection12 }
 ];
 
 // Import the existing HTML template and styles from your current implementation
@@ -208,101 +225,44 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export async function POST(request) {
+// Export the compile function for direct use
+export async function compileMOP(formData) {
   try {
-    const { formData } = await request.json();
     const globalSourceManager = new SourceManager();
     
-    console.log('Starting modular MOP generation...');
+    console.log('Starting modular MOP generation with direct function calls...');
     
-    // Generate each section
+    // Generate each section using direct function calls
     const sections = [];
-    // Fix URL construction - VERCEL_URL doesn't include protocol
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NODE_ENV === 'production'
-        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL}`
-        : 'http://localhost:3000';
     
-    console.log('Base URL for internal API calls:', baseUrl);
-    console.log('Environment:', {
-      VERCEL_URL: process.env.VERCEL_URL,
-      NODE_ENV: process.env.NODE_ENV,
-      VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL
-    });
-    
-    // Prepare headers with authentication for internal API calls
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-    
-    // Forward cookies for Auth0 session
-    const cookieHeader = request.headers.get('cookie');
-    if (cookieHeader) {
-      headers['cookie'] = cookieHeader;
-    }
-    
-    // Forward authorization header if present
-    const authHeader = request.headers.get('authorization');
-    if (authHeader) {
-      headers['authorization'] = authHeader;
-    }
-    
-    for (const endpoint of SECTION_ENDPOINTS) {
+    for (const { name, generator } of SECTION_GENERATORS) {
       try {
-        const fullUrl = `${baseUrl}/api/generate-mop-ai/sections/${endpoint}`;
-        console.log(`Generating ${endpoint} at ${fullUrl}...`);
+        console.log(`Generating ${name}...`);
         
-        const response = await fetch(fullUrl, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ formData })
-        });
+        // Call the generator function directly
+        const result = await generator(formData);
         
-        if (!response.ok) {
-          const errorText = await response.text();
-          let errorData;
-          try {
-            errorData = JSON.parse(errorText);
-          } catch {
-            errorData = { error: errorText || response.statusText };
-          }
-          
-          console.error(`Failed to generate ${endpoint}:`, {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorData,
-            url: fullUrl
-          });
-          
-          // Check for specific error types
-          if (response.status === 401) {
-            throw new Error(`Authentication error for ${endpoint}. Check API configuration.`);
-          }
-          
-          if (response.status === 429 || errorData.error?.includes('busy') || errorData.error?.includes('quota')) {
-            throw new Error(`AI service is busy. Please wait 2-3 minutes and try again.`);
-          }
-          
-          if (errorData.error?.includes('API key') || errorData.error?.includes('API_KEY')) {
-            throw new Error(`AI service configuration error. Please contact support.`);
-          }
-          
-          throw new Error(`Failed to generate ${endpoint}: ${errorData.error || response.statusText}`);
-        }
-        
-        const data = await response.json();
-        sections.push(data.html);
+        sections.push(result.html);
         
         // Merge sources from each section
-        if (data.sources && Array.isArray(data.sources)) {
-          data.sources.forEach(source => globalSourceManager.addSource(source));
+        if (result.sources && Array.isArray(result.sources)) {
+          result.sources.forEach(source => globalSourceManager.addSource(source));
         }
         
       } catch (error) {
-        console.error(`Error generating ${endpoint}:`, error);
+        console.error(`Error generating ${name}:`, error);
+        
+        // Check for specific error types
+        if (error.message?.includes('429') || error.message?.includes('busy') || error.message?.includes('quota')) {
+          throw new Error(`AI service is busy. Please wait 2-3 minutes and try again.`);
+        }
+        
+        if (error.message?.includes('API key') || error.message?.includes('API_KEY')) {
+          throw new Error(`AI service configuration error. Please contact support.`);
+        }
+        
         // Don't fail the whole MOP if one section fails
-        sections.push(`<h2>Error generating section ${endpoint}</h2><p>${error.message}</p>`);
+        sections.push(`<h2>Error generating section ${name}</h2><p>${error.message}</p>`);
       }
     }
     
@@ -382,15 +342,27 @@ export async function POST(request) {
     
     console.log('MOP generation complete:', filename);
     
-    return NextResponse.json({ 
+    return { 
       success: true,
       filename: filename,
       url: blob.url,
       message: 'MOP generated successfully with source attribution'
-    });
+    };
     
   } catch (error) {
     console.error('MOP compilation error:', error);
+    throw error;
+  }
+}
+
+// Keep the POST handler for backward compatibility
+export async function POST(request) {
+  try {
+    const { formData } = await request.json();
+    const result = await compileMOP(formData);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('MOP compilation route error:', error);
     return NextResponse.json({ 
       error: 'Failed to compile MOP',
       details: error.message
