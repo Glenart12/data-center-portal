@@ -821,6 +821,45 @@ export async function generateSection08(formData) {
       
       return `Generate comprehensive maintenance procedure steps for ${manufacturer} ${modelNumber} ${system} ${workDescription || 'maintenance'}.
       
+      CRITICAL OUTPUT FORMAT REQUIREMENTS:
+      ===============================
+      YOU MUST OUTPUT ONLY HTML TABLE ROWS IN THIS EXACT FORMAT:
+      
+      For normal steps:
+      <tr>
+          <td style="text-align: center;">STEP_NUMBER</td>
+          <td>PROCEDURE_TEXT</td>
+          <td><input type="text" class="small-input" /></td>
+          <td><input type="text" class="small-input" /></td>
+      </tr>
+      
+      For safety-critical steps:
+      <tr>
+          <td style="text-align: center;">STEP_NUMBER</td>
+          <td class="safety-critical">PROCEDURE_TEXT</td>
+          <td><input type="text" class="small-input" /></td>
+          <td><input type="text" class="small-input" /></td>
+      </tr>
+      
+      For verification steps:
+      <tr>
+          <td style="text-align: center;">STEP_NUMBER</td>
+          <td class="verification">PROCEDURE_TEXT</td>
+          <td><input type="text" class="small-input" /></td>
+          <td><input type="text" class="small-input" /></td>
+      </tr>
+      
+      CRITICAL FORMAT RULES:
+      - Generate ONLY HTML table rows (<tr> tags)
+      - Do NOT generate markdown tables (no pipes |, no dashes ---)
+      - Do NOT generate column headers (no <th> tags)
+      - Do NOT generate any text outside of HTML table rows
+      - Do NOT use markdown code blocks or backticks
+      - Start numbering from step 2 (step 1 is already hardcoded)
+      - Generate 50+ detailed procedure steps
+      - Each step MUST be a complete HTML table row with the exact format shown above
+      ===============================
+      
       CRITICAL ACCURACY REQUIREMENTS:
       - Generate procedures SPECIFIC to ${manufacturer} ${modelNumber} ${system}
       - Research actual ${manufacturer} ${modelNumber} specifications and maintenance procedures
@@ -897,14 +936,6 @@ export async function generateSection08(formData) {
       - Control and monitoring system verification
       `}
 
-      Format each step as a complete HTML table row:
-      <tr>
-          <td style="text-align: center;">2</td>
-          <td class="safety-critical">Verify redundant equipment is running and stable before proceeding</td>
-          <td><input type="text" class="small-input" /></td>
-          <td><input type="text" class="small-input" /></td>
-      </tr>
-
       CRITICAL REQUIREMENTS:
       - Include specific torque verification steps but mark unknown values as "VERIFY WITH MANUFACTURER"
       - Add pressure and temperature recording points with note "VERIFY ACCEPTABLE RANGES WITH MANUFACTURER"
@@ -919,7 +950,7 @@ export async function generateSection08(formData) {
       - class="verification" for verification and testing steps
       - No class for normal procedural steps
 
-      DO NOT include markdown code blocks or backticks. Output clean HTML table rows only.
+      REMEMBER: Output ONLY HTML table rows. No markdown, no text outside of <tr> tags, no column headers.
       Start with step 2 since step 1 is already provided.`;
     };
 
