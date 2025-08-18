@@ -58,7 +58,7 @@ export default function Header() {
               src="/Cream_LogoWordMark-1 (1)-cropped.svg" 
               alt="Logo" 
               style={{ 
-                height: '80px',
+                height: '60px',
                 width: 'auto',
                 objectFit: 'contain',
                 filter: 'brightness(0) invert(1)'
@@ -275,7 +275,7 @@ export default function Header() {
           }
           
           header > div > div:first-child img {
-            height: 60px !important;
+            height: 45px !important;
           }
           
           header > div > div:first-child h1 {
@@ -314,7 +314,7 @@ export default function Header() {
           }
           
           header > div > div:first-child img {
-            height: 50px !important;
+            height: 40px !important;
           }
           
           header > div > div:first-child h1 {
