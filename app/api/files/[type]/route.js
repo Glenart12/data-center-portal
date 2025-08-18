@@ -1,7 +1,5 @@
 import { list } from '@vercel/blob';
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
 
 export async function GET(request, props) {
   try {
@@ -15,7 +13,7 @@ export async function GET(request, props) {
 
     console.log(`Listing files for type: ${type}`);
 
-    // Get files from Blob storage
+    // Get files from Blob storage ONLY - no more local files
     let blobFiles = [];
     try {
       const result = await list({ limit: 1000 });
@@ -95,48 +93,19 @@ export async function GET(request, props) {
       console.error('Error accessing Blob storage:', error);
     }
 
-    // Get local files
-    let localFiles = [];
-    try {
-      const directory = path.join(process.cwd(), 'public', type);
-      const filenames = await fs.readdir(directory);
-      
-      localFiles = filenames
-        .filter(name => name.endsWith('.pdf') || name.endsWith('.txt') || name.endsWith('.html'))
-        .map(filename => ({
-          filename: filename,
-          url: `/${type}/${filename}`,
-          size: 0,
-          uploadedAt: new Date().toISOString(),
-          source: 'local'
-        }));
-      
-      console.log(`Found ${localFiles.length} local files`);
-    } catch (error) {
-      console.log('No local files found');
-    }
-
-    // Combine both sources
+    // Only use Blob storage files - no local files
     const allFiles = [...blobFiles];
-    const blobFilenames = new Set(blobFiles.map(f => f.filename));
-    
-    localFiles.forEach(localFile => {
-      if (!blobFilenames.has(localFile.filename)) {
-        allFiles.push(localFile);
-      }
-    });
 
     // Sort by upload date (newest first)
     allFiles.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
 
-    console.log(`Total files: ${allFiles.length}`);
+    console.log(`Total files from Blob storage: ${allFiles.length}`);
 
     return NextResponse.json({ 
       files: allFiles.map(f => f.filename),
       filesWithUrls: allFiles,
       debug: {
         blobCount: blobFiles.length,
-        localCount: localFiles.length,
         totalCount: allFiles.length
       }
     });

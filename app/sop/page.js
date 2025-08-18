@@ -421,37 +421,40 @@ function SopPage() {
                   >
                     Download
                   </a>
-                  <button
-                    onClick={(e) => handleDelete(fileData.filename, e)}
-                    disabled={deletingFile === fileData.filename}
-                    style={{
-                      padding: '10px 15px',
-                      backgroundColor: deletingFile === fileData.filename ? '#ccc' : '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      cursor: deletingFile === fileData.filename ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.2s ease',
-                      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-                      fontWeight: '500',
-                      flex: 1
-                    }}
-                    onMouseEnter={(e) => {
-                      if (deletingFile !== fileData.filename) {
-                        e.currentTarget.style.backgroundColor = '#bb2d3b';
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (deletingFile !== fileData.filename) {
-                        e.currentTarget.style.backgroundColor = '#dc3545';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                      }
-                    }}
-                  >
-                    {deletingFile === fileData.filename ? 'Deleting...' : 'Delete'}
-                  </button>
+                  {/* Only show delete button for Blob storage files */}
+                  {fileData.source === 'blob' && (
+                    <button
+                      onClick={(e) => handleDelete(fileData.filename, e)}
+                      disabled={deletingFile === fileData.filename}
+                      style={{
+                        padding: '10px 15px',
+                        backgroundColor: deletingFile === fileData.filename ? '#ccc' : '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        cursor: deletingFile === fileData.filename ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.2s ease',
+                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                        fontWeight: '500',
+                        flex: 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deletingFile !== fileData.filename) {
+                          e.currentTarget.style.backgroundColor = '#bb2d3b';
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deletingFile !== fileData.filename) {
+                          e.currentTarget.style.backgroundColor = '#dc3545';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }
+                      }}
+                    >
+                      {deletingFile === fileData.filename ? 'Deleting...' : 'Delete'}
+                    </button>
+                  )}
                 </div>
 
                 {/* Version Badge */}

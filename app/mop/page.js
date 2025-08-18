@@ -401,43 +401,45 @@ function MopPage() {
                   e.currentTarget.style.borderColor = '#e0e0e0';
                 }}
                 >
-                  {/* Delete Button */}
-                  <button
-                    onClick={(e) => handleDelete(filename, e)}
-                    style={{
-                      position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: '#dc3545',
-                      cursor: 'pointer',
-                      fontSize: '20px',
-                      width: '30px',
-                      height: '30px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s ease',
-                      opacity: 0.7,
-                      zIndex: 10
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#dc3545';
-                      e.currentTarget.style.color = 'white';
-                      e.currentTarget.style.opacity = '1';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#dc3545';
-                      e.currentTarget.style.opacity = '0.7';
-                    }}
-                    disabled={deletingFile === filename}
-                    title="Delete file"
-                  >
-                    {deletingFile === filename ? '⟳' : '×'}
-                  </button>
+                  {/* Delete Button - Only show for Blob storage files */}
+                  {fileData?.source === 'blob' && (
+                    <button
+                      onClick={(e) => handleDelete(filename, e)}
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: '#dc3545',
+                        cursor: 'pointer',
+                        fontSize: '20px',
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s ease',
+                        opacity: 0.7,
+                        zIndex: 10
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#dc3545';
+                        e.currentTarget.style.color = 'white';
+                        e.currentTarget.style.opacity = '1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#dc3545';
+                        e.currentTarget.style.opacity = '0.7';
+                      }}
+                      disabled={deletingFile === filename}
+                      title="Delete file"
+                    >
+                      {deletingFile === filename ? '⟳' : '×'}
+                    </button>
+                  )}
 
                   <div style={{ 
                     display: 'flex', 
