@@ -6,10 +6,10 @@ export async function POST(request) {
     const body = await request.json();
     
     // Validate required fields
-    if (!body.formData?.manufacturer || !body.formData?.modelNumber) {
+    if (!body.formData?.manufacturer || !body.formData?.modelNumber || !body.formData?.equipmentNumber) {
       return NextResponse.json({ 
         error: 'Missing required fields',
-        userMessage: 'Please fill in all required fields'
+        userMessage: 'Please fill in all required fields including Equipment Number'
       }, { status: 400 });
     }
     

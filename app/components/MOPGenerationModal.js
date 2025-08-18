@@ -6,6 +6,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     manufacturer: '',
     modelNumber: '',
+    equipmentNumber: '',
     serialNumber: '',
     location: '',
     address: {
@@ -113,9 +114,9 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     }
 
     // Check all required fields
-    if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
+    if (!formData.manufacturer || !formData.modelNumber || !formData.equipmentNumber || !formData.system || 
         !formData.category || !formData.description) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Category\n• Work Description');
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Category\n• Work Description');
       return;
     }
 
@@ -267,6 +268,24 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Equipment Number *
+              </label>
+              <input
+                type="text"
+                value={formData.equipmentNumber}
+                onChange={(e) => handleInputChange('equipmentNumber', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Chiller 1, Generator 2"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Serial Number
               </label>
               <input
@@ -282,24 +301,24 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 placeholder="e.g., SN123456789"
               />
             </div>
+          </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., Data Hall 1"
-              />
-            </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Location
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px'
+              }}
+              placeholder="e.g., Data Hall 1"
+            />
           </div>
 
           {/* Address Section */}

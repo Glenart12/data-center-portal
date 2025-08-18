@@ -6,13 +6,21 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     manufacturer: '',
     modelNumber: '',
+    equipmentNumber: '',
     serialNumber: '',
     location: '',
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: ''
+    },
     system: '',
-    component: '',
-    emergencyType: ''
+    category: '',
+    description: ''
   });
   
+  const [supportingDocs, setSupportingDocs] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
   const [lastGenerationTime, setLastGenerationTime] = useState(0);
@@ -54,6 +62,50 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     }));
   };
 
+  const handleAddressChange = (addressField, value) => {
+    setFormData(prev => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        [addressField]: value
+      }
+    }));
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    setUploadProgress('Reading files...');
+    
+    const newDocs = [];
+    
+    for (const file of files) {
+      if (file.type === 'application/pdf' || file.type === 'text/plain' || 
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        
+        // Convert file to base64 for sending to API
+        const reader = new FileReader();
+        const base64 = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+        
+        newDocs.push({
+          name: file.name,
+          type: file.type,
+          content: base64,
+          size: file.size
+        });
+      }
+    }
+    
+    setSupportingDocs(prev => [...prev, ...newDocs]);
+    setUploadProgress('');
+  };
+
+  const removeDoc = (index) => {
+    setSupportingDocs(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleGenerate = async () => {
     // Check cooldown
     if (cooldownRemaining > 0) {
@@ -62,9 +114,9 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     }
 
     // Check all required fields
-    if (!formData.manufacturer || !formData.modelNumber || !formData.system || 
-        !formData.component || !formData.emergencyType) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• System\n• Component/Equipment Type\n• Emergency Type');
+    if (!formData.manufacturer || !formData.modelNumber || !formData.equipmentNumber || !formData.system || 
+        !formData.category || !formData.description) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Category\n• Work Description');
       return;
     }
 
@@ -78,7 +130,16 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          formData: formData
+          formData: {
+            ...formData,
+            frequency: formData.category, // Add frequency field using category value
+            workDescription: formData.description // Ensure workDescription is available
+          },
+          supportingDocs: supportingDocs.map(doc => ({
+            name: doc.name,
+            type: doc.type,
+            content: doc.content
+          }))
         })
       });
 
@@ -143,27 +204,11 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '10px' }}>🚨</div>
-          <h2 style={{ marginBottom: '5px', fontSize: '24px' }}>Generate Emergency Operating Procedure</h2>
+          <div style={{ fontSize: '48px', marginBottom: '10px' }}>🤖</div>
+          <h2 style={{ marginBottom: '5px', fontSize: '24px' }}>Generate EOP with AI</h2>
           <p style={{ color: '#666', fontSize: '14px' }}>
-            Create an EOP for critical equipment failures and emergency situations
+            Fill in the basic equipment information and let AI create a comprehensive EOP
           </p>
-          
-          {/* Warning Banner */}
-          <div style={{
-            marginTop: '15px',
-            padding: '12px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            fontWeight: 'bold'
-          }}>
-            ⚠️ This will generate an Emergency Operating Procedure for critical equipment failures
-          </div>
           
           {/* Cooldown Notice */}
           {cooldownRemaining > 0 && (
@@ -180,9 +225,9 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
           )}
         </div>
 
-        {/* Form Fields */}
+        {/* Equipment Information */}
         <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment & Emergency Information</h3>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment Information</h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
             <div>
@@ -199,7 +244,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., York, Trane, Carrier"
+                placeholder="e.g., Trane, Carrier, York"
               />
             </div>
 
@@ -217,7 +262,25 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., YVAA0350"
+                placeholder="e.g., CVHF1000"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Equipment Number *
+              </label>
+              <input
+                type="text"
+                value={formData.equipmentNumber}
+                onChange={(e) => handleInputChange('equipmentNumber', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Chiller 1, Generator 2"
               />
             </div>
 
@@ -238,27 +301,99 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                 placeholder="e.g., SN123456789"
               />
             </div>
+          </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., Data Hall 1"
-              />
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Location
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px'
+              }}
+              placeholder="e.g., Data Hall 1"
+            />
+          </div>
+
+          {/* Address Section */}
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#333' }}>
+              Site Address
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 80px', gap: '15px', marginBottom: '15px' }}>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.street}
+                  onChange={(e) => handleAddressChange('street', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="Street Address"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.city}
+                  onChange={(e) => handleAddressChange('city', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="City"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.state}
+                  onChange={(e) => handleAddressChange('state', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    textTransform: 'uppercase'
+                  }}
+                  placeholder="State"
+                  maxLength="2"
+                />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '15px' }}>
+              <div>
+                <input
+                  type="text"
+                  value={formData.address.zipCode}
+                  onChange={(e) => handleAddressChange('zipCode', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                  placeholder="ZIP Code"
+                  maxLength="10"
+                />
+              </div>
+              <div></div>
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 System *
@@ -273,48 +408,115 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., Cooling System, Power Distribution"
+                placeholder="e.g., Cooling, Power, UPS"
               />
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Component/Equipment Type *
+                Category *
               </label>
               <input
                 type="text"
-                value={formData.component}
-                onChange={(e) => handleInputChange('component', e.target.value)}
+                value={formData.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., Air Cooled Chiller, Water Cooled Chiller, Cooling Tower, etc."
+                placeholder="e.g., Emergency Shutdown"
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', marginBottom: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Emergency Type *
-              </label>
-              <input
-                type="text"
-                value={formData.emergencyType}
-                onChange={(e) => handleInputChange('emergencyType', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., Power Failure, High Temperature Alarm, Compressor Failure"
-              />
-            </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Work Description *
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                minHeight: '120px',
+                resize: 'vertical'
+              }}
+              placeholder="Describe the emergency operating procedure (e.g., emergency shutdown, power failure response, cooling failure mitigation)..."
+            />
           </div>
+        </div>
+
+        {/* Supporting Documents */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Supporting Documents</h3>
+          <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
+            Upload equipment manuals, specifications, or reference documents to help the AI generate a more accurate EOP
+          </p>
+          
+          <input
+            type="file"
+            multiple
+            accept=".pdf,.txt,.doc,.docx"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+            id="doc-upload"
+          />
+          
+          <label
+            htmlFor="doc-upload"
+            style={{
+              display: 'inline-block',
+              padding: '10px 20px',
+              backgroundColor: '#0070f3',
+              color: 'white',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginBottom: '15px',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0051cc'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0070f3'}
+          >
+            📎 Add Documents
+          </label>
+
+          {supportingDocs.length > 0 && (
+            <div style={{ marginTop: '15px' }}>
+              {supportingDocs.map((doc, index) => (
+                <div key={index} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '4px',
+                  marginBottom: '8px'
+                }}>
+                  <span style={{ fontSize: '14px' }}>
+                    📄 {doc.name} ({(doc.size / 1024).toFixed(1)} KB)
+                  </span>
+                  <button
+                    onClick={() => removeDoc(index)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#dc3545',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Progress Message */}
@@ -344,15 +546,14 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
         {/* Note about AI capabilities */}
         <div style={{
           padding: '15px',
-          backgroundColor: '#fff5f5',
+          backgroundColor: '#f0f7ff',
           borderRadius: '4px',
           marginBottom: '20px',
           fontSize: '14px',
-          color: '#555',
-          border: '1px solid #ffdddd'
+          color: '#555'
         }}>
-          <strong>Note:</strong> The AI will generate a comprehensive Emergency Operating Procedure including immediate actions, 
-          safety precautions, step-by-step response procedures, escalation protocols, and recovery procedures specific to the emergency type.
+          <strong>Note:</strong> The AI will automatically generate all necessary EOP sections including immediate actions, 
+          safety requirements, emergency procedures, and recovery steps based on the equipment information you provide.
           {' '}To ensure reliable service, there's a 60-second cooldown between generations.
         </div>
 
@@ -381,7 +582,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
             onClick={handleGenerate}
             style={{
               padding: '12px 30px',
-              backgroundColor: cooldownRemaining > 0 ? '#6c757d' : '#dc3545',
+              backgroundColor: cooldownRemaining > 0 ? '#6c757d' : '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -390,11 +591,11 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
               opacity: (isGenerating || cooldownRemaining > 0) ? 0.6 : 1,
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => !isGenerating && cooldownRemaining === 0 && (e.currentTarget.style.backgroundColor = '#c82333')}
-            onMouseLeave={(e) => !isGenerating && cooldownRemaining === 0 && (e.currentTarget.style.backgroundColor = '#dc3545')}
+            onMouseEnter={(e) => !isGenerating && cooldownRemaining === 0 && (e.currentTarget.style.backgroundColor = '#218838')}
+            onMouseLeave={(e) => !isGenerating && cooldownRemaining === 0 && (e.currentTarget.style.backgroundColor = '#28a745')}
             disabled={isGenerating || cooldownRemaining > 0}
           >
-            {isGenerating ? 'Generating...' : cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : '🚨 Generate EOP'}
+            {isGenerating ? 'Generating...' : cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : '🤖 Generate EOP'}
           </button>
         </div>
       </div>

@@ -41,7 +41,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Method of Procedure (MOP)</title>
+    <title>Emergency Operating Procedure (EOP)</title>
     <style>
         /* YOUR EXACT EXISTING STYLES */
         body { 
@@ -218,7 +218,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 </head>
 <body>
     <div class="container">
-        <h1>Method of Procedure (MOP)</h1>
+        <h1>Emergency Operating Procedure (EOP)</h1>
         {{SECTIONS}}
     </div>
     {{SCRIPTS}}
@@ -226,7 +226,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 </html>`;
 
 // Export the compile function for direct use
-export async function compileMOP(formData) {
+export async function compileEOP(formData) {
   try {
     const globalSourceManager = new SourceManager();
     
@@ -332,25 +332,25 @@ export async function compileMOP(formData) {
     const cleanTask = abbreviateTask(taskDescription);
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
-    const filename = `MOP_${cleanEquipmentNumber}_${cleanTask}_${currentDate}.html`;
+    const filename = `EOP_${cleanEquipmentNumber}_${cleanTask}_${currentDate}.html`;
 
     // Save to blob storage
-    const blob = await put(`mops/${filename}`, completeHtml, {
+    const blob = await put(`eops/${filename}`, completeHtml, {
       access: 'public',
       contentType: 'text/html'
     });
     
-    console.log('MOP generation complete:', filename);
+    console.log('EOP generation complete:', filename);
     
     return { 
       success: true,
       filename: filename,
       url: blob.url,
-      message: 'MOP generated successfully with source attribution'
+      message: 'EOP generated successfully with source attribution'
     };
     
   } catch (error) {
-    console.error('MOP compilation error:', error);
+    console.error('EOP compilation error:', error);
     throw error;
   }
 }
@@ -359,12 +359,12 @@ export async function compileMOP(formData) {
 export async function POST(request) {
   try {
     const { formData } = await request.json();
-    const result = await compileMOP(formData);
+    const result = await compileEOP(formData);
     return NextResponse.json(result);
   } catch (error) {
     console.error('MOP compilation route error:', error);
     return NextResponse.json({ 
-      error: 'Failed to compile MOP',
+      error: 'Failed to compile EOP',
       details: error.message
     }, { status: 500 });
   }
