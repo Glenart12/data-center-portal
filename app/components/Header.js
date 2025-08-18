@@ -82,7 +82,8 @@ export default function Header() {
             <h1 style={{ 
               margin: 0, 
               fontSize: 'clamp(16px, 2.5vw, 22px)',
-              fontWeight: '700',
+              fontWeight: 'normal',
+              fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
               color: 'white',
               letterSpacing: '-0.5px',
               textShadow: '0 2px 4px rgba(0,0,0,0.2)',
