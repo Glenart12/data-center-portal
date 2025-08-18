@@ -522,7 +522,7 @@ function EopPage() {
                   {versionDisplay && (
                     <div style={{
                       position: 'absolute',
-                      bottom: '50px',
+                      bottom: '30px',
                       left: '15px',
                       backgroundColor: '#dc3545',
                       color: 'white',
@@ -538,7 +538,7 @@ function EopPage() {
                   {/* File Type Badge */}
                   <div style={{
                     position: 'absolute',
-                    bottom: '50px',
+                    bottom: '30px',
                     right: '15px',
                     backgroundColor: getFileTypeColor(filename),
                     color: 'white',

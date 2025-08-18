@@ -511,7 +511,7 @@ function MopPage() {
                   {/* Version Badge */}
                   <div style={{
                     position: 'absolute',
-                    bottom: '50px',
+                    bottom: '30px',
                     left: '15px',
                     backgroundColor: '#0f3456',
                     color: 'white',
@@ -526,7 +526,7 @@ function MopPage() {
                   {/* File Type Badge */}
                   <div style={{
                     position: 'absolute',
-                    bottom: '50px',
+                    bottom: '30px',
                     right: '15px',
                     backgroundColor: getFileTypeColor(filename),
                     color: 'white',
