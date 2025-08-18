@@ -486,7 +486,7 @@ function SopPage() {
                 {/* File Type Badge */}
                 <div style={{
                   position: 'absolute',
-                  top: '15px',
+                  bottom: '15px',
                   right: '15px',
                   backgroundColor: getFileTypeColor(fileData.filename),
                   color: 'white',
