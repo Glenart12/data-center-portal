@@ -318,7 +318,7 @@ function SopPage() {
             filteredFiles.map((fileData) => (
               <div key={fileData.filename} style={{ 
                 border: '1px solid #e0e0e0', 
-                padding: '25px', 
+                padding: '25px 25px 70px 25px', 
                 borderRadius: '12px',
                 backgroundColor: 'white',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
