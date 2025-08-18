@@ -217,25 +217,69 @@ export async function POST(request) {
     
     // Generate each section
     const sections = [];
+    // Fix URL construction - VERCEL_URL doesn't include protocol
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000';
+      : process.env.NODE_ENV === 'production'
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL}`
+        : 'http://localhost:3000';
+    
+    console.log('Base URL for internal API calls:', baseUrl);
+    console.log('Environment:', {
+      VERCEL_URL: process.env.VERCEL_URL,
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL
+    });
+    
+    // Prepare headers with authentication for internal API calls
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Forward cookies for Auth0 session
+    const cookieHeader = request.headers.get('cookie');
+    if (cookieHeader) {
+      headers['cookie'] = cookieHeader;
+    }
+    
+    // Forward authorization header if present
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      headers['authorization'] = authHeader;
+    }
     
     for (const endpoint of SECTION_ENDPOINTS) {
       try {
-        console.log(`Generating ${endpoint}...`);
+        const fullUrl = `${baseUrl}/api/generate-mop-ai/sections/${endpoint}`;
+        console.log(`Generating ${endpoint} at ${fullUrl}...`);
         
-        const response = await fetch(`${baseUrl}/api/generate-mop-ai/sections/${endpoint}`, {
+        const response = await fetch(fullUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ formData })
         });
         
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: response.statusText }));
-          console.error(`Failed to generate ${endpoint}:`, errorData);
+          const errorText = await response.text();
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { error: errorText || response.statusText };
+          }
+          
+          console.error(`Failed to generate ${endpoint}:`, {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData,
+            url: fullUrl
+          });
           
           // Check for specific error types
+          if (response.status === 401) {
+            throw new Error(`Authentication error for ${endpoint}. Check API configuration.`);
+          }
+          
           if (response.status === 429 || errorData.error?.includes('busy') || errorData.error?.includes('quota')) {
             throw new Error(`AI service is busy. Please wait 2-3 minutes and try again.`);
           }

@@ -16,15 +16,48 @@ export async function POST(request) {
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
       : 'http://localhost:3000';
+    
+    // Pass through authentication headers for internal API calls
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Forward cookies for Auth0 session
+    const cookieHeader = request.headers.get('cookie');
+    if (cookieHeader) {
+      headers['cookie'] = cookieHeader;
+    }
+    
+    // Forward authorization header if present
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      headers['authorization'] = authHeader;
+    }
       
     const response = await fetch(`${baseUrl}/api/generate-mop-ai/sections/compile`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body)
     });
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Server error', userMessage: 'Server is busy. Please try again.' }));
+      // Get the error text first for logging
+      const errorText = await response.text();
+      console.error('MOP Compile failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText: errorText,
+        baseUrl: baseUrl,
+        fullUrl: `${baseUrl}/api/generate-mop-ai/sections/compile`
+      });
+      
+      // Try to parse as JSON, fallback to text error
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { error: errorText || 'Server error', userMessage: 'Server is busy. Please try again.' };
+      }
       
       // Add better error messages for common issues
       if (response.status === 429 || errorData.error?.includes('busy')) {
