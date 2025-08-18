@@ -71,19 +71,20 @@ export default function Header() {
               animation: 'shimmer 3s infinite'
             }} />
             <img 
-              src="/logo.png" 
-              alt="Glenart Group Logo" 
+              src="/Cream_LogoWordMark-1 (1)-cropped.svg" 
+              alt="Logo" 
               style={{ 
                 width: '28px',
                 height: '28px',
                 objectFit: 'contain',
                 position: 'relative',
-                zIndex: 1
+                zIndex: 1,
+                filter: 'brightness(0) invert(1)'
               }}
               onError={(e) => {
                 // If logo doesn't exist, show initials
                 e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span style="color: white; font-weight: bold; font-size: 18px; z-index: 1; position: relative;">GG</span>';
+                e.target.parentNode.innerHTML = '<span style="color: white; font-weight: bold; font-size: 18px; z-index: 1; position: relative;">AP</span>';
               }}
             />
           </div>
@@ -97,17 +98,8 @@ export default function Header() {
               letterSpacing: '-0.5px',
               textShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }}>
-              Glenart Group
+              Automated Procedure Generator
             </h1>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '13px',
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontWeight: '500',
-              letterSpacing: '0.5px'
-            }}>
-              Data Center Portal • CTP-003
-            </p>
           </div>
         </div>
 
