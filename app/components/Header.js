@@ -30,7 +30,9 @@ export default function Header() {
       top: 0,
       zIndex: 1000,
       boxShadow: '0 8px 32px rgba(15, 52, 86, 0.3)',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      width: '100%',
+      boxSizing: 'border-box'
     }}>
       <div style={{
         maxWidth: '1400px',
@@ -71,16 +73,24 @@ export default function Header() {
             />
           </div>
           
-          <div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            lineHeight: '1'
+          }}>
             <h1 style={{ 
               margin: 0, 
-              fontSize: '22px',
+              fontSize: 'clamp(16px, 2.5vw, 22px)',
               fontWeight: '700',
               color: 'white',
               letterSpacing: '-0.5px',
-              textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              lineHeight: '1.1'
             }}>
-              Automated Procedure Generator
+              <div>Automated</div>
+              <div>Procedure</div>
+              <div>Generator</div>
             </h1>
           </div>
         </div>
@@ -263,23 +273,35 @@ export default function Header() {
         
         /* Mobile responsive design */
         @media (max-width: 768px) {
+          header {
+            padding: 12px 16px !important;
+          }
+          
           header > div {
             flex-direction: column !important;
-            gap: 16px !important;
-            padding: 12px !important;
+            gap: 12px !important;
           }
           
           header > div > div:first-child {
             width: 100% !important;
             justify-content: center !important;
+            gap: 12px !important;
           }
           
           header > div > div:first-child img {
             height: 45px !important;
           }
           
+          header > div > div:first-child > div:last-child {
+            align-items: center !important;
+          }
+          
           header > div > div:first-child h1 {
-            font-size: 18px !important;
+            font-size: clamp(14px, 2vw, 18px) !important;
+            text-align: center !important;
+          }
+          
+          header > div > div:first-child h1 div {
             text-align: center !important;
           }
           
@@ -308,6 +330,10 @@ export default function Header() {
         
         /* Small mobile responsive design */
         @media (max-width: 480px) {
+          header {
+            padding: 10px 12px !important;
+          }
+          
           header > div > div:first-child {
             flex-direction: column !important;
             gap: 8px !important;
@@ -318,7 +344,11 @@ export default function Header() {
           }
           
           header > div > div:first-child h1 {
-            font-size: 16px !important;
+            font-size: clamp(12px, 1.8vw, 16px) !important;
+          }
+          
+          header > div > div:first-child h1 div {
+            line-height: 1.2 !important;
           }
           
           nav a {
