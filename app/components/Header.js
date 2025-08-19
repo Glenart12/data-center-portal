@@ -49,32 +49,26 @@ export default function Header() {
           gap: '20px',
           flex: '0 0 auto'
         }}>
-          {/* Logo Container */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: '12px',
-            padding: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-          }}>
-            <img 
-              src="/Cream_Logo.svg" 
-              alt="Glenart Group Logo" 
-              style={{ 
-                height: '50px',
-                width: '50px',
-                objectFit: 'contain'
-              }}
-              onError={(e) => {
-                // If logo doesn't exist, show initials
-                e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span style="color: #0070f3; font-weight: bold; font-size: 28px;">GG</span>';
-              }}
-            />
-          </div>
+          {/* Logo - Display directly without container */}
+          <img 
+            src="/Cream_Logo.svg" 
+            alt="Glenart Group Logo" 
+            style={{ 
+              height: '50px',
+              width: '50px',
+              objectFit: 'contain'
+            }}
+            onError={(e) => {
+              // If logo doesn't exist, show initials
+              e.target.style.display = 'none';
+              const fallback = document.createElement('span');
+              fallback.style.color = '#ffffff';
+              fallback.style.fontWeight = 'bold';
+              fallback.style.fontSize = '28px';
+              fallback.textContent = 'GG';
+              e.target.parentNode.replaceChild(fallback, e.target);
+            }}
+          />
           
           {/* Divider Line */}
           <div style={{
@@ -92,14 +86,15 @@ export default function Header() {
           }}>
             <h1 style={{ 
               margin: 0, 
-              fontSize: 'clamp(18px, 2.5vw, 24px)',
+              fontSize: 'clamp(14px, 2vw, 24px)',
               fontWeight: '600',
               fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
               color: 'white',
               letterSpacing: '1px',
               textShadow: '0 2px 6px rgba(0,0,0,0.3)',
               lineHeight: '1.2',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap'
             }}>
               Automated Procedure Generator
             </h1>
@@ -288,6 +283,10 @@ export default function Header() {
             padding: 10px 18px !important;
             font-size: 14px !important;
           }
+          
+          header > div > div:first-child h1 {
+            font-size: clamp(12px, 1.8vw, 20px) !important;
+          }
         }
         
         /* Mobile responsive design */
@@ -307,10 +306,6 @@ export default function Header() {
             gap: 12px !important;
           }
           
-          header > div > div:first-child > div:first-child {
-            padding: 6px !important;
-          }
-          
           header > div > div:first-child img {
             height: 40px !important;
             width: 40px !important;
@@ -325,8 +320,9 @@ export default function Header() {
           }
           
           header > div > div:first-child h1 {
-            font-size: clamp(14px, 2vw, 18px) !important;
+            font-size: clamp(10px, 3.5vw, 16px) !important;
             text-align: center !important;
+            letter-spacing: 0.5px !important;
           }
           
           header > div > div:first-child > div:last-child > div:last-child {
@@ -366,17 +362,14 @@ export default function Header() {
             gap: 8px !important;
           }
           
-          header > div > div:first-child > div:first-child {
-            padding: 5px !important;
-          }
-          
           header > div > div:first-child img {
             height: 35px !important;
             width: 35px !important;
           }
           
           header > div > div:first-child h1 {
-            font-size: clamp(12px, 1.8vw, 16px) !important;
+            font-size: clamp(9px, 3vw, 14px) !important;
+            letter-spacing: 0.3px !important;
           }
           
           nav a {
