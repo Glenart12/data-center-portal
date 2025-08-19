@@ -25,7 +25,6 @@ export default function Header() {
       background: 'linear-gradient(135deg, #0f3456 0%, #1e4a72 100%)',
       backdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-      padding: '16px 32px',
       position: 'sticky',
       top: 0,
       zIndex: 1000,
@@ -35,20 +34,23 @@ export default function Header() {
       boxSizing: 'border-box'
     }}>
       <div style={{
-        maxWidth: '100%',
-        margin: '0',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '16px 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif'
+        fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
+        gap: '20px',
+        flexWrap: 'wrap'
       }}>
         {/* Left side - Logo and Company Name */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
           gap: '20px',
-          flex: '0 0 auto',
-          marginRight: '30px'
+          flex: '1 1 auto',
+          minWidth: '200px'
         }}>
           {/* Logo - Display directly without container */}
           <img 
@@ -117,8 +119,7 @@ export default function Header() {
           display: 'flex', 
           gap: '12px',
           alignItems: 'center',
-          marginLeft: '20px',
-          marginRight: '20px'
+          flex: '0 1 auto'
         }}>
           {[
             { href: '/', label: 'Home' },
@@ -191,8 +192,9 @@ export default function Header() {
           display: 'flex', 
           alignItems: 'center', 
           gap: '16px',
-          flex: '0 0 auto',
-          marginLeft: '20px'
+          flex: '1 1 auto',
+          justifyContent: 'flex-end',
+          minWidth: '200px'
         }}>
           {/* User Avatar & Info */}
           <div style={{
@@ -282,11 +284,22 @@ export default function Header() {
           100% { transform: translateX(100%); }
         }
         
+        /* Large desktop */
+        @media (min-width: 1400px) {
+          header > div {
+            padding: 16px 40px !important;
+          }
+        }
+        
         /* Tablet responsive design */
         @media (max-width: 1024px) {
+          header > div {
+            padding: 14px 20px !important;
+          }
+          
           nav a {
             min-width: 70px !important;
-            padding: 10px 18px !important;
+            padding: 10px 16px !important;
             font-size: 14px !important;
           }
           
@@ -297,20 +310,17 @@ export default function Header() {
         
         /* Mobile responsive design */
         @media (max-width: 768px) {
-          header {
-            padding: 12px 16px !important;
-          }
-          
           header > div {
             flex-direction: column !important;
             gap: 12px !important;
+            padding: 12px 16px !important;
           }
           
           header > div > div:first-child {
             width: 100% !important;
             justify-content: center !important;
             gap: 12px !important;
-            margin-right: 0 !important;
+            min-width: unset !important;
           }
           
           header > div > div:first-child img {
@@ -345,8 +355,6 @@ export default function Header() {
             justify-content: center !important;
             flex-wrap: wrap !important;
             gap: 8px !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
           }
           
           nav a {
@@ -358,7 +366,7 @@ export default function Header() {
           header > div > div:last-child {
             width: 100% !important;
             justify-content: center !important;
-            margin-left: 0 !important;
+            min-width: unset !important;
           }
           
           header > div > div:last-child > div:first-child {
@@ -368,7 +376,7 @@ export default function Header() {
         
         /* Small mobile responsive design */
         @media (max-width: 480px) {
-          header {
+          header > div {
             padding: 10px 12px !important;
           }
           
