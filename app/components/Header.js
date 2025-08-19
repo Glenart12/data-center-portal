@@ -46,53 +46,71 @@ export default function Header() {
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '16px',
+          gap: '20px',
           flex: '0 0 auto'
         }}>
-          {/* Logo Container - No background color */}
+          {/* Logo Container */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            position: 'relative'
+            position: 'relative',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '12px',
+            padding: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
           }}>
             <img 
-              src="/Cream_LogoWordMark-1 (1)-cropped.svg" 
-              alt="Logo" 
+              src="/Cream_Logo.svg" 
+              alt="Glenart Group Logo" 
               style={{ 
-                height: '60px',
-                width: 'auto',
-                objectFit: 'contain',
-                filter: 'brightness(0) invert(1)'
+                height: '50px',
+                width: '50px',
+                objectFit: 'contain'
               }}
               onError={(e) => {
                 // If logo doesn't exist, show initials
                 e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span style="color: white; font-weight: bold; font-size: 36px;">AP</span>';
+                e.target.parentNode.innerHTML = '<span style="color: #0070f3; font-weight: bold; font-size: 28px;">GG</span>';
               }}
             />
           </div>
+          
+          {/* Divider Line */}
+          <div style={{
+            width: '1px',
+            height: '40px',
+            background: 'linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.5), transparent)',
+            margin: '0 4px'
+          }}></div>
           
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
-            lineHeight: '1'
+            gap: '2px'
           }}>
             <h1 style={{ 
               margin: 0, 
-              fontSize: 'clamp(16px, 2.5vw, 22px)',
-              fontWeight: 'normal',
+              fontSize: 'clamp(18px, 2.5vw, 24px)',
+              fontWeight: '600',
               fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
               color: 'white',
-              letterSpacing: '-0.5px',
-              textShadow: '0 2px 4px rgba(0,0,0,0.2)',
-              lineHeight: '1.1'
+              letterSpacing: '1px',
+              textShadow: '0 2px 6px rgba(0,0,0,0.3)',
+              lineHeight: '1.2',
+              textTransform: 'uppercase'
             }}>
-              <div>Automated</div>
-              <div>Procedure</div>
-              <div>Generator</div>
+              Automated Procedure Generator
             </h1>
+            <div style={{
+              fontSize: '12px',
+              color: 'rgba(255, 255, 255, 0.8)',
+              letterSpacing: '0.5px',
+              fontWeight: '400'
+            }}>
+              Data Center Operations Portal
+            </div>
           </div>
         </div>
 
@@ -289,8 +307,17 @@ export default function Header() {
             gap: 12px !important;
           }
           
+          header > div > div:first-child > div:first-child {
+            padding: 6px !important;
+          }
+          
           header > div > div:first-child img {
-            height: 45px !important;
+            height: 40px !important;
+            width: 40px !important;
+          }
+          
+          header > div > div:first-child > div:nth-child(2) {
+            display: none !important;
           }
           
           header > div > div:first-child > div:last-child {
@@ -302,8 +329,8 @@ export default function Header() {
             text-align: center !important;
           }
           
-          header > div > div:first-child h1 div {
-            text-align: center !important;
+          header > div > div:first-child > div:last-child > div:last-child {
+            display: none !important;
           }
           
           nav {
@@ -336,20 +363,20 @@ export default function Header() {
           }
           
           header > div > div:first-child {
-            flex-direction: column !important;
             gap: 8px !important;
           }
           
+          header > div > div:first-child > div:first-child {
+            padding: 5px !important;
+          }
+          
           header > div > div:first-child img {
-            height: 40px !important;
+            height: 35px !important;
+            width: 35px !important;
           }
           
           header > div > div:first-child h1 {
             font-size: clamp(12px, 1.8vw, 16px) !important;
-          }
-          
-          header > div > div:first-child h1 div {
-            line-height: 1.2 !important;
           }
           
           nav a {
