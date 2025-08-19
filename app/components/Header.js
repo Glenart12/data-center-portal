@@ -47,7 +47,8 @@ export default function Header() {
           display: 'flex', 
           alignItems: 'center', 
           gap: '20px',
-          flex: '0 0 auto'
+          flex: '0 0 auto',
+          marginRight: '30px'
         }}>
           {/* Logo - Display directly without container */}
           <img 
@@ -115,7 +116,9 @@ export default function Header() {
         <nav style={{ 
           display: 'flex', 
           gap: '12px',
-          alignItems: 'center'
+          alignItems: 'center',
+          marginLeft: '20px',
+          marginRight: '20px'
         }}>
           {[
             { href: '/', label: 'Home' },
@@ -306,6 +309,7 @@ export default function Header() {
             width: 100% !important;
             justify-content: center !important;
             gap: 12px !important;
+            margin-right: 0 !important;
           }
           
           header > div > div:first-child img {
@@ -340,6 +344,8 @@ export default function Header() {
             justify-content: center !important;
             flex-wrap: wrap !important;
             gap: 8px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
           }
           
           nav a {
