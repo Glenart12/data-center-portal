@@ -102,9 +102,11 @@ export default function Header() {
               fontSize: '12px',
               color: 'rgba(255, 255, 255, 0.8)',
               letterSpacing: '0.5px',
-              fontWeight: '400'
+              fontWeight: '400',
+              lineHeight: '1.2'
             }}>
-              Data Center Operations Portal
+              <div>Data Center Operations</div>
+              <div>Portal</div>
             </div>
           </div>
         </div>
