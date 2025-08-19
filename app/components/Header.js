@@ -54,8 +54,8 @@ export default function Header() {
             src="/Cream_Logo.svg" 
             alt="Glenart Group Logo" 
             style={{ 
-              height: '50px',
-              width: '50px',
+              height: '70px',
+              width: '70px',
               objectFit: 'contain'
             }}
             onError={(e) => {
@@ -92,11 +92,11 @@ export default function Header() {
               color: 'white',
               letterSpacing: '1px',
               textShadow: '0 2px 6px rgba(0,0,0,0.3)',
-              lineHeight: '1.2',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap'
+              lineHeight: '1.1',
+              textTransform: 'uppercase'
             }}>
-              Automated Procedure Generator
+              <div>Automated Procedure</div>
+              <div>Generator</div>
             </h1>
             <div style={{
               fontSize: '12px',
@@ -307,8 +307,8 @@ export default function Header() {
           }
           
           header > div > div:first-child img {
-            height: 40px !important;
-            width: 40px !important;
+            height: 50px !important;
+            width: 50px !important;
           }
           
           header > div > div:first-child > div:nth-child(2) {
@@ -323,6 +323,10 @@ export default function Header() {
             font-size: clamp(10px, 3.5vw, 16px) !important;
             text-align: center !important;
             letter-spacing: 0.5px !important;
+          }
+          
+          header > div > div:first-child h1 > div {
+            line-height: 1.1 !important;
           }
           
           header > div > div:first-child > div:last-child > div:last-child {
@@ -363,13 +367,17 @@ export default function Header() {
           }
           
           header > div > div:first-child img {
-            height: 35px !important;
-            width: 35px !important;
+            height: 45px !important;
+            width: 45px !important;
           }
           
           header > div > div:first-child h1 {
             font-size: clamp(9px, 3vw, 14px) !important;
             letter-spacing: 0.3px !important;
+          }
+          
+          header > div > div:first-child h1 > div {
+            line-height: 1.1 !important;
           }
           
           nav a {
