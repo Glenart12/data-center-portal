@@ -25,7 +25,7 @@ export default function Header() {
       background: 'linear-gradient(135deg, #0f3456 0%, #1e4a72 100%)',
       backdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-      padding: '16px 24px',
+      padding: '16px 32px',
       position: 'sticky',
       top: 0,
       zIndex: 1000,
@@ -35,8 +35,8 @@ export default function Header() {
       boxSizing: 'border-box'
     }}>
       <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
+        maxWidth: '100%',
+        margin: '0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -191,7 +191,8 @@ export default function Header() {
           display: 'flex', 
           alignItems: 'center', 
           gap: '16px',
-          flex: '0 0 auto'
+          flex: '0 0 auto',
+          marginLeft: '20px'
         }}>
           {/* User Avatar & Info */}
           <div style={{
@@ -357,6 +358,7 @@ export default function Header() {
           header > div > div:last-child {
             width: 100% !important;
             justify-content: center !important;
+            margin-left: 0 !important;
           }
           
           header > div > div:last-child > div:first-child {
