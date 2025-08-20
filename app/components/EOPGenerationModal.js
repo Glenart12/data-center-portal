@@ -416,7 +416,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Category *
+                Component Type *
               </label>
               <input
                 type="text"
@@ -428,7 +428,7 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., Emergency Shutdown"
+                placeholder="e.g., Air Cooled Chiller, Pump, etc."
               />
             </div>
           </div>

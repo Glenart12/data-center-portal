@@ -25,22 +25,24 @@ START WITH:
 <h1>Emergency Operating Procedure (EOP)</h1>
 
 <div class="emergency-warning" style="background: #dc3545; color: white; padding: 20px; margin: 20px 0; border-radius: 5px; font-size: 1.1em;">
-<strong>⚠️ EMERGENCY RESPONSE: \${manufacturer} \${modelNumber}</strong><br>
+<strong>⚠️ EMERGENCY RESPONSE: \${category} + \${workDescription}</strong><br>
 <strong>Location:</strong> \${location || 'Data Center'}<br>
 <strong>Emergency Type:</strong> \${emergencyType}<br>
 <strong>Critical Specs:</strong> Generate based on equipment database - voltage, phase, capacity, refrigerant type, etc.
 </div>
 
 <h2>Section 01: EOP Identification & Control</h2>
-<p><strong>EOP Title:</strong> Emergency Operating Procedure for \${manufacturer} \${modelNumber}</p>
-<p><strong>EOP Identifier:</strong> EOP-\${manufacturer.toUpperCase().substring(0,3)}-\${modelNumber.replace(/[^A-Z0-9]/gi, '').substring(0,8)}-PWR-001</p>
-<p><strong>Equipment Details:</strong></p>
+<p><strong>EOP Title:</strong> Emergency Operating Procedure for \${manufacturer} \${category} \${workDescription}</p>
+<p><strong>EOP Identifier:</strong></p>
+<p><strong>Work Description:</strong> \${workDescription}</p>
 <p><strong>Manufacturer:</strong> \${manufacturer}</p>
 <p><strong>Model Number:</strong> \${modelNumber}</p>
 <p><strong>Serial Number:</strong> \${serialNumber || 'N/A'}</p>
+<p><strong>Equipment Number:</strong> \${equipmentNumber || 'N/A'}</p>
 <p><strong>Location:</strong> \${location || 'Data Center'}</p>
 <p><strong>System:</strong> \${system}</p>
-<p><strong>Component Type:</strong> \${component}</p>
+<p><strong>Component Type:</strong> \${category}</p>
+<p><strong>Critical Specs:</strong> \${criticalSpecs}</p>
 <p><strong>Version:</strong> <input type="text" value="1.0" style="width:80px" /></p>
 <p><strong>Date:</strong> <input type="text" value="[current_date]" style="width:150px" /></p>
 <p><strong>Author:</strong> <input type="text" placeholder="Enter Author Name" style="width:250px" /></p>
