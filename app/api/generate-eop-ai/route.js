@@ -24,11 +24,8 @@ The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 START WITH:
 <h1>Emergency Operating Procedure (EOP)</h1>
 
-<div class="emergency-warning" style="background: #dc3545; color: white; padding: 20px; margin: 20px 0; border-radius: 5px; font-size: 1.1em;">
-<strong>⚠️ EMERGENCY RESPONSE: \${category} + \${workDescription}</strong><br>
-<strong>Location:</strong> \${location || 'Data Center'}<br>
-<strong>Emergency Type:</strong> \${emergencyType}<br>
-<strong>Critical Specs:</strong> Generate based on equipment database - voltage, phase, capacity, refrigerant type, etc.
+<div style="background: #dc3545; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
+    <h2 style="font-size: 2.5em; margin: 0; color: white;">\${category} \${workDescription}</h2>
 </div>
 
 <h2>Section 01: EOP Identification & Control</h2>
@@ -42,7 +39,18 @@ START WITH:
 <p><strong>Location:</strong> \${location || 'Data Center'}</p>
 <p><strong>System:</strong> \${system}</p>
 <p><strong>Component Type:</strong> \${category}</p>
-<p><strong>Critical Specs:</strong> \${criticalSpecs}</p>
+<p><strong>Critical Specs:</strong></p>
+<ul>
+    <li><strong>Manufacturer:</strong> \${manufacturer}</li>
+    <li><strong>Model:</strong> \${modelNumber}</li>
+    <li><strong>Serial Number:</strong> \${serialNumber || 'UPDATE NEEDED'}</li>
+    <li><strong>Voltage:</strong> \${voltage || 'UPDATE NEEDED - Verify equipment voltage'}</li>
+    <li><strong>Phase:</strong> \${phase || 'UPDATE NEEDED - Verify phase configuration'}</li>
+    <li><strong>Full Load Amps (FLA):</strong> \${amperage || 'UPDATE NEEDED - Verify FLA rating'}</li>
+    <li><strong>Control System:</strong> \${controlSystem || 'UPDATE NEEDED - Verify control type'}</li>
+    <li><strong>Power Rating:</strong> \${powerRating || 'UPDATE NEEDED - Verify kW/HP rating'}</li>
+    <li><strong>Operating Weight:</strong> \${weight || 'UPDATE NEEDED - Verify equipment weight'}</li>
+</ul>
 <p><strong>Version:</strong> <input type="text" value="1.0" style="width:80px" /></p>
 <p><strong>Date:</strong> <input type="text" value="[current_date]" style="width:150px" /></p>
 <p><strong>Author:</strong> <input type="text" placeholder="Enter Author Name" style="width:250px" /></p>
