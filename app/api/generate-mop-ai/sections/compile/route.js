@@ -325,20 +325,18 @@ export async function compileMOP(formData) {
     // Extract work description from form data
     const workDescription = formData.workDescription || formData.category || formData.system || 'MAINTENANCE';
     
-    // Get the next version number
-    const version = getNextVersion(
-      existingFiles.blobs,
-      formData.manufacturer || '',
-      formData.modelNumber || formData.model || '',
-      formData.serialNumber || formData.serial || '',
-      workDescription
-    );
-    
-    // Generate filename with new naming convention
+    // Generate filename components
     const cleanEquipmentNumber = sanitizeForFilename(formData.equipmentNumber || '');
     const taskDescription = `${formData.category || ''} ${workDescription}`;
     const cleanTask = abbreviateTask(taskDescription);
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Get the next version number based on equipment number and date
+    const version = getNextVersion(
+      existingFiles.blobs,
+      cleanEquipmentNumber,
+      currentDate
+    );
     
     const filename = `MOP_${cleanEquipmentNumber}_${cleanTask}_${currentDate}_V${version}.html`;
 
