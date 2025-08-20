@@ -1,4 +1,4 @@
-import { list, copy, del } from '@vercel/blob';
+import { list, put, del } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -16,7 +16,10 @@ export async function POST(request) {
     console.log(`Hiding file: ${filename} of type: ${type}`);
     
     // List all blobs to find the file
-    const result = await list({ limit: 1000 });
+    const result = await list({ 
+      limit: 1000,
+      token: process.env.BLOB_READ_WRITE_TOKEN 
+    });
     const blobs = result.blobs || [];
     
     // Find the blob to hide
@@ -33,20 +36,29 @@ export async function POST(request) {
     
     console.log(`Found blob to hide: ${blobToHide.pathname}`);
     
+    // Fetch the content from the original blob
+    const response = await fetch(blobToHide.url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch blob content');
+    }
+    const blobContent = await response.blob();
+    
     // Determine the new path in hidden folder
     const hiddenPath = `hidden/${type}/${filename}`;
     
-    // Copy the blob to the hidden location
-    const copiedBlob = await copy(blobToHide.url, { 
+    // Upload the content to the hidden location
+    const copiedBlob = await put(hiddenPath, blobContent, { 
       access: 'public',
       addRandomSuffix: false,
-      pathname: hiddenPath
+      token: process.env.BLOB_READ_WRITE_TOKEN
     });
     
     console.log(`Copied blob to hidden location: ${copiedBlob.pathname}`);
     
     // Delete the original blob
-    await del(blobToHide.url);
+    await del(blobToHide.url, {
+      token: process.env.BLOB_READ_WRITE_TOKEN
+    });
     
     console.log(`Deleted original blob: ${blobToHide.pathname}`);
     
