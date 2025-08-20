@@ -29,38 +29,100 @@ START WITH:
 </div>
 
 <h2>Section 01: EOP Identification & Control</h2>
-<p><strong>EOP Title:</strong> Emergency Operating Procedure for \${manufacturer} \${category} \${workDescription}</p>
-<p><strong>EOP Identifier:</strong></p>
-<p><strong>Work Description:</strong> \${workDescription}</p>
-<p><strong>Manufacturer:</strong> \${manufacturer}</p>
-<p><strong>Model Number:</strong> \${modelNumber}</p>
-<p><strong>Serial Number:</strong> \${serialNumber || 'N/A'}</p>
-<p><strong>Equipment Number:</strong> \${equipmentNumber || 'N/A'}</p>
-<p><strong>Location:</strong> \${location || 'Data Center'}</p>
-<p><strong>System:</strong> \${system}</p>
-<p><strong>Component Type:</strong> \${category}</p>
-<p><strong>Critical Specs:</strong></p>
-<ul>
-    <li><strong>Manufacturer:</strong> \${manufacturer}</li>
-    <li><strong>Model:</strong> \${modelNumber}</li>
-    <li><strong>Serial Number:</strong> \${serialNumber || 'UPDATE NEEDED'}</li>
-    <li><strong>Voltage:</strong> \${voltage || 'UPDATE NEEDED - Verify equipment voltage'}</li>
-    <li><strong>Phase:</strong> \${phase || 'UPDATE NEEDED - Verify phase configuration'}</li>
-    <li><strong>Full Load Amps (FLA):</strong> \${amperage || 'UPDATE NEEDED - Verify FLA rating'}</li>
-    <li><strong>Control System:</strong> \${controlSystem || 'UPDATE NEEDED - Verify control type'}</li>
-    <li><strong>Power Rating:</strong> \${powerRating || 'UPDATE NEEDED - Verify kW/HP rating'}</li>
-    <li><strong>Operating Weight:</strong> \${weight || 'UPDATE NEEDED - Verify equipment weight'}</li>
-</ul>
-<p><strong>Version:</strong> <input type="text" value="1.0" style="width:80px" /></p>
-<p><strong>Date:</strong> <input type="text" value="[current_date]" style="width:150px" /></p>
-<p><strong>Author:</strong> <input type="text" placeholder="Enter Author Name" style="width:250px" /></p>
-<p><strong>Approver:</strong> <input type="text" placeholder="Enter Approver Name" style="width:250px" /></p>
+<table class="info-table">
+    <tr>
+        <td>EOP Title:</td>
+        <td>Emergency Operating Procedure for \${manufacturer} \${category} \${workDescription}</td>
+    </tr>
+    <tr>
+        <td>EOP Identifier:</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Component Type:</td>
+        <td>\${category}</td>
+    </tr>
+    <tr>
+        <td>Work Description:</td>
+        <td>\${workDescription}</td>
+    </tr>
+    <tr>
+        <td>Manufacturer:</td>
+        <td>\${manufacturer}</td>
+    </tr>
+    <tr>
+        <td>Model Number:</td>
+        <td>\${modelNumber}</td>
+    </tr>
+    <tr>
+        <td>Serial Number:</td>
+        <td>\${serialNumber || 'N/A'}</td>
+    </tr>
+    <tr>
+        <td>Equipment Number:</td>
+        <td>\${equipmentNumber || 'N/A'}</td>
+    </tr>
+    <tr>
+        <td>Location:</td>
+        <td>\${location || 'Data Center'}</td>
+    </tr>
+    <tr>
+        <td>System:</td>
+        <td>\${system}</td>
+    </tr>
+    <tr>
+        <td>Critical Specs:</td>
+        <td>
+            <ul style="margin: 0; padding-left: 20px;">
+                <li><strong>Manufacturer:</strong> \${manufacturer}</li>
+                <li><strong>Model:</strong> \${modelNumber}</li>
+                <li><strong>Serial Number:</strong> \${serialNumber || 'UPDATE NEEDED'}</li>
+                <li><strong>Voltage:</strong> \${voltage || 'UPDATE NEEDED - Verify equipment voltage'}</li>
+                <li><strong>Phase:</strong> \${phase || 'UPDATE NEEDED - Verify phase configuration'}</li>
+                <li><strong>Full Load Amps (FLA):</strong> \${amperage || 'UPDATE NEEDED - Verify FLA rating'}</li>
+                <li><strong>Control System:</strong> \${controlSystem || 'UPDATE NEEDED - Verify control type'}</li>
+                <li><strong>Power Rating:</strong> \${powerRating || 'UPDATE NEEDED - Verify kW/HP rating'}</li>
+                <li><strong>Operating Weight:</strong> \${weight || 'UPDATE NEEDED - Verify equipment weight'}</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>Version:</td>
+        <td><input type="text" value="1.0" style="width:80px" /></td>
+    </tr>
+    <tr>
+        <td>Date:</td>
+        <td><input type="text" value="[current_date]" style="width:150px" /></td>
+    </tr>
+    <tr>
+        <td>Author:</td>
+        <td><input type="text" placeholder="Enter Author Name" style="width:250px" /></td>
+    </tr>
+    <tr>
+        <td>Approver:</td>
+        <td><input type="text" placeholder="Enter Approver Name" style="width:250px" /></td>
+    </tr>
+</table>
 
 <h2>Section 02: Purpose & Scope</h2>
-<p><strong>Purpose:</strong> This Emergency Operating Procedure provides step-by-step instructions for responding to power failure emergencies affecting the \${manufacturer} \${modelNumber} \${system}. This document ensures rapid, safe, and effective response to restore critical infrastructure operations.</p>
-<p><strong>Scope:</strong> This procedure applies to all data center operations personnel, facilities engineers, and emergency response teams responsible for maintaining the \${manufacturer} \${modelNumber} and associated critical infrastructure systems.</p>
-<p><strong>Activation Criteria:</strong> This EOP shall be activated when power loss is detected or suspected on the \${manufacturer} \${modelNumber}, including but not limited to: utility power outages, automatic transfer switch failures, distribution panel failures, circuit breaker trips, or equipment-specific power supply failures.</p>
-<p><strong>Safety Notice:</strong> All personnel must follow proper electrical safety procedures, use appropriate PPE, and verify de-energization before working on any electrical equipment.</p>
+<table class="info-table">
+    <tr>
+        <td>Purpose:</td>
+        <td>This Emergency Operating Procedure provides step-by-step instructions for responding to power failure emergencies affecting the \${manufacturer} \${modelNumber} \${system}. This document ensures rapid, safe, and effective response to restore critical infrastructure operations.</td>
+    </tr>
+    <tr>
+        <td>Scope:</td>
+        <td>This procedure applies to all data center operations personnel, facilities engineers, and emergency response teams responsible for maintaining the \${manufacturer} \${modelNumber} and associated critical infrastructure systems.</td>
+    </tr>
+    <tr>
+        <td>Activation Criteria:</td>
+        <td>This EOP shall be activated when power loss is detected or suspected on the \${manufacturer} \${modelNumber}, including but not limited to: utility power outages, automatic transfer switch failures, distribution panel failures, circuit breaker trips, or equipment-specific power supply failures.</td>
+    </tr>
+    <tr>
+        <td>Safety Notice:</td>
+        <td>All personnel must follow proper electrical safety procedures, use appropriate PPE, and verify de-energization before working on any electrical equipment.</td>
+    </tr>
+</table>
 
 <h2>Section 03: Immediate Emergency Actions - Power Failure Diagnostics</h2>
 
