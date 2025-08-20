@@ -554,7 +554,8 @@ CALCULATED VALUES:
 Current Date: ${currentDate}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
-Start with <h1>Standard Operating Procedure (SOP)</h1> and proceed with all 12 sections using H2 headers.
+Do NOT generate any <h1> tags or <div class="sop-document"> wrapper - the main title is already provided.
+Start DIRECTLY with <h2>Section 01: SOP Schedule Information</h2> and proceed with all 12 sections using H2 headers.
 
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early
@@ -655,7 +656,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     // Add green banner with category and description
     const bannerHtml = `
 <div style="background: #28a745; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-    <h2 style="font-size: 2.5em; margin: 0; color: white;">${formData.category} ${formData.description}</h2>
+    <h2 style="font-size: 2.5em; margin: 0; color: white; border: none;">${formData.category} ${formData.description}</h2>
 </div>`;
     
     // Insert banner after the main h1 title
