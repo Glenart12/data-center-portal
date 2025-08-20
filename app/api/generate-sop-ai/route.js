@@ -6,6 +6,40 @@ import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enha
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Helper function to calculate CET Level based on task complexity
+function calculateCETLevel(manufacturer, model, task) {
+  const taskLower = task?.toLowerCase() || '';
+  
+  if (taskLower.includes('commission') || taskLower.includes('replacement') || 
+      taskLower.includes('overhaul') || taskLower.includes('emergency')) {
+    return '<strong>CET 3 (Lead Technician)</strong> - Complex procedure requiring advanced expertise';
+  }
+  
+  if (taskLower.includes('maintenance') || taskLower.includes('quarterly') || 
+      taskLower.includes('annual') || taskLower.includes('repair')) {
+    return '<strong>CET 2 (Technician)</strong> - Standard maintenance procedure';
+  }
+  
+  return '<strong>CET 1 (Junior Technician)</strong> - Routine operational procedure';
+}
+
+// Helper function to calculate Risk Level based on task criticality
+function calculateRiskLevel(manufacturer, model, task) {
+  const taskLower = task?.toLowerCase() || '';
+  
+  if (taskLower.includes('emergency') || taskLower.includes('critical') || 
+      taskLower.includes('electrical') || taskLower.includes('power')) {
+    return '<strong>Level 3</strong> (High) - Critical infrastructure impact possible';
+  }
+  
+  if (taskLower.includes('maintenance') || taskLower.includes('quarterly') || 
+      taskLower.includes('annual')) {
+    return '<strong>Level 2</strong> (Medium) - Limited system impact with redundancy';
+  }
+  
+  return '<strong>Level 1</strong> (Low) - Minimal operational impact';
+}
+
 const SOP_INSTRUCTIONS = `
 You are an expert data center operations engineer creating a Standard Operating Procedure (SOP) document.
 Generate a comprehensive, professional SOP document in HTML format with ALL 12 sections listed below.
@@ -34,29 +68,23 @@ CRITICAL: You MUST include ALL 12 sections in order:
 SECTION-BY-SECTION REQUIREMENTS:
 
 Section 01: SOP Schedule Information
+MUST use table format with these exact rows:
 - SOP Identifier: Generate unique ID (e.g., SOP-[SYSTEM]-[DATE]-[NUMBER])
 - Procedure Title: Clear, descriptive title including manufacturer and model
-- Duration: AUTO-CALCULATE based on task complexity:
-  * Daily checks: 30-45 minutes
-  * Weekly maintenance: 1-2 hours
-  * Monthly maintenance: 2-4 hours
-  * Quarterly/Annual: 4-8 hours
-- Level of Risk (LOR): Calculate using exact same logic as MOP generation:
-  * Level 1 (Low): Routine non-intrusive checks
-  * Level 2 (Medium): Standard maintenance with redundancy
-  * Level 3 (High): Work on critical systems (UPS, generators, chillers)
-  * Level 4 (Critical): Work on single points of failure or switchgear
+- Duration: USE PROVIDED VALUE from CALCULATED VALUES section
+- Level of Risk (LOR): USE PROVIDED VALUE from CALCULATED VALUES section (display the full HTML with strong tags)
+- CET Level Required to Perform Task: USE PROVIDED "CET Level Required" from CALCULATED VALUES section (display the full HTML with strong tags)
 - Author: <input type="text" placeholder="Enter Author Name" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- Date: ${new Date().toLocaleDateString('en-US')} (today's date)
+- Date: Use Current Date from CALCULATED VALUES section
 - Version: <input type="text" value="1.0" style="border: 1px solid #999; padding: 2px; width: 80px;">
-- CET Level Required to Perform Task: <input type="text" placeholder="CET Level" style="border: 1px solid #999; padding: 2px; width: 100px;">
 - Author CET Level: <input type="text" placeholder="Author CET Level" style="border: 1px solid #999; padding: 2px; width: 100px;">
 - Frequency: Based on the procedure type provided
 
 Section 02: Site Information
-- Customer: [Customer name from form]
-- Site Name: [Site name or UPDATE NEEDED]
-- Site Address: [Full site address or UPDATE NEEDED]
+Format as table with these rows:
+- Customer: [Use Customer from Customer Information section]
+- Site Name: [Use Site Name from Site Information section, or show UPDATE NEEDED in red if not provided]
+- Site Address: [Use full address from Site Address section]
 DO NOT include Customer Address
 
 Section 03: SOP Overview
@@ -74,6 +102,14 @@ MUST format EXACTLY as:
 </table>
 <h3>Personnel Required:</h3>
 <table class="info-table">
+  <tr>
+    <td>Personnel Required:</td>
+    <td>2<br><em style="font-size: 0.9em; color: #666;">
+        For the [Procedure Description] of the [Manufacturer] [Model], a minimum of 2 qualified technicians are required. 
+        This ensures proper safety protocols are followed during [Category] operations, including lockout/tagout procedures, equipment handling, and emergency response capability. 
+        The two-person rule enables verification of critical steps and provides immediate assistance in case of equipment malfunction or safety incidents.
+    </em></td>
+  </tr>
   <tr><td># of Facilities Personnel:</td><td><input type="text" value="2" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
   <tr><td># of Contractors #1:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
   <tr><td># of Contractors #2:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
@@ -478,6 +514,10 @@ export async function POST(request) {
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
     
+    // Calculate CET Level and Risk Level using the helper functions
+    const cetLevelHtml = calculateCETLevel(formData.manufacturer, formData.modelNumber, formData.description);
+    const riskLevelHtml = calculateRiskLevel(formData.manufacturer, formData.modelNumber, formData.description);
+    
     // Prepare the prompt for Gemini
     const prompt = `${SOP_INSTRUCTIONS}
 
@@ -495,6 +535,9 @@ Equipment Details:
 Customer Information:
 - Customer: ${formData.customer}
 
+Site Information:
+- Site Name: ${formData.siteName || 'UPDATE NEEDED'}
+
 Site Address:
 - Street: ${formData.address?.street || 'UPDATE NEEDED'}
 - City: ${formData.address?.city || 'UPDATE NEEDED'}
@@ -505,6 +548,8 @@ CALCULATED VALUES:
 - Level of Risk (LOR): ${riskLevel} - ${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]}
 - Risk Justification: ${riskJustification}
 - Duration: ${duration}
+- CET Level Required: ${cetLevelHtml}
+- Risk Level Assessment: ${riskLevelHtml}
 
 Current Date: ${currentDate}
 
@@ -513,8 +558,11 @@ Start with <h1>Standard Operating Procedure (SOP)</h1> and proceed with all 12 s
 
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early
-2. Section 01 MUST include calculated LOR: ${riskLevel} and Duration: ${duration}
-3. Section 01 MUST have editable input fields for Author, Version, CET Level Required, Author CET Level
+2. Section 01 MUST use the EXACT calculated values provided:
+   - Duration: ${duration}
+   - Level of Risk (LOR): ${riskLevelHtml} (display as HTML with strong tags)
+   - CET Level Required: ${cetLevelHtml} (display as HTML with strong tags)
+3. Section 01 MUST have editable input fields for Author, Version, Author CET Level
 4. Section 02 MUST show Customer: ${formData.customer} ONLY (no Customer Address)
 5. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
 6. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
@@ -603,6 +651,18 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     if (!generatedContent.includes('<h1>')) {
       generatedContent = `<h1>Standard Operating Procedure (SOP)</h1>\n${generatedContent}`;
     }
+    
+    // Add green banner with category and description
+    const bannerHtml = `
+<div style="background: #28a745; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
+    <h2 style="font-size: 2.5em; margin: 0; color: white;">${formData.category} ${formData.description}</h2>
+</div>`;
+    
+    // Insert banner after the main h1 title
+    generatedContent = generatedContent.replace(
+      /<h1>Standard Operating Procedure \(SOP\)<\/h1>/,
+      `<h1>Standard Operating Procedure (SOP)</h1>${bannerHtml}`
+    );
     
     // Generate dynamic SOP title
     const sopTitle = `SOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.procedureType}`;

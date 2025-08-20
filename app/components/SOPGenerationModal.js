@@ -9,6 +9,7 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     equipmentNumber: '',
     serialNumber: '',
     location: '',
+    siteName: '',
     address: {
       street: '',
       city: '',
@@ -137,6 +138,7 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             modelNumber: formData.modelNumber,
             serialNumber: formData.serialNumber,
             location: formData.location,
+            siteName: formData.siteName,
             system: formData.system,
             category: formData.category,
             description: formData.description,
@@ -330,6 +332,25 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
                 borderRadius: '4px'
               }}
               placeholder="e.g., Data Hall 1"
+            />
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              Site Name
+            </label>
+            <input
+              type="text"
+              value={formData.siteName}
+              onChange={(e) => handleInputChange('siteName', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+              placeholder="Enter site name (e.g., Data Center West)"
             />
           </div>
 
