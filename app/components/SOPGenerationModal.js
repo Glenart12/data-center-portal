@@ -17,7 +17,9 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     },
     system: '',
     category: '',
-    description: ''
+    description: '',
+    procedureType: 'Standard',  // Add this with default value
+    customer: ''  // Add this
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -115,8 +117,8 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.equipmentNumber || !formData.system || 
-        !formData.category || !formData.description) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Category\n• Work Description');
+        !formData.category || !formData.description || !formData.procedureType || !formData.customer) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Category\n• Procedure Type\n• Customer\n• Work Description');
       return;
     }
 
@@ -131,9 +133,19 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
         },
         body: JSON.stringify({
           formData: {
-            ...formData,
-            frequency: formData.category, // Add frequency field using category value
-            workDescription: formData.description // Ensure workDescription is available
+            manufacturer: formData.manufacturer,
+            modelNumber: formData.modelNumber,
+            serialNumber: formData.serialNumber,
+            location: formData.location,
+            system: formData.system,
+            category: formData.category,
+            description: formData.description,
+            procedureType: formData.procedureType,
+            customer: formData.customer,
+            frequency: formData.category, // Keep for backward compatibility
+            workDescription: formData.description, // Keep for backward compatibility
+            equipmentNumber: formData.equipmentNumber,
+            address: formData.address
           },
           supportingDocs: supportingDocs.map(doc => ({
             name: doc.name,
@@ -427,6 +439,51 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
                   borderRadius: '4px'
                 }}
                 placeholder="e.g., Standard Operating Procedure"
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Procedure Type *
+              </label>
+              <select
+                value={formData.procedureType}
+                onChange={(e) => handleInputChange('procedureType', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  backgroundColor: 'white'
+                }}
+                required
+              >
+                <option value="Standard">Standard</option>
+                <option value="Emergency">Emergency</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Customer *
+              </label>
+              <input
+                type="text"
+                value={formData.customer}
+                onChange={(e) => handleInputChange('customer', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+                placeholder="Enter customer name"
+                required
               />
             </div>
           </div>
