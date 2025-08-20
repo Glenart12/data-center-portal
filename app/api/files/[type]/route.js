@@ -7,11 +7,15 @@ export async function GET(request, props) {
     const params = await props.params;
     const { type } = params;
     
+    // Check if we should fetch hidden files
+    const { searchParams } = new URL(request.url);
+    const fetchHidden = searchParams.get('hidden') === 'true';
+    
     if (!['mops', 'sops', 'eops'].includes(type)) {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    console.log(`Listing files for type: ${type}`);
+    console.log(`Listing ${fetchHidden ? 'hidden ' : ''}files for type: ${type}`);
 
     // Get files from Blob storage ONLY - no more local files
     let blobFiles = [];
@@ -32,12 +36,32 @@ export async function GET(request, props) {
       }
       
       // Handle different document types
-      if (type === 'mops') {
+      if (fetchHidden) {
+        // Fetch hidden files
+        const hiddenPath = `hidden/${type}/`;
+        blobFiles = blobs
+          .filter(blob => {
+            return blob.pathname.startsWith(hiddenPath) && 
+                   (blob.pathname.endsWith('.pdf') || blob.pathname.endsWith('.txt') || blob.pathname.endsWith('.html'));
+          })
+          .map(blob => {
+            const filename = blob.pathname.split('/').pop();
+            return {
+              filename: filename,
+              url: blob.url,
+              size: blob.size,
+              uploadedAt: blob.uploadedAt,
+              source: 'blob',
+              isHidden: true
+            };
+          });
+      } else if (type === 'mops') {
         blobFiles = blobs
           .filter(blob => {
             const filename = blob.pathname.split('/').pop();
-            // Include files that start with MOP_ or are in mops/ folder
-            return (filename.startsWith('MOP_') || blob.pathname.startsWith('mops/')) && 
+            // Include files that start with MOP_ or are in mops/ folder (but not hidden)
+            return !blob.pathname.startsWith('hidden/') &&
+                   (filename.startsWith('MOP_') || blob.pathname.startsWith('mops/')) && 
                    (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
           })
           .map(blob => {
@@ -54,8 +78,9 @@ export async function GET(request, props) {
         blobFiles = blobs
           .filter(blob => {
             const filename = blob.pathname.split('/').pop();
-            // Include files that start with EOP_ or are in eops/ folder
-            return (filename.startsWith('EOP_') || blob.pathname.startsWith('eops/')) && 
+            // Include files that start with EOP_ or are in eops/ folder (but not hidden)
+            return !blob.pathname.startsWith('hidden/') &&
+                   (filename.startsWith('EOP_') || blob.pathname.startsWith('eops/')) && 
                    (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
           })
           .map(blob => {
@@ -72,8 +97,9 @@ export async function GET(request, props) {
         blobFiles = blobs
           .filter(blob => {
             const filename = blob.pathname.split('/').pop();
-            // Include files that start with SOP_ or are in sops/ folder
-            return (filename.startsWith('SOP_') || blob.pathname.startsWith('sops/')) && 
+            // Include files that start with SOP_ or are in sops/ folder (but not hidden)
+            return !blob.pathname.startsWith('hidden/') &&
+                   (filename.startsWith('SOP_') || blob.pathname.startsWith('sops/')) && 
                    (filename.endsWith('.pdf') || filename.endsWith('.txt') || filename.endsWith('.html'));
           })
           .map(blob => {

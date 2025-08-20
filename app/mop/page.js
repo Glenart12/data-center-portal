@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import MOPGenerationModal from '../components/MOPGenerationModal';
+import HiddenFilesModal from '../components/HiddenFilesModal';
 
 function MopPage() {
   const [files, setFiles] = useState([]);
@@ -15,9 +16,15 @@ function MopPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [deletingFile, setDeletingFile] = useState(null);
+  const [hiddenFilesCount, setHiddenFilesCount] = useState(0);
+  const [isHiddenModalOpen, setIsHiddenModalOpen] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [hidingFile, setHidingFile] = useState(null);
 
   useEffect(() => {
     fetchFiles();
+    fetchHiddenCount();
   }, []);
 
   const fetchFiles = async () => {
@@ -39,6 +46,16 @@ function MopPage() {
       setFilesData(fileDataMap);
     } catch (err) {
       console.error('Error fetching files:', err);
+    }
+  };
+
+  const fetchHiddenCount = async () => {
+    try {
+      const response = await fetch('/api/files/mops?hidden=true');
+      const data = await response.json();
+      setHiddenFilesCount(data.files?.length || 0);
+    } catch (err) {
+      console.error('Error fetching hidden files count:', err);
     }
   };
 
@@ -80,6 +97,44 @@ function MopPage() {
     setIsGenerateModalOpen(false);
     // Refresh files after closing generate modal
     fetchFiles();
+    fetchHiddenCount();
+  };
+
+  const handleHide = async (filename, e) => {
+    if (e) e.stopPropagation();
+    setDropdownOpen(null);
+    setHidingFile(filename);
+    
+    try {
+      const response = await fetch('/api/hide-file', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename,
+          type: 'mops'
+        })
+      });
+
+      if (response.ok) {
+        await fetchFiles();
+        await fetchHiddenCount();
+      } else {
+        const error = await response.json();
+        alert(`Failed to hide file: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Hide error:', error);
+      alert('Failed to hide file');
+    } finally {
+      setHidingFile(null);
+    }
+  };
+
+  const handleUnhideCallback = () => {
+    fetchFiles();
+    fetchHiddenCount();
   };
 
 
@@ -318,7 +373,7 @@ function MopPage() {
           </button>
 
           <div style={{ minWidth: '180px', height: '48px' }}>
-            <UploadButton type="mops" onUploadSuccess={fetchFiles} />
+            <UploadButton type="mops" onUploadSuccess={() => { fetchFiles(); fetchHiddenCount(); }} />
           </div>
         </div>
 
@@ -365,54 +420,135 @@ function MopPage() {
                 }}
                 onClick={() => handlePDFClick(filename)}
                 onMouseEnter={(e) => {
+                  setHoveredCard(filename);
                   e.currentTarget.style.transform = 'translateY(-5px)';
                   e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
                   e.currentTarget.style.borderColor = '#0f3456';
                 }}
                 onMouseLeave={(e) => {
+                  setHoveredCard(null);
                   e.currentTarget.style.transform = 'translateY(0)';
                   e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
                   e.currentTarget.style.borderColor = '#e0e0e0';
                 }}
                 >
-                  {/* Delete Button - Only show for Blob storage files */}
+                  {/* Three dots menu - only show on hover for Blob storage files */}
                   {fileData?.source === 'blob' && (
-                    <button
-                      onClick={(e) => handleDelete(filename, e)}
+                    <div
                       style={{
                         position: 'absolute',
                         top: '10px',
                         right: '10px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        color: '#dc3545',
-                        cursor: 'pointer',
-                        fontSize: '20px',
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 0.2s ease',
-                        opacity: 0.7,
+                        opacity: hoveredCard === filename ? 1 : 0,
+                        transition: 'opacity 0.2s ease',
                         zIndex: 10
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#dc3545';
-                        e.currentTarget.style.color = 'white';
-                        e.currentTarget.style.opacity = '1';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#dc3545';
-                        e.currentTarget.style.opacity = '0.7';
-                      }}
-                      disabled={deletingFile === filename}
-                      title="Delete file"
                     >
-                      {deletingFile === filename ? '⟳' : '×'}
-                    </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDropdownOpen(dropdownOpen === filename ? null : filename);
+                        }}
+                        style={{
+                          background: 'white',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          color: '#666',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f0f0f0';
+                          e.currentTarget.style.borderColor = '#999';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'white';
+                          e.currentTarget.style.borderColor = '#ddd';
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      
+                      {/* Dropdown menu */}
+                      {dropdownOpen === filename && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '35px',
+                            right: '0',
+                            backgroundColor: 'white',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                            zIndex: 1000,
+                            minWidth: '120px'
+                          }}
+                        >
+                          <button
+                            onClick={(e) => handleHide(filename, e)}
+                            disabled={hidingFile === filename}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              padding: '10px 15px',
+                              border: 'none',
+                              background: 'none',
+                              textAlign: 'left',
+                              cursor: hidingFile === filename ? 'wait' : 'pointer',
+                              fontSize: '14px',
+                              color: '#333',
+                              transition: 'background-color 0.2s ease',
+                              borderRadius: '6px 6px 0 0'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (hidingFile !== filename) {
+                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            {hidingFile === filename ? 'Hiding...' : 'Hide'}
+                          </button>
+                          <div style={{ borderTop: '1px solid #eee' }}></div>
+                          <button
+                            onClick={(e) => handleDelete(filename, e)}
+                            disabled={deletingFile === filename}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              padding: '10px 15px',
+                              border: 'none',
+                              background: 'none',
+                              textAlign: 'left',
+                              cursor: deletingFile === filename ? 'wait' : 'pointer',
+                              fontSize: '14px',
+                              color: '#dc3545',
+                              transition: 'background-color 0.2s ease',
+                              borderRadius: '0 0 6px 6px'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (deletingFile !== filename) {
+                                e.currentTarget.style.backgroundColor = '#fef2f2';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            {deletingFile === filename ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   <div style={{ 
@@ -542,6 +678,43 @@ function MopPage() {
             })
           )}
         </div>
+        
+        {/* Hidden Documents Button */}
+        {hiddenFilesCount > 0 && (
+          <div style={{
+            textAlign: 'center',
+            marginTop: '30px'
+          }}>
+            <button
+              onClick={() => setIsHiddenModalOpen(true)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                boxShadow: '0 2px 8px rgba(108, 117, 125, 0.2)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a6268';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(108, 117, 125, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#6c757d';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(108, 117, 125, 0.2)';
+              }}
+            >
+              🔒 Hidden Documents ({hiddenFilesCount})
+            </button>
+          </div>
+        )}
       </div>
 
       {/* All the Modals */}
@@ -556,6 +729,13 @@ function MopPage() {
       <MOPGenerationModal
         isOpen={isGenerateModalOpen}
         onClose={closeGenerateModal}
+      />
+      
+      <HiddenFilesModal
+        isOpen={isHiddenModalOpen}
+        onClose={() => setIsHiddenModalOpen(false)}
+        type="mops"
+        onUnhide={handleUnhideCallback}
       />
 
     </div>
