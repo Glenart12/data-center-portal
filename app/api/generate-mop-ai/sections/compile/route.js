@@ -306,11 +306,32 @@ export async function compileMOP(formData) {
     });
     </script>`;
     
+    // Helper function to abbreviate long component types
+    const getAbbreviatedComponentType = (componentType) => {
+      if (!componentType) return '';
+      
+      const abbreviations = {
+        'Automatic Transfer Switch': 'ATS',
+        'Uninterruptible Power Supply': 'UPS',
+        'Computer Room Air Handler': 'CRAH',
+        'Computer Room Air Conditioner': 'CRAC',
+        'Variable Frequency Drive': 'VFD',
+        'Power Distribution Unit': 'PDU'
+      };
+      
+      // Return abbreviation if it exists and is significantly shorter
+      if (abbreviations[componentType] && componentType.length > 20) {
+        return abbreviations[componentType];
+      }
+      
+      return componentType;
+    };
+
     // Add blue title card after h1
     const { category, componentType } = formData;
     const titleCard = `
         <div style="background: #0f3456; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-            <h2 style="font-size: 2.5em; margin: 0; color: white;">${formData.description || formData.workDescription || formData.category || 'Maintenance Procedure'}</h2>
+            <h2 style="font-size: 2.5em; margin: 0; color: white;">${getAbbreviatedComponentType(formData.componentType)} ${formData.description || formData.workDescription || 'Maintenance'}</h2>
         </div>`;
     
     // Build complete HTML

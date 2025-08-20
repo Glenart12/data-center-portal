@@ -43,7 +43,7 @@ export async function generateSection01(formData) {
     </tr>
     <tr>
         <td>MOP Identifier:</td>
-        <td>MOP_${(equipmentNumber || 'EQUIPMENT').toUpperCase().replace(/\s+/g, '_')}_${(category || 'MAINTENANCE').replace(/\s+/g, '_').toUpperCase()}_${new Date().toISOString().split('T')[0]}</td>
+        <td><input type="text" placeholder="To be assigned" style="width:250px" /></td>
     </tr>
     <tr>
         <td>Component Type:</td>
@@ -204,7 +204,11 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Min. # of Facilities Personnel:</td>
-        <td>2<br><em style="font-size: 0.9em; color: #666;">(Minimum 2 technicians required for safety and proper equipment handling)</em></td>
+        <td>2<br><em style="font-size: 0.9em; color: #666;">
+            For the ${formData.category || 'maintenance'} of the ${formData.manufacturer || ''} ${formData.modelNumber || 'equipment'} (S/N: ${formData.serialNumber || 'TBD'}), a minimum of 2 qualified technicians are required. 
+            This ensures proper safety protocols are followed during ${formData.componentType || 'equipment'} maintenance, including lockout/tagout procedures, heavy component handling, and emergency response capability. 
+            The two-person rule also enables verification of critical steps and provides immediate assistance in case of equipment malfunction or safety incidents.
+        </em></td>
     </tr>
     <tr>
         <td>Work Performed By:</td>
