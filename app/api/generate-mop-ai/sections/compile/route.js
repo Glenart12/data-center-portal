@@ -340,7 +340,7 @@ export async function compileMOP(formData) {
     const cleanTask = abbreviateTask(taskDescription);
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
-    const filename = `MOP_${cleanEquipmentNumber}_${cleanTask}_${currentDate}.html`;
+    const filename = `MOP_${cleanEquipmentNumber}_${cleanTask}_${currentDate}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`mops/${filename}`, completeHtml, {
