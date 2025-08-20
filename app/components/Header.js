@@ -27,7 +27,7 @@ export default function Header() {
       borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
       position: 'sticky',
       top: 0,
-      zIndex: 1000,
+      zIndex: 100,
       boxShadow: '0 8px 32px rgba(15, 52, 86, 0.3)',
       transition: 'all 0.3s ease',
       width: '100%',
@@ -41,16 +41,14 @@ export default function Header() {
         alignItems: 'center',
         justifyContent: 'space-between',
         fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
-        gap: '20px',
-        flexWrap: 'wrap'
+        gap: '20px'
       }}>
         {/* Left side - Logo and Company Name */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
           gap: '20px',
-          flex: '1 1 auto',
-          minWidth: '200px'
+          flex: '0 1 auto'
         }}>
           {/* Logo - Display directly without container */}
           <img 
@@ -119,7 +117,8 @@ export default function Header() {
           display: 'flex', 
           gap: '12px',
           alignItems: 'center',
-          flex: '0 1 auto'
+          flex: '1 1 auto',
+          justifyContent: 'center'
         }}>
           {[
             { href: '/', label: 'Home' },
@@ -192,9 +191,7 @@ export default function Header() {
           display: 'flex', 
           alignItems: 'center', 
           gap: '16px',
-          flex: '1 1 auto',
-          justifyContent: 'flex-end',
-          minWidth: '200px'
+          flex: '0 1 auto'
         }}>
           {/* User Avatar & Info */}
           <div style={{

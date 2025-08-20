@@ -202,8 +202,8 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
       alignItems: 'flex-start',
       justifyContent: 'center',
       zIndex: 9999,
-      paddingTop: '90px',
-      overflowY: 'auto'
+      paddingTop: '100px',
+      overflow: 'auto'
     }}>
       <div style={{
         backgroundColor: 'white',
@@ -211,7 +211,7 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
         borderRadius: '8px',
         width: '95%',
         maxWidth: '700px',
-        maxHeight: 'calc(100vh - 140px)',
+        maxHeight: 'calc(100vh - 120px)',
         overflowY: 'auto',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         marginBottom: '40px'

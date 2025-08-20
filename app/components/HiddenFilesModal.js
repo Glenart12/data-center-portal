@@ -113,7 +113,7 @@ export default function HiddenFilesModal({ isOpen, onClose, type, onUnhide }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
+        zIndex: 9999,
         fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
       }}
       onClick={onClose}

@@ -474,16 +474,16 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
       justifyContent: 'center',
       zIndex: 9999,
       padding: '20px',
-      paddingTop: '90px',
+      paddingTop: '100px',
       backdropFilter: 'blur(5px)',
-      overflowY: 'auto'
+      overflow: 'auto'
     }}>
       <div style={{
         backgroundColor: 'white',
         borderRadius: '15px',
         width: '95%',
         maxWidth: '1000px',
-        maxHeight: 'calc(100vh - 140px)',
+        maxHeight: 'calc(100vh - 120px)',
         overflow: 'hidden',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         display: 'flex',
