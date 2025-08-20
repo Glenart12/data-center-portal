@@ -306,8 +306,16 @@ export async function compileMOP(formData) {
     });
     </script>`;
     
+    // Add blue title card after h1
+    const { category, workDescription, componentType } = formData;
+    const titleCard = `
+        <div style="background: #0f3456; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
+            <h2 style="font-size: 2.5em; margin: 0; color: white;">${category || workDescription || 'Maintenance Procedure'}</h2>
+        </div>`;
+    
     // Build complete HTML
     const completeHtml = HTML_TEMPLATE
+      .replace('<h1>Method of Procedure (MOP)</h1>', `<h1>Method of Procedure (MOP)</h1>${titleCard}`)
       .replace('{{SECTIONS}}', sectionsHtml)
       .replace('{{SCRIPTS}}', scripts);
     

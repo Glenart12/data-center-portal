@@ -25,8 +25,8 @@ export async function generateSection01(formData) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, system, category, frequency } = formData;
-    console.log('Destructured fields:', { manufacturer, system, category, frequency });
+    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency } = formData;
+    console.log('Destructured fields:', { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency });
     
     const currentDate = new Date().toLocaleDateString('en-US', {
       month: '2-digit',
@@ -35,46 +35,59 @@ export async function generateSection01(formData) {
     });
     console.log('Generated current date:', currentDate);
 
-    // Generate title based on equipment
-    console.log('Processing system type:', system);
-    const equipmentType = system && system.includes('Chiller') ? 'CHILLER' : 
-                         system && system.includes('Generator') ? 'GENERATOR' :
-                         system && system.includes('UPS') ? 'UPS' : 
-                         system ? system.toUpperCase() : 'EQUIPMENT';
-    console.log('Determined equipment type:', equipmentType);
-    
-    const title = `${(manufacturer || 'UNKNOWN').toUpperCase()} ${equipmentType} - ${(category || 'MAINTENANCE').toUpperCase()}`;
-    console.log('Generated title:', title);
-
     const html = `<h2>Section 01: MOP Schedule Information</h2>
 <table class="info-table">
     <tr>
         <td>MOP Title:</td>
-        <td>${title}</td>
+        <td>Method of Procedure for ${manufacturer || 'Equipment'} ${modelNumber || 'Model'}</td>
     </tr>
     <tr>
-        <td>MOP Information:</td>
-        <td>This is ${category && category.toLowerCase().includes('annual') ? 'an' : 'a'} ${(category || 'maintenance').toLowerCase()} on the ${manufacturer || 'equipment'} ${system || 'system'}.</td>
+        <td>MOP Identifier:</td>
+        <td>MOP_${(system || 'SYSTEM').toUpperCase().replace(/\s+/g, '_')}_${(category || 'MAINTENANCE').replace(/\s+/g, '_').toUpperCase()}_${new Date().toISOString().split('T')[0]}</td>
     </tr>
     <tr>
-        <td>MOP Creation Date:</td>
-        <td>${currentDate}</td>
+        <td>Manufacturer:</td>
+        <td>${manufacturer || 'N/A'}</td>
     </tr>
     <tr>
-        <td>MOP Revision Date:</td>
-        <td><input type="text" value="${currentDate}" style="width:150px" /></td>
+        <td>Model Number:</td>
+        <td>${modelNumber || 'N/A'}</td>
     </tr>
     <tr>
-        <td>Document Number:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Assign per facility process" /></td>
+        <td>Serial Number:</td>
+        <td>${serialNumber || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record from nameplate" />'}</td>
     </tr>
     <tr>
-        <td>Revision Number:</td>
-        <td><input type="text" value="V1" style="width:100px" /></td>
+        <td>Location:</td>
+        <td>${location || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter location" />'}</td>
+    </tr>
+    <tr>
+        <td>System:</td>
+        <td>${system || 'N/A'}</td>
+    </tr>
+    <tr>
+        <td>Component Type:</td>
+        <td>${componentType || 'N/A'}</td>
+    </tr>
+    <tr>
+        <td>Version:</td>
+        <td>1.0</td>
+    </tr>
+    <tr>
+        <td>Date:</td>
+        <td>${new Date().toLocaleDateString()}</td>
+    </tr>
+    <tr>
+        <td>Author:</td>
+        <td><input type="text" placeholder="Enter Author Name" style="width:250px" /></td>
     </tr>
     <tr>
         <td>Author CET Level:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Assign per facility process" /></td>
+        <td><input type="text" placeholder="Enter Author CET level" style="width:250px" /></td>
+    </tr>
+    <tr>
+        <td>Approver:</td>
+        <td><input type="text" placeholder="Enter Approver Name" style="width:250px" /></td>
     </tr>
 </table>`;
 
@@ -203,7 +216,7 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Min. # of Facilities Personnel:</td>
-        <td>2</td>
+        <td>2<br><em style="font-size: 0.9em; color: #666;">(Minimum 2 technicians required for safety and proper equipment handling)</em></td>
     </tr>
     <tr>
         <td>Work Performed By:</td>

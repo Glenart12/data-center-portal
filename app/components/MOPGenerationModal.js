@@ -16,6 +16,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
       zipCode: ''
     },
     system: '',
+    componentType: '',
     category: '',
     description: ''
   });
@@ -412,6 +413,26 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
               />
             </div>
 
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Component Type
+              </label>
+              <input
+                type="text"
+                value={formData.componentType}
+                onChange={(e) => handleInputChange('componentType', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Air-Cooled Chiller, Pump, Generator"
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Category *
