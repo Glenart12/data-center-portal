@@ -133,7 +133,9 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
           formData: {
             ...formData,
             frequency: formData.category, // Add frequency field using category value
-            workDescription: formData.description // Ensure workDescription is available
+            workDescription: formData.description, // Ensure workDescription is available
+            component: formData.category, // Add component field that the EOP route expects
+            emergencyType: 'Power Failure' // Add default emergency type that EOP route expects
           },
           supportingDocs: supportingDocs.map(doc => ({
             name: doc.name,
