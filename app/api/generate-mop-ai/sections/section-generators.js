@@ -25,7 +25,7 @@ export async function generateSection01(formData) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber } = formData;
+    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber, workDescription } = formData;
     console.log('Destructured fields:', { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber });
     
     const currentDate = new Date().toLocaleDateString('en-US', {
@@ -39,7 +39,7 @@ export async function generateSection01(formData) {
 <table class="info-table">
     <tr>
         <td>MOP Title:</td>
-        <td>Method of Procedure for ${manufacturer || 'Equipment'} ${modelNumber || 'Model'}</td>
+        <td>Method of Procedure for ${manufacturer || 'Equipment'} ${componentType || 'Equipment Type'} ${workDescription || category || 'Maintenance'}</td>
     </tr>
     <tr>
         <td>MOP Identifier:</td>
@@ -203,22 +203,6 @@ export async function generateSection03(formData) {
         <td>${system.includes('Chiller') ? 'Mechanical Room / Rooftop' : 'Equipment Room'}</td>
     </tr>
     <tr>
-        <td>Manufacturer:</td>
-        <td>${manufacturer}</td>
-    </tr>
-    <tr>
-        <td>Equipment ID:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record on-site" /></td>
-    </tr>
-    <tr>
-        <td>Model #:</td>
-        <td>${modelNumber}</td>
-    </tr>
-    <tr>
-        <td>Serial #:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record from nameplate" /></td>
-    </tr>
-    <tr>
         <td>Min. # of Facilities Personnel:</td>
         <td>2<br><em style="font-size: 0.9em; color: #666;">(Minimum 2 technicians required for safety and proper equipment handling)</em></td>
     </tr>
@@ -247,10 +231,6 @@ export async function generateSection03(formData) {
     <tr>
         <td>Qualifications Required:</td>
         <td>EPA 608 Universal Certification, Qualified Electrical Worker</td>
-    </tr>
-    <tr>
-        <td>Tools Required:</td>
-        <td>Standard mechanics tool set, refrigerant gauges, multimeter, torque wrench set</td>
     </tr>
     <tr>
         <td>Advance notifications required:</td>
