@@ -281,7 +281,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., Chiller 1, Generator 2"
+                placeholder="e.g., CHILLER-1, ATS-2, GEN-3"
               />
             </div>
 

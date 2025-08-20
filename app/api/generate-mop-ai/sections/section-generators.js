@@ -25,8 +25,8 @@ export async function generateSection01(formData) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency } = formData;
-    console.log('Destructured fields:', { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency });
+    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber } = formData;
+    console.log('Destructured fields:', { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber });
     
     const currentDate = new Date().toLocaleDateString('en-US', {
       month: '2-digit',
@@ -43,7 +43,11 @@ export async function generateSection01(formData) {
     </tr>
     <tr>
         <td>MOP Identifier:</td>
-        <td>MOP_${(system || 'SYSTEM').toUpperCase().replace(/\s+/g, '_')}_${(category || 'MAINTENANCE').replace(/\s+/g, '_').toUpperCase()}_${new Date().toISOString().split('T')[0]}</td>
+        <td>MOP_${(equipmentNumber || 'EQUIPMENT').toUpperCase().replace(/\s+/g, '_')}_${(category || 'MAINTENANCE').replace(/\s+/g, '_').toUpperCase()}_${new Date().toISOString().split('T')[0]}</td>
+    </tr>
+    <tr>
+        <td>Component Type:</td>
+        <td>${componentType || 'N/A'}</td>
     </tr>
     <tr>
         <td>Manufacturer:</td>
@@ -58,16 +62,16 @@ export async function generateSection01(formData) {
         <td>${serialNumber || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record from nameplate" />'}</td>
     </tr>
     <tr>
+        <td>Equipment Number:</td>
+        <td>${equipmentNumber || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter equipment number" />'}</td>
+    </tr>
+    <tr>
         <td>Location:</td>
         <td>${location || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter location" />'}</td>
     </tr>
     <tr>
         <td>System:</td>
         <td>${system || 'N/A'}</td>
-    </tr>
-    <tr>
-        <td>Component Type:</td>
-        <td>${componentType || 'N/A'}</td>
     </tr>
     <tr>
         <td>Version:</td>
