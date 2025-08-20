@@ -47,10 +47,6 @@ Generate a comprehensive, professional SOP document in HTML format with ALL 12 s
 IMPORTANT: You must generate EQUIPMENT-SPECIFIC procedures based on the exact manufacturer and model provided.
 Do NOT generate generic procedures. All steps, safety requirements, and technical details must be specific to the equipment.
 
-HEADER FORMAT (At the very top of document):
-- Title: Standard Operating Procedure (SOP)
-- Use green color (#198754) for the SOP header
-
 CRITICAL: You MUST include ALL 12 sections in order:
 - Section 01: SOP Schedule Information
 - Section 02: Site Information
@@ -554,7 +550,7 @@ CALCULATED VALUES:
 Current Date: ${currentDate}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
-Do NOT generate any <h1> tags or <div class="sop-document"> wrapper - the main title is already provided.
+Do NOT generate any <h1> tags, titles, or <div class="sop-document"> wrapper.
 Start DIRECTLY with <h2>Section 01: SOP Schedule Information</h2> and proceed with all 12 sections using H2 headers.
 
 CRITICAL REQUIREMENTS:
@@ -648,22 +644,14 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
       .trim();
     
-    // Add the main title if not present
-    if (!generatedContent.includes('<h1>')) {
-      generatedContent = `<h1>Standard Operating Procedure (SOP)</h1>\n${generatedContent}`;
-    }
-    
-    // Add green banner with category and description
+    // Add green banner with category and description directly
     const bannerHtml = `
 <div style="background: #28a745; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
     <h2 style="font-size: 2.5em; margin: 0; color: white; border: none;">${formData.category} ${formData.description}</h2>
 </div>`;
     
-    // Insert banner after the main h1 title
-    generatedContent = generatedContent.replace(
-      /<h1>Standard Operating Procedure \(SOP\)<\/h1>/,
-      `<h1>Standard Operating Procedure (SOP)</h1>${bannerHtml}`
-    );
+    // Add banner at the beginning
+    generatedContent = `${bannerHtml}\n${generatedContent}`;
     
     // Generate dynamic SOP title
     const sopTitle = `SOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.procedureType}`;
