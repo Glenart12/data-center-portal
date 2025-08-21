@@ -48,7 +48,254 @@ function calculateRiskLevel(manufacturer, model, task) {
   return '<strong>Level 1</strong> (Low) - Routine operational procedure with minimal impact';
 }
 
-const SOP_INSTRUCTIONS = `
+const HTML_TEMPLATE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>__SOP_TITLE__</title>
+    <style>
+        body { 
+            font-family: 'Century Gothic', Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+            line-height: 1.6;
+        }
+        .container { 
+            background-color: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #198754; 
+            text-align: center; 
+            margin-bottom: 40px; 
+            font-size: 2.5em;
+            border-bottom: 3px solid #198754;
+            padding-bottom: 20px;
+        }
+        h2 { 
+            color: #198754; 
+            border-bottom: 2px solid #20c997; 
+            padding-bottom: 10px; 
+            margin-top: 40px; 
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #146c43;
+            margin-top: 25px;
+            font-size: 1.3em;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #198754; 
+            color: white; 
+            font-weight: bold;
+        }
+        tr:nth-child(even) { 
+            background-color: #f9f9f9; 
+        }
+        .info-table td:first-child { 
+            font-weight: bold; 
+            background-color: #e8f5e9; 
+            width: 35%; 
+        }
+        .procedure-step {
+            background-color: #f0f9f5;
+            padding: 15px;
+            border-left: 5px solid #20c997;
+            margin: 15px 0;
+        }
+        .caution-box {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .warning-box {
+            background-color: #fee;
+            border: 2px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success-criteria {
+            background-color: #d1f2eb;
+            padding: 15px;
+            border-left: 5px solid #198754;
+            margin: 15px 0;
+        }
+        input[type="text"], input[type="date"], input[type="time"], textarea {
+            border: 1px solid #999;
+            padding: 5px;
+            background-color: #fff;
+            font-family: inherit;
+            font-size: inherit;
+            width: 90%;
+        }
+        input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+        .checkbox-item {
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        ul { 
+            line-height: 1.8; 
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .update-needed {
+            color: #dc3545;
+            font-weight: bold;
+            background-color: #ffe6e6;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .section-separator {
+            border-top: 2px solid #ccc;
+            margin: 40px 0;
+        }
+        .approval-signature {
+            border: 1px solid #999;
+            width: 200px;
+            height: 40px;
+            background-color: #fff;
+            margin-top: 5px;
+        }
+        .completion-checklist {
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        @media print {
+            body { background-color: white; }
+            .container { box-shadow: none; padding: 20px; }
+            h1, h2 { page-break-after: avoid; }
+            table { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {{CONTENT}}
+    </div>
+</body>
+</html>`;
+
+export async function POST(request) {
+  try {
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY is not configured');
+      return NextResponse.json({ 
+        error: 'Configuration error',
+        userMessage: 'AI service is not properly configured. Please check GEMINI_API_KEY.'
+      }, { status: 500 });
+    }
+    
+    const body = await request.json();
+    const { formData } = body;
+    
+    // Validate required fields
+    if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
+        !formData?.componentType || !formData?.workDescription || !formData?.customer ||
+        !formData?.author || !formData?.authorCETLevel || !formData?.approver) {
+      return NextResponse.json({ 
+        error: 'Missing required fields',
+        userMessage: 'Please fill in all required fields'
+      }, { status: 400 });
+    }
+    
+    console.log('Starting SOP generation for:', formData.manufacturer, formData.modelNumber);
+    
+    // Determine LOR based on operational procedure type
+    let riskLevel = 2;
+    let riskJustification = "Standard operational procedure";
+    
+    const workDesc = formData.workDescription || '';
+    const system = formData.system?.toLowerCase() || '';
+    const componentType = formData.componentType?.toLowerCase() || '';
+    
+    // Risk levels for operational procedures (not maintenance)
+    if (workDesc === 'Emergency Shutdown Procedure') {
+      riskLevel = 3;
+      riskJustification = "Emergency procedure affecting critical systems";
+    } else if (workDesc === 'Backup System Activation') {
+      riskLevel = 3;
+      riskJustification = "Critical failover procedure requiring precise execution";
+    } else if (workDesc === 'Load Transfer Procedure') {
+      riskLevel = 3;
+      riskJustification = "Power transfer operation affecting critical loads";
+    } else if (workDesc === 'Alarm Response Procedure') {
+      riskLevel = 2;
+      riskJustification = "Response procedure requiring immediate action";
+    } else if (workDesc === 'System Changeover Procedure') {
+      riskLevel = 2;
+      riskJustification = "System transition requiring coordinated steps";
+    } else if (workDesc === 'Daily Startup Procedure' || workDesc === 'Daily Shutdown Procedure' ||
+               workDesc === 'Weekly System Check' || workDesc === 'Equipment Monitoring Protocol' ||
+               workDesc === 'Normal Operating Procedure') {
+      riskLevel = 1;
+      riskJustification = "Routine operational procedure with minimal risk";
+    }
+    
+    // Additional risk factors based on equipment type
+    if (system.includes('electrical') && componentType.includes('switchgear')) {
+      riskLevel = Math.max(riskLevel, 3);
+      riskJustification = "Critical electrical system operation";
+    } else if (componentType.includes('ups') || componentType.includes('generator')) {
+      riskLevel = Math.max(riskLevel, 2);
+      riskJustification = "Critical power system operation";
+    }
+    
+    // Auto-calculate duration based on operational procedure type
+    let duration = "30 minutes";
+    if (workDesc === 'Emergency Shutdown Procedure') {
+      duration = "15-30 minutes";
+    } else if (workDesc === 'Backup System Activation' || workDesc === 'Load Transfer Procedure') {
+      duration = "30-60 minutes";
+    } else if (workDesc === 'System Changeover Procedure') {
+      duration = "45-90 minutes";
+    } else if (workDesc === 'Daily Startup Procedure' || workDesc === 'Daily Shutdown Procedure') {
+      duration = "15-30 minutes";
+    } else if (workDesc === 'Weekly System Check') {
+      duration = "30-45 minutes";
+    } else if (workDesc === 'Equipment Monitoring Protocol' || workDesc === 'Normal Operating Procedure') {
+      duration = "15-20 minutes";
+    } else if (workDesc === 'Alarm Response Procedure') {
+      duration = "10-20 minutes";
+    }
+    
+    // Get current date for input fields
+    const currentDate = new Date().toLocaleDateString('en-US');
+    
+    // Calculate CET Level and Risk Level using the helper functions
+    const cetLevelHtml = calculateCETLevel(formData.manufacturer, formData.modelNumber, formData.workDescription);
+    const riskLevelHtml = calculateRiskLevel(formData.manufacturer, formData.modelNumber, formData.workDescription);
+    
+    // Define SOP_INSTRUCTIONS template with formData now in scope
+    const SOP_INSTRUCTIONS = `
 You are an expert data center operations engineer creating a Standard Operating Procedure (SOP) document.
 Generate a comprehensive, professional SOP document in HTML format with ALL 12 sections listed below.
 
@@ -319,252 +566,6 @@ FORMATTING REQUIREMENTS:
 - Make the document printer-friendly
 - Use clear section numbering (Section 01, Section 02, etc.)
 `;
-
-const HTML_TEMPLATE = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>__SOP_TITLE__</title>
-    <style>
-        body { 
-            font-family: 'Century Gothic', Arial, sans-serif; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            background-color: #f5f5f5; 
-            line-height: 1.6;
-        }
-        .container { 
-            background-color: white; 
-            padding: 40px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-        }
-        h1 { 
-            color: #198754; 
-            text-align: center; 
-            margin-bottom: 40px; 
-            font-size: 2.5em;
-            border-bottom: 3px solid #198754;
-            padding-bottom: 20px;
-        }
-        h2 { 
-            color: #198754; 
-            border-bottom: 2px solid #20c997; 
-            padding-bottom: 10px; 
-            margin-top: 40px; 
-            font-size: 1.8em;
-        }
-        h3 {
-            color: #146c43;
-            margin-top: 25px;
-            font-size: 1.3em;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 20px 0; 
-        }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 12px; 
-            text-align: left; 
-        }
-        th { 
-            background-color: #198754; 
-            color: white; 
-            font-weight: bold;
-        }
-        tr:nth-child(even) { 
-            background-color: #f9f9f9; 
-        }
-        .info-table td:first-child { 
-            font-weight: bold; 
-            background-color: #e8f5e9; 
-            width: 35%; 
-        }
-        .procedure-step {
-            background-color: #f0f9f5;
-            padding: 15px;
-            border-left: 5px solid #20c997;
-            margin: 15px 0;
-        }
-        .caution-box {
-            background-color: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-        .warning-box {
-            background-color: #fee;
-            border: 2px solid #dc3545;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .success-criteria {
-            background-color: #d1f2eb;
-            padding: 15px;
-            border-left: 5px solid #198754;
-            margin: 15px 0;
-        }
-        input[type="text"], input[type="date"], input[type="time"], textarea {
-            border: 1px solid #999;
-            padding: 5px;
-            background-color: #fff;
-            font-family: inherit;
-            font-size: inherit;
-            width: 90%;
-        }
-        input[type="checkbox"] {
-            margin-right: 8px;
-            transform: scale(1.2);
-        }
-        .checkbox-item {
-            margin: 10px 0;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        ul { 
-            line-height: 1.8; 
-            margin-left: 20px;
-        }
-        li {
-            margin-bottom: 8px;
-        }
-        .update-needed {
-            color: #dc3545;
-            font-weight: bold;
-            background-color: #ffe6e6;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-        .section-separator {
-            border-top: 2px solid #ccc;
-            margin: 40px 0;
-        }
-        .approval-signature {
-            border: 1px solid #999;
-            width: 200px;
-            height: 40px;
-            background-color: #fff;
-            margin-top: 5px;
-        }
-        .completion-checklist {
-            background-color: #e8f5e9;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        @media print {
-            body { background-color: white; }
-            .container { box-shadow: none; padding: 20px; }
-            h1, h2 { page-break-after: avoid; }
-            table { page-break-inside: avoid; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        {{CONTENT}}
-    </div>
-</body>
-</html>`;
-
-export async function POST(request) {
-  try {
-    // Check if Gemini API key is configured
-    if (!process.env.GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY is not configured');
-      return NextResponse.json({ 
-        error: 'Configuration error',
-        userMessage: 'AI service is not properly configured. Please check GEMINI_API_KEY.'
-      }, { status: 500 });
-    }
-    
-    const body = await request.json();
-    const { formData } = body;
-    
-    // Validate required fields
-    if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.componentType || !formData?.workDescription || !formData?.customer ||
-        !formData?.author || !formData?.authorCETLevel || !formData?.approver) {
-      return NextResponse.json({ 
-        error: 'Missing required fields',
-        userMessage: 'Please fill in all required fields'
-      }, { status: 400 });
-    }
-    
-    console.log('Starting SOP generation for:', formData.manufacturer, formData.modelNumber);
-    
-    // Determine LOR based on operational procedure type
-    let riskLevel = 2;
-    let riskJustification = "Standard operational procedure";
-    
-    const workDesc = formData.workDescription || '';
-    const system = formData.system?.toLowerCase() || '';
-    const componentType = formData.componentType?.toLowerCase() || '';
-    
-    // Risk levels for operational procedures (not maintenance)
-    if (workDesc === 'Emergency Shutdown Procedure') {
-      riskLevel = 3;
-      riskJustification = "Emergency procedure affecting critical systems";
-    } else if (workDesc === 'Backup System Activation') {
-      riskLevel = 3;
-      riskJustification = "Critical failover procedure requiring precise execution";
-    } else if (workDesc === 'Load Transfer Procedure') {
-      riskLevel = 3;
-      riskJustification = "Power transfer operation affecting critical loads";
-    } else if (workDesc === 'Alarm Response Procedure') {
-      riskLevel = 2;
-      riskJustification = "Response procedure requiring immediate action";
-    } else if (workDesc === 'System Changeover Procedure') {
-      riskLevel = 2;
-      riskJustification = "System transition requiring coordinated steps";
-    } else if (workDesc === 'Daily Startup Procedure' || workDesc === 'Daily Shutdown Procedure' ||
-               workDesc === 'Weekly System Check' || workDesc === 'Equipment Monitoring Protocol' ||
-               workDesc === 'Normal Operating Procedure') {
-      riskLevel = 1;
-      riskJustification = "Routine operational procedure with minimal risk";
-    }
-    
-    // Additional risk factors based on equipment type
-    if (system.includes('electrical') && componentType.includes('switchgear')) {
-      riskLevel = Math.max(riskLevel, 3);
-      riskJustification = "Critical electrical system operation";
-    } else if (componentType.includes('ups') || componentType.includes('generator')) {
-      riskLevel = Math.max(riskLevel, 2);
-      riskJustification = "Critical power system operation";
-    }
-    
-    // Auto-calculate duration based on operational procedure type
-    let duration = "30 minutes";
-    if (workDesc === 'Emergency Shutdown Procedure') {
-      duration = "15-30 minutes";
-    } else if (workDesc === 'Backup System Activation' || workDesc === 'Load Transfer Procedure') {
-      duration = "30-60 minutes";
-    } else if (workDesc === 'System Changeover Procedure') {
-      duration = "45-90 minutes";
-    } else if (workDesc === 'Daily Startup Procedure' || workDesc === 'Daily Shutdown Procedure') {
-      duration = "15-30 minutes";
-    } else if (workDesc === 'Weekly System Check') {
-      duration = "30-45 minutes";
-    } else if (workDesc === 'Equipment Monitoring Protocol' || workDesc === 'Normal Operating Procedure') {
-      duration = "15-20 minutes";
-    } else if (workDesc === 'Alarm Response Procedure') {
-      duration = "10-20 minutes";
-    }
-    
-    // Get current date for input fields
-    const currentDate = new Date().toLocaleDateString('en-US');
-    
-    // Calculate CET Level and Risk Level using the helper functions
-    const cetLevelHtml = calculateCETLevel(formData.manufacturer, formData.modelNumber, formData.workDescription);
-    const riskLevelHtml = calculateRiskLevel(formData.manufacturer, formData.modelNumber, formData.workDescription);
     
     // Prepare the prompt for Gemini
     const prompt = `${SOP_INSTRUCTIONS}
