@@ -25,7 +25,7 @@ export async function generateSection01(formData) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber, workDescription } = formData;
+    const { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber, workDescription, description } = formData;
     console.log('Destructured fields:', { manufacturer, modelNumber, serialNumber, location, system, componentType, category, frequency, equipmentNumber });
     
     const currentDate = new Date().toLocaleDateString('en-US', {
@@ -35,11 +35,39 @@ export async function generateSection01(formData) {
     });
     console.log('Generated current date:', currentDate);
 
+    // Determine risk level based on system and work description
+    let riskLevel = 2;
+    let riskJustification = "Single system affected with redundancy available";
+    
+    const workDesc = workDescription || description || '';
+    const systemLower = (system || '').toLowerCase();
+    
+    if (workDesc.toLowerCase().includes('electrical') && systemLower.includes('switchgear')) {
+      riskLevel = 4;
+      riskJustification = "Main switchgear work affects entire facility";
+    } else if (systemLower.includes('chiller') && workDesc.toLowerCase().includes('major')) {
+      riskLevel = 3;
+      riskJustification = "Critical cooling system with limited redundancy";
+    } else if (systemLower.includes('generator')) {
+      riskLevel = 3;
+      riskJustification = "Critical power system maintenance";
+    } else if (systemLower.includes('ups')) {
+      riskLevel = 3;
+      riskJustification = "Critical power protection system";
+    }
+
+    const cetRequired = {
+      1: "CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve",
+      2: "CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve",
+      3: "CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve",
+      4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
+    };
+
     const html = `<h2>Section 01: MOP Schedule Information</h2>
 <table class="info-table">
     <tr>
         <td>MOP Title:</td>
-        <td>Method of Procedure for ${manufacturer || 'Equipment'} ${componentType || 'Equipment Type'} ${workDescription || category || 'Maintenance'}</td>
+        <td>${componentType || system || 'System'} ${workDescription || description || 'Maintenance'}</td>
     </tr>
     <tr>
         <td>MOP Identifier:</td>
@@ -47,39 +75,55 @@ export async function generateSection01(formData) {
     </tr>
     <tr>
         <td>Component Type:</td>
-        <td>${componentType || 'N/A'}</td>
+        <td>${componentType || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Manufacturer:</td>
-        <td>${manufacturer || 'N/A'}</td>
+        <td>${manufacturer || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Model Number:</td>
-        <td>${modelNumber || 'N/A'}</td>
+        <td>${modelNumber || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Serial Number:</td>
-        <td>${serialNumber || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Record from nameplate" />'}</td>
+        <td>${serialNumber || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Equipment Number:</td>
-        <td>${equipmentNumber || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter equipment number" />'}</td>
+        <td>${equipmentNumber || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Location:</td>
-        <td>${location || '<input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter location" />'}</td>
+        <td>${location || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
-        <td>System:</td>
-        <td>${system || 'N/A'}</td>
+        <td>Work Description:</td>
+        <td>${workDescription || description || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Version:</td>
-        <td>1.0</td>
+        <td><input type="text" value="V1" style="width:100px" /></td>
     </tr>
     <tr>
-        <td>Date:</td>
+        <td>Creation Date:</td>
         <td>${new Date().toLocaleDateString()}</td>
+    </tr>
+    <tr>
+        <td>Affected Systems:</td>
+        <td>PLACEHOLDER: AI will research systems affected by ${manufacturer} ${modelNumber} maintenance</td>
+    </tr>
+    <tr>
+        <td>Duration:</td>
+        <td>PLACEHOLDER: AI will research approximate duration for ${manufacturer} ${modelNumber} ${workDescription || description || 'maintenance'}</td>
+    </tr>
+    <tr>
+        <td>Level of Risk:</td>
+        <td><strong>Level ${riskLevel}</strong> (${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]})<br><em>${riskJustification}</em></td>
+    </tr>
+    <tr>
+        <td>CET Level Required:</td>
+        <td><strong>${cetRequired[riskLevel]}</strong><br><em>Based on risk level assessment</em></td>
     </tr>
     <tr>
         <td>Author:</td>
@@ -110,63 +154,23 @@ export async function generateSection01(formData) {
 // Section 02: Site - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection02(formData) {
   try {
-    const { system, workDescription, location, address } = formData;
-    const siteData = getSiteData(location || 'stewart');
-    
-    // Determine risk level based on system and work description
-    let riskLevel = 2;
-    let riskJustification = "Single system affected with redundancy available";
-    
-    if (workDescription && workDescription.toLowerCase().includes('electrical') && system.toLowerCase().includes('switchgear')) {
-      riskLevel = 4;
-      riskJustification = "Main switchgear work affects entire facility";
-    } else if (system.toLowerCase().includes('chiller') && workDescription && workDescription.toLowerCase().includes('major')) {
-      riskLevel = 3;
-      riskJustification = "Critical cooling system with limited redundancy";
-    } else if (system.toLowerCase().includes('generator')) {
-      riskLevel = 3;
-      riskJustification = "Critical power system maintenance";
-    } else if (system.toLowerCase().includes('ups')) {
-      riskLevel = 3;
-      riskJustification = "Critical power protection system";
-    }
-
-    const cetRequired = {
-      1: "CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve",
-      2: "CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve",
-      3: "CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve",
-      4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
-    };
-
     const html = `<h2>Section 02: Site Information</h2>
 <table class="info-table">
     <tr>
+        <td>Customer:</td>
+        <td>${formData.customer || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
+        <td>Site Name:</td>
+        <td>${formData.siteName || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
         <td>Data Center Location:</td>
-        <td>${location || siteData.name}<br>${address?.street || siteData.address.street}<br>${address?.city || siteData.address.city}, ${address?.state || siteData.address.state} ${address?.zipCode || siteData.address.zipCode}</td>
-    </tr>
-    <tr>
-        <td>Service Ticket/Project Number:</td>
-        <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Assign per facility process" style="width:300px" /></td>
-    </tr>
-    <tr>
-        <td>Level of Risk:</td>
-        <td><strong>Level ${riskLevel}</strong> (${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]})<br><em>${riskJustification}</em></td>
-    </tr>
-    <tr>
-        <td>CET Level Required:</td>
-        <td><strong>${cetRequired[riskLevel]}</strong><br><em>Based on risk level assessment</em></td>
+        <td>${formData.location || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Site Contact:</td>
-        <td><input type="text" placeholder="Site Manager Name" style="width:250px" /> <input type="text" placeholder="Phone" style="width:150px" /></td>
-    </tr>
-    <tr>
-        <td>Building/Floor/Room:</td>
-        <td><input type="text" placeholder="Building" style="width:120px" /> / <input type="text" placeholder="Floor" style="width:80px" /> / <input type="text" placeholder="Room" style="width:120px" /></td>
-    </tr>
-    <tr>
-        <td>Access Requirements:</td>
-        <td><input type="text" placeholder="Badge access, escort required, etc." style="width:400px" /></td>
+        <td><input type="text" placeholder="Name, Phone, Job Title/Role" style="width:400px" /></td>
     </tr>
 </table>`;
 
@@ -187,38 +191,61 @@ export async function generateSection02(formData) {
 // Section 03: Overview - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection03(formData) {
   try {
-    const { manufacturer, modelNumber, system, workDescription, location, description } = formData;
-    
-    // Use workDescription or description field, with fallback
-    const mopDescription = workDescription || description || `${system} maintenance and inspection`;
+    const { manufacturer, modelNumber, system, componentType, workDescription, description } = formData;
     
     const html = `<h2>Section 03: MOP Overview</h2>
 <table class="info-table">
     <tr>
-        <td>MOP Description:</td>
-        <td>${mopDescription}</td>
+        <td>MOP Title:</td>
+        <td>${componentType || system || 'System'} ${workDescription || description || 'Maintenance'}</td>
     </tr>
     <tr>
         <td>Work Area:</td>
-        <td>${system.includes('Chiller') ? 'Mechanical Room / Rooftop' : 'Equipment Room'}</td>
+        <td><input type="text" placeholder="Enter work area" style="width:300px" /></td>
     </tr>
     <tr>
-        <td>Min. # of Facilities Personnel:</td>
-        <td>2<br><em style="font-size: 0.9em; color: #666;">
-            For the ${formData.category || 'maintenance'} of the ${formData.manufacturer || ''} ${formData.modelNumber || 'equipment'} (S/N: ${formData.serialNumber || 'TBD'}), a minimum of 2 qualified technicians are required. 
-            This ensures proper safety protocols are followed during ${formData.componentType || 'equipment'} maintenance, including lockout/tagout procedures, heavy component handling, and emergency response capability. 
-            The two-person rule also enables verification of critical steps and provides immediate assistance in case of equipment malfunction or safety incidents.
-        </em></td>
+        <td>Building/Floor/Room:</td>
+        <td><input type="text" placeholder="Building/Floor/Room" style="width:300px" /></td>
+    </tr>
+    <tr>
+        <td>Access Requirements:</td>
+        <td><input type="text" placeholder="Badge access, escort required, etc." style="width:400px" /></td>
+    </tr>
+    <tr>
+        <td>Personnel Required:</td>
+        <td>PLACEHOLDER: AI will research specific roles needed for ${manufacturer} ${modelNumber} maintenance</td>
     </tr>
     <tr>
         <td>Work Performed By:</td>
-        <td colspan="3">
-            <input type="checkbox" id="self-delivered" name="work-type" checked> 
-            <label for="self-delivered">Self-Delivered</label>
+        <td>
+            <input type="checkbox" id="self-delivered" checked> Self-Delivered
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="checkbox" id="subcontractor" name="work-type"> 
-            <label for="subcontractor">Subcontractor</label>
+            <input type="checkbox" id="subcontractor"> Subcontractor
         </td>
+    </tr>
+    <tr>
+        <td># of Facilities Personnel:</td>
+        <td>PLACEHOLDER: AI will research number needed for ${manufacturer} ${modelNumber}</td>
+    </tr>
+    <tr>
+        <td># of Contractors #1:</td>
+        <td><input type="text" placeholder="Number" style="width:100px" /></td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Company Name:</td>
+        <td><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Personnel Name:</td>
+        <td><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Contact Details:</td>
+        <td><input type="text" class="field-box" /></td>
+    </tr>
+    <tr>
+        <td># of Contractors #2:</td>
+        <td><input type="text" placeholder="Number" style="width:100px" /></td>
     </tr>
     <tr>
         <td>If Subcontractor - Company Name:</td>
@@ -234,15 +261,15 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Qualifications Required:</td>
-        <td>EPA 608 Universal Certification, Qualified Electrical Worker</td>
+        <td>PLACEHOLDER: AI will research certifications needed for ${manufacturer} ${modelNumber}</td>
     </tr>
     <tr>
         <td>Advance notifications required:</td>
-        <td>Data Center Operations Manager, Site Security, NOC/BMS Operator</td>
+        <td>PLACEHOLDER: AI will research advance notices for ${manufacturer} ${modelNumber} in data center</td>
     </tr>
     <tr>
         <td>Post notifications required:</td>
-        <td>Data Center Operations Manager, Site Security, NOC/BMS Operator</td>
+        <td>PLACEHOLDER: AI will research post notices for ${manufacturer} ${modelNumber} in data center</td>
     </tr>
 </table>`;
 

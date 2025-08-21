@@ -9,6 +9,8 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     equipmentNumber: '',
     serialNumber: '',
     location: '',
+    customer: '',
+    siteName: '',
     address: {
       street: '',
       city: '',
@@ -17,7 +19,6 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     },
     system: '',
     componentType: '',
-    category: '',
     description: ''
   });
   
@@ -116,8 +117,8 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.equipmentNumber || !formData.system || 
-        !formData.category || !formData.description) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Category\n• Work Description');
+        !formData.description || !formData.customer || !formData.siteName) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Work Description\n• Customer\n• Site Name');
       return;
     }
 
@@ -133,7 +134,6 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         body: JSON.stringify({
           formData: {
             ...formData,
-            frequency: formData.category, // Add frequency field using category value
             workDescription: formData.description // Ensure workDescription is available
           },
           supportingDocs: supportingDocs.map(doc => ({
@@ -322,6 +322,44 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
             />
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Customer *
+              </label>
+              <input
+                type="text"
+                value={formData.customer}
+                onChange={(e) => handleInputChange('customer', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Company Name"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Site Name *
+              </label>
+              <input
+                type="text"
+                value={formData.siteName}
+                onChange={(e) => handleInputChange('siteName', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Main Data Center"
+              />
+            </div>
+          </div>
+
           {/* Address Section */}
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', color: '#333' }}>
@@ -432,31 +470,11 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Category *
-              </label>
-              <input
-                type="text"
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-                placeholder="e.g., Preventive Maintenance"
-              />
-            </div>
-          </div>
-
           <div>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
               Work Description *
             </label>
-            <textarea
+            <select
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               style={{
@@ -464,11 +482,17 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 padding: '10px',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
-                minHeight: '120px',
-                resize: 'vertical'
+                backgroundColor: 'white',
+                cursor: 'pointer'
               }}
-              placeholder="Describe the work to be performed (e.g., quarterly preventive maintenance, filter replacement, bearing inspection)..."
-            />
+            >
+              <option value="">Select Work Description</option>
+              <option value="Weekly Preventative Maintenance">Weekly Preventative Maintenance</option>
+              <option value="Monthly Preventative Maintenance">Monthly Preventative Maintenance</option>
+              <option value="Quarterly Preventative Maintenance">Quarterly Preventative Maintenance</option>
+              <option value="Semi-Annual Preventative Maintenance">Semi-Annual Preventative Maintenance</option>
+              <option value="Annual Preventative Maintenance">Annual Preventative Maintenance</option>
+            </select>
           </div>
         </div>
 
