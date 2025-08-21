@@ -17,10 +17,26 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
       zipCode: ''
     },
     system: '',
-    category: '',
-    description: '',
-    procedureType: 'Standard',  // Add this with default value
-    customer: ''  // Add this
+    workDescription: '',  // Changed from description, now with default
+    procedureType: 'Standard',
+    customer: '',
+    componentType: '',  // New required field
+    author: '',  // New required field
+    authorCETLevel: '',  // New required field
+    approver: '',  // New required field
+    siteContact: '',  // New optional field
+    workArea: '',  // New optional field
+    buildingFloorRoom: '',  // New optional field
+    accessRequirements: '',  // New optional field
+    workPerformedBy: 'Self-Delivered',  // New field with default
+    contractors1: '',  // New contractor field
+    companyName1: '',  // New contractor field
+    personnelName1: '',  // New contractor field
+    contactDetails1: '',  // New contractor field
+    contractors2: '',  // New contractor field
+    companyName2: '',  // New contractor field
+    personnelName2: '',  // New contractor field
+    contactDetails2: ''  // New contractor field
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -118,8 +134,9 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.equipmentNumber || !formData.system || 
-        !formData.category || !formData.description || !formData.customer) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Category\n• Customer\n• Work Description');
+        !formData.workDescription || !formData.customer || !formData.componentType || 
+        !formData.author || !formData.authorCETLevel || !formData.approver) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Component Type\n• Author\n• Author CET Level\n• Approver\n• Customer\n• Work Description');
       return;
     }
 
@@ -140,12 +157,26 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             location: formData.location,
             siteName: formData.siteName,
             system: formData.system,
-            category: formData.category,
-            description: formData.description,
+            workDescription: formData.workDescription,
             procedureType: formData.procedureType,
             customer: formData.customer,
-            frequency: formData.category, // Keep for backward compatibility
-            workDescription: formData.description, // Keep for backward compatibility
+            componentType: formData.componentType,
+            author: formData.author,
+            authorCETLevel: formData.authorCETLevel,
+            approver: formData.approver,
+            siteContact: formData.siteContact,
+            workArea: formData.workArea,
+            buildingFloorRoom: formData.buildingFloorRoom,
+            accessRequirements: formData.accessRequirements,
+            workPerformedBy: formData.workPerformedBy,
+            contractors1: formData.contractors1,
+            companyName1: formData.companyName1,
+            personnelName1: formData.personnelName1,
+            contactDetails1: formData.contactDetails1,
+            contractors2: formData.contractors2,
+            companyName2: formData.companyName2,
+            personnelName2: formData.personnelName2,
+            contactDetails2: formData.contactDetails2,
             equipmentNumber: formData.equipmentNumber,
             address: formData.address
           },
@@ -426,7 +457,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 System *
@@ -447,19 +477,19 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
 
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Category *
+                Component Type *
               </label>
               <input
                 type="text"
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
+                value={formData.componentType}
+                onChange={(e) => handleInputChange('componentType', e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px',
                   border: '1px solid #ddd',
                   borderRadius: '4px'
                 }}
-                placeholder="e.g., Standard Operating Procedure"
+                placeholder="e.g., Chiller, Generator, UPS"
               />
             </div>
           </div>
@@ -484,24 +514,374 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             />
           </div>
 
-          <div>
+          <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
               Work Description *
             </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+            <select
+              value={formData.workDescription}
+              onChange={(e) => handleInputChange('workDescription', e.target.value)}
               style={{
                 width: '100%',
                 padding: '10px',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
-                minHeight: '120px',
-                resize: 'vertical'
+                fontSize: '14px',
+                backgroundColor: 'white'
               }}
-              placeholder="Describe the standard operating procedure (e.g., daily startup procedure, equipment monitoring, routine checks)..."
-            />
+            >
+              <option value="">Select Procedure Type</option>
+              <option value="Daily Startup Procedure">Daily Startup Procedure</option>
+              <option value="Daily Shutdown Procedure">Daily Shutdown Procedure</option>
+              <option value="Weekly System Check">Weekly System Check</option>
+              <option value="Equipment Monitoring Protocol">Equipment Monitoring Protocol</option>
+              <option value="Alarm Response Procedure">Alarm Response Procedure</option>
+              <option value="Emergency Shutdown Procedure">Emergency Shutdown Procedure</option>
+              <option value="System Changeover Procedure">System Changeover Procedure</option>
+              <option value="Normal Operating Procedure">Normal Operating Procedure</option>
+              <option value="Backup System Activation">Backup System Activation</option>
+              <option value="Load Transfer Procedure">Load Transfer Procedure</option>
+            </select>
           </div>
+        </div>
+
+        {/* Personnel Information */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Personnel Information</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Author *
+              </label>
+              <input
+                type="text"
+                value={formData.author}
+                onChange={(e) => handleInputChange('author', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="Enter author name"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Author CET Level *
+              </label>
+              <input
+                type="text"
+                value={formData.authorCETLevel}
+                onChange={(e) => handleInputChange('authorCETLevel', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., CET 3"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Approver *
+              </label>
+              <input
+                type="text"
+                value={formData.approver}
+                onChange={(e) => handleInputChange('approver', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="Enter approver name"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Site Contact
+              </label>
+              <input
+                type="text"
+                value={formData.siteContact}
+                onChange={(e) => handleInputChange('siteContact', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="Name, Phone, Job Title/Role"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Location Details */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Location Details</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Work Area
+              </label>
+              <input
+                type="text"
+                value={formData.workArea}
+                onChange={(e) => handleInputChange('workArea', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Mechanical Room"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Building/Floor/Room
+              </label>
+              <input
+                type="text"
+                value={formData.buildingFloorRoom}
+                onChange={(e) => handleInputChange('buildingFloorRoom', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Building A/Floor 2/Room 201"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Access Requirements
+              </label>
+              <input
+                type="text"
+                value={formData.accessRequirements}
+                onChange={(e) => handleInputChange('accessRequirements', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Badge access, escort required"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Work Performance */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Work Performance</h3>
+          
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+              Work Performed By
+            </label>
+            <div style={{ display: 'flex', gap: '30px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  value="Self-Delivered"
+                  checked={formData.workPerformedBy === 'Self-Delivered'}
+                  onChange={(e) => handleInputChange('workPerformedBy', e.target.value)}
+                  style={{ marginRight: '8px' }}
+                />
+                Self-Delivered
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  value="Subcontractor"
+                  checked={formData.workPerformedBy === 'Subcontractor'}
+                  onChange={(e) => handleInputChange('workPerformedBy', e.target.value)}
+                  style={{ marginRight: '8px' }}
+                />
+                Subcontractor
+              </label>
+            </div>
+          </div>
+
+          {/* Contractor Fields - Only show when Subcontractor is selected */}
+          {formData.workPerformedBy === 'Subcontractor' && (
+            <>
+              <div style={{ 
+                backgroundColor: '#f8f9fa', 
+                padding: '20px', 
+                borderRadius: '8px', 
+                marginBottom: '15px',
+                border: '1px solid #dee2e6'
+              }}>
+                <h4 style={{ marginBottom: '15px', color: '#495057' }}>Contractor #1</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr 1fr', gap: '15px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      # Personnel
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.contractors1}
+                      onChange={(e) => handleInputChange('contractors1', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      min="0"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.companyName1}
+                      onChange={(e) => handleInputChange('companyName1', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      placeholder="Enter company name"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      Personnel Name(s)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.personnelName1}
+                      onChange={(e) => handleInputChange('personnelName1', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      placeholder="Enter personnel names"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      Contact Details
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.contactDetails1}
+                      onChange={(e) => handleInputChange('contactDetails1', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      placeholder="Phone/Email"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ 
+                backgroundColor: '#f8f9fa', 
+                padding: '20px', 
+                borderRadius: '8px',
+                border: '1px solid #dee2e6'
+              }}>
+                <h4 style={{ marginBottom: '15px', color: '#495057' }}>Contractor #2</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr 1fr', gap: '15px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      # Personnel
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.contractors2}
+                      onChange={(e) => handleInputChange('contractors2', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      min="0"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.companyName2}
+                      onChange={(e) => handleInputChange('companyName2', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      placeholder="Enter company name"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      Personnel Name(s)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.personnelName2}
+                      onChange={(e) => handleInputChange('personnelName2', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      placeholder="Enter personnel names"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                      Contact Details
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.contactDetails2}
+                      onChange={(e) => handleInputChange('contactDetails2', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                      }}
+                      placeholder="Phone/Email"
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Supporting Documents */}

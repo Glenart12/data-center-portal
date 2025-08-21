@@ -8,41 +8,56 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Helper function to calculate CET Level based on task complexity
 function calculateCETLevel(manufacturer, model, task) {
-  const taskLower = task?.toLowerCase() || '';
+  const taskStr = task || '';
   
-  if (taskLower.includes('commission') || taskLower.includes('replacement') || 
-      taskLower.includes('overhaul') || taskLower.includes('emergency')) {
-    return '<strong>CET 3 (Lead Technician)</strong> - Complex procedure requiring advanced expertise';
+  // High complexity operational procedures requiring CET 3
+  if (taskStr === 'Emergency Shutdown Procedure' || 
+      taskStr === 'Backup System Activation' || 
+      taskStr === 'Load Transfer Procedure') {
+    return '<strong>CET 3 (Lead Technician)</strong> - Critical procedure requiring advanced expertise';
   }
   
-  if (taskLower.includes('maintenance') || taskLower.includes('quarterly') || 
-      taskLower.includes('annual') || taskLower.includes('repair')) {
-    return '<strong>CET 2 (Technician)</strong> - Standard maintenance procedure';
+  // Medium complexity operational procedures requiring CET 2
+  if (taskStr === 'System Changeover Procedure' || 
+      taskStr === 'Alarm Response Procedure') {
+    return '<strong>CET 2 (Technician)</strong> - Standard operational procedure requiring experience';
   }
   
+  // Routine operational procedures requiring CET 1
   return '<strong>CET 1 (Junior Technician)</strong> - Routine operational procedure';
 }
 
 // Helper function to calculate Risk Level based on task criticality
 function calculateRiskLevel(manufacturer, model, task) {
-  const taskLower = task?.toLowerCase() || '';
+  const taskStr = task || '';
   
-  if (taskLower.includes('emergency') || taskLower.includes('critical') || 
-      taskLower.includes('electrical') || taskLower.includes('power')) {
-    return '<strong>Level 3</strong> (High) - Critical infrastructure impact possible';
+  // High risk operational procedures
+  if (taskStr === 'Emergency Shutdown Procedure' || 
+      taskStr === 'Backup System Activation' || 
+      taskStr === 'Load Transfer Procedure') {
+    return '<strong>Level 3</strong> (High) - Critical operational procedure affecting facility operations';
   }
   
-  if (taskLower.includes('maintenance') || taskLower.includes('quarterly') || 
-      taskLower.includes('annual')) {
-    return '<strong>Level 2</strong> (Medium) - Limited system impact with redundancy';
+  // Medium risk operational procedures
+  if (taskStr === 'System Changeover Procedure' || 
+      taskStr === 'Alarm Response Procedure') {
+    return '<strong>Level 2</strong> (Medium) - Operational procedure with moderate impact';
   }
   
-  return '<strong>Level 1</strong> (Low) - Minimal operational impact';
+  // Low risk operational procedures
+  return '<strong>Level 1</strong> (Low) - Routine operational procedure with minimal impact';
 }
 
 const SOP_INSTRUCTIONS = `
 You are an expert data center operations engineer creating a Standard Operating Procedure (SOP) document.
 Generate a comprehensive, professional SOP document in HTML format with ALL 12 sections listed below.
+
+CRITICAL: This is an OPERATIONAL PROCEDURE, not maintenance. Focus on:
+- Step-by-step operational instructions for running/operating equipment
+- Normal operating parameters and monitoring checkpoints
+- Response procedures for alarms and abnormal conditions
+- System startup, shutdown, changeover, and monitoring procedures
+- Do NOT include maintenance tasks, repairs, or component replacements
 
 IMPORTANT: You must generate EQUIPMENT-SPECIFIC procedures based on the exact manufacturer and model provided.
 Do NOT generate generic procedures. All steps, safety requirements, and technical details must be specific to the equipment.
@@ -64,73 +79,88 @@ CRITICAL: You MUST include ALL 12 sections in order:
 SECTION-BY-SECTION REQUIREMENTS:
 
 Section 01: SOP Schedule Information
-MUST use table format with these exact rows:
-- SOP Identifier: Generate unique ID (e.g., SOP-[SYSTEM]-[DATE]-[NUMBER])
-- Procedure Title: Clear, descriptive title including manufacturer and model
-- Duration: USE PROVIDED VALUE from CALCULATED VALUES section
+MUST use table format with these exact rows in this order:
+- SOP Title: ${formData.componentType} ${formData.workDescription}
+- SOP Identifier: To be assigned
+- Version: V1
+- Creation Date: ${new Date().toLocaleDateString()}
+- Work Description: ${formData.workDescription}
+- Component Type: ${formData.componentType}
+- Manufacturer: ${formData.manufacturer}
+- Model Number: ${formData.modelNumber}
+- Serial Number: ${formData.serialNumber || 'UPDATE NEEDED'}
+- Equipment Number: ${formData.equipmentNumber}
+- Location: ${formData.location || 'UPDATE NEEDED'}
+- Affected Systems: [IMPORTANT: AI must research and list each affected system with one-sentence explanation based on the specific ${formData.manufacturer} ${formData.modelNumber} equipment for data center operations]
+- Duration: [IMPORTANT: AI must research and provide estimated duration based on ${formData.workDescription} maintenance level for this specific ${formData.manufacturer} ${formData.modelNumber} equipment]
 - Level of Risk (LOR): USE PROVIDED VALUE from CALCULATED VALUES section (display the full HTML with strong tags)
-- CET Level Required to Perform Task: USE PROVIDED "CET Level Required" from CALCULATED VALUES section (display the full HTML with strong tags)
-- Author: <input type="text" placeholder="Enter Author Name" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- Date: Use Current Date from CALCULATED VALUES section
-- Version: <input type="text" value="1.0" style="border: 1px solid #999; padding: 2px; width: 80px;">
-- Author CET Level: <input type="text" placeholder="Author CET Level" style="border: 1px solid #999; padding: 2px; width: 100px;">
-- Frequency: Based on the procedure type provided
+- CET Level Required: USE PROVIDED "CET Level Required" from CALCULATED VALUES section (display the full HTML with strong tags)
+- Author: ${formData.author}
+- Author CET Level: ${formData.authorCETLevel}
+- Approver: ${formData.approver}
 
 Section 02: Site Information
-Format as table with these rows:
-- Customer: [Use Customer from Customer Information section]
-- Site Name: [Use Site Name from Site Information section, or show UPDATE NEEDED in red if not provided]
-- Site Address: [Use full address from Site Address section]
-DO NOT include Customer Address
+Format as table with these exact rows:
+- Customer: ${formData.customer}
+- Site Name: ${formData.siteName || 'UPDATE NEEDED'}
+- Data Center Location: ${formData.location || 'UPDATE NEEDED'}
+- Site Contact: ${formData.siteContact || 'UPDATE NEEDED'}
 
 Section 03: SOP Overview
-MUST format EXACTLY as:
-<h2>Section 03: SOP Overview</h2>
-<table class="info-table">
-  <tr><td>Work Area:</td><td>[Work area or Data Hall 1]</td></tr>
-  <tr><td>Affected Systems:</td><td>[Affected systems or Cooling System]</td></tr>
-</table>
-<h3>Equipment Information:</h3>
-<table class="info-table">
-  <tr><td>Manufacturer:</td><td>[Manufacturer from form]</td></tr>
-  <tr><td>Model #:</td><td>[Model number from form]</td></tr>
-  <tr><td>Serial #:</td><td>[Serial number or UPDATE NEEDED]</td></tr>
-</table>
-<h3>Personnel Required:</h3>
-<table class="info-table">
-  <tr>
-    <td>Personnel Required:</td>
-    <td>2<br><em style="font-size: 0.9em; color: #666;">
-        For the [Procedure Description] of the [Manufacturer] [Model], a minimum of 2 qualified technicians are required. 
-        This ensures proper safety protocols are followed during [Category] operations, including lockout/tagout procedures, equipment handling, and emergency response capability. 
-        The two-person rule enables verification of critical steps and provides immediate assistance in case of equipment malfunction or safety incidents.
-    </em></td>
-  </tr>
-  <tr><td># of Facilities Personnel:</td><td><input type="text" value="2" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
-  <tr><td># of Contractors #1:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
-  <tr><td># of Contractors #2:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
-  <tr><td># of Customers:</td><td><input type="text" value="0" style="border: 1px solid #999; padding: 2px; width: 50px;"></td></tr>
-</table>
+MUST format as table with these rows:
+- SOP Title: ${formData.componentType} ${formData.workDescription}
+- Work Area: ${formData.workArea || 'UPDATE NEEDED'}
+- Building/Floor/Room: ${formData.buildingFloorRoom || 'UPDATE NEEDED'}
+- Access Requirements: ${formData.accessRequirements || 'UPDATE NEEDED'}
+- Personnel Required: [AI must research based on ${formData.manufacturer} ${formData.modelNumber} equipment and provide detailed explanation for each role required]
+- Work Performed By: ${formData.workPerformedBy}
+- # of Facilities Personnel: [AI must research and provide detailed explanation for why this specific number is needed for ${formData.manufacturer} ${formData.modelNumber} maintenance]
+${formData.workPerformedBy === 'Subcontractor' ? `- # of Contractors #1: ${formData.contractors1 || '0'}
+- Company Name #1: ${formData.companyName1 || 'UPDATE NEEDED'}
+- Personnel Name #1: ${formData.personnelName1 || 'UPDATE NEEDED'}
+- Contact Details #1: ${formData.contactDetails1 || 'UPDATE NEEDED'}
+- # of Contractors #2: ${formData.contractors2 || '0'}
+- Company Name #2: ${formData.companyName2 || 'UPDATE NEEDED'}
+- Personnel Name #2: ${formData.personnelName2 || 'UPDATE NEEDED'}
+- Contact Details #2: ${formData.contactDetails2 || 'UPDATE NEEDED'}` : ''}
+- Qualifications Required: [AI must research and explain required qualifications for ${formData.manufacturer} ${formData.modelNumber} ${formData.workDescription}]
+- Advance notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
+- Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
 
 Section 04: Effect of SOP on Critical Facility
-Create table with EXACTLY these 15 systems and columns:
+The AI must follow this four-step analysis process:
+Step 1: Identify the ${formData.manufacturer} ${formData.modelNumber} equipment function and role in data center
+Step 2: Analyze maintenance scope for ${formData.workDescription} (shutdown needs, isolation requirements, components serviced)
+Step 3: Apply universal rules:
+  - Monitoring System is ALWAYS YES
+  - Annual/Semi-Annual maintenance requires Lockout/Tagout = YES
+  - Equipment being maintained is always affected by its own maintenance
+Step 4: Apply equipment-specific logic based on ${formData.componentType}
+
+Create table with EXACTLY these 21 systems and columns:
 | Facility Equipment or System | Yes | No | N/A | Details |
-Include these 15 systems exactly:
-1. Cooling System
-2. Electrical System
-3. UPS System
-4. Generator System
-5. Fire Protection
-6. BMS/EPMS
-7. Security System
-8. Network Infrastructure
-9. Water/Plumbing
-10. Access Control
-11. VESDA/Smoke Detection
-12. Fuel System
-13. Emergency Lighting
-14. HVAC Controls
-15. Communication Systems
+Include these 21 systems exactly:
+1. Electrical Utility Equipment
+2. Emergency Generator System
+3. Critical Cooling System
+4. Ventilation System
+5. Mechanical System
+6. Uninterruptible Power Supply (UPS)
+7. Critical Power Distribution System
+8. Emergency Power Off (EPO)
+9. Fire Detection Systems
+10. Fire Suppression System
+11. Disable Fire System
+12. Monitoring System - ALWAYS mark YES with note: "Monitoring System is ALWAYS affected for data center equipment maintenance"
+13. Control System
+14. Security System
+15. General Power and Lighting System
+16. Lockout/Tagout Required? (YES for Annual/Semi-Annual)
+17. Work to be performed "hot"?
+18. Radio interference potential?
+19. Transfer Switch System
+20. Building Automation System (BAS)
+21. Water/Leak Detection System
 
 Section 05: SOP Supporting Documentation
 Based on LOR value calculated in Section 01:
@@ -461,7 +491,8 @@ export async function POST(request) {
     
     // Validate required fields
     if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.category || !formData?.description || !formData?.procedureType || !formData?.customer) {
+        !formData?.componentType || !formData?.workDescription || !formData?.customer ||
+        !formData?.author || !formData?.authorCETLevel || !formData?.approver) {
       return NextResponse.json({ 
         error: 'Missing required fields',
         userMessage: 'Please fill in all required fields'
@@ -470,49 +501,70 @@ export async function POST(request) {
     
     console.log('Starting SOP generation for:', formData.manufacturer, formData.modelNumber);
     
-    // Determine LOR based on same logic as MOP generation
+    // Determine LOR based on operational procedure type
     let riskLevel = 2;
-    let riskJustification = "Single system affected with redundancy available";
+    let riskJustification = "Standard operational procedure";
     
-    const workDescription = formData.description?.toLowerCase() || '';
+    const workDesc = formData.workDescription || '';
     const system = formData.system?.toLowerCase() || '';
-    const procedureType = formData.procedureType?.toLowerCase() || '';
+    const componentType = formData.componentType?.toLowerCase() || '';
     
-    if (workDescription.includes('electrical') && system.includes('switchgear')) {
-      riskLevel = 4;
-      riskJustification = "Main switchgear work affects entire facility";
-    } else if (system.includes('chiller') && (workDescription.includes('major') || procedureType.includes('annual'))) {
+    // Risk levels for operational procedures (not maintenance)
+    if (workDesc === 'Emergency Shutdown Procedure') {
       riskLevel = 3;
-      riskJustification = "Critical cooling system with limited redundancy";
-    } else if (system.includes('generator')) {
+      riskJustification = "Emergency procedure affecting critical systems";
+    } else if (workDesc === 'Backup System Activation') {
       riskLevel = 3;
-      riskJustification = "Critical power system maintenance";
-    } else if (system.includes('ups')) {
+      riskJustification = "Critical failover procedure requiring precise execution";
+    } else if (workDesc === 'Load Transfer Procedure') {
       riskLevel = 3;
-      riskJustification = "Critical power protection system";
-    } else if (procedureType.includes('daily') || procedureType.includes('routine')) {
+      riskJustification = "Power transfer operation affecting critical loads";
+    } else if (workDesc === 'Alarm Response Procedure') {
+      riskLevel = 2;
+      riskJustification = "Response procedure requiring immediate action";
+    } else if (workDesc === 'System Changeover Procedure') {
+      riskLevel = 2;
+      riskJustification = "System transition requiring coordinated steps";
+    } else if (workDesc === 'Daily Startup Procedure' || workDesc === 'Daily Shutdown Procedure' ||
+               workDesc === 'Weekly System Check' || workDesc === 'Equipment Monitoring Protocol' ||
+               workDesc === 'Normal Operating Procedure') {
       riskLevel = 1;
-      riskJustification = "Routine non-intrusive checks";
+      riskJustification = "Routine operational procedure with minimal risk";
     }
     
-    // Auto-calculate duration based on procedure type
-    let duration = "45 minutes";
-    if (procedureType.includes('weekly')) {
-      duration = "1-2 hours";
-    } else if (procedureType.includes('monthly')) {
-      duration = "2-4 hours";
-    } else if (procedureType.includes('quarterly') || procedureType.includes('annual')) {
-      duration = "4-8 hours";
-    } else if (procedureType.includes('daily')) {
+    // Additional risk factors based on equipment type
+    if (system.includes('electrical') && componentType.includes('switchgear')) {
+      riskLevel = Math.max(riskLevel, 3);
+      riskJustification = "Critical electrical system operation";
+    } else if (componentType.includes('ups') || componentType.includes('generator')) {
+      riskLevel = Math.max(riskLevel, 2);
+      riskJustification = "Critical power system operation";
+    }
+    
+    // Auto-calculate duration based on operational procedure type
+    let duration = "30 minutes";
+    if (workDesc === 'Emergency Shutdown Procedure') {
+      duration = "15-30 minutes";
+    } else if (workDesc === 'Backup System Activation' || workDesc === 'Load Transfer Procedure') {
+      duration = "30-60 minutes";
+    } else if (workDesc === 'System Changeover Procedure') {
+      duration = "45-90 minutes";
+    } else if (workDesc === 'Daily Startup Procedure' || workDesc === 'Daily Shutdown Procedure') {
+      duration = "15-30 minutes";
+    } else if (workDesc === 'Weekly System Check') {
       duration = "30-45 minutes";
+    } else if (workDesc === 'Equipment Monitoring Protocol' || workDesc === 'Normal Operating Procedure') {
+      duration = "15-20 minutes";
+    } else if (workDesc === 'Alarm Response Procedure') {
+      duration = "10-20 minutes";
     }
     
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
     
     // Calculate CET Level and Risk Level using the helper functions
-    const cetLevelHtml = calculateCETLevel(formData.manufacturer, formData.modelNumber, formData.description);
-    const riskLevelHtml = calculateRiskLevel(formData.manufacturer, formData.modelNumber, formData.description);
+    const cetLevelHtml = calculateCETLevel(formData.manufacturer, formData.modelNumber, formData.workDescription);
+    const riskLevelHtml = calculateRiskLevel(formData.manufacturer, formData.modelNumber, formData.workDescription);
     
     // Prepare the prompt for Gemini
     const prompt = `${SOP_INSTRUCTIONS}
