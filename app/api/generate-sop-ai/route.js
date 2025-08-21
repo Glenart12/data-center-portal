@@ -74,8 +74,13 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             text-align: center; 
             margin-bottom: 40px; 
             font-size: 2.5em;
-            border-bottom: 3px solid #198754;
+            border: none !important;  /* Remove all borders */
+            text-decoration: none !important;
             padding-bottom: 20px;
+        }
+        h1, h2, h3 {
+            text-decoration: none !important;
+            border-bottom: none !important;
         }
         h2 { 
             color: #198754; 
@@ -149,6 +154,10 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
         input[type="checkbox"] {
             margin-right: 8px;
             transform: scale(1.2);
+        }
+        .checkbox {
+            text-align: center;
+            font-size: 1.2em;
         }
         .checkbox-item {
             margin: 10px 0;
@@ -385,8 +394,25 @@ Step 3: Apply universal rules:
   - Equipment being maintained is always affected by its own maintenance
 Step 4: Apply equipment-specific logic based on ${formData.componentType}
 
+IMPORTANT: Place a checkmark (✓) in the appropriate column (Yes, No, or N/A) for each system based on your analysis.
+
 Create table with EXACTLY these 21 systems and columns:
 | Facility Equipment or System | Yes | No | N/A | Details |
+
+For each row in the table:
+- If a system is affected: Put ✓ in the Yes column
+- If not affected: Put ✓ in the No column  
+- If not applicable: Put ✓ in the N/A column
+
+Example format for table rows:
+<tr>
+    <td>Monitoring System</td>
+    <td class="checkbox">✓</td>  <!-- Yes -->
+    <td class="checkbox"></td>   <!-- No -->
+    <td class="checkbox"></td>   <!-- N/A -->
+    <td>Monitoring System is ALWAYS affected for data center equipment maintenance</td>
+</tr>
+
 Include these 21 systems exactly:
 1. Electrical Utility Equipment
 2. Emergency Generator System
