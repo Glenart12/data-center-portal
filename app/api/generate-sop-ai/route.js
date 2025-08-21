@@ -79,7 +79,6 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
         }
         h2 { 
             color: #198754; 
-            border-bottom: 2px solid #20c997; 
             padding-bottom: 10px; 
             margin-top: 40px; 
             font-size: 1.8em;
@@ -172,8 +171,11 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             border-radius: 3px;
         }
         .section-separator {
-            border-top: 2px solid #ccc;
+            border-top: 2px solid #198754;
             margin: 40px 0;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
         }
         .approval-signature {
             border: 1px solid #999;
@@ -698,9 +700,9 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     // Add title and green banner with component type and work description
     const bannerHtml = `
 <h1 style="color: #198754; text-align: center; margin-bottom: 20px; font-size: 2.5em;">Standard Operating Procedure (SOP)</h1>
-<hr style="border: 1px solid #198754; margin: 20px 0;">
+<hr style="border-top: 2px solid #198754; margin: 20px 0; border-bottom: none; border-left: none; border-right: none;">
 <div style="background: #198754; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-    <h2 style="font-size: 2.5em; margin: 0; color: white;">${formData.componentType} ${formData.workDescription}</h2>
+    <h2 style="font-size: 2.5em; margin: 0; color: white; border-bottom: none; text-decoration: none;">${formData.componentType} ${formData.workDescription}</h2>
 </div>`;
     
     // Add banner at the beginning
