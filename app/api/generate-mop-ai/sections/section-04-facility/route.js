@@ -1,168 +1,79 @@
-import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export async function POST(request) {
-  try {
-    const { formData } = await request.json();
-    const { system } = formData;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+export async function generateSection04(formData, sourceManager) {
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash-exp",
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 15000,
+    }
+  });
+
+  const prompt = `
+    Generate Section 04: Effect of MOP on Critical Facility for data center equipment.
     
-    // Generate the facility impact table with all 19 systems
-    const html = `<h2>Section 04: Effect of MOP on Critical Facility</h2>
-<table>
-    <thead>
-        <tr>
+    Equipment: ${formData.manufacturer} ${formData.modelNumber}
+    Component Type: ${formData.componentType || formData.system}
+    Equipment ID: ${formData.equipmentNumber}
+    Maintenance: ${formData.workDescription || formData.description}
+    
+    CRITICAL RULES:
+    1. Equipment cannot be "not affected" by its own maintenance
+    2. If it's a chiller/CRAC/CRAH → Critical Cooling System = YES
+    3. If it's a UPS → UPS System = YES
+    4. If it's a generator → Emergency Generator = YES
+    
+    For ${formData.workDescription || formData.description}, research what's involved:
+    - Does it require shutdown? → Affected systems = YES
+    - Does it require electrical isolation? → Electrical Utility = YES
+    - Does it have motors/compressors? → Mechanical System = YES
+    - Annual/Semi-Annual maintenance? → Lockout/Tagout = YES
+    - ANY equipment maintenance → Monitoring System = YES
+    - BAS/BMS connected? → Control System = YES
+    
+    Generate ONLY the table body rows (<tr> tags) with:
+    - Each system name in first column
+    - ✓ in appropriate Yes/No/N/A column with class="checkbox"
+    - Detailed explanation in Details column for YES items
+    
+    Format exactly like this for each row:
+    <tr>
+      <td>System Name</td>
+      <td class="checkbox">✓</td>
+      <td class="checkbox"></td>
+      <td class="checkbox"></td>
+      <td>Detailed explanation why affected</td>
+    </tr>
+    
+    Include ALL 20 systems from the standard facility impact table.
+    Be ACCURATE - a chiller maintenance MUST show cooling system affected!
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const tableContent = result.response.text();
+    
+    return `
+      <h2>Section 04: Effect of MOP on Critical Facility</h2>
+      <table>
+        <thead>
+          <tr>
             <th>Facility Equipment or System</th>
             <th width="60">Yes</th>
             <th width="60">No</th>
             <th width="60">N/A</th>
             <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Electrical Utility Equipment</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Emergency Generator System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Critical Cooling System</td>
-            <td class="checkbox">${system.includes('Chiller') ? '✓' : ''}</td>
-            <td class="checkbox">${system.includes('Chiller') ? '' : '✓'}</td>
-            <td class="checkbox"></td>
-            <td>${system.includes('Chiller') ? 'Unit will be offline for maintenance' : ''}</td>
-        </tr>
-        <tr>
-            <td>Ventilation System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Mechanical System</td>
-            <td class="checkbox">${system.includes('Chiller') || system.includes('CRAC') ? '✓' : ''}</td>
-            <td class="checkbox">${system.includes('Chiller') || system.includes('CRAC') ? '' : '✓'}</td>
-            <td class="checkbox"></td>
-            <td>${system.includes('Chiller') || system.includes('CRAC') ? 'Primary mechanical component' : ''}</td>
-        </tr>
-        <tr>
-            <td>Uninterruptible Power Supply (UPS)</td>
-            <td class="checkbox">${system.includes('UPS') ? '✓' : ''}</td>
-            <td class="checkbox">${system.includes('UPS') ? '' : '✓'}</td>
-            <td class="checkbox"></td>
-            <td>${system.includes('UPS') ? 'UPS maintenance affects critical power' : ''}</td>
-        </tr>
-        <tr>
-            <td>Critical Power Distribution System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Emergency Power Off (EPO)</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Fire Detection Systems</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Fire Suppression System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Monitoring System</td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td class="checkbox"></td>
-            <td>Monitoring System is ALWAYS affected for data center equipment maintenance</td>
-        </tr>
-        <tr>
-            <td>Control System</td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td class="checkbox"></td>
-            <td>BAS/BMS control required for maintenance</td>
-        </tr>
-        <tr>
-            <td>Security System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>General Power and Lighting System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Lockout/Tagout Required?</td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td class="checkbox"></td>
-            <td>LOTO required on main disconnect</td>
-        </tr>
-        <tr>
-            <td>Work to be performed "hot"?</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td>All work performed de-energized</td>
-        </tr>
-        <tr>
-            <td>Radio interference potential?</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Water/Leak Detection System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Building Automation System</td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td class="checkbox"></td>
-            <td>BAS control interface required</td>
-        </tr>
-        <tr>
-            <td>Transfer Switch System</td>
-            <td class="checkbox"></td>
-            <td class="checkbox">✓</td>
-            <td class="checkbox"></td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>`;
-
-    return NextResponse.json({ html, sources: [] });
+          </tr>
+        </thead>
+        <tbody>
+          ${tableContent}
+        </tbody>
+      </table>
+    `;
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Error generating Section 04:', error);
+    throw error;
   }
 }

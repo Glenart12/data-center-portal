@@ -19,8 +19,8 @@ import {
   generateSection12
 } from '../section-generators.js';
 
-// Import enhancement function for sections 1-4
-import { enhanceSections1to4 } from '../enhance-sections-1-4/route.js';
+// Import enhancement function for sections 1-3
+import { enhanceSections1to3 } from '../enhance-sections-1-4/route.js';
 
 // Map section names to generator functions
 const SECTION_GENERATORS = [
@@ -237,7 +237,7 @@ export async function compileMOP(formData) {
     
     // Generate each section using direct function calls
     const sections = [];
-    const sections1to4 = [];
+    const sections1to3 = [];
     
     for (let i = 0; i < SECTION_GENERATORS.length; i++) {
       const { name, generator } = SECTION_GENERATORS[i];
@@ -250,9 +250,9 @@ export async function compileMOP(formData) {
         
         sections.push(result.html);
         
-        // Collect sections 1-4 separately for enhancement
-        if (i < 4) {
-          sections1to4.push(result.html);
+        // Collect sections 1-3 separately for enhancement
+        if (i < 3) {
+          sections1to3.push(result.html);
         }
         
         // Merge sources from each section
@@ -274,43 +274,43 @@ export async function compileMOP(formData) {
         
         // Don't fail the whole MOP if one section fails
         sections.push(`<h2>Error generating section ${name}</h2><p>${error.message}</p>`);
-        if (i < 4) {
-          sections1to4.push(`<h2>Error generating section ${name}</h2><p>${error.message}</p>`);
+        if (i < 3) {
+          sections1to3.push(`<h2>Error generating section ${name}</h2><p>${error.message}</p>`);
         }
       }
     }
     
-    // Enhance sections 1-4 with AI research after all basic generation is complete
-    if (sections1to4.length === 4) {
+    // Enhance sections 1-3 with AI research after all basic generation is complete
+    if (sections1to3.length === 3) {
       try {
-        console.log('Enhancing sections 1-4 with AI research for placeholders...');
+        console.log('Enhancing sections 1-3 with AI research for placeholders...');
         
-        // Combine sections 1-4 for enhancement
-        const combinedHtml = sections1to4.join('\n<div class="section-separator"></div>\n');
+        // Combine sections 1-3 for enhancement
+        const combinedHtml = sections1to3.join('\n<div class="section-separator"></div>\n');
         
         // Enhance with AI
-        const enhancedHtml = await enhanceSections1to4(combinedHtml, formData);
+        const enhancedHtml = await enhanceSections1to3(combinedHtml, formData);
         
         // Split enhanced HTML back into individual sections
         // Look for section headers to split properly
         const sectionPattern = /<h2>Section \d{2}:[^<]*<\/h2>/g;
         const headers = enhancedHtml.match(sectionPattern) || [];
         
-        if (headers.length >= 4) {
+        if (headers.length >= 3) {
           // Split by section headers and reconstruct
           const parts = enhancedHtml.split(sectionPattern);
           
-          for (let i = 0; i < 4; i++) {
+          for (let i = 0; i < 3; i++) {
             if (headers[i] && parts[i + 1]) {
               // Reconstruct each section with its header
               sections[i] = headers[i] + parts[i + 1].split('<div class="section-separator">')[0];
             }
           }
-          console.log('Successfully enhanced sections 1-4 with AI research');
+          console.log('Successfully enhanced sections 1-3 with AI research');
         } else {
           // Fallback: try simpler split by section separator
           const enhancedSections = enhancedHtml.split('<div class="section-separator"></div>');
-          for (let i = 0; i < Math.min(4, enhancedSections.length); i++) {
+          for (let i = 0; i < Math.min(3, enhancedSections.length); i++) {
             if (enhancedSections[i] && enhancedSections[i].trim()) {
               sections[i] = enhancedSections[i];
             }

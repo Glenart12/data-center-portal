@@ -3,9 +3,9 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export async function enhanceSections1to4(htmlContent, formData) {
+export async function enhanceSections1to3(htmlContent, formData) {
   try {
-    console.log('Enhancing sections 1-4 with AI research...');
+    console.log('Enhancing sections 1-3 with AI research...');
     
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.0-flash-exp",
