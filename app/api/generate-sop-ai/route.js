@@ -109,7 +109,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
         }
         .info-table td:first-child { 
             font-weight: bold; 
-            background-color: #e8f5e9; 
+            background-color: #f0f0f0; 
             width: 35%; 
         }
         .procedure-step {
@@ -697,8 +697,9 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     
     // Add green banner with component type and work description directly
     const bannerHtml = `
-<div style="background: #28a745; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-    <h2 style="font-size: 2.5em; margin: 0; color: white; border: none;">${formData.componentType} ${formData.workDescription}</h2>
+<div style="background: #198754; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
+    <h1 style="font-size: 2.5em; margin: 0 0 10px 0; color: white; border: none;">Standard Operating Procedure (SOP)</h1>
+    <h2 style="font-size: 2em; margin: 0; color: white; border: none;">${formData.componentType} ${formData.workDescription}</h2>
 </div>`;
     
     // Add banner at the beginning
