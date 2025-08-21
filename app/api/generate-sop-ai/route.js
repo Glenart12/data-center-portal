@@ -219,8 +219,7 @@ export async function POST(request) {
     
     // Validate required fields
     if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.componentType || !formData?.workDescription || !formData?.customer ||
-        !formData?.author || !formData?.authorCETLevel || !formData?.approver) {
+        !formData?.componentType || !formData?.workDescription || !formData?.customer) {
       return NextResponse.json({ 
         error: 'Missing required fields',
         userMessage: 'Please fill in all required fields'
@@ -342,34 +341,34 @@ MUST use table format with these exact rows in this order:
 - Duration: [IMPORTANT: AI must research and provide estimated duration based on ${formData.workDescription} maintenance level for this specific ${formData.manufacturer} ${formData.modelNumber} equipment]
 - Level of Risk (LOR): USE PROVIDED VALUE from CALCULATED VALUES section (display the full HTML with strong tags)
 - CET Level Required: USE PROVIDED "CET Level Required" from CALCULATED VALUES section (display the full HTML with strong tags)
-- Author: ${formData.author}
-- Author CET Level: ${formData.authorCETLevel}
-- Approver: ${formData.approver}
+- Author: <input type="text" placeholder="Enter author name" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- Author CET Level: <input type="text" placeholder="Enter CET level" style="border: 1px solid #999; padding: 2px; width: 100px;">
+- Approver: <input type="text" placeholder="Enter approver name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 
 Section 02: Site Information
 Format as table with these exact rows:
 - Customer: ${formData.customer}
 - Site Name: ${formData.siteName || 'UPDATE NEEDED'}
 - Data Center Location: ${formData.location || 'UPDATE NEEDED'}
-- Site Contact: ${formData.siteContact || 'UPDATE NEEDED'}
+- Site Contact: <input type="text" placeholder="Name, Phone, Job Title/Role" style="border: 1px solid #999; padding: 2px; width: 400px;">
 
 Section 03: SOP Overview
 MUST format as table with these rows:
 - SOP Title: ${formData.componentType} ${formData.workDescription}
-- Work Area: ${formData.workArea || 'UPDATE NEEDED'}
-- Building/Floor/Room: ${formData.buildingFloorRoom || 'UPDATE NEEDED'}
-- Access Requirements: ${formData.accessRequirements || 'UPDATE NEEDED'}
+- Work Area: <input type="text" placeholder="Enter work area" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- Building/Floor/Room: <input type="text" placeholder="Enter building/floor/room" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- Access Requirements: <input type="text" placeholder="Enter access requirements" style="border: 1px solid #999; padding: 2px; width: 300px;">
 - Personnel Required: [AI must research based on ${formData.manufacturer} ${formData.modelNumber} equipment and provide detailed explanation for each role required]
-- Work Performed By: ${formData.workPerformedBy}
+- Work Performed By: <input type="checkbox"> Self-Delivered <input type="checkbox"> Subcontractor
 - # of Facilities Personnel: [AI must research and provide detailed explanation for why this specific number is needed for ${formData.manufacturer} ${formData.modelNumber} maintenance]
-${formData.workPerformedBy === 'Subcontractor' ? `- # of Contractors #1: ${formData.contractors1 || '0'}
-- Company Name #1: ${formData.companyName1 || 'UPDATE NEEDED'}
-- Personnel Name #1: ${formData.personnelName1 || 'UPDATE NEEDED'}
-- Contact Details #1: ${formData.contactDetails1 || 'UPDATE NEEDED'}
-- # of Contractors #2: ${formData.contractors2 || '0'}
-- Company Name #2: ${formData.companyName2 || 'UPDATE NEEDED'}
-- Personnel Name #2: ${formData.personnelName2 || 'UPDATE NEEDED'}
-- Contact Details #2: ${formData.contactDetails2 || 'UPDATE NEEDED'}` : ''}
+- # of Contractors #1: <input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">
+- If Subcontractor - Company Name #1: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- If Subcontractor - Personnel Name #1: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- If Subcontractor - Contact Details #1: <input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- # of Contractors #2: <input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">
+- If Subcontractor - Company Name #2: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- If Subcontractor - Personnel Name #2: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- If Subcontractor - Contact Details #2: <input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Qualifications Required: [AI must research and explain required qualifications for ${formData.manufacturer} ${formData.modelNumber} ${formData.workDescription}]
 - Advance notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
 - Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
@@ -576,10 +575,9 @@ Equipment Details:
 - Serial Number: ${formData.serialNumber || 'UPDATE NEEDED'}
 - Location: ${formData.location || 'UPDATE NEEDED'}
 - System: ${formData.system}
-- Category: ${formData.category}
+- Component Type: ${formData.componentType}
 - Procedure Type: ${formData.procedureType}
-- Frequency: ${formData.frequency || 'As per procedure type'}
-- Procedure Description: ${formData.description}
+- Work Description: ${formData.workDescription}
 
 Customer Information:
 - Customer: ${formData.customer}
@@ -612,7 +610,7 @@ CRITICAL REQUIREMENTS:
    - Duration: ${duration}
    - Level of Risk (LOR): ${riskLevelHtml} (display as HTML with strong tags)
    - CET Level Required: ${cetLevelHtml} (display as HTML with strong tags)
-3. Section 01 MUST have editable input fields for Author, Version, Author CET Level
+3. Section 01 MUST have editable input fields for Author, Author CET Level, and Approver
 4. Section 02 MUST show Customer: ${formData.customer} ONLY (no Customer Address)
 5. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
 6. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
@@ -697,10 +695,10 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
       .trim();
     
-    // Add green banner with category and description directly
+    // Add green banner with component type and work description directly
     const bannerHtml = `
 <div style="background: #28a745; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-    <h2 style="font-size: 2.5em; margin: 0; color: white; border: none;">${formData.category} ${formData.description}</h2>
+    <h2 style="font-size: 2.5em; margin: 0; color: white; border: none;">${formData.componentType} ${formData.workDescription}</h2>
 </div>`;
     
     // Add banner at the beginning
