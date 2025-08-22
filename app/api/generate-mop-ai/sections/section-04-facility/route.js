@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export async function generateSection04(formData, sourceManager) {
+export async function generateSection04(formData) {
   const model = genAI.getGenerativeModel({ 
     model: "gemini-2.0-flash-exp",
     generationConfig: {
@@ -123,7 +123,7 @@ export async function generateSection04(formData, sourceManager) {
     const result = await model.generateContent(prompt);
     const tableContent = result.response.text();
     
-    return `
+    const html = `
       <h2>Section 04: Effect of MOP on Critical Facility</h2>
       <table>
         <thead>
@@ -140,6 +140,8 @@ export async function generateSection04(formData, sourceManager) {
         </tbody>
       </table>
     `;
+    
+    return { html, sources: [] };
   } catch (error) {
     console.error('Error generating Section 04:', error);
     throw error;
