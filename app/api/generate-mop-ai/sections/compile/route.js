@@ -15,8 +15,7 @@ import {
   generateSection08,
   generateSection09,
   generateSection10,
-  generateSection11,
-  generateSection12
+  generateSection11
 } from '../section-generators.js';
 
 // Import enhancement function for sections 1-3
@@ -28,14 +27,13 @@ const SECTION_GENERATORS = [
   { name: 'section-02-site', generator: generateSection02 },
   { name: 'section-03-overview', generator: generateSection03 },
   { name: 'section-04-facility', generator: generateSection04 },
-  { name: 'section-05-documentation', generator: generateSection05 },
-  { name: 'section-06-safety', generator: generateSection06 },
-  { name: 'section-07-risks', generator: generateSection07 },
-  { name: 'section-08-procedures', generator: generateSection08 },
-  { name: 'section-09-backout', generator: generateSection09 },
-  { name: 'section-10-approval', generator: generateSection10 },
-  { name: 'section-11-comments', generator: generateSection11 },
-  { name: 'section-12-references', generator: generateSection12 }
+  { name: 'section-05-safety', generator: generateSection05 },
+  { name: 'section-06-risks', generator: generateSection06 },
+  { name: 'section-07-procedures', generator: generateSection07 },
+  { name: 'section-08-backout', generator: generateSection08 },
+  { name: 'section-09-approval', generator: generateSection09 },
+  { name: 'section-10-comments', generator: generateSection10 },
+  { name: 'section-11-references', generator: generateSection11 }
 ];
 
 // Import the existing HTML template and styles from your current implementation

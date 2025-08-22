@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-export async function generateSection11(formData) {
+export async function generateSection10(formData) {
   try {
     const { manufacturer, modelNumber, system, workDescription } = formData;
     
@@ -69,7 +69,7 @@ export async function generateSection11(formData) {
     // Clean up any markdown code blocks from AI output
     generatedComments = generatedComments.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
 
-    const html = `<h2>Section 11: MOP Comments</h2>
+    const html = `<h2>Section 10: MOP Comments</h2>
 <p><strong>MOP Comments</strong></p>
 ${generatedComments}
 <ul>

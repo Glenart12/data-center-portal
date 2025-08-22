@@ -3,7 +3,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getCompressorCount } from '@/lib/mop-knowledge/enhanced-equipment-database';
 import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 
-export async function generateSection08(formData) {
+export async function generateSection07(formData) {
   try {
     console.log('Section 08 Procedures: Starting generation...');
     const { manufacturer, modelNumber, system, workDescription } = formData;
@@ -965,7 +965,7 @@ export async function generateSection08(formData) {
     // Clean up any markdown code blocks from AI output
     procedures = procedures.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
 
-    const html = `<h2>Section 08: MOP Details</h2>
+    const html = `<h2>Section 07: MOP Details</h2>
 <table class="info-table">
     <tr>
         <td>Date Performed:</td>

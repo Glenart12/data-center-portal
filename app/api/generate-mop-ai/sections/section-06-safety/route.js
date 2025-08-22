@@ -108,7 +108,7 @@ Research this information thoroughly - these are real emergency contacts that ma
   }
 }
 
-export async function generateSection06(formData) {
+export async function generateSection05(formData) {
   try {
     console.log('=== Section 06 Safety Generation ===');
     console.log('FormData:', JSON.stringify(formData, null, 2));
@@ -263,7 +263,7 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
     </tbody>
 </table>`;
 
-    const html = `<h2>Section 06: Safety Requirements</h2>
+    const html = `<h2>Section 05: Safety Requirements</h2>
 <p><strong>Pre Work Conditions / Safety Requirements for ${manufacturer} ${modelNumber} ${system}</strong></p>
 
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>

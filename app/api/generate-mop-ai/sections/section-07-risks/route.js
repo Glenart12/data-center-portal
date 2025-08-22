@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-export async function generateSection07(formData) {
+export async function generateSection06(formData) {
   try {
     const { manufacturer, modelNumber, system, workDescription } = formData;
     
@@ -109,7 +109,7 @@ export async function generateSection07(formData) {
     risks = risks.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
     assumptions = assumptions.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
 
-    const html = `<h2>Section 07: MOP Risks & Assumptions</h2>
+    const html = `<h2>Section 06: MOP Risks & Assumptions</h2>
 <p><strong>Risk Assessment and Key Assumptions</strong></p>
 
 <h3>Risk Analysis Matrix</h3>
