@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request) {
   try {
     const { formData } = await request.json();
-    const { manufacturer, modelNumber, system, workDescription } = formData;
+    const { manufacturer, modelNumber, system, componentType, workDescription } = formData;
     
     // Generate manufacturer-specific documentation links
     const getManufacturerLinks = (manufacturer) => {
@@ -35,7 +35,7 @@ export async function POST(request) {
     };
 
     // Determine relevant documentation based on equipment type
-    let manufacturerDoc = `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`;
+    let manufacturerDoc = `${manufacturer} ${componentType || 'Equipment'} Operation and Maintenance Manual`;
     let manufacturerUrl = getManufacturerLinks(manufacturer);
     let nfpaStandards = [];
     let additionalDocs = [];

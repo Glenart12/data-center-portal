@@ -3,11 +3,11 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 
 export async function generateSection10(formData) {
   try {
-    const { manufacturer, modelNumber, system, workDescription } = formData;
+    const { manufacturer, modelNumber, system, componentType, workDescription } = formData;
     
     // Simplify equipment name for display
-    const componentType = system || 'Equipment';
-    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    const equipmentType = componentType || system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${equipmentType}`;
     
     // Use AI to generate relevant comments
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -45,7 +45,7 @@ export async function generateSection10(formData) {
     const commentsPrompt = `Generate 5 relevant MOP comments for ${simplifiedEquipmentName} ${workDescription || 'maintenance'}.
     
     CRITICAL ACCURACY REQUIREMENTS:
-    - Research actual ${manufacturer} ${componentType} maintenance requirements and known issues
+    - Research actual ${manufacturer} ${equipmentType} maintenance requirements and known issues
     - Use real manufacturer specifications and documented maintenance intervals
     - Base recommendations on genuine industry standards and regulatory requirements
     - DO NOT make up specific technical values, part numbers, or maintenance frequencies

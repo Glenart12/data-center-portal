@@ -14,8 +14,8 @@ export async function POST(request) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, modelNumber, system, workDescription, location } = formData;
-    console.log('Destructured fields:', { manufacturer, modelNumber, system, workDescription, location });
+    const { manufacturer, modelNumber, system, componentType, workDescription, location } = formData;
+    console.log('Destructured fields:', { manufacturer, modelNumber, system, componentType, workDescription, location });
 
     // Generate manufacturer-specific documentation links
     const getManufacturerLinks = (manufacturer) => {
@@ -55,10 +55,10 @@ export async function POST(request) {
 
     if (system?.toLowerCase().includes('chiller')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Service Bulletins and Technical Updates`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
         { name: `${manufacturer} Service Bulletins and Technical Updates`, type: 'internal' },
       ];
       
@@ -71,10 +71,10 @@ export async function POST(request) {
       ];
     } else if (system?.toLowerCase().includes('generator')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Engine Service Manual`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
         { name: `${manufacturer} Engine Service Manual`, type: 'internal' },
       ];
       
@@ -85,10 +85,10 @@ export async function POST(request) {
       ];
     } else if (system?.toLowerCase().includes('ups')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${system || 'Equipment'} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Battery System Documentation`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${system || 'Equipment'} Installation and Operation Manual`, type: 'internal' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Installation and Operation Manual`, type: 'internal' },
         { name: `${manufacturer} Battery System Documentation`, type: 'internal' },
       ];
       
@@ -99,9 +99,9 @@ export async function POST(request) {
     } else {
       // Generic equipment references
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${system || 'Equipment'} Documentation`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Documentation`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${system || 'Equipment'} Documentation`, type: 'internal' },
+        { name: `${manufacturer} ${componentType || 'Equipment'} Documentation`, type: 'internal' },
       ];
     }
 
@@ -241,7 +241,7 @@ export async function POST(request) {
     const sources = [
       manufacturerUrl ? {
         type: "equipment_manual",
-        document: `${manufacturer} ${system || 'Equipment'} Documentation`,
+        document: `${manufacturer} ${componentType || 'Equipment'} Documentation`,
         url: manufacturerUrl,
         lastVerified: new Date().toISOString().split('T')[0]
       } : null,

@@ -118,12 +118,12 @@ export async function generateSection05(formData) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, modelNumber, system, workDescription, location, address } = formData;
-    console.log('Destructured fields:', { manufacturer, modelNumber, system, workDescription, location, address });
+    const { manufacturer, modelNumber, system, componentType, workDescription, location, address } = formData;
+    console.log('Destructured fields:', { manufacturer, modelNumber, system, componentType, workDescription, location, address });
     
     // Simplify equipment name for display
-    const componentType = system || 'Equipment';
-    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    const equipmentType = componentType || system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${equipmentType}`;
     
     // Get equipment data and EOPs
     console.log('Getting equipment data for:', manufacturer, modelNumber);

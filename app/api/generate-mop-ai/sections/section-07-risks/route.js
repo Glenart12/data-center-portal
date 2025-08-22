@@ -3,11 +3,11 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 
 export async function generateSection06(formData) {
   try {
-    const { manufacturer, modelNumber, system, workDescription, serialNumber, equipmentNumber } = formData;
+    const { manufacturer, modelNumber, system, componentType, workDescription, serialNumber, equipmentNumber } = formData;
     
     // Simplify equipment name for display
-    const componentType = system || 'Equipment';
-    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    const equipmentType = componentType || system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${equipmentType}`;
     
     // Use AI to generate assumptions only (no risks)
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

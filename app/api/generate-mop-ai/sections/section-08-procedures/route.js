@@ -6,12 +6,12 @@ import { SourceManager } from '@/lib/mop-knowledge/source-manager';
 export async function generateSection07(formData) {
   try {
     console.log('Section 08 Procedures: Starting generation...');
-    const { manufacturer, modelNumber, system, workDescription } = formData;
+    const { manufacturer, modelNumber, system, componentType, workDescription } = formData;
     const sourceManager = new SourceManager();
     
     // Simplify equipment name for display
-    const componentType = system || 'Equipment';
-    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    const equipmentType = componentType || system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${equipmentType}`;
     
     console.log('Section 08 Procedures: Equipment data:', { manufacturer, modelNumber, system });
     
@@ -824,7 +824,7 @@ export async function generateSection07(formData) {
       const systemType = system.toLowerCase();
       const componentType = system.split(' ')[0]; // Extract component type from system
       
-      return `Generate comprehensive maintenance procedure steps for ${manufacturer} ${componentType} ${workDescription || 'maintenance'}.
+      return `Generate comprehensive maintenance procedure steps for ${manufacturer} ${equipmentType} ${workDescription || 'maintenance'}.
       
       CRITICAL OUTPUT FORMAT REQUIREMENTS:
       ===============================
@@ -869,20 +869,20 @@ export async function generateSection07(formData) {
       ===============================
       
       CRITICAL ACCURACY REQUIREMENTS:
-      - Generate procedures SPECIFIC to ${manufacturer} ${componentType}
-      - Research actual ${manufacturer} specifications and maintenance procedures for this ${componentType}
+      - Generate procedures SPECIFIC to ${manufacturer} ${equipmentType}
+      - Research actual ${manufacturer} specifications and maintenance procedures for this ${equipmentType}
       - Use real regulatory requirements (OSHA, EPA, NFPA) and industry standards
       - Base procedures on accurate technical data and documented manufacturer requirements
       - DO NOT make up specific technical values, torque specifications, or pressure readings
       - If specific manufacturer data is not known, mark as "VERIFY WITH MANUFACTURER" or "REFER TO ${manufacturer} MANUAL"
       - Use genuine safety procedures and industry-standard practices
       - Reference actual equipment characteristics and known maintenance requirements
-      - ALWAYS reference the specific equipment: ${manufacturer} ${componentType} (Unit: ${formData.equipmentNumber || 'TBD'}, Serial: ${formData.serialNumber || 'TBD'})
+      - ALWAYS reference the specific equipment: ${manufacturer} ${equipmentType} (Unit: ${formData.equipmentNumber || 'TBD'}, Serial: ${formData.serialNumber || 'TBD'})
       - Make every step relate to THIS SPECIFIC EQUIPMENT, not generic procedures
       
       EQUIPMENT-SPECIFIC REQUIREMENTS:
       ${equipmentData.specificProcedures ? `
-      For ${manufacturer} ${componentType}, include these verified details where known:
+      For ${manufacturer} ${equipmentType}, include these verified details where known:
       - Electrical torque: ${equipmentData.torqueValues.electrical} (VERIFY WITH MANUFACTURER MANUAL)
       - Mechanical torque: ${equipmentData.torqueValues.mechanical} (VERIFY WITH MANUFACTURER MANUAL)
       - Refrigerant service torque: ${equipmentData.torqueValues.refrigerant || 'VERIFY WITH MANUFACTURER'}
