@@ -338,7 +338,7 @@ SECTION-BY-SECTION REQUIREMENTS:
 Section 01: SOP Schedule Information
 MUST use table format with these exact rows in this order:
 - SOP Title: ${formData.componentType} ${formData.workDescription}
-- SOP Identifier: ${formData.sopIdentifier || '<input type="text" placeholder="Enter SOP identifier" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
+- SOP Identifier: <span contenteditable="true" style="cursor: text; text-decoration: underline; padding: 2px 4px; min-width: 150px; display: inline-block;">To be assigned</span>
 - Version: V1
 - Creation Date: ${new Date().toLocaleDateString()}
 - Work Description: ${formData.workDescription}
@@ -369,7 +369,7 @@ MUST format as table with these rows:
 - Work Area: <input type="text" placeholder="Enter work area" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Building/Floor/Room: <input type="text" placeholder="Enter building/floor/room" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Access Requirements: <input type="text" placeholder="Enter access requirements" style="border: 1px solid #999; padding: 2px; width: 300px;">
-- Personnel Required: [IMPORTANT: AI must generate based on the specific ${formData.workDescription} for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Consider the complexity of the operational procedure, equipment criticality, and safety requirements. List specific roles (e.g., Lead Technician, Support Technician, Safety Observer) with brief explanations]
+- Personnel Required: [IMPORTANT: AI must generate based on the specific ${formData.workDescription} for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Consider the complexity of the operational procedure, equipment criticality, and safety requirements. List specific roles with brief explanations. FORMAT AS CLEAN HTML: Use <ul> and <li> tags. Use <strong> tags for role names. DO NOT output markdown asterisks (**). Example: <li><strong>Lead Technician (CET 1+):</strong> Responsible for...</li>]
 - Work Performed By: <input type="checkbox"> Self-Delivered <input type="checkbox"> Subcontractor
 - # of Contractors #1: <input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">
 - If Subcontractor - Company Name #1: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
@@ -379,9 +379,9 @@ MUST format as table with these rows:
 - If Subcontractor - Company Name #2: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - If Subcontractor - Personnel Name #2: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - If Subcontractor - Contact Details #2: <input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- Qualifications Required: [IMPORTANT: AI must generate specific qualifications based on ${formData.workDescription} complexity for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications]
-- Advance notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
-- Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
+- Qualifications Required: [IMPORTANT: AI must generate specific qualifications based on ${formData.workDescription} complexity for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications. FORMAT AS CLEAN HTML: Use <ul> and <li> tags. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
+- Advance notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}. FORMAT AS CLEAN HTML: Use <ul> and <li> tags if listing multiple items. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
+- Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}. FORMAT AS CLEAN HTML: Use <ul> and <li> tags if listing multiple items. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
 
 Section 04: Effect of SOP on Critical Facility
 The AI must follow this four-step analysis process:
@@ -630,6 +630,15 @@ Current Date: ${currentDate}
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Do NOT generate any <h1> tags, titles, or <div class="sop-document"> wrapper.
 Start DIRECTLY with <h2>Section 01: SOP Schedule Information</h2> and proceed with all 12 sections using H2 headers.
+
+CRITICAL HTML FORMATTING RULES:
+- DO NOT use markdown syntax (**, *, _, etc.) in your output
+- Use proper HTML tags: <strong> for bold, <em> for italic, <ul>/<li> for lists
+- When generating lists in Section 03 (Personnel Required, Qualifications, Notifications), use clean HTML:
+  * Use <ul> and <li> tags for bullet points
+  * Use <strong> tags for emphasis, NOT markdown asterisks
+  * Example: <li><strong>Lead Technician:</strong> Responsible for...</li>
+- Ensure all output is valid, clean HTML without any markdown artifacts
 
 CRITICAL REQUIREMENTS:
 1. Generate ALL 12 sections completely - do not stop early

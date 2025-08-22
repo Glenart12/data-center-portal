@@ -10,7 +10,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     serialNumber: '',
     location: '',
     siteName: '',
-    sopIdentifier: '',  // New field for SOP Identifier
     address: {
       street: '',
       city: '',
@@ -119,8 +118,8 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
 
     // Check all required fields
     if (!formData.manufacturer || !formData.modelNumber || !formData.equipmentNumber || !formData.system || 
-        !formData.workDescription || !formData.customer || !formData.componentType || !formData.sopIdentifier) {
-      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Component Type\n• Customer\n• Work Description\n• SOP Identifier');
+        !formData.workDescription || !formData.customer || !formData.componentType) {
+      alert('Please fill in all required fields:\n• Manufacturer\n• Model Number\n• Equipment Number\n• System\n• Component Type\n• Customer\n• Work Description');
       return;
     }
 
@@ -140,7 +139,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             serialNumber: formData.serialNumber,
             location: formData.location,
             siteName: formData.siteName,
-            sopIdentifier: formData.sopIdentifier,
             system: formData.system,
             workDescription: formData.workDescription,
             procedureType: formData.procedureType,
@@ -317,23 +315,6 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              SOP Identifier *
-            </label>
-            <input
-              type="text"
-              value={formData.sopIdentifier}
-              onChange={(e) => handleInputChange('sopIdentifier', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-              placeholder="e.g., SOP-COOL-001, SOP-PWR-002"
-            />
-          </div>
 
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
