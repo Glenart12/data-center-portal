@@ -338,8 +338,8 @@ SECTION-BY-SECTION REQUIREMENTS:
 Section 01: SOP Schedule Information
 MUST use table format with these exact rows in this order:
 - SOP Title: ${formData.componentType} ${formData.workDescription}
-- SOP Identifier: <span contenteditable="true" style="cursor: text; text-decoration: underline; padding: 2px 4px; min-width: 150px; display: inline-block;">To be assigned</span>
-- Version: V1
+- SOP Identifier: <input type="text" placeholder="To be assigned" style="width:250px" />
+- Version: <input type="text" value="V1" style="width:100px" />
 - Creation Date: ${new Date().toLocaleDateString()}
 - Work Description: ${formData.workDescription}
 - Component Type: ${formData.componentType}
