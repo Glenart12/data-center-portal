@@ -6,25 +6,40 @@ import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enha
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Helper function to calculate CET Level based on task complexity
+// Helper function to calculate CET Level based on technical complexity of work performed
 function calculateCETLevel(manufacturer, model, task) {
-  const taskStr = task || '';
+  const taskStr = (task || '').toLowerCase();
   
-  // High complexity operational procedures requiring CET 3
-  if (taskStr === 'Emergency Shutdown Procedure' || 
-      taskStr === 'Backup System Activation' || 
-      taskStr === 'Load Transfer Procedure') {
-    return '<strong>CET 3 (Lead Technician)</strong> - Critical procedure requiring advanced expertise';
+  // CET-4: High-risk operations, MV switching, utility work
+  if (taskStr.includes('medium voltage') || taskStr.includes('mv') || 
+      taskStr.includes('switchgear') || taskStr.includes('utility') ||
+      taskStr.includes('plant-wide')) {
+    return '<strong>CET-4 required to perform work</strong> - MV switching, utility transfers, or plant-wide critical operations';
   }
   
-  // Medium complexity operational procedures requiring CET 2
-  if (taskStr === 'System Changeover Procedure' || 
-      taskStr === 'Alarm Response Procedure') {
-    return '<strong>CET 2 (Technician)</strong> - Standard operational procedure requiring experience';
+  // CET-3: Complex operations, UPS work, limited energized work (≤480V)
+  if (taskStr.includes('emergency shutdown') || taskStr.includes('backup system') || 
+      taskStr.includes('load transfer') || taskStr.includes('ups') || 
+      taskStr.includes('ats') || taskStr.includes('electrical')) {
+    return '<strong>CET-3 required to perform work</strong> - Complex operations, limited energized work (≤480V)';
   }
   
-  // Routine operational procedures requiring CET 1
-  return '<strong>CET 1 (Junior Technician)</strong> - Routine operational procedure';
+  // CET-2: Mechanical work, no electrical
+  if (taskStr.includes('changeover') || taskStr.includes('alarm response') ||
+      taskStr.includes('startup') || taskStr.includes('shutdown') ||
+      taskStr.includes('filter') || taskStr.includes('valve')) {
+    return '<strong>CET-2 required to perform work</strong> - Mechanical work, no electrical';
+  }
+  
+  // CET-1: Basic rounds, readings, visual checks only
+  if (taskStr.includes('monitoring') || taskStr.includes('check') || 
+      taskStr.includes('visual') || taskStr.includes('rounds') ||
+      taskStr.includes('log') || taskStr.includes('escort')) {
+    return '<strong>CET-1 required to perform work</strong> - Basic rounds, readings, visual checks only';
+  }
+  
+  // Default to CET-2 for standard operations
+  return '<strong>CET-2 required to perform work</strong> - Standard operational procedure';
 }
 
 // Helper function to calculate Risk Level based on task criticality
@@ -369,16 +384,15 @@ MUST format as table with these rows:
 - Work Area: <input type="text" placeholder="Enter work area" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Building/Floor/Room: <input type="text" placeholder="Enter building/floor/room" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Access Requirements: <input type="text" placeholder="Enter access requirements" style="border: 1px solid #999; padding: 2px; width: 300px;">
-- Personnel Required: [IMPORTANT: AI must generate based on the specific ${formData.workDescription} for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Consider the complexity of the operational procedure, equipment criticality, and safety requirements. List specific roles with brief explanations. FORMAT AS CLEAN HTML: Use <ul> and <li> tags. Use <strong> tags for role names. DO NOT output markdown asterisks (**). Example: <li><strong>Lead Technician (CET 1+):</strong> Responsible for...</li>]
-- Work Performed By: <input type="checkbox"> Self-Delivered <input type="checkbox"> Subcontractor
-- # of Contractors #1: <input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">
-- If Subcontractor - Company Name #1: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- If Subcontractor - Personnel Name #1: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- If Subcontractor - Contact Details #1: <input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- # of Contractors #2: <input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">
-- If Subcontractor - Company Name #2: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- If Subcontractor - Personnel Name #2: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- If Subcontractor - Contact Details #2: <input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">
+- Delivery Method: ${formData.workType === 'subcontractor' ? 'Subcontractor' : 'Self-Delivered'}
+${formData.workType === 'subcontractor' ? `- # of Contractors #1: ${formData.contractors1 || '<input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">'}
+- If Subcontractor - Company Name #1: ${formData.contractorCompany1 || '<input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
+- If Subcontractor - Personnel Name #1: ${formData.contractorPersonnel1 || '<input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
+- If Subcontractor - Contact Details #1: ${formData.contractorContact1 || '<input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
+- # of Contractors #2: ${formData.contractors2 || '<input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">'}
+- If Subcontractor - Company Name #2: ${formData.contractorCompany2 || '<input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
+- If Subcontractor - Personnel Name #2: ${formData.contractorPersonnel2 || '<input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
+- If Subcontractor - Contact Details #2: ${formData.contractorContact2 || '<input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">'}` : ''}
 - Qualifications Required: [IMPORTANT: AI must generate specific qualifications based on ${formData.workDescription} complexity for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications. FORMAT AS CLEAN HTML: Use <ul> and <li> tags. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
 - Advance notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}. FORMAT AS CLEAN HTML: Use <ul> and <li> tags if listing multiple items. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
 - Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}. FORMAT AS CLEAN HTML: Use <ul> and <li> tags if listing multiple items. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
@@ -634,7 +648,7 @@ Start DIRECTLY with <h2>Section 01: SOP Schedule Information</h2> and proceed wi
 CRITICAL HTML FORMATTING RULES:
 - DO NOT use markdown syntax (**, *, _, etc.) in your output
 - Use proper HTML tags: <strong> for bold, <em> for italic, <ul>/<li> for lists
-- When generating lists in Section 03 (Personnel Required, Qualifications, Notifications), use clean HTML:
+- When generating lists in Section 03 (Qualifications, Notifications), use clean HTML:
   * Use <ul> and <li> tags for bullet points
   * Use <strong> tags for emphasis, NOT markdown asterisks
   * Example: <li><strong>Lead Technician:</strong> Responsible for...</li>

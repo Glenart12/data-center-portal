@@ -20,7 +20,16 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
     workDescription: '',  // Changed from description, now with default
     procedureType: 'Standard',
     customer: '',
-    componentType: ''  // Required field
+    componentType: '',  // Required field
+    workType: 'self-delivered', // New field for self-delivered vs subcontractor
+    contractors1: '',
+    contractorCompany1: '',
+    contractorPersonnel1: '',
+    contractorContact1: '',
+    contractors2: '',
+    contractorCompany2: '',
+    contractorPersonnel2: '',
+    contractorContact2: ''
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -511,6 +520,189 @@ export default function SOPGenerationModal({ isOpen, onClose }) {
               <option value="Load Transfer Procedure">Load Transfer Procedure</option>
             </select>
           </div>
+        </div>
+
+        {/* Work Type Selection */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Work Execution Type</h3>
+          <div style={{ display: 'flex', gap: '30px', marginBottom: '20px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="workType"
+                value="self-delivered"
+                checked={formData.workType === 'self-delivered'}
+                onChange={(e) => handleInputChange('workType', e.target.value)}
+                style={{ marginRight: '8px' }}
+              />
+              Self-Delivered
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="workType"
+                value="subcontractor"
+                checked={formData.workType === 'subcontractor'}
+                onChange={(e) => handleInputChange('workType', e.target.value)}
+                style={{ marginRight: '8px' }}
+              />
+              Subcontractor
+            </label>
+          </div>
+
+          {/* Contractor Fields - Only show when Subcontractor is selected */}
+          {formData.workType === 'subcontractor' && (
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '4px',
+              border: '1px solid #dee2e6'
+            }}>
+              <h4 style={{ marginBottom: '15px', color: '#495057' }}>Contractor #1</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Number of Contractors
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractors1}
+                    onChange={(e) => handleInputChange('contractors1', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., 2"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractorCompany1}
+                    onChange={(e) => handleInputChange('contractorCompany1', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., ACME HVAC Services"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Personnel Name(s)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractorPersonnel1}
+                    onChange={(e) => handleInputChange('contractorPersonnel1', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., John Smith, Jane Doe"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Contact Details
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractorContact1}
+                    onChange={(e) => handleInputChange('contractorContact1', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., 555-1234, john@acme.com"
+                  />
+                </div>
+              </div>
+
+              <h4 style={{ marginBottom: '15px', color: '#495057' }}>Contractor #2 (Optional)</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Number of Contractors
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractors2}
+                    onChange={(e) => handleInputChange('contractors2', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., 1"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractorCompany2}
+                    onChange={(e) => handleInputChange('contractorCompany2', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., XYZ Electrical"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Personnel Name(s)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractorPersonnel2}
+                    onChange={(e) => handleInputChange('contractorPersonnel2', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., Bob Johnson"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px' }}>
+                    Contact Details
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contractorContact2}
+                    onChange={(e) => handleInputChange('contractorContact2', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                    placeholder="e.g., 555-5678, bob@xyz.com"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Supporting Documents */}
