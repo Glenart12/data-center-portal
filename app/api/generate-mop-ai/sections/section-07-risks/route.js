@@ -3,9 +3,9 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 
 export async function generateSection06(formData) {
   try {
-    const { manufacturer, modelNumber, system, workDescription } = formData;
+    const { manufacturer, modelNumber, system, workDescription, serialNumber, equipmentNumber } = formData;
     
-    // Use AI to generate comprehensive risks and assumptions
+    // Use AI to generate assumptions only (no risks)
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.0-flash-exp',
@@ -38,45 +38,6 @@ export async function generateSection06(formData) {
       }]
     });
     
-    const risksPrompt = `Generate exactly 8 detailed risks for ${manufacturer} ${modelNumber} ${system} ${workDescription || 'maintenance'}.
-    
-    CRITICAL ACCURACY REQUIREMENTS:
-    - Research actual manufacturer specifications and known issues for ${manufacturer} ${modelNumber}
-    - Use real regulatory requirements and industry standards
-    - Base risks on accurate technical data and documented equipment characteristics
-    - DO NOT make up specific technical values or manufacturer details
-    - If specific data is not known, mark risks as "VERIFY WITH MANUFACTURER" or "SITE-SPECIFIC REQUIREMENT"
-    - Focus on realistic, equipment-specific risks rather than generic maintenance risks
-    
-    Format as HTML table rows only. DO NOT include <table> tags or headers, just the <tr> rows.
-    DO NOT use markdown code blocks or backticks.
-    
-    Each row should have 5 columns:
-    1. Risk Category (e.g., Operational, Safety, Environmental, Technical, Schedule)
-    2. Description (specific risk description based on actual equipment characteristics)
-    3. Likelihood (High/Medium/Low - based on real equipment reliability data when available)
-    4. Impact (High/Medium/Low - based on actual system criticality) 
-    5. Mitigation Strategy (detailed prevention/response using real procedures and standards)
-    
-    Include equipment-specific risks such as:
-    - Known failure modes for this equipment type and manufacturer
-    - Actual regulatory compliance requirements
-    - Real environmental factors affecting this specific equipment
-    - Documented safety hazards for this equipment class
-    - Realistic schedule risks based on equipment complexity
-    
-    Example format:
-    <tr>
-        <td><strong>Operational</strong></td>
-        <td>Equipment failure during startup testing (specific to ${manufacturer} ${system} characteristics)</td>
-        <td>Medium</td>
-        <td>High</td>
-        <td>Follow manufacturer's specific startup procedures, verify all prerequisite checks per ${manufacturer} documentation</td>
-    </tr>`;
-    
-    const risksResult = await model.generateContent(risksPrompt);
-    let risks = risksResult.response.text();
-    
     const assumptionsPrompt = `Generate exactly 6 key assumptions for ${manufacturer} ${modelNumber} ${system} maintenance.
     
     CRITICAL ACCURACY REQUIREMENTS:
@@ -106,41 +67,9 @@ export async function generateSection06(formData) {
     let assumptions = assumptionsResult.response.text();
     
     // Clean up any markdown code blocks from AI output
-    risks = risks.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
     assumptions = assumptions.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
 
-    const html = `<h2>Section 06: MOP Risks & Assumptions</h2>
-<p><strong>Risk Assessment and Key Assumptions</strong></p>
-
-<h3>Risk Analysis Matrix</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Risk Category</th>
-            <th>Description</th>
-            <th>Likelihood</th>
-            <th>Impact</th>
-            <th>Mitigation Strategy</th>
-        </tr>
-    </thead>
-    <tbody>
-        ${risks}
-        <tr>
-            <td><strong>Operational</strong></td>
-            <td>Discovery of additional defects during maintenance requiring extended downtime</td>
-            <td>Medium</td>
-            <td>High</td>
-            <td>Have contingency plan approved by management. Maintain clear communication channels for immediate escalation. Have manufacturer technical support contact available</td>
-        </tr>
-        <tr>
-            <td><strong>Environmental</strong></td>
-            <td>Weather conditions affecting outdoor equipment (for rooftop units)</td>
-            <td>Low</td>
-            <td>Medium</td>
-            <td>Monitor weather forecasts 48 hours in advance. Have protective covers ready. Establish weather-related abort criteria</td>
-        </tr>
-    </tbody>
-</table>
+    const html = `<h2>Section 06: MOP Assumptions</h2>
 
 <h3>Key Project Assumptions</h3>
 <table>
@@ -167,12 +96,13 @@ export async function generateSection06(formData) {
     </tbody>
 </table>
 
-<p><strong>Critical Decision Points:</strong></p>
+<p><strong>Critical Decision Points for ${manufacturer} ${modelNumber} (Unit: ${equipmentNumber || 'TBD'}, Serial: ${serialNumber || 'TBD'}):</strong></p>
 <ul>
-    <li>If redundant equipment fails during maintenance - STOP work and return primary unit to service</li>
-    <li>If major defects are discovered - Escalate to Chief Engineer for go/no-go decision</li>
-    <li>If weather conditions deteriorate (outdoor equipment) - Implement weather abort procedures</li>
-    <li>If estimated completion time exceeds approved window - Notify management for extension approval</li>
+    <li>If redundant ${system} fails while performing ${workDescription || 'maintenance'} on ${manufacturer} ${modelNumber} ${equipmentNumber || ''} - STOP work immediately and return primary ${modelNumber} to service following ${manufacturer} restart procedures</li>
+    <li>If ${system.toLowerCase().includes('chiller') ? 'refrigerant leak detected' : system.toLowerCase().includes('ups') ? 'battery failure detected' : system.toLowerCase().includes('generator') ? 'fuel leak detected' : 'major defect discovered'} on ${manufacturer} ${modelNumber} unit ${equipmentNumber || 'TBD'} - Escalate to Chief Engineer for immediate go/no-go decision</li>
+    <li>If ${system.toLowerCase().includes('chiller') ? 'chilled water temperature rises above setpoint' : system.toLowerCase().includes('ups') ? 'critical load transfer fails' : system.toLowerCase().includes('generator') ? 'automatic transfer switch fails to operate' : 'system parameters exceed normal ranges'} during ${workDescription || 'maintenance'} on unit ${equipmentNumber || 'TBD'} - Implement emergency ${system} recovery procedures</li>
+    <li>If ${workDescription || 'maintenance'} reveals ${system.toLowerCase().includes('chiller') ? 'compressor damage' : system.toLowerCase().includes('ups') ? 'inverter failure' : system.toLowerCase().includes('generator') ? 'alternator issues' : 'component failure'} on ${manufacturer} ${modelNumber} ${equipmentNumber || ''} - Notify management for extended maintenance window approval</li>
+    <li>If building automation system shows critical alarms for ${manufacturer} ${modelNumber} during ${workDescription || 'maintenance'} - Verify with BMS operator before continuing work on unit ${equipmentNumber || 'TBD'}</li>
 </ul>`;
 
     return { html, sources: [] };

@@ -121,7 +121,10 @@ export async function generateSection04(formData) {
 
   try {
     const result = await model.generateContent(prompt);
-    const tableContent = result.response.text();
+    let tableContent = result.response.text();
+    
+    // Clean up any markdown code blocks from AI output
+    tableContent = tableContent.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
     
     const html = `
       <h2>Section 04: Effect of MOP on Critical Facility</h2>

@@ -264,7 +264,6 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
 </table>`;
 
     const html = `<h2>Section 05: Safety Requirements</h2>
-<p><strong>Pre Work Conditions / Safety Requirements for ${manufacturer} ${modelNumber} ${system}</strong></p>
 
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
 <p><strong>PPE requirements specific to ${manufacturer} ${modelNumber} ${system} maintenance:</strong></p>
