@@ -20,35 +20,71 @@ export async function generateSection04(formData, sourceManager) {
   Component Type: ${formData.componentType || formData.system}
   Maintenance Type: ${formData.workDescription || formData.description}
   
-  STEP 1: IDENTIFY what this equipment IS and what it DOES
-  - Research ${formData.manufacturer} ${formData.modelNumber}
-  - Understand its function in the data center
-  - Identify what systems it belongs to or supports
+  The AI must follow this four-step analysis process:
   
-  STEP 2: UNDERSTAND the maintenance scope
-  - ${formData.workDescription || formData.description} typically involves what tasks?
+  STEP 1: Identify the ${formData.manufacturer} ${formData.modelNumber} equipment function and role in data center
+  - What type of equipment is this?
+  - What is its primary function?
+  - What systems does it belong to or support?
+  
+  STEP 2: Analyze maintenance scope for ${formData.workDescription || formData.description}
+  - What specific tasks are involved?
   - Does it require equipment shutdown?
   - Does it require electrical isolation?
-  - What components are serviced?
+  - What components will be serviced?
   
-  STEP 3: APPLY THESE UNIVERSAL RULES
-  - Equipment cannot be "not affected" by its own maintenance
-  - If equipment IS part of a system, that system = YES
-  - Monitoring System = ALWAYS YES for any maintenance
-  - Annual/Semi-Annual maintenance = Lockout/Tagout YES
-  - If equipment has electrical components = consider Electrical Utility
-  - If equipment has motors/pumps/compressors = Mechanical System YES
-  - If BAS/BMS controlled = Control System & Building Automation YES
+  STEP 3: Apply universal rules:
+  - Monitoring System is ALWAYS YES
+  - Annual/Semi-Annual maintenance requires Lockout/Tagout = YES
+  - Equipment being maintained is always affected by its own maintenance
   
-  STEP 4: EQUIPMENT-SPECIFIC LOGIC
-  - Cooling equipment (chiller/CRAC/CRAH) → Critical Cooling = YES
-  - Power equipment (UPS/PDU/switchgear) → Critical Power = YES  
-  - Generator → Emergency Generator = YES
-  - Transfer switch → Transfer Switch & Emergency Generator = YES
-  - Air handlers/fans → Ventilation = YES
-  - Pumps → Mechanical & related water systems = YES
+  STEP 4: Apply equipment-specific logic based on ${formData.componentType || formData.system}
   
-  Generate EXACTLY these 20 rows with accurate assessments:
+  CRITICAL DECISION LOGIC (USE THIS TO DETERMINE YES/NO/N/A):
+  
+  FOR UPS WORK:
+  - Uninterruptible Power Supply (UPS) = YES
+  - Critical Power Distribution System = YES (if UPS feeds critical loads)
+  - Electrical Utility Equipment = YES (if working on input/output breakers)
+  - Monitoring System = YES (always)
+  - Control System = YES (if BMS integrated)
+  - Lockout/Tagout = YES (for annual/semi-annual)
+  - Most other systems = NO or N/A
+  
+  FOR CHILLER/COOLING WORK:
+  - Critical Cooling System = YES
+  - Mechanical System = YES
+  - Monitoring System = YES (always)
+  - Control System = YES (if BMS controlled)
+  - Building Automation System = YES (if BAS integrated)
+  - Water/Leak Detection = YES (if water-cooled)
+  - Lockout/Tagout = YES (for annual/semi-annual)
+  - Power systems = NO unless electrical work involved
+  
+  FOR GENERATOR WORK:
+  - Emergency Generator System = YES
+  - Transfer Switch System = YES (if ATS testing involved)
+  - Electrical Utility Equipment = YES (if paralleling with utility)
+  - Monitoring System = YES (always)
+  - Control System = YES
+  - Lockout/Tagout = YES (for major maintenance)
+  - Cooling systems = NO unless generator cooling affected
+  
+  FOR ELECTRICAL DISTRIBUTION:
+  - Critical Power Distribution System = YES
+  - Electrical Utility Equipment = YES
+  - Emergency Power Off (EPO) = Check if EPO circuits affected
+  - Monitoring System = YES (always)
+  - Lockout/Tagout = YES
+  - UPS = YES only if downstream of UPS
+  
+  FOR VISUAL INSPECTION/MONITORING ONLY:
+  - Monitoring System = YES (always)
+  - All other systems = NO or N/A (no physical work performed)
+  - Lockout/Tagout = NO (no hazardous energy exposure)
+  - Work performed hot = NO (observation only)
+  
+  Generate EXACTLY these 18 rows with intelligent YES/NO/N/A decisions:
   1. Electrical Utility Equipment
   2. Emergency Generator System
   3. Critical Cooling System
@@ -67,8 +103,6 @@ export async function generateSection04(formData, sourceManager) {
   16. Work to be performed "hot"?
   17. Radio interference potential?
   18. Water/Leak Detection System
-  19. Building Automation System
-  20. Transfer Switch System
   
   Format each row EXACTLY like this:
   <tr>
@@ -79,8 +113,10 @@ export async function generateSection04(formData, sourceManager) {
     <td>Specific explanation why affected</td>
   </tr>
   
-  Research the ACTUAL equipment and be ACCURATE!
-  Generate ONLY the 20 <tr> rows.
+  IMPORTANT: Place a checkmark (✓) in the appropriate column (Yes, No, or N/A) based on your analysis.
+  Only put ✓ in ONE column per row. Leave other columns empty.
+  
+  Generate ONLY the 18 <tr> rows.
 `;
 
   try {
