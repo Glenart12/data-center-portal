@@ -338,7 +338,7 @@ SECTION-BY-SECTION REQUIREMENTS:
 Section 01: SOP Schedule Information
 MUST use table format with these exact rows in this order:
 - SOP Title: ${formData.componentType} ${formData.workDescription}
-- SOP Identifier: To be assigned
+- SOP Identifier: ${formData.sopIdentifier || '<input type="text" placeholder="Enter SOP identifier" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
 - Version: V1
 - Creation Date: ${new Date().toLocaleDateString()}
 - Work Description: ${formData.workDescription}
@@ -348,7 +348,6 @@ MUST use table format with these exact rows in this order:
 - Serial Number: ${formData.serialNumber || 'UPDATE NEEDED'}
 - Equipment Number: ${formData.equipmentNumber}
 - Location: ${formData.location || 'UPDATE NEEDED'}
-- Affected Systems: [IMPORTANT: AI must research and list each affected system with one-sentence explanation based on the specific ${formData.manufacturer} ${formData.modelNumber} equipment for data center operations]
 - Duration: [IMPORTANT: AI must research and provide estimated duration based on ${formData.workDescription} maintenance level for this specific ${formData.manufacturer} ${formData.modelNumber} equipment]
 - Level of Risk (LOR): USE PROVIDED VALUE from CALCULATED VALUES section (display the full HTML with strong tags)
 - CET Level Required: USE PROVIDED "CET Level Required" from CALCULATED VALUES section (display the full HTML with strong tags)
@@ -361,6 +360,7 @@ Format as table with these exact rows:
 - Customer: ${formData.customer}
 - Site Name: ${formData.siteName || 'UPDATE NEEDED'}
 - Data Center Location: ${formData.location || 'UPDATE NEEDED'}
+- Site Address: ${formData.address?.street || 'UPDATE NEEDED'}, ${formData.address?.city || 'UPDATE NEEDED'}, ${formData.address?.state || 'UPDATE NEEDED'} ${formData.address?.zipCode || 'UPDATE NEEDED'}
 - Site Contact: <input type="text" placeholder="Name, Phone, Job Title/Role" style="border: 1px solid #999; padding: 2px; width: 400px;">
 
 Section 03: SOP Overview
@@ -369,9 +369,8 @@ MUST format as table with these rows:
 - Work Area: <input type="text" placeholder="Enter work area" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Building/Floor/Room: <input type="text" placeholder="Enter building/floor/room" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Access Requirements: <input type="text" placeholder="Enter access requirements" style="border: 1px solid #999; padding: 2px; width: 300px;">
-- Personnel Required: [AI must research based on ${formData.manufacturer} ${formData.modelNumber} equipment and provide detailed explanation for each role required]
+- Personnel Required: [IMPORTANT: AI must generate based on the specific ${formData.workDescription} for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Consider the complexity of the operational procedure, equipment criticality, and safety requirements. List specific roles (e.g., Lead Technician, Support Technician, Safety Observer) with brief explanations]
 - Work Performed By: <input type="checkbox"> Self-Delivered <input type="checkbox"> Subcontractor
-- # of Facilities Personnel: [AI must research and provide detailed explanation for why this specific number is needed for ${formData.manufacturer} ${formData.modelNumber} maintenance]
 - # of Contractors #1: <input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">
 - If Subcontractor - Company Name #1: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - If Subcontractor - Personnel Name #1: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
@@ -380,7 +379,7 @@ MUST format as table with these rows:
 - If Subcontractor - Company Name #2: <input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - If Subcontractor - Personnel Name #2: <input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - If Subcontractor - Contact Details #2: <input type="text" placeholder="Contact details" style="border: 1px solid #999; padding: 2px; width: 200px;">
-- Qualifications Required: [AI must research and explain required qualifications for ${formData.manufacturer} ${formData.modelNumber} ${formData.workDescription}]
+- Qualifications Required: [IMPORTANT: AI must generate specific qualifications based on ${formData.workDescription} complexity for ${formData.manufacturer} ${formData.modelNumber} ${formData.serialNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications]
 - Advance notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
 - Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}]
 
@@ -639,8 +638,8 @@ CRITICAL REQUIREMENTS:
    - Level of Risk (LOR): ${riskLevelHtml} (display as HTML with strong tags)
    - CET Level Required: ${cetLevelHtml} (display as HTML with strong tags)
 3. Section 01 MUST have editable input fields for Author, Author CET Level, and Approver
-4. Section 02 MUST show Customer: ${formData.customer} ONLY (no Customer Address)
-5. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel
+4. Section 02 MUST show Customer: ${formData.customer} AND Site Address from location input
+5. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel (NO '# of Facilities Personnel' field)
 6. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
 7. Section 05 MUST base documentation on LOR ${riskLevel}
 8. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
