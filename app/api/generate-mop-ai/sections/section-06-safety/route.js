@@ -121,6 +121,10 @@ export async function generateSection05(formData) {
     const { manufacturer, modelNumber, system, workDescription, location, address } = formData;
     console.log('Destructured fields:', { manufacturer, modelNumber, system, workDescription, location, address });
     
+    // Simplify equipment name for display
+    const componentType = system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    
     // Get equipment data and EOPs
     console.log('Getting equipment data for:', manufacturer, modelNumber);
     const equipmentData = getEquipmentData(manufacturer, modelNumber);
@@ -189,7 +193,7 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
     // Generate Tools Required table based on equipment
     const toolsRequired = `
 <h3>TOOLS REQUIRED</h3>
-<p><strong>Specific tools required for ${manufacturer} ${modelNumber} ${system} based on manufacturer specifications:</strong></p>
+<p><strong>Specific tools required for ${simplifiedEquipmentName} based on manufacturer specifications:</strong></p>
 <table>
     <thead>
         <tr>
@@ -205,14 +209,14 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
                 • Fluke 376 FC clamp meter<br>
                 • Megger MIT1025 insulation tester<br>
                 • Fluke 1587 FC insulation multimeter</td>
-            <td>Voltage verification, current measurement, insulation resistance testing for ${modelNumber}</td>
+            <td>Voltage verification, current measurement, insulation resistance testing for ${simplifiedEquipmentName}</td>
         </tr>
         <tr>
             <td><strong>Torque Tools</strong></td>
             <td>• Torque wrench (10-250 ft-lbs)<br>
                 • Torque screwdriver set (5-50 in-lbs)<br>
                 • Digital torque adapter</td>
-            <td>Proper torquing of ${manufacturer} ${modelNumber} electrical and mechanical connections per manufacturer specs</td>
+            <td>Proper torquing of ${simplifiedEquipmentName} electrical and mechanical connections per manufacturer specs</td>
         </tr>
         <tr>
             <td><strong>Temperature & Pressure</strong></td>
@@ -220,14 +224,14 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
                 • Digital manifold gauge set<br>
                 • Differential pressure gauge<br>
                 • Thermocouple probe set</td>
-            <td>Temperature and pressure measurements specific to ${system} operating parameters</td>
+            <td>Temperature and pressure measurements specific to ${componentType} operating parameters</td>
         </tr>
         <tr>
             <td><strong>Vibration Analysis</strong></td>
             <td>• Fluke 810 vibration tester<br>
                 • SKF CMXA 80 analyzer<br>
                 • Accelerometer sensors</td>
-            <td>Vibration analysis of rotating equipment in ${manufacturer} ${modelNumber}</td>
+            <td>Vibration analysis of rotating equipment in ${simplifiedEquipmentName}</td>
         </tr>
         <tr>
             <td><strong>Refrigerant Service</strong></td>
@@ -236,7 +240,7 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
                 • Refrigerant scale<br>
                 • Leak detector (electronic)</td>
             <td>${system.toLowerCase().includes('chiller') || system.toLowerCase().includes('cooling') ? 
-                `Refrigerant service for ${modelNumber} cooling system` : 
+                `Refrigerant service for ${simplifiedEquipmentName}` : 
                 'If applicable to equipment type'}</td>
         </tr>
         <tr>
@@ -245,7 +249,7 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
                 • Socket set (metric and standard)<br>
                 • Allen key set<br>
                 • Channel lock pliers</td>
-            <td>General maintenance on ${manufacturer} ${modelNumber} components</td>
+            <td>General maintenance on ${simplifiedEquipmentName} components</td>
         </tr>
         <tr>
             <td><strong>Safety Equipment</strong></td>
@@ -253,12 +257,12 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
                 • Voltage detector (non-contact)<br>
                 • Ground fault tester<br>
                 • Arc flash boundary tape</td>
-            <td>Safety isolation and verification for work on ${modelNumber}</td>
+            <td>Safety isolation and verification for work on ${simplifiedEquipmentName}</td>
         </tr>
         <tr>
             <td><strong>Specialized ${manufacturer} Tools</strong></td>
             <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter ${manufacturer}-specific service tools" style="width:100%" /></td>
-            <td>Manufacturer-specific tools required for ${modelNumber} service</td>
+            <td>Manufacturer-specific tools required for ${simplifiedEquipmentName} service</td>
         </tr>
     </tbody>
 </table>`;
@@ -266,7 +270,7 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
     const html = `<h2>Section 05: Safety Requirements</h2>
 
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
-<p><strong>PPE requirements specific to ${manufacturer} ${modelNumber} ${system} maintenance:</strong></p>
+<p><strong>PPE requirements specific to ${simplifiedEquipmentName} maintenance:</strong></p>
 <table>
     <thead>
         <tr>

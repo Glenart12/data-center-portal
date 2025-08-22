@@ -55,10 +55,10 @@ export async function POST(request) {
 
     if (system?.toLowerCase().includes('chiller')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Service Bulletins and Technical Updates`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
         { name: `${manufacturer} Service Bulletins and Technical Updates`, type: 'internal' },
       ];
       
@@ -71,10 +71,10 @@ export async function POST(request) {
       ];
     } else if (system?.toLowerCase().includes('generator')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Engine Service Manual`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
         { name: `${manufacturer} Engine Service Manual`, type: 'internal' },
       ];
       
@@ -85,10 +85,10 @@ export async function POST(request) {
       ];
     } else if (system?.toLowerCase().includes('ups')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Battery System Documentation`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Installation and Operation Manual`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Installation and Operation Manual`, type: 'internal' },
         { name: `${manufacturer} Battery System Documentation`, type: 'internal' },
       ];
       
@@ -99,9 +99,9 @@ export async function POST(request) {
     } else {
       // Generic equipment references
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Documentation`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Documentation`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Documentation`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Documentation`, type: 'internal' },
       ];
     }
 
@@ -241,7 +241,7 @@ export async function POST(request) {
     const sources = [
       manufacturerUrl ? {
         type: "equipment_manual",
-        document: `${manufacturer} ${modelNumber} Documentation`,
+        document: `${manufacturer} ${system || 'Equipment'} Documentation`,
         url: manufacturerUrl,
         lastVerified: new Date().toISOString().split('T')[0]
       } : null,

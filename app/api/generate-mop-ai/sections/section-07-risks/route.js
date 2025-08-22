@@ -5,6 +5,10 @@ export async function generateSection06(formData) {
   try {
     const { manufacturer, modelNumber, system, workDescription, serialNumber, equipmentNumber } = formData;
     
+    // Simplify equipment name for display
+    const componentType = system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    
     // Use AI to generate assumptions only (no risks)
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
@@ -38,7 +42,7 @@ export async function generateSection06(formData) {
       }]
     });
     
-    const assumptionsPrompt = `Generate exactly 6 key assumptions for ${manufacturer} ${modelNumber} ${system} maintenance.
+    const assumptionsPrompt = `Generate exactly 6 key assumptions for ${simplifiedEquipmentName} maintenance.
     
     CRITICAL ACCURACY REQUIREMENTS:
     - Base assumptions on real manufacturer specifications and requirements
@@ -96,13 +100,13 @@ export async function generateSection06(formData) {
     </tbody>
 </table>
 
-<p><strong>Critical Decision Points for ${manufacturer} ${modelNumber} (Unit: ${equipmentNumber || 'TBD'}, Serial: ${serialNumber || 'TBD'}):</strong></p>
+<p><strong>Critical Decision Points for ${simplifiedEquipmentName} (Unit: ${equipmentNumber || 'TBD'}, Serial: ${serialNumber || 'TBD'}):</strong></p>
 <ul>
-    <li>If redundant ${system} fails while performing ${workDescription || 'maintenance'} on ${manufacturer} ${modelNumber} ${equipmentNumber || ''} - STOP work immediately and return primary ${modelNumber} to service following ${manufacturer} restart procedures</li>
-    <li>If ${system.toLowerCase().includes('chiller') ? 'refrigerant leak detected' : system.toLowerCase().includes('ups') ? 'battery failure detected' : system.toLowerCase().includes('generator') ? 'fuel leak detected' : 'major defect discovered'} on ${manufacturer} ${modelNumber} unit ${equipmentNumber || 'TBD'} - Escalate to Chief Engineer for immediate go/no-go decision</li>
-    <li>If ${system.toLowerCase().includes('chiller') ? 'chilled water temperature rises above setpoint' : system.toLowerCase().includes('ups') ? 'critical load transfer fails' : system.toLowerCase().includes('generator') ? 'automatic transfer switch fails to operate' : 'system parameters exceed normal ranges'} during ${workDescription || 'maintenance'} on unit ${equipmentNumber || 'TBD'} - Implement emergency ${system} recovery procedures</li>
-    <li>If ${workDescription || 'maintenance'} reveals ${system.toLowerCase().includes('chiller') ? 'compressor damage' : system.toLowerCase().includes('ups') ? 'inverter failure' : system.toLowerCase().includes('generator') ? 'alternator issues' : 'component failure'} on ${manufacturer} ${modelNumber} ${equipmentNumber || ''} - Notify management for extended maintenance window approval</li>
-    <li>If building automation system shows critical alarms for ${manufacturer} ${modelNumber} during ${workDescription || 'maintenance'} - Verify with BMS operator before continuing work on unit ${equipmentNumber || 'TBD'}</li>
+    <li>If redundant ${componentType} fails while performing ${workDescription || 'maintenance'} on ${simplifiedEquipmentName} ${equipmentNumber || ''} - STOP work immediately and return primary unit to service following ${manufacturer} restart procedures</li>
+    <li>If ${system.toLowerCase().includes('chiller') ? 'refrigerant leak detected' : system.toLowerCase().includes('ups') ? 'battery failure detected' : system.toLowerCase().includes('generator') ? 'fuel leak detected' : 'major defect discovered'} on ${simplifiedEquipmentName} unit ${equipmentNumber || 'TBD'} - Escalate to Chief Engineer for immediate go/no-go decision</li>
+    <li>If ${system.toLowerCase().includes('chiller') ? 'chilled water temperature rises above setpoint' : system.toLowerCase().includes('ups') ? 'critical load transfer fails' : system.toLowerCase().includes('generator') ? 'automatic transfer switch fails to operate' : 'system parameters exceed normal ranges'} during ${workDescription || 'maintenance'} on unit ${equipmentNumber || 'TBD'} - Implement emergency ${componentType} recovery procedures</li>
+    <li>If ${workDescription || 'maintenance'} reveals ${system.toLowerCase().includes('chiller') ? 'compressor damage' : system.toLowerCase().includes('ups') ? 'inverter failure' : system.toLowerCase().includes('generator') ? 'alternator issues' : 'component failure'} on ${simplifiedEquipmentName} ${equipmentNumber || ''} - Notify management for extended maintenance window approval</li>
+    <li>If building automation system shows critical alarms for ${simplifiedEquipmentName} during ${workDescription || 'maintenance'} - Verify with BMS operator before continuing work on unit ${equipmentNumber || 'TBD'}</li>
 </ul>`;
 
     return { html, sources: [] };

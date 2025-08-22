@@ -148,7 +148,7 @@ export async function generateSection01(formData) {
     </tr>
     <tr>
         <td>Duration:</td>
-        <td>PLACEHOLDER: AI will research approximate duration for ${manufacturer} ${modelNumber} ${workDescription || description || 'maintenance'}</td>
+        <td>PLACEHOLDER: AI will research approximate duration for ${manufacturer} ${componentType || system || 'Equipment'} ${workDescription || description || 'maintenance'}</td>
     </tr>
     <tr>
         <td>Level of Risk (LOR):</td>
@@ -292,7 +292,7 @@ export async function generateSection03(formData) {
     </tr>${contractorFields}
     <tr>
         <td>Qualifications Required:</td>
-        <td>PLACEHOLDER: AI must generate specific qualifications based on ${workDescription || description || 'maintenance'} complexity for ${manufacturer} ${modelNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
+        <td>PLACEHOLDER: AI must generate specific qualifications based on ${workDescription || description || 'maintenance'} complexity for ${manufacturer} ${componentType || system || 'Equipment'}. Include certifications, training requirements, experience levels, and equipment-specific qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
     </tr>
     <tr>
         <td>Advance notifications required:</td>
@@ -528,10 +528,10 @@ export async function generateSection11(formData) {
 
     if (system?.toLowerCase().includes('chiller')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Service Bulletins and Technical Updates`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
         { name: `${manufacturer} Service Bulletins and Technical Updates`, type: 'internal' },
       ];
       
@@ -544,10 +544,10 @@ export async function generateSection11(formData) {
       ];
     } else if (system?.toLowerCase().includes('generator')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Engine Service Manual`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Operation and Maintenance Manual`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`, type: 'internal' },
         { name: `${manufacturer} Engine Service Manual`, type: 'internal' },
       ];
       
@@ -558,10 +558,10 @@ export async function generateSection11(formData) {
       ];
     } else if (system?.toLowerCase().includes('ups')) {
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Installation and Operation Manual`, url: manufacturerUrl, type: 'link' },
         { name: `${manufacturer} Battery System Documentation`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Installation and Operation Manual`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Installation and Operation Manual`, type: 'internal' },
         { name: `${manufacturer} Battery System Documentation`, type: 'internal' },
       ];
       
@@ -572,9 +572,9 @@ export async function generateSection11(formData) {
     } else {
       // Generic equipment references
       equipmentReferences = manufacturerUrl ? [
-        { name: `${manufacturer} ${modelNumber} Documentation`, url: manufacturerUrl, type: 'link' },
+        { name: `${manufacturer} ${system || 'Equipment'} Documentation`, url: manufacturerUrl, type: 'link' },
       ] : [
-        { name: `${manufacturer} ${modelNumber} Documentation`, type: 'internal' },
+        { name: `${manufacturer} ${system || 'Equipment'} Documentation`, type: 'internal' },
       ];
     }
 
@@ -714,7 +714,7 @@ export async function generateSection11(formData) {
     const sources = [
       manufacturerUrl ? {
         type: "equipment_manual",
-        document: `${manufacturer} ${modelNumber} Documentation`,
+        document: `${manufacturer} ${system || 'Equipment'} Documentation`,
         url: manufacturerUrl,
         lastVerified: new Date().toISOString().split('T')[0]
       } : null,

@@ -35,7 +35,7 @@ export async function POST(request) {
     };
 
     // Determine relevant documentation based on equipment type
-    let manufacturerDoc = `${manufacturer} ${modelNumber} Operation and Maintenance Manual`;
+    let manufacturerDoc = `${manufacturer} ${system || 'Equipment'} Operation and Maintenance Manual`;
     let manufacturerUrl = getManufacturerLinks(manufacturer);
     let nfpaStandards = [];
     let additionalDocs = [];

@@ -9,6 +9,10 @@ export async function generateSection07(formData) {
     const { manufacturer, modelNumber, system, workDescription } = formData;
     const sourceManager = new SourceManager();
     
+    // Simplify equipment name for display
+    const componentType = system || 'Equipment';
+    const simplifiedEquipmentName = `${manufacturer} ${componentType}`;
+    
     console.log('Section 08 Procedures: Equipment data:', { manufacturer, modelNumber, system });
     
     // Generate equipment-specific data recording tables
@@ -818,11 +822,15 @@ export async function generateSection07(formData) {
 
     const getDynamicProcedurePrompt = (system, workDescription, equipmentData) => {
       const systemType = system.toLowerCase();
+      const componentType = system.split(' ')[0]; // Extract component type from system
       
-      return `Generate comprehensive maintenance procedure steps for ${manufacturer} ${modelNumber} ${system} ${workDescription || 'maintenance'}.
+      return `Generate comprehensive maintenance procedure steps for ${manufacturer} ${componentType} ${workDescription || 'maintenance'}.
       
       CRITICAL OUTPUT FORMAT REQUIREMENTS:
       ===============================
+      DO NOT include any prefacing text like "Okay, I will generate..." or "Here are the steps..."
+      DO NOT include any AI response acknowledgments or explanations
+      START DIRECTLY with the HTML table rows - no introduction text
       YOU MUST OUTPUT ONLY HTML TABLE ROWS IN THIS EXACT FORMAT:
       
       For normal steps:
@@ -861,20 +869,20 @@ export async function generateSection07(formData) {
       ===============================
       
       CRITICAL ACCURACY REQUIREMENTS:
-      - Generate procedures SPECIFIC to ${manufacturer} ${modelNumber} ${system}
-      - Research actual ${manufacturer} ${modelNumber} specifications and maintenance procedures
+      - Generate procedures SPECIFIC to ${manufacturer} ${componentType}
+      - Research actual ${manufacturer} specifications and maintenance procedures for this ${componentType}
       - Use real regulatory requirements (OSHA, EPA, NFPA) and industry standards
       - Base procedures on accurate technical data and documented manufacturer requirements
       - DO NOT make up specific technical values, torque specifications, or pressure readings
       - If specific manufacturer data is not known, mark as "VERIFY WITH MANUFACTURER" or "REFER TO ${manufacturer} MANUAL"
       - Use genuine safety procedures and industry-standard practices
       - Reference actual equipment characteristics and known maintenance requirements
-      - ALWAYS reference the specific equipment: ${manufacturer} ${modelNumber} Serial #${formData.serialNumber || 'TBD'}
+      - ALWAYS reference the specific equipment: ${manufacturer} ${componentType} (Unit: ${formData.equipmentNumber || 'TBD'}, Serial: ${formData.serialNumber || 'TBD'})
       - Make every step relate to THIS SPECIFIC EQUIPMENT, not generic procedures
       
       EQUIPMENT-SPECIFIC REQUIREMENTS:
       ${equipmentData.specificProcedures ? `
-      For ${manufacturer} ${modelNumber}, include these verified details where known:
+      For ${manufacturer} ${componentType}, include these verified details where known:
       - Electrical torque: ${equipmentData.torqueValues.electrical} (VERIFY WITH MANUFACTURER MANUAL)
       - Mechanical torque: ${equipmentData.torqueValues.mechanical} (VERIFY WITH MANUFACTURER MANUAL)
       - Refrigerant service torque: ${equipmentData.torqueValues.refrigerant || 'VERIFY WITH MANUFACTURER'}
