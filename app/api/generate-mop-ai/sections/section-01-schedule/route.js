@@ -45,11 +45,34 @@ export async function POST(request) {
       riskJustification = "Critical power protection system";
     }
 
+    // CET level determination based on technical complexity of work performed
+    let cetLevel = 2; // Default to CET-2
+    let cetJustification = "Standard mechanical maintenance work";
+    
+    // Determine CET level based on actual technical work being performed
+    if (workDesc.toLowerCase().includes('rounds') || workDesc.toLowerCase().includes('visual') || 
+        workDesc.toLowerCase().includes('readings') || workDesc.toLowerCase().includes('log')) {
+      cetLevel = 1;
+      cetJustification = "Basic rounds, readings, and visual checks only";
+    } else if (systemLower.includes('filter') || workDesc.toLowerCase().includes('filter') ||
+               workDesc.toLowerCase().includes('valve') || workDesc.toLowerCase().includes('mechanical')) {
+      cetLevel = 2;
+      cetJustification = "Mechanical work, filter changes, valve operations (no electrical)";
+    } else if (systemLower.includes('ups') || workDesc.toLowerCase().includes('ups') ||
+               (workDesc.toLowerCase().includes('electrical') && !workDesc.toLowerCase().includes('switchgear'))) {
+      cetLevel = 3;
+      cetJustification = "Complex operations, UPS work, limited energized work (≤480V)";
+    } else if (workDesc.toLowerCase().includes('switchgear') || workDesc.toLowerCase().includes('utility') ||
+               workDesc.toLowerCase().includes('medium voltage') || workDesc.toLowerCase().includes('mv')) {
+      cetLevel = 4;
+      cetJustification = "High-risk operations, MV switching, utility work";
+    }
+    
     const cetRequired = {
-      1: "CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve",
-      2: "CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve",
-      3: "CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve",
-      4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
+      1: "CET-1 required to perform work",
+      2: "CET-2 required to perform work",
+      3: "CET-3 required to perform work",
+      4: "CET-4 required to perform work"
     };
 
     const html = `<h2>Section 01: MOP Schedule Information</h2>
@@ -112,7 +135,7 @@ export async function POST(request) {
     </tr>
     <tr>
         <td>CET Level Required:</td>
-        <td><strong>${cetRequired[riskLevel]}</strong><br><em>Based on risk level assessment</em></td>
+        <td><strong>${cetRequired[cetLevel]}</strong><br><em>${cetJustification}</em></td>
     </tr>
     <tr>
         <td>Author:</td>
