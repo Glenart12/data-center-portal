@@ -166,7 +166,7 @@ export async function generateSection02(formData) {
     </tr>
     <tr>
         <td>Site Address:</td>
-        <td>${formData.location || 'UPDATE NEEDED'}</td>
+        <td>${formData.address ? `${formData.address.street || ''}, ${formData.address.city || ''}, ${formData.address.state || ''} ${formData.address.zipCode || ''}` : 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
         <td>Site Contact:</td>
@@ -213,7 +213,7 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Personnel Required:</td>
-        <td>PLACEHOLDER: AI will generate specific roles and number of personnel based on ${manufacturer} ${modelNumber} ${workDescription || description || 'maintenance'} complexity and equipment requirements</td>
+        <td>PLACEHOLDER: AI will research specific roles needed for ${manufacturer} ${modelNumber} maintenance</td>
     </tr>
     <tr>
         <td>Work Performed By:</td>
@@ -257,7 +257,7 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Qualifications Required:</td>
-        <td>PLACEHOLDER: AI will generate required certifications and qualifications based on ${manufacturer} ${modelNumber} ${serialNumber} equipment specifications and ${workDescription || description || 'maintenance'} complexity</td>
+        <td>PLACEHOLDER: AI will research certifications needed for ${manufacturer} ${modelNumber}</td>
     </tr>
     <tr>
         <td>Advance notifications required:</td>
