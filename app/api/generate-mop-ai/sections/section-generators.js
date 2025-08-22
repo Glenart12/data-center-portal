@@ -74,6 +74,18 @@ export async function generateSection01(formData) {
         <td><input type="text" placeholder="To be assigned" style="width:250px" /></td>
     </tr>
     <tr>
+        <td>Version:</td>
+        <td><input type="text" value="V1" style="width:100px" /></td>
+    </tr>
+    <tr>
+        <td>Creation Date:</td>
+        <td>${new Date().toLocaleDateString()}</td>
+    </tr>
+    <tr>
+        <td>Work Description:</td>
+        <td>${workDescription || description || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
         <td>Component Type:</td>
         <td>${componentType || 'UPDATE NEEDED'}</td>
     </tr>
@@ -98,23 +110,11 @@ export async function generateSection01(formData) {
         <td>${location || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
-        <td>Work Description:</td>
-        <td>${workDescription || description || 'UPDATE NEEDED'}</td>
-    </tr>
-    <tr>
-        <td>Version:</td>
-        <td><input type="text" value="V1" style="width:100px" /></td>
-    </tr>
-    <tr>
-        <td>Creation Date:</td>
-        <td>${new Date().toLocaleDateString()}</td>
-    </tr>
-    <tr>
         <td>Duration:</td>
         <td>PLACEHOLDER: AI will research approximate duration for ${manufacturer} ${modelNumber} ${workDescription || description || 'maintenance'}</td>
     </tr>
     <tr>
-        <td>Level of Risk:</td>
+        <td>Level of Risk (LOR):</td>
         <td><strong>Level ${riskLevel}</strong> (${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]})<br><em>${riskJustification}</em></td>
     </tr>
     <tr>
@@ -213,7 +213,7 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Personnel Required:</td>
-        <td>PLACEHOLDER: AI will research specific roles needed for ${manufacturer} ${modelNumber} maintenance</td>
+        <td>PLACEHOLDER: AI must generate based on the specific ${workDescription || description || 'maintenance'} for ${manufacturer} ${modelNumber}. Consider the complexity of the maintenance procedure, equipment criticality, and safety requirements. List specific roles with brief explanations. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for role names. DO NOT output markdown asterisks</td>
     </tr>
     <tr>
         <td>Work Performed By:</td>
@@ -257,15 +257,15 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Qualifications Required:</td>
-        <td>PLACEHOLDER: AI will research certifications needed for ${manufacturer} ${modelNumber}</td>
+        <td>PLACEHOLDER: AI must generate specific qualifications based on ${workDescription || description || 'maintenance'} complexity for ${manufacturer} ${modelNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
     </tr>
     <tr>
         <td>Advance notifications required:</td>
-        <td>PLACEHOLDER: AI will research advance notices for ${manufacturer} ${modelNumber} in data center</td>
+        <td>PLACEHOLDER: AI must research and explain based on equipment type and ${workDescription || description || 'maintenance'}. FORMAT AS CLEAN HTML: Use ul and li tags if listing multiple items. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
     </tr>
     <tr>
         <td>Post notifications required:</td>
-        <td>PLACEHOLDER: AI will research post notices for ${manufacturer} ${modelNumber} in data center</td>
+        <td>PLACEHOLDER: AI must research and explain based on equipment type and ${workDescription || description || 'maintenance'}. FORMAT AS CLEAN HTML: Use ul and li tags if listing multiple items. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
     </tr>
 </table>`;
 

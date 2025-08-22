@@ -61,30 +61,59 @@ export async function enhanceSections1to3(htmlContent, formData) {
        - Annual PM: 6-8 hours
        - Include brief justification
     
-    3. For "PLACEHOLDER: AI will research specific roles needed for [manufacturer] [model] maintenance":
-       - List 2-4 specific job roles
-       - Examples: "Lead HVAC Technician, Electrical Technician, Controls Specialist"
-       - For chillers: Include refrigeration specialist
-       - For generators: Include diesel mechanic
-       - For UPS: Include battery technician
+    3. For "PLACEHOLDER: AI must generate based on the specific [work] for [manufacturer] [model]":
+       - Generate detailed personnel requirements with HTML formatting
+       - Use <ul> and <li> tags for bullet points, <strong> tags for role names
+       - Include 2-4 specific roles with descriptions for each:
+         * <li><strong>Lead Technician (CET 2+):</strong> Primary responsibility for equipment operation, safety protocols, and procedure execution</li>
+         * <li><strong>Assistant Technician:</strong> Support lead tech, monitor gauges, record data, assist with tools</li>
+         * <li><strong>Safety Observer:</strong> Dedicated safety monitoring, emergency response readiness</li>
+       - Adjust roles based on equipment type:
+         * Chillers: Add <li><strong>Refrigeration Specialist:</strong> Handle refrigerant recovery, pressure testing, leak detection</li>
+         * Generators: Add <li><strong>Diesel Mechanic:</strong> Engine maintenance, fuel system checks, load testing</li>
+         * UPS: Add <li><strong>Battery Technician:</strong> Battery testing, replacement, disposal procedures</li>
+       - DO NOT use markdown asterisks (**), only HTML tags
     
     4. For "PLACEHOLDER: AI will research number needed for [manufacturer] [model]":
        - Provide specific number (typically 2-3 for safety)
        - Include justification: "2 technicians - One lead technician for primary work, one assistant for safety/LOTO verification"
     
-    5. For "PLACEHOLDER: AI will research certifications needed for [manufacturer] [model]":
-       - List relevant certifications based on equipment type
-       - Chillers: "EPA 608 Universal Certification, OSHA 10, Electrical Safety Training"
-       - Generators: "Diesel Engine Certification, Electrical License, OSHA 10"
-       - UPS: "Battery Safety Certification, Electrical License, Arc Flash Training"
-       - Include manufacturer-specific training if applicable
+    5. For "PLACEHOLDER: AI must generate specific qualifications based on [work] complexity for [manufacturer] [model]":
+       - Generate detailed qualifications with HTML formatting
+       - Use <ul> and <li> tags for bullet points, <strong> tags for emphasis
+       - Include comprehensive qualifications:
+         * <li><strong>Required Certifications:</strong> List specific certifications based on equipment</li>
+         * <li><strong>Experience Level:</strong> Minimum years of experience with similar equipment</li>
+         * <li><strong>Technical Skills:</strong> Specific technical competencies required</li>
+         * <li><strong>Manufacturer Training:</strong> Any OEM-specific training requirements</li>
+       - Equipment-specific qualifications:
+         * Chillers: <li><strong>EPA 608 Universal:</strong> Required for refrigerant handling</li>
+         * Generators: <li><strong>Diesel Engine Certification:</strong> For engine maintenance procedures</li>
+         * UPS: <li><strong>Battery Safety NFPA 70E:</strong> For working with battery systems</li>
+       - Add <li><strong>OSHA 10/30:</strong> General industry safety certification</li>
+       - DO NOT use markdown asterisks (**), only HTML tags
     
-    6. For "PLACEHOLDER: AI will research advance notices":
-       - List: "Data Center Manager (24 hours), NOC/BMS Operator (4 hours), IT Operations (24 hours), Security (Day of work)"
-       - Include timing for each notification
+    6. For "PLACEHOLDER: AI must research and explain based on equipment type and [work]":
+       - Generate advance notifications with HTML formatting
+       - Use <ul> and <li> tags for each notification
+       - Format: <li><strong>[Role/Department]:</strong> [Timeframe] - [Reason for notification]</li>
+       - Standard notifications:
+         * <li><strong>Data Center Manager:</strong> 24 hours advance - Approve maintenance window and coordinate resources</li>
+         * <li><strong>NOC/BMS Operator:</strong> 4 hours advance - Prepare monitoring systems and acknowledge alarms</li>
+         * <li><strong>IT Operations:</strong> 24 hours advance - Plan for any affected systems or redundancy needs</li>
+         * <li><strong>Security:</strong> Day of work - Arrange access and visitor badges for any contractors</li>
+       - DO NOT use markdown asterisks (**), only HTML tags
     
-    7. For "PLACEHOLDER: AI will research post notices":
-       - List: "Data Center Manager (Completion confirmation), NOC/BMS Operator (System status), IT Operations (All-clear), Maintenance Log (Updated)"
+    7. For "PLACEHOLDER: AI must research and explain based on equipment type and [work]":
+       - Generate post-completion notifications with HTML formatting
+       - Use <ul> and <li> tags for each notification
+       - Format: <li><strong>[Role/Department]:</strong> [Action required]</li>
+       - Standard notifications:
+         * <li><strong>Data Center Manager:</strong> Completion confirmation with any issues encountered</li>
+         * <li><strong>NOC/BMS Operator:</strong> System status update and alarm points restored to normal</li>
+         * <li><strong>IT Operations:</strong> All-clear notification that equipment is back online</li>
+         * <li><strong>Maintenance Log:</strong> Updated with work performed, readings, and next due date</li>
+       - DO NOT use markdown asterisks (**), only HTML tags
     
     CRITICAL RULES:
     - Return ONLY the modified HTML with no markdown formatting
