@@ -56,11 +56,47 @@ export async function generateSection01(formData) {
       riskJustification = "Critical power protection system";
     }
 
+    // Determine CET level based on technical complexity of work performed (NOT approval)
+    let cetLevel = 2; // Default to CET-2
+    let cetJustification = "Standard mechanical maintenance work";
+    
+    // CET-1: Basic non-technical tasks
+    if (workDesc.toLowerCase().includes('rounds') || workDesc.toLowerCase().includes('visual') || 
+        workDesc.toLowerCase().includes('readings') || workDesc.toLowerCase().includes('log') ||
+        workDesc.toLowerCase().includes('housekeeping') || workDesc.toLowerCase().includes('escort')) {
+      cetLevel = 1;
+      cetJustification = "Basic rounds, readings, visual checks, housekeeping, or vendor escort";
+    } 
+    // CET-2: Mechanical work (no electrical)
+    else if (systemLower.includes('filter') || workDesc.toLowerCase().includes('filter') ||
+             workDesc.toLowerCase().includes('valve') || workDesc.toLowerCase().includes('mechanical') ||
+             workDesc.toLowerCase().includes('sensor') || (workDesc.toLowerCase().includes('replacement') && 
+             !workDesc.toLowerCase().includes('electrical'))) {
+      cetLevel = 2;
+      cetJustification = "Mechanical work, filter changes, valve operations, sensor replacement (NO electrical work)";
+    } 
+    // CET-3: Complex operations including limited electrical
+    else if (systemLower.includes('ups') || workDesc.toLowerCase().includes('ups') ||
+             systemLower.includes('ats') || workDesc.toLowerCase().includes('ats') ||
+             (systemLower.includes('chiller') && !workDesc.toLowerCase().includes('filter')) ||
+             (workDesc.toLowerCase().includes('electrical') && !workDesc.toLowerCase().includes('switchgear') && 
+              !workDesc.toLowerCase().includes('medium voltage') && !workDesc.toLowerCase().includes('mv'))) {
+      cetLevel = 3;
+      cetJustification = "UPS operations, ATS testing, chiller operations, or limited energized work (≤480V)";
+    } 
+    // CET-4: High-risk operations
+    else if (workDesc.toLowerCase().includes('switchgear') || workDesc.toLowerCase().includes('utility') ||
+             workDesc.toLowerCase().includes('medium voltage') || workDesc.toLowerCase().includes('mv') ||
+             workDesc.toLowerCase().includes('plant-wide') || workDesc.toLowerCase().includes('critical')) {
+      cetLevel = 4;
+      cetJustification = "MV switching, utility transfers, or plant-wide critical operations";
+    }
+
     const cetRequired = {
-      1: "CET 1 (Technician) to execute, CET 2 (Lead Technician) to approve",
-      2: "CET 2 (Technician) to execute, CET 3 (Lead Technician) to approve",
-      3: "CET 3 (Lead Technician) to execute, CET 4 (Manager) to approve",
-      4: "CET 4 (Manager) to execute, CET 5 (Director) to approve"
+      1: "CET-1 required to perform work",
+      2: "CET-2 required to perform work",
+      3: "CET-3 required to perform work",
+      4: "CET-4 required to perform work"
     };
 
     const html = `<h2>Section 01: MOP Schedule Information</h2>
@@ -119,7 +155,7 @@ export async function generateSection01(formData) {
     </tr>
     <tr>
         <td>CET Level Required:</td>
-        <td><strong>${cetRequired[riskLevel]}</strong><br><em>Based on risk level assessment</em></td>
+        <td><strong>${cetRequired[cetLevel]}</strong><br><em>${cetJustification}</em></td>
     </tr>
     <tr>
         <td>Author:</td>
@@ -191,8 +227,46 @@ export async function generateSection02(formData) {
 // Section 03: Overview - EXACT ORIGINAL CODE FROM POST FUNCTION
 export async function generateSection03(formData) {
   try {
-    const { manufacturer, modelNumber, system, componentType, workDescription, description } = formData;
+    const { manufacturer, modelNumber, system, componentType, workDescription, description, workType } = formData;
     
+    // Determine delivery method display
+    const deliveryMethod = workType === 'subcontractor' ? 'Subcontractor' : 'Self-Delivered';
+    
+    // Build contractor fields conditionally
+    const contractorFields = workType === 'subcontractor' ? `
+    <tr>
+        <td># of Contractors #1:</td>
+        <td>${formData.contractors1 || '<input type="text" placeholder="Number" style="width:100px" />'}</td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Company Name:</td>
+        <td>${formData.contractorCompany1 || '<input type="text" class="field-box" />'}</td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Personnel Name:</td>
+        <td>${formData.contractorPersonnel1 || '<input type="text" class="field-box" />'}</td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Contact Details:</td>
+        <td>${formData.contractorContact1 || '<input type="text" class="field-box" />'}</td>
+    </tr>
+    <tr>
+        <td># of Contractors #2:</td>
+        <td>${formData.contractors2 || '<input type="text" placeholder="Number" style="width:100px" />'}</td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Company Name:</td>
+        <td>${formData.contractorCompany2 || '<input type="text" class="field-box" />'}</td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Personnel Name:</td>
+        <td>${formData.contractorPersonnel2 || '<input type="text" class="field-box" />'}</td>
+    </tr>
+    <tr>
+        <td>If Subcontractor - Contact Details:</td>
+        <td>${formData.contractorContact2 || '<input type="text" class="field-box" />'}</td>
+    </tr>` : '';
+
     const html = `<h2>Section 03: MOP Overview</h2>
 <table class="info-table">
     <tr>
@@ -212,49 +286,9 @@ export async function generateSection03(formData) {
         <td><input type="text" placeholder="Badge access, escort required, etc." style="width:400px" /></td>
     </tr>
     <tr>
-        <td>Personnel Required:</td>
-        <td>PLACEHOLDER: AI must generate based on the specific ${workDescription || description || 'maintenance'} for ${manufacturer} ${modelNumber}. Consider the complexity of the maintenance procedure, equipment criticality, and safety requirements. List specific roles with brief explanations. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for role names. DO NOT output markdown asterisks</td>
-    </tr>
-    <tr>
-        <td>Work Performed By:</td>
-        <td>
-            <input type="checkbox" id="self-delivered" checked> Self-Delivered
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="checkbox" id="subcontractor"> Subcontractor
-        </td>
-    </tr>
-    <tr>
-        <td># of Contractors #1:</td>
-        <td><input type="text" placeholder="Number" style="width:100px" /></td>
-    </tr>
-    <tr>
-        <td>If Subcontractor - Company Name:</td>
-        <td><input type="text" class="field-box" /></td>
-    </tr>
-    <tr>
-        <td>If Subcontractor - Personnel Name:</td>
-        <td><input type="text" class="field-box" /></td>
-    </tr>
-    <tr>
-        <td>If Subcontractor - Contact Details:</td>
-        <td><input type="text" class="field-box" /></td>
-    </tr>
-    <tr>
-        <td># of Contractors #2:</td>
-        <td><input type="text" placeholder="Number" style="width:100px" /></td>
-    </tr>
-    <tr>
-        <td>If Subcontractor - Company Name:</td>
-        <td><input type="text" class="field-box" /></td>
-    </tr>
-    <tr>
-        <td>If Subcontractor - Personnel Name:</td>
-        <td><input type="text" class="field-box" /></td>
-    </tr>
-    <tr>
-        <td>If Subcontractor - Contact Details:</td>
-        <td><input type="text" class="field-box" /></td>
-    </tr>
+        <td>Delivery Method:</td>
+        <td>${deliveryMethod}</td>
+    </tr>${contractorFields}
     <tr>
         <td>Qualifications Required:</td>
         <td>PLACEHOLDER: AI must generate specific qualifications based on ${workDescription || description || 'maintenance'} complexity for ${manufacturer} ${modelNumber}. Include certifications, training requirements, experience levels, and equipment-specific qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
