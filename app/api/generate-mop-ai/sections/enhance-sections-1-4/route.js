@@ -41,6 +41,7 @@ export async function enhanceSections1to3(htmlContent, formData) {
     Equipment Details:
     - Manufacturer: ${formData.manufacturer || 'Not specified'}
     - Model Number: ${formData.modelNumber || 'Not specified'}
+    - Serial Number: ${formData.serialNumber || 'Not specified'}
     - Component Type: ${formData.componentType || 'Not specified'}
     - System: ${formData.system || 'Not specified'}
     - Work Description: ${formData.workDescription || formData.description || 'Not specified'}
@@ -50,10 +51,7 @@ export async function enhanceSections1to3(htmlContent, formData) {
     
     REPLACEMENT GUIDELINES:
     
-    1. For "PLACEHOLDER: AI will research systems affected by [manufacturer] [model] maintenance":
-       - List 3-5 specific systems that would be affected during this maintenance
-       - Include: Cooling systems, Power distribution, BMS/monitoring, IT loads, backup systems
-       - Format: "Primary cooling loop, Secondary chilled water pumps, BMS monitoring points, Adjacent equipment cooling"
+    1. [REMOVED - No longer needed for MOP generation]
     
     2. For "PLACEHOLDER: AI will research approximate duration for [manufacturer] [model] [work]":
        - Provide realistic time range based on maintenance type
@@ -64,29 +62,46 @@ export async function enhanceSections1to3(htmlContent, formData) {
        - Annual PM: 6-8 hours
        - Include brief justification
     
-    3. For "PLACEHOLDER: AI will research specific roles needed for [manufacturer] [model] maintenance":
-       - List 2-4 specific job roles
-       - Examples: "Lead HVAC Technician, Electrical Technician, Controls Specialist"
-       - For chillers: Include refrigeration specialist
-       - For generators: Include diesel mechanic
-       - For UPS: Include battery technician
+    3. For "PLACEHOLDER: AI will generate specific roles and number of personnel based on [manufacturer] [model] [work] complexity and equipment requirements":
+       - Analyze the specific task complexity and equipment specifications
+       - Consider manufacturer ${formData.manufacturer}, model ${formData.modelNumber}, serial ${formData.serialNumber}
+       - Base personnel count on work complexity:
+         * Simple PM (filters, visual inspection): 2 technicians
+         * Medium complexity (belt changes, calibration): 2-3 technicians  
+         * Complex work (compressor service, major repairs): 3-4 technicians
+         * Critical/hazardous work: 4+ technicians
+       - List specific roles based on equipment:
+         * Chillers: "Lead HVAC Technician, Refrigeration Specialist, Controls Technician (3 total)"
+         * Generators: "Lead Diesel Mechanic, Electrical Technician, Fuel Systems Specialist (3 total)"
+         * UPS: "Lead Electrical Technician, Battery Specialist, Controls Technician (3 total)"
+         * CRAC/CRAH: "Lead HVAC Technician, Controls Specialist (2 total)"
+       - Include safety observer for high-risk work
+       - Format: "Lead [Type] Technician, [Specialty] Technician, Safety Observer (3 total) - Based on ${formData.manufacturer} ${formData.modelNumber} complexity"
     
-    4. For "PLACEHOLDER: AI will research number needed for [manufacturer] [model]":
-       - Provide specific number (typically 2-3 for safety)
-       - Include justification: "2 technicians - One lead technician for primary work, one assistant for safety/LOTO verification"
+    4. [REMOVED - Now integrated into Personnel Required field above]
     
-    5. For "PLACEHOLDER: AI will research certifications needed for [manufacturer] [model]":
-       - List relevant certifications based on equipment type
-       - Chillers: "EPA 608 Universal Certification, OSHA 10, Electrical Safety Training"
-       - Generators: "Diesel Engine Certification, Electrical License, OSHA 10"
-       - UPS: "Battery Safety Certification, Electrical License, Arc Flash Training"
-       - Include manufacturer-specific training if applicable
+    5. For "PLACEHOLDER: AI will generate required certifications and qualifications based on [manufacturer] [model] [serial] equipment specifications and [work] complexity":
+       - Analyze specific equipment: ${formData.manufacturer} ${formData.modelNumber} Serial: ${formData.serialNumber}
+       - Consider work complexity: ${formData.workDescription || formData.description}
+       - Base certifications on equipment type AND manufacturer:
+         * Trane/Carrier/York Chillers: "EPA 608 Universal, ${formData.manufacturer} Factory Certification, OSHA 30, Refrigerant Handling License, High Voltage Safety (for centrifugal units > 460V)"
+         * Caterpillar/Cummins Generators: "${formData.manufacturer} Certified Technician, Diesel Engine Specialist, NFPA 110 Certification, Electrical License, OSHA 10"
+         * Liebert/Eaton/APC UPS: "${formData.manufacturer} Service Certification, Battery Safety NFPA 70E, Electrical License, Arc Flash Level 2, OSHA 10"
+         * Specific voltage requirements: Add "High Voltage Certification" for equipment > 600V
+       - Add specialized requirements based on serial number patterns:
+         * Newer models (recent serials): "${formData.manufacturer} Digital Controls Certification"
+         * Older models: "Legacy Equipment Specialist Certification"
+       - Include task-specific qualifications:
+         * Compressor work: "Vibration Analysis Level II, Alignment Certification"
+         * Controls work: "BAS Programming Certification, ${formData.manufacturer} Controls Specialist"
+         * Refrigerant work: "EPA 608 Universal, Refrigerant Recovery Certification"
+       - Format: "Required: [Primary Certs]. Preferred: [Additional Certs]. Manufacturer-specific: ${formData.manufacturer} Model ${formData.modelNumber} Service Certification"
     
-    6. For "PLACEHOLDER: AI will research advance notices for [manufacturer] [model] in data center":
+    6. For "PLACEHOLDER: AI will research advance notices":
        - List: "Data Center Manager (24 hours), NOC/BMS Operator (4 hours), IT Operations (24 hours), Security (Day of work)"
        - Include timing for each notification
     
-    7. For "PLACEHOLDER: AI will research post notices for [manufacturer] [model] in data center":
+    7. For "PLACEHOLDER: AI will research post notices":
        - List: "Data Center Manager (Completion confirmation), NOC/BMS Operator (System status), IT Operations (All-clear), Maintenance Log (Updated)"
     
     CRITICAL RULES:

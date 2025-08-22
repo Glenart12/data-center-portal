@@ -110,10 +110,6 @@ export async function generateSection01(formData) {
         <td>${new Date().toLocaleDateString()}</td>
     </tr>
     <tr>
-        <td>Affected Systems:</td>
-        <td>PLACEHOLDER: AI will research systems affected by ${manufacturer} ${modelNumber} maintenance</td>
-    </tr>
-    <tr>
         <td>Duration:</td>
         <td>PLACEHOLDER: AI will research approximate duration for ${manufacturer} ${modelNumber} ${workDescription || description || 'maintenance'}</td>
     </tr>
@@ -169,6 +165,10 @@ export async function generateSection02(formData) {
         <td>${formData.location || 'UPDATE NEEDED'}</td>
     </tr>
     <tr>
+        <td>Site Address:</td>
+        <td>${formData.location || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
         <td>Site Contact:</td>
         <td><input type="text" placeholder="Name, Phone, Job Title/Role" style="width:400px" /></td>
     </tr>
@@ -213,7 +213,7 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Personnel Required:</td>
-        <td>PLACEHOLDER: AI will research specific roles needed for ${manufacturer} ${modelNumber} maintenance</td>
+        <td>PLACEHOLDER: AI will generate specific roles and number of personnel based on ${manufacturer} ${modelNumber} ${workDescription || description || 'maintenance'} complexity and equipment requirements</td>
     </tr>
     <tr>
         <td>Work Performed By:</td>
@@ -222,10 +222,6 @@ export async function generateSection03(formData) {
             &nbsp;&nbsp;&nbsp;&nbsp;
             <input type="checkbox" id="subcontractor"> Subcontractor
         </td>
-    </tr>
-    <tr>
-        <td># of Facilities Personnel:</td>
-        <td>PLACEHOLDER: AI will research number needed for ${manufacturer} ${modelNumber}</td>
     </tr>
     <tr>
         <td># of Contractors #1:</td>
@@ -261,7 +257,7 @@ export async function generateSection03(formData) {
     </tr>
     <tr>
         <td>Qualifications Required:</td>
-        <td>PLACEHOLDER: AI will research certifications needed for ${manufacturer} ${modelNumber}</td>
+        <td>PLACEHOLDER: AI will generate required certifications and qualifications based on ${manufacturer} ${modelNumber} ${serialNumber} equipment specifications and ${workDescription || description || 'maintenance'} complexity</td>
     </tr>
     <tr>
         <td>Advance notifications required:</td>
