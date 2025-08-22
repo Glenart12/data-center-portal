@@ -487,7 +487,7 @@ export async function generateSection11(formData) {
       throw new Error('Missing formData in request body');
     }
     
-    const { manufacturer, modelNumber, system, workDescription, location } = formData;
+    const { manufacturer, modelNumber, system, componentType, workDescription, location } = formData;
     console.log('Destructured fields:', { manufacturer, modelNumber, system, workDescription, location });
 
     // Generate manufacturer-specific documentation links
