@@ -9,6 +9,8 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     equipmentNumber: '',
     serialNumber: '',
     location: '',
+    customer: '',
+    siteName: '',
     address: {
       street: '',
       city: '',
@@ -321,6 +323,44 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
               }}
               placeholder="e.g., Data Hall 1"
             />
+          </div>
+
+          {/* Customer and Site Name */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Customer
+              </label>
+              <input
+                type="text"
+                value={formData.customer}
+                onChange={(e) => handleInputChange('customer', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., ABC Corporation"
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Site Name
+              </label>
+              <input
+                type="text"
+                value={formData.siteName}
+                onChange={(e) => handleInputChange('siteName', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+                placeholder="e.g., Phoenix Data Center"
+              />
+            </div>
           </div>
 
           {/* Address Section */}

@@ -19,6 +19,19 @@ CRITICAL HTML GENERATION RULES:
 
 IMPORTANT: This EOP must be INTERACTIVE with editable input fields. Include HTML input elements throughout.
 
+CRITICAL VARIABLE MAPPING for template placeholders:
+- Use \${manufacturer} for Manufacturer (from Emergency Details)
+- Use \${modelNumber} for Model Number (from Emergency Details)
+- Use \${serialNumber} for Serial Number (from Emergency Details)
+- Use \${component} for Component Type (from Emergency Details)
+- Use \${emergencyType} for Emergency Type/Work Description (from Emergency Details)
+- Use \${location} for Location/Data Center Location (from Emergency Details)
+- Use \${customer} for Customer (from Emergency Details)
+- Use \${siteName} for Site Name (from Emergency Details)
+- Use \${siteAddress} for Site Address (from Emergency Details)
+- Use \${system} for System (from Emergency Details)
+- Use \${equipmentNumber} for Equipment Number (from Emergency Details)
+
 The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 
 START WITH:
@@ -104,19 +117,19 @@ START WITH:
 <table class="info-table">
     <tr>
         <td>Customer:</td>
-        <td>\${customer || 'UPDATE NEEDED'}</td>
+        <td>\${customer}</td>
     </tr>
     <tr>
         <td>Site Name:</td>
-        <td>\${siteName || 'UPDATE NEEDED'}</td>
+        <td>\${siteName}</td>
     </tr>
     <tr>
         <td>Data Center Location:</td>
-        <td>\${location || 'UPDATE NEEDED'}</td>
+        <td>\${location}</td>
     </tr>
     <tr>
         <td>Site Address:</td>
-        <td>\${address ? (address.street || '') + ', ' + (address.city || '') + ', ' + (address.state || '') + ' ' + (address.zipCode || '') : 'UPDATE NEEDED'}</td>
+        <td>\${siteAddress}</td>
     </tr>
     <tr>
         <td>Site Contact:</td>
@@ -1001,6 +1014,10 @@ Emergency Details:
 - System: ${formData.system}
 - Component/Equipment Type: ${formData.component}
 - Emergency Type: ${formData.emergencyType}
+Variables for template use:
+- customer: ${formData.customer || 'UPDATE NEEDED'}
+- siteName: ${formData.siteName || 'UPDATE NEEDED'}
+- siteAddress: ${formData.address ? `${formData.address.street || ''}, ${formData.address.city || ''}, ${formData.address.state || ''} ${formData.address.zipCode || ''}` : 'UPDATE NEEDED'}
 
 CALCULATED VALUES FOR SECTION 01:
 - Duration: ${duration}
