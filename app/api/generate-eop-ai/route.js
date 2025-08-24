@@ -76,15 +76,15 @@ START WITH:
     </tr>
     <tr>
         <td>Duration:</td>
-        <td>${duration}</td>
+        <td>[DURATION_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Level of Risk (LOR):</td>
-        <td>${riskLevelDisplay}</td>
+        <td>[RISK_LEVEL_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>CET Level Required:</td>
-        <td>${cetLevelDisplay}</td>
+        <td>[CET_LEVEL_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Author:</td>
@@ -904,7 +904,11 @@ export async function POST(request) {
     const cetLevelDisplay = `<strong>CET-${cetLevel} required to perform work</strong><br><em>${cetJustification}</em>`;
     
     // Prepare the prompt for Gemini with calculated values
-    const prompt = `${PROJECT_INSTRUCTIONS.replace('[current_date]', currentDate)}
+    const prompt = `${PROJECT_INSTRUCTIONS
+      .replace('[current_date]', currentDate)
+      .replace('[DURATION_PLACEHOLDER]', duration)
+      .replace('[RISK_LEVEL_PLACEHOLDER]', riskLevelDisplay)
+      .replace('[CET_LEVEL_PLACEHOLDER]', cetLevelDisplay)}
 
 CRITICAL EQUIPMENT TYPE: ${formData.component}
 THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are specific to ${formData.component}
