@@ -20,17 +20,17 @@ CRITICAL HTML GENERATION RULES:
 IMPORTANT: This EOP must be INTERACTIVE with editable input fields. Include HTML input elements throughout.
 
 CRITICAL VARIABLE MAPPING for template placeholders:
-- Use \${manufacturer} for Manufacturer (from Emergency Details)
-- Use \${modelNumber} for Model Number (from Emergency Details)
-- Use \${serialNumber} for Serial Number (from Emergency Details)
-- Use \${component} for Component Type (from Emergency Details)
-- Use \${emergencyType} for Emergency Type/Work Description (from Emergency Details)
-- Use \${location} for Location/Data Center Location (from Emergency Details)
-- Use \${customer} for Customer (from Emergency Details)
-- Use \${siteName} for Site Name (from Emergency Details)
-- Use \${siteAddress} for Site Address (from Emergency Details)
-- Use \${system} for System (from Emergency Details)
-- Use \${equipmentNumber} for Equipment Number (from Emergency Details)
+- Use [MANUFACTURER_PLACEHOLDER] for Manufacturer (from Emergency Details)
+- Use [MODEL_PLACEHOLDER] for Model Number (from Emergency Details)
+- Use [SERIAL_PLACEHOLDER] for Serial Number (from Emergency Details)
+- Use [COMPONENT_PLACEHOLDER] for Component Type (from Emergency Details)
+- Use [EMERGENCY_TYPE_PLACEHOLDER] for Emergency Type/Work Description (from Emergency Details)
+- Use [LOCATION_PLACEHOLDER] for Location/Data Center Location (from Emergency Details)
+- Use [CUSTOMER_PLACEHOLDER] for Customer (from Emergency Details)
+- Use [SITE_NAME_PLACEHOLDER] for Site Name (from Emergency Details)
+- Use [SITE_ADDRESS_PLACEHOLDER] for Site Address (from Emergency Details)
+- Use [SYSTEM_PLACEHOLDER] for System (from Emergency Details)
+- Use [EQUIPMENT_NUMBER_PLACEHOLDER] for Equipment Number (from Emergency Details)
 
 The EOP must follow this EXACT structure with INTERACTIVE ELEMENTS:
 
@@ -38,14 +38,14 @@ START WITH:
 <h1>Emergency Operating Procedure (EOP)</h1>
 
 <div style="background: #dc3545; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-    <h2 style="font-size: 2.5em; margin: 0; color: white;">\${component} \${emergencyType}</h2>
+    <h2 style="font-size: 2.5em; margin: 0; color: white;">[COMPONENT_PLACEHOLDER] [EMERGENCY_TYPE_PLACEHOLDER]</h2>
 </div>
 
 <h2>Section 01: EOP Identification & Control</h2>
 <table class="info-table">
     <tr>
         <td>EOP Title:</td>
-        <td>\${component} - \${emergencyType}</td>
+        <td>[COMPONENT_PLACEHOLDER] - [EMERGENCY_TYPE_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>EOP Identifier:</td>
@@ -61,31 +61,31 @@ START WITH:
     </tr>
     <tr>
         <td>Work Description:</td>
-        <td>\${emergencyType}</td>
+        <td>[EMERGENCY_TYPE_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Component Type:</td>
-        <td>\${component}</td>
+        <td>[COMPONENT_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Manufacturer:</td>
-        <td>\${manufacturer}</td>
+        <td>[MANUFACTURER_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Model Number:</td>
-        <td>\${modelNumber}</td>
+        <td>[MODEL_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Serial Number:</td>
-        <td>\${serialNumber || 'N/A'}</td>
+        <td>[SERIAL_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Equipment Number:</td>
-        <td>\${equipmentNumber || 'N/A'}</td>
+        <td>[EQUIPMENT_NUMBER_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Location:</td>
-        <td>\${location || 'Data Center'}</td>
+        <td>[LOCATION_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Duration:</td>
@@ -117,19 +117,19 @@ START WITH:
 <table class="info-table">
     <tr>
         <td>Customer:</td>
-        <td>\${customer}</td>
+        <td>[CUSTOMER_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Site Name:</td>
-        <td>\${siteName}</td>
+        <td>[SITE_NAME_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Data Center Location:</td>
-        <td>\${location}</td>
+        <td>[LOCATION_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Site Address:</td>
-        <td>\${siteAddress}</td>
+        <td>[SITE_ADDRESS_PLACEHOLDER]</td>
     </tr>
     <tr>
         <td>Site Contact:</td>
@@ -141,15 +141,15 @@ START WITH:
 <table class="info-table">
     <tr>
         <td>Purpose:</td>
-        <td>This Emergency Operating Procedure provides step-by-step instructions for responding to power failure emergencies affecting the \${manufacturer} \${modelNumber} \${system}. This document ensures rapid, safe, and effective response to restore critical infrastructure operations.</td>
+        <td>This Emergency Operating Procedure provides step-by-step instructions for responding to power failure emergencies affecting the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] [SYSTEM_PLACEHOLDER]. This document ensures rapid, safe, and effective response to restore critical infrastructure operations.</td>
     </tr>
     <tr>
         <td>Scope:</td>
-        <td>This procedure applies to all data center operations personnel, facilities engineers, and emergency response teams responsible for maintaining the \${manufacturer} \${modelNumber} and associated critical infrastructure systems.</td>
+        <td>This procedure applies to all data center operations personnel, facilities engineers, and emergency response teams responsible for maintaining the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] and associated critical infrastructure systems.</td>
     </tr>
     <tr>
         <td>Activation Criteria:</td>
-        <td>This EOP shall be activated when power loss is detected or suspected on the \${manufacturer} \${modelNumber}, including but not limited to: utility power outages, automatic transfer switch failures, distribution panel failures, circuit breaker trips, or equipment-specific power supply failures.</td>
+        <td>This EOP shall be activated when power loss is detected or suspected on the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER], including but not limited to: utility power outages, automatic transfer switch failures, distribution panel failures, circuit breaker trips, or equipment-specific power supply failures.</td>
     </tr>
     <tr>
         <td>Safety Notice:</td>
@@ -163,7 +163,7 @@ START WITH:
 
 <div class="emergency-action" style="background: #fee; border: 2px solid #dc3545; padding: 15px; margin: 20px 0;">
 <h4>⚠️ CRITICAL SAFETY CHECKPOINT - STOP Before Proceeding:</h4>
-<p><strong>Equipment-Specific PPE Requirements for \${manufacturer} \${modelNumber}:</strong></p>
+<p><strong>Equipment-Specific PPE Requirements for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:</strong></p>
 
 Generate PPE requirements based on the SPECIFIC equipment type and voltage:
 - For 480V 3-phase equipment (chillers, large motors): Arc Flash Category 2 PPE minimum
@@ -175,7 +175,7 @@ Generate PPE requirements based on the SPECIFIC equipment type and voltage:
 <table>
 <tr>
   <th>PPE Item</th>
-  <th>Specification for \${modelNumber}</th>
+  <th>Specification for [MODEL_PLACEHOLDER]</th>
   <th>Verified</th>
 </tr>
 <tr>
@@ -200,7 +200,7 @@ Generate PPE requirements based on the SPECIFIC equipment type and voltage:
 </tr>
 </table>
 
-<p><strong>Required Tools & Test Equipment for \${manufacturer} \${modelNumber}:</strong></p>
+<p><strong>Required Tools & Test Equipment for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:</strong></p>
 
 Generate tool list based on the SPECIFIC equipment model:
 - For Carrier 19XRV5P5: Carrier CCN interface tool, specific control board diagnostic tools
@@ -211,7 +211,7 @@ Generate tool list based on the SPECIFIC equipment model:
 <table>
 <tr>
   <th>Tool/Equipment</th>
-  <th>Specific Model/Type for \${modelNumber}</th>
+  <th>Specific Model/Type for [MODEL_PLACEHOLDER]</th>
   <th>Available</th>
 </tr>
 <tr>
@@ -231,7 +231,7 @@ Generate tool list based on the SPECIFIC equipment model:
 </tr>
 <tr>
   <td>Manufacturer Interface Tool</td>
-  <td>[Specific tool for \${manufacturer} \${modelNumber}]</td>
+  <td>[Specific tool for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]]</td>
   <td><input type="checkbox" /></td>
 </tr>
 <tr>
@@ -241,22 +241,22 @@ Generate tool list based on the SPECIFIC equipment model:
 </tr>
 </table>
 
-<p><strong>\${manufacturer} \${modelNumber} Specific Safety Requirements:</strong></p>
+<p><strong>[MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] Specific Safety Requirements:</strong></p>
 <ul>
-<li>□ Verify de-energization procedures per \${manufacturer} service manual</li>
+<li>□ Verify de-energization procedures per [MANUFACTURER_PLACEHOLDER] service manual</li>
 <li>□ Check for stored energy in [capacitors/VFDs/control circuits] specific to this model</li>
-<li>□ Review \${manufacturer} emergency shutdown sequence</li>
+<li>□ Review [MANUFACTURER_PLACEHOLDER] emergency shutdown sequence</li>
 <li>□ Confirm [equipment-specific hazards: refrigerant pressure, battery acid, hot surfaces, etc.]</li>
-<li>□ Emergency contact for \${manufacturer} technical support ready: <input type="text" placeholder="Support #" style="width:150px" /></li>
+<li>□ Emergency contact for [MANUFACTURER_PLACEHOLDER] technical support ready: <input type="text" placeholder="Support #" style="width:150px" /></li>
 </ul>
 
 <div style="background: #dc3545; color: white; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
-DO NOT PROCEED until all safety requirements are verified for \${manufacturer} \${modelNumber}
+DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
 </div>
 </div>
 
 <h3>Step 1: Obvious Power Loss Indicators Check (BEFORE opening any equipment)</h3>
-<p><strong>Verify facility-wide power status indicators before approaching \${manufacturer} \${modelNumber}</strong></p>
+<p><strong>Verify facility-wide power status indicators before approaching [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
 <table>
 <tr>
   <th>Check Item</th>
@@ -303,20 +303,20 @@ DO NOT PROCEED until all safety requirements are verified for \${manufacturer} \
 </table>
 
 <h3>Step 2: System Monitoring Verification</h3>
-<p><strong>Verify how \${manufacturer} \${modelNumber} appears in monitoring systems</strong></p>
+<p><strong>Verify how [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] appears in monitoring systems</strong></p>
 <table>
 <tr>
   <th>System</th>
   <th>Check Location</th>
   <th>What to Verify</th>
-  <th>Expected Reading for \${modelNumber}</th>
+  <th>Expected Reading for [MODEL_PLACEHOLDER]</th>
   <th>Actual Reading</th>
   <th>Pass/Fail</th>
 </tr>
 <tr>
   <td>EPMS</td>
   <td>Electrical Power Monitoring System</td>
-  <td>Power consumption for \${modelNumber}</td>
+  <td>Power consumption for [MODEL_PLACEHOLDER]</td>
   <td>0 kW if de-energized</td>
   <td><input type="text" placeholder="kW reading" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
@@ -324,7 +324,7 @@ DO NOT PROCEED until all safety requirements are verified for \${manufacturer} \
 <tr>
   <td>BMS</td>
   <td>Building Management System</td>
-  <td>\${manufacturer} \${modelNumber} status</td>
+  <td>[MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] status</td>
   <td>"Offline" or "No Communication"</td>
   <td><input type="text" placeholder="Status" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
@@ -332,8 +332,8 @@ DO NOT PROCEED until all safety requirements are verified for \${manufacturer} \
 <tr>
   <td>SCADA (if available)</td>
   <td>SCADA System</td>
-  <td>\${system} operational status</td>
-  <td>Shows \${modelNumber} as non-operational</td>
+  <td>[SYSTEM_PLACEHOLDER] operational status</td>
+  <td>Shows [MODEL_PLACEHOLDER] as non-operational</td>
   <td><input type="text" placeholder="Status" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
 </tr>
@@ -356,7 +356,7 @@ DO NOT PROCEED until all safety requirements are verified for \${manufacturer} \
 </table>
 
 <h3>Step 3: Electrical Diagnostics</h3>
-<p><strong>Equipment-specific electrical verification for \${manufacturer} \${modelNumber}</strong></p>
+<p><strong>Equipment-specific electrical verification for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
 
 First, identify the specific equipment type from the manufacturer and model provided. Determine:
 - Equipment category (chiller, UPS, generator, PDU, CRAC unit, etc.)
@@ -485,7 +485,7 @@ Add this important note at the bottom of the Emergency Contacts section:
 
 <h2>Section 07: Recovery & Return to Service</h2>
 <h3>Power Restoration and Equipment Recovery Procedures</h3>
-<p>Follow these steps in sequence to safely restore the \${manufacturer} \${modelNumber} to normal operation after power has been restored:</p>
+<p>Follow these steps in sequence to safely restore the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] to normal operation after power has been restored:</p>
 
 <ol>
   <li>
@@ -504,7 +504,7 @@ Add this important note at the bottom of the Emergency Contacts section:
     <p>Complete all safety verifications before energizing equipment:</p>
     <ul>
       <li>Verify all LOTO devices have been removed</li>
-      <li>Confirm no personnel are working on the \${manufacturer} \${modelNumber}</li>
+      <li>Confirm no personnel are working on the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</li>
       <li>Reset all emergency stops and safety interlocks</li>
       <li>Check control power availability: <input type="text" placeholder="Control voltage" style="width:100px" /> VAC</li>
     </ul>
@@ -512,7 +512,7 @@ Add this important note at the bottom of the Emergency Contacts section:
   
   <li>
     <strong>Equipment-Specific Restart Sequence</strong>
-    <p>Follow the manufacturer-specific startup procedure for \${manufacturer} \${modelNumber}:</p>
+    <p>Follow the manufacturer-specific startup procedure for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:</p>
     <ul>
       <li>Turn main disconnect to "ON" position</li>
       <li>Verify control panel indicators show normal status</li>
@@ -597,7 +597,7 @@ Add this important note at the bottom of the Emergency Contacts section:
     <th>Access Requirements</th>
   </tr>
   <tr>
-    <td><strong>\${manufacturer} \${modelNumber} Location</strong></td>
+    <td><strong>[MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] Location</strong></td>
     <td><input type="text" placeholder="Enter exact location (Room/Row/Rack)" style="width:250px" /></td>
     <td><input type="text" placeholder="Badge/Key required" style="width:150px" /></td>
   </tr>
@@ -629,7 +629,7 @@ Add this important note at the bottom of the Emergency Contacts section:
 </table>
 
 <h3>Spare Parts Inventory</h3>
-<p>Critical spare parts for \${manufacturer} \${modelNumber} emergency response:</p>
+<p>Critical spare parts for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] emergency response:</p>
 <table>
   <tr>
     <th>Part Description</th>
@@ -945,7 +945,20 @@ export async function POST(request) {
       .replace('[current_date]', currentDate)
       .replace('[DURATION_PLACEHOLDER]', duration)
       .replace('[RISK_LEVEL_PLACEHOLDER]', riskLevelDisplay)
-      .replace('[CET_LEVEL_PLACEHOLDER]', cetLevelDisplay)}
+      .replace('[CET_LEVEL_PLACEHOLDER]', cetLevelDisplay)
+      .replace(/\[MANUFACTURER_PLACEHOLDER\]/g, formData.manufacturer || 'UPDATE NEEDED')
+      .replace(/\[MODEL_PLACEHOLDER\]/g, formData.modelNumber || 'UPDATE NEEDED')
+      .replace(/\[SERIAL_PLACEHOLDER\]/g, formData.serialNumber || 'N/A')
+      .replace(/\[EQUIPMENT_NUMBER_PLACEHOLDER\]/g, formData.equipmentNumber || 'N/A')
+      .replace(/\[COMPONENT_PLACEHOLDER\]/g, formData.component || 'UPDATE NEEDED')
+      .replace(/\[EMERGENCY_TYPE_PLACEHOLDER\]/g, formData.emergencyType || 'Power Failure')
+      .replace(/\[LOCATION_PLACEHOLDER\]/g, formData.location || 'Data Center')
+      .replace(/\[SYSTEM_PLACEHOLDER\]/g, formData.system || 'UPDATE NEEDED')
+      .replace(/\[CUSTOMER_PLACEHOLDER\]/g, formData.customer || 'UPDATE NEEDED')
+      .replace(/\[SITE_NAME_PLACEHOLDER\]/g, formData.siteName || 'UPDATE NEEDED')
+      .replace(/\[SITE_ADDRESS_PLACEHOLDER\]/g, formData.address ? 
+        `${formData.address.street || ''}, ${formData.address.city || ''}, ${formData.address.state || ''} ${formData.address.zipCode || ''}`.trim() || 'UPDATE NEEDED' : 
+        'UPDATE NEEDED')}
 
 CRITICAL EQUIPMENT TYPE: ${formData.component}
 THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are specific to ${formData.component}
