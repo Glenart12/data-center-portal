@@ -54,6 +54,10 @@ export async function generateSection06(formData) {
     
     Include assumptions about: equipment condition, spare parts availability, system redundancy, environmental conditions, personnel qualifications, and system documentation.
     
+    CRITICAL: DO NOT include any introductory text like "Here are X assumptions..." or "The following assumptions..."
+    Start DIRECTLY with the table rows.
+    Do NOT describe what you're generating.
+    
     Format as HTML table rows only. DO NOT include <table> tags or headers, just the <tr> rows.
     DO NOT use markdown code blocks or backticks.
     
