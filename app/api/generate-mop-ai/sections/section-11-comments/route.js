@@ -44,6 +44,12 @@ export async function generateSection10(formData) {
     
     const commentsPrompt = `Generate 5 relevant MOP comments for ${simplifiedEquipmentName} ${workDescription || 'maintenance'}.
     
+    CRITICAL FORMATTING REQUIREMENTS:
+    - DO NOT include any introductory text like "Here are X comments..." or "The following are..."
+    - DO NOT describe what you're generating
+    - Start DIRECTLY with the HTML <ul> tag
+    - Output ONLY the HTML unordered list with the 5 comments
+    
     CRITICAL ACCURACY REQUIREMENTS:
     - Research actual ${manufacturer} ${equipmentType} maintenance requirements and known issues
     - Use real manufacturer specifications and documented maintenance intervals
