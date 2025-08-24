@@ -100,7 +100,31 @@ START WITH:
     </tr>
 </table>
 
-<h2>Section 02: Purpose & Scope</h2>
+<h2>Section 02: Site Information</h2>
+<table class="info-table">
+    <tr>
+        <td>Customer:</td>
+        <td>\${customer || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
+        <td>Site Name:</td>
+        <td>\${siteName || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
+        <td>Data Center Location:</td>
+        <td>\${location || 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
+        <td>Site Address:</td>
+        <td>\${address ? (address.street || '') + ', ' + (address.city || '') + ', ' + (address.state || '') + ' ' + (address.zipCode || '') : 'UPDATE NEEDED'}</td>
+    </tr>
+    <tr>
+        <td>Site Contact:</td>
+        <td>UPDATE NEEDED</td>
+    </tr>
+</table>
+
+<h2>Section 03: Purpose & Scope</h2>
 <table class="info-table">
     <tr>
         <td>Purpose:</td>
@@ -120,7 +144,7 @@ START WITH:
     </tr>
 </table>
 
-<h2>Section 03: Immediate Emergency Actions - Power Failure Diagnostics</h2>
+<h2>Section 04: Immediate Emergency Actions - Power Failure Diagnostics</h2>
 
 <h3>Pre-Action Safety & Equipment Requirements</h3>
 
@@ -357,7 +381,7 @@ After the table, include:
 <h3>POWER DIAGNOSIS DETERMINATION:</h3>
 <ul>
 <li>IF power is present at main input but equipment won't operate = INTERNAL POWER ISSUE (specify internal components for THIS equipment type)</li>
-<li>IF NO power at main input = EXTERNAL POWER ISSUE (proceed to Section 04)</li>
+<li>IF NO power at main input = EXTERNAL POWER ISSUE (proceed to Section 05)</li>
 </ul>
 </div>
 
@@ -366,7 +390,7 @@ Include equipment-specific measurement requirements:
 - PPE requirements based on voltage levels
 - Lock-out/Tag-out specific to this equipment
 
-<h2>Section 04: External Power Supply Scenarios</h2>
+<h2>Section 05: External Power Supply Scenarios</h2>
 
 Generate 4 scenarios based on the SPECIFIC EQUIPMENT TYPE and its typical installation:
 
@@ -427,7 +451,7 @@ IMPORTANT EQUIPMENT-SPECIFIC ADAPTATIONS:
 - If equipment is SWITCHGEAR: Focus on bus voltage, protection relays, control power (125VDC typical), breaker charging motors
 - Adapt accordingly for any other equipment type
 
-<h2>Section 05: Communication & Escalation Protocol</h2>
+<h2>Section 06: Communication & Escalation Protocol</h2>
 - Table with contact levels 0-3 plus emergency services
 - Phone number fields: <input type="text" placeholder="Enter phone" style="width:150px" />
 - Contact name fields where appropriate: <input type="text" placeholder="Enter contact name" style="width:200px" />
@@ -446,7 +470,7 @@ Include these essential emergency contacts (use editable input fields for phone 
 Add this important note at the bottom of the Emergency Contacts section:
 "⚠️ IMPORTANT: Verify all emergency contact numbers for your specific facility location. Update phone numbers as needed."
 
-<h2>Section 06: Recovery & Return to Service</h2>
+<h2>Section 07: Recovery & Return to Service</h2>
 <h3>Power Restoration and Equipment Recovery Procedures</h3>
 <p>Follow these steps in sequence to safely restore the \${manufacturer} \${modelNumber} to normal operation after power has been restored:</p>
 
@@ -551,7 +575,7 @@ Add this important note at the bottom of the Emergency Contacts section:
   </li>
 </ol>
 
-<h2>Section 07: Supporting Information</h2>
+<h2>Section 08: Supporting Information</h2>
 <h3>Critical Infrastructure Locations</h3>
 <table>
   <tr>
@@ -640,7 +664,7 @@ Make these clickable hyperlinks:
 - <a href="https://www.osha.gov/electrical" target="_blank" style="color: #0070f3; text-decoration: underline;">OSHA Electrical Safety Standards</a>
 - <a href="https://www.nfpa.org/codes-and-standards/nfpa-70e" target="_blank" style="color: #0070f3; text-decoration: underline;">NFPA 70E Electrical Safety</a>
 
-<h2>Section 08: EOP Approval & Review</h2>
+<h2>Section 09: EOP Approval & Review</h2>
 - Approval matrix table with editable fields:
   - Name column: <input type="text" placeholder="Enter name" style="width:200px" />
   - Signature column: <input type="text" placeholder="Signature" style="width:200px" />
@@ -916,8 +940,8 @@ THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are s
 EMERGENCY TYPE FOCUS: ${formData.emergencyType}
 ${formData.emergencyType.toLowerCase().includes('power') ? `
 POWER FAILURE EMERGENCY - This EOP is specifically for power failure response. 
-Section 03 MUST include comprehensive power diagnostics with voltage verification tables.
-Section 04 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
+Section 04 MUST include comprehensive power diagnostics with voltage verification tables.
+Section 05 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
 ` : ''}
 
 Equipment-Specific Details for ${formData.manufacturer} ${formData.modelNumber}:
@@ -988,10 +1012,10 @@ IMPORTANT: In Section 01, use these EXACT calculated values as provided above. T
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Start with <h1>Emergency Operating Procedure (EOP)</h1> followed by the Quick Response header div, then proceed with sections using H2 headers.
 
-IMPORTANT: In Section 07, do NOT include PPE Requirements or Tools Required subsections - these are now in Section 03 where they're needed immediately.
-Include ALL 8 sections with complete, detailed content and INTERACTIVE INPUT FIELDS as specified above.
+IMPORTANT: In Section 08, do NOT include PPE Requirements or Tools Required subsections - these are now in Section 04 where they're needed immediately.
+Include ALL 9 sections with complete, detailed content and INTERACTIVE INPUT FIELDS as specified above.
 
-CRITICAL FOR SECTION 03:
+CRITICAL FOR SECTION 04:
 - FIRST add Pre-Action Safety & Equipment Requirements subsection with:
   * PPE requirements specific to ${formData.component} voltage and hazards
   * Tool requirements based on ${formData.manufacturer} ${formData.modelNumber}
@@ -1001,7 +1025,7 @@ CRITICAL FOR SECTION 03:
 - Add input fields for technician readings
 - Include Pass/Fail checkboxes
 
-CRITICAL FOR SECTION 04:
+CRITICAL FOR SECTION 05:
 - Generate 4 complete scenarios for external power issues
 - Each scenario must be specific to ${formData.component} equipment type
 - Include verification tables with input fields
