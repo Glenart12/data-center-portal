@@ -611,12 +611,124 @@ Include:
 - Additional notes field for technician observations
 
 Section 11: References and Documentation
-Include comprehensive reference library with:
-- Equipment-Specific Documentation table
-- Safety Standards and Guidelines table
-- Additional Resources table
-- Reference usage guidelines section
-- Important notices about link verification
+Create comprehensive reference library with THREE TABLES based on ACTUAL EQUIPMENT:
+
+<h3>Equipment-Specific Documentation</h3>
+<table>
+  <tr>
+    <th>Document Type</th>
+    <th>Description</th>
+    <th>Access/Location</th>
+  </tr>
+  <tr>
+    <td>Operation Manual</td>
+    <td>${formData.manufacturer} ${formData.modelNumber} Operations Guide</td>
+    <td>📋 <a href="[SELECT URL BASED ON MANUFACTURER]" style="color: #20c997;">View</a></td>
+  </tr>
+  <tr>
+    <td>Service Manual</td>
+    <td>${formData.manufacturer} ${formData.modelNumber} Service Documentation</td>
+    <td>📋 <a href="[SELECT URL BASED ON MANUFACTURER]" style="color: #20c997;">View</a></td>
+  </tr>
+  <tr>
+    <td>Parts Catalog</td>
+    <td>${formData.manufacturer} ${formData.modelNumber} Parts List</td>
+    <td>📋 <a href="[SELECT URL BASED ON MANUFACTURER]" style="color: #20c997;">View</a></td>
+  </tr>
+  <tr>
+    <td>Installation Guide</td>
+    <td>${formData.manufacturer} ${formData.modelNumber} Installation Manual</td>
+    <td>Internal Document - Request from Site Manager</td>
+  </tr>
+</table>
+
+CRITICAL: Use the ACTUAL manufacturer from ${formData.manufacturer} to select the correct URL:
+- If manufacturer is "Trane": use https://www.trane.com/commercial/north-america/us/en/support/manuals-guides.html
+- If manufacturer is "Carrier": use https://www.carrier.com/commercial/en/us/support/
+- If manufacturer is "York": use https://www.york.com/commercial-equipment/support
+- If manufacturer is "Liebert" or "Vertiv": use https://www.vertiv.com/en-us/support/
+- If manufacturer is "Caterpillar": use https://www.cat.com/en_US/support/manuals.html
+- For any other manufacturer: use https://www.[manufacturer-name-lowercase].com/support/
+
+<h3>Safety Standards and Guidelines</h3>
+IMPORTANT: Generate safety standards relevant to ${formData.system} and ${formData.componentType}:
+- For Cooling systems: Include refrigerant handling (EPA 608), pressure vessel standards
+- For Power/Generator systems: Include fuel handling (NFPA 30), electrical safety (NFPA 70E)
+- For UPS systems: Include battery safety (IEEE 450), electrical safety
+- Always include general safety: OSHA lockout/tagout, PPE requirements
+
+<table>
+  <tr>
+    <th>Standard</th>
+    <th>Description</th>
+    <th>Access/Location</th>
+  </tr>
+  <tr>
+    <td>OSHA 1910.147</td>
+    <td>Lockout/Tagout Requirements</td>
+    <td>📋 <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147" style="color: #20c997;">View</a></td>
+  </tr>
+  <!-- Generate additional standards based on ${formData.system} type:
+       - Cooling: Add EPA 608 (https://www.epa.gov/section608), ASHRAE standards
+       - Power: Add NFPA 70E, IEEE standards
+       - Generator: Add NFPA 30 (fuel), NFPA 110 (emergency power)
+       - Include system-specific safety standards with actual URLs -->
+</table>
+
+<h3>Additional Resources</h3>
+IMPORTANT: Generate resources specific to ${formData.system} and ${formData.componentType}:
+<table>
+  <tr>
+    <th>Resource Type</th>
+    <th>Description</th>
+    <th>Access/Location</th>
+  </tr>
+  <!-- Generate system-specific resources based on equipment type:
+       For Cooling Systems: -->
+  <tr>
+    <td>Refrigerant Safety Data</td>
+    <td>SDS for refrigerants used in ${formData.manufacturer} ${formData.modelNumber}</td>
+    <td>📋 <a href="https://www.osha.gov/chemicaldata/" style="color: #20c997;">View</a></td>
+  </tr>
+  <!-- For Power/Generator Systems: -->
+  <tr>
+    <td>Fuel Safety Data</td>
+    <td>Diesel/Natural Gas safety information for ${formData.componentType}</td>
+    <td>📋 <a href="https://www.osha.gov/chemicaldata/" style="color: #20c997;">View</a></td>
+  </tr>
+  <!-- Always include these internal documents: -->
+  <tr>
+    <td>${formData.manufacturer} Equipment History</td>
+    <td>Maintenance records for ${formData.modelNumber} Serial: ${formData.serialNumber}</td>
+    <td>Internal Document - Request from Site Manager</td>
+  </tr>
+  <tr>
+    <td>Site Emergency Procedures</td>
+    <td>Facility-specific emergency response for ${formData.location}</td>
+    <td>Internal Document - Request from Site Manager</td>
+  </tr>
+  <tr>
+    <td>System Diagrams</td>
+    <td>${formData.system} P&ID and electrical schematics</td>
+    <td>Internal Document - Request from Site Manager</td>
+  </tr>
+</table>
+
+Include reference usage guidelines and notices about verification
+
+CRITICAL FORMAT REQUIREMENTS FOR SECTION 11:
+- MUST use ACTUAL equipment data: ${formData.manufacturer}, ${formData.modelNumber}, ${formData.system}
+- DO NOT use generic "Carrier" or any other hardcoded manufacturer names
+- ALL documentation descriptions MUST reference the ACTUAL equipment being worked on
+- ALL external documents MUST have clickable "📋 View" links with actual URLs (not text descriptions)
+- Use green color (#20c997) for all View links to match SOP styling
+- Internal documents show "Internal Document - Request from Site Manager" (no link)
+- DO NOT show text descriptions like "Site Document Library" or "Manufacturer Website"
+- EVERY row in Access/Location column must be either:
+  1. A clickable "📋 View" link with real URL based on ACTUAL manufacturer, OR
+  2. "Internal Document - Request from Site Manager" text (no link)
+- Safety standards MUST be relevant to the ACTUAL system type (cooling, power, etc.)
+- Resources MUST be specific to the ACTUAL equipment and work being performed
 
 FORMATTING REQUIREMENTS:
 - Use professional green color theme (#198754 for headers, #20c997 for accents)
@@ -692,7 +804,11 @@ CRITICAL REQUIREMENTS:
 10. Section 08 MUST be titled "Back-out Procedures" with verification table
 11. Section 09 MUST have the professional approval table format
 12. Section 10 MUST include AI-generated comments relevant to the equipment
-13. Section 11 MUST include comprehensive reference library tables
+13. Section 11 MUST include THREE tables with clickable View links using ACTUAL equipment data:
+    - Equipment-Specific Documentation: MUST show ${formData.manufacturer} ${formData.modelNumber} docs with correct manufacturer URLs
+    - Safety Standards: MUST be relevant to ${formData.system} type with actual regulatory URLs  
+    - Additional Resources: MUST reference actual ${formData.componentType} and ${formData.serialNumber}
+    - NO GENERIC CONTENT: Every reference must be specific to the ACTUAL equipment being worked on
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
