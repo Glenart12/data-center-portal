@@ -578,8 +578,9 @@ export async function generateSection11(formData) {
       ];
     }
 
-    // Common safety and regulatory references for all equipment
+    // Combine safety and regulatory references
     safetyReferences = [
+      ...regulatoryReferences,  // Include all regulatory references
       { name: 'OSHA 29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)', url: 'https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147', type: 'link' },
       { name: 'OSHA 29 CFR 1910.95 - Occupational Noise Exposure', url: 'https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.95', type: 'link' },
       { name: 'OSHA Personal Protective Equipment Standards', url: 'https://www.osha.gov/personal-protective-equipment', type: 'link' },
@@ -609,25 +610,6 @@ export async function generateSection11(formData) {
     </tbody>
 </table>
 
-<h3>Regulatory Standards and Codes</h3>
-<table>
-    <thead>
-        <tr>
-            <th width="60%">Standard/Regulation</th>
-            <th width="20%">Authority</th>
-            <th width="20%">Access</th>
-        </tr>
-    </thead>
-    <tbody>
-        ${regulatoryReferences.map(ref => `
-        <tr>
-            <td><strong>${ref.name}</strong></td>
-            <td>${ref.name.includes('EPA') ? 'EPA' : ref.name.includes('NFPA') ? 'NFPA' : 'Industry'}</td>
-            <td><a href="${ref.url}" target="_blank" style="color: #0066cc;">📋 View</a></td>
-        </tr>`).join('')}
-    </tbody>
-</table>
-
 <h3>Safety Standards and Guidelines</h3>
 <table>
     <thead>
@@ -641,7 +623,7 @@ export async function generateSection11(formData) {
         ${safetyReferences.map(ref => `
         <tr>
             <td><strong>${ref.name}</strong></td>
-            <td>${ref.name.includes('OSHA') ? 'OSHA' : ref.name.includes('ANSI') ? 'ANSI' : 'ASTM'}</td>
+            <td>${ref.name.includes('OSHA') ? 'OSHA' : ref.name.includes('EPA') ? 'EPA' : ref.name.includes('NFPA') ? 'NFPA' : ref.name.includes('ANSI') ? 'ANSI' : 'ASTM'}</td>
             <td><a href="${ref.url}" target="_blank" style="color: #0066cc;">📋 View</a></td>
         </tr>`).join('')}
     </tbody>
