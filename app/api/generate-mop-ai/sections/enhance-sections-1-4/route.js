@@ -84,7 +84,6 @@ export async function enhanceSections1to3(htmlContent, formData) {
        - Include comprehensive qualifications:
          * <li><strong>Required Certifications:</strong> List specific certifications based on equipment</li>
          * <li><strong>Experience Level:</strong> Minimum years of experience with similar equipment</li>
-         * <li><strong>Technical Skills:</strong> Specific technical competencies required</li>
          * <li><strong>Manufacturer Training:</strong> Any OEM-specific training requirements</li>
        - Equipment-specific qualifications:
          * Chillers: <li><strong>EPA 608 Universal:</strong> Required for refrigerant handling</li>
