@@ -334,19 +334,18 @@ CRITICAL: This is an OPERATIONAL PROCEDURE, not maintenance. Focus on:
 IMPORTANT: You must generate EQUIPMENT-SPECIFIC procedures based on the exact manufacturer and model provided.
 Do NOT generate generic procedures. All steps, safety requirements, and technical details must be specific to the equipment.
 
-CRITICAL: You MUST include ALL 12 sections in order:
+CRITICAL: You MUST include ALL 11 sections in order:
 - Section 01: SOP Schedule Information
 - Section 02: Site Information
 - Section 03: SOP Overview
 - Section 04: Effect of SOP on Critical Facility
-- Section 05: SOP Supporting Documentation
-- Section 06: Safety Requirements
-- Section 07: SOP Risks & Assumptions
-- Section 08: SOP Details
-- Section 09: Back-out Procedures
-- Section 10: SOP Approval
-- Section 11: SOP Completion
-- Section 12: Comments
+- Section 05: Safety Requirements
+- Section 06: SOP Risks & Assumptions
+- Section 07: SOP Details
+- Section 08: Back-out Procedures
+- Section 09: SOP Approval
+- Section 10: SOP Comments
+- Section 11: References and Documentation
 
 SECTION-BY-SECTION REQUIREMENTS:
 
@@ -449,14 +448,7 @@ Include these 21 systems exactly:
 20. Building Automation System (BAS)
 21. Water/Leak Detection System
 
-Section 05: SOP Supporting Documentation
-Based on LOR value calculated in Section 01:
-- LOR 1 (Low): "Basic operating procedure reference guide"
-- LOR 2 (Medium): Add "Equipment safety data sheets"
-- LOR 3 (High): Add "Equipment O&M manuals, electrical diagrams"
-- LOR 4 (Critical): Add "Complete documentation package including OEM manuals, as-builts, commissioning reports"
-
-Section 06: Safety Requirements
+Section 05: Safety Requirements
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
 <table>
   <tr>
@@ -511,7 +503,7 @@ Section 06: Safety Requirements
   <!-- Generate equipment-specific hazards -->
 </table>
 
-Section 07: SOP Risks & Assumptions
+Section 06: SOP Risks & Assumptions
 <h3>Risk Analysis Matrix</h3>
 <table>
   <tr>
@@ -540,9 +532,9 @@ Section 07: SOP Risks & Assumptions
 <h3>Critical Decision Points</h3>
 <!-- List critical decision points -->
 
-Section 08: SOP Details
+Section 07: SOP Details
 Convert ALL subsections to table format:
-<h3>8.1 Pre-Procedure Checks</h3>
+<h3>7.1 Pre-Procedure Checks</h3>
 <table>
   <tr>
     <th>Step</th>
@@ -554,7 +546,7 @@ Convert ALL subsections to table format:
   <!-- Convert numbered list to table rows -->
 </table>
 
-<h3>8.2 Detailed Procedure Steps</h3>
+<h3>7.2 Detailed Procedure Steps</h3>
 <table>
   <tr>
     <th>Step</th>
@@ -567,10 +559,8 @@ Convert ALL subsections to table format:
   <!-- Equipment-specific readings with sources: PIC5+/BMS/Physical Gauge -->
 </table>
 
-Section 09: Back-out Procedures
-RENAME from "Escalation/Communication" to "Back-out Procedures"
-Move Section 8.3 Post-Procedure Verification content here as table:
-<h2>Section 09: Back-out Procedures</h2>
+Section 08: Back-out Procedures
+<h2>Section 08: Back-out Procedures</h2>
 <table>
   <tr>
     <th>Step</th>
@@ -581,21 +571,62 @@ Move Section 8.3 Post-Procedure Verification content here as table:
   <!-- Post-procedure verification steps -->
 </table>
 
-Section 10: SOP Approval
-Create an approval matrix table with:
-- Role (Operations Manager, Facility Manager, Safety Officer, Customer Representative)
-- Name (input field)
-- Signature (input field)
-- Date (input field)
+Section 09: SOP Approval
+Create a professional approval table matching the following format:
+<h2>Section 09: SOP Approval</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Review Stage</th>
+            <th>Reviewer's Name</th>
+            <th>Reviewer's Title</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Tested for clarity:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
+        </tr>
+        <tr>
+            <td><strong>Technical review:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
+        </tr>
+        <tr>
+            <td><strong>Chief Engineer approval:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
+        </tr>
+        <tr>
+            <td><strong>Customer approval:</strong></td>
+            <td><input type="text" style="width:100%" placeholder="Print Name" /></td>
+            <td><input type="text" style="width:100%" placeholder="Title" /></td>
+            <td><input type="text" style="width:100px" placeholder="MM/DD/YYYY" /></td>
+        </tr>
+    </tbody>
+</table>
 
-Section 11: SOP Completion
-ONLY include:
-- Technician Sign-off table with Name, Signature, Date, Time fields
+Include approval requirements section and effective/expiration dates
 
-Section 12: Comments
+Section 10: SOP Comments
+Generate relevant operational comments for the specific equipment and procedure.
 Include:
-- Revision History table: Version | Date | Author | Changes
-- General comments field (optional)
+- AI-generated operational insights for the equipment
+- Post-operation requirements section
+- Additional notes field for technician observations
+
+Section 11: References and Documentation
+Include comprehensive reference library with:
+- Equipment-Specific Documentation table
+- Safety Standards and Guidelines table
+- Additional Resources table
+- Reference usage guidelines section
+- Important notices about link verification
 
 FORMATTING REQUIREMENTS:
 - Use professional green color theme (#198754 for headers, #20c997 for accents)
@@ -643,7 +674,7 @@ Current Date: ${currentDate}
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Do NOT generate any <h1> tags, titles, or <div class="sop-document"> wrapper.
-Start DIRECTLY with <h2>Section 01: SOP Schedule Information</h2> and proceed with all 12 sections using H2 headers.
+Start DIRECTLY with <h2>Section 01: SOP Schedule Information</h2> and proceed with all 11 sections using H2 headers.
 
 CRITICAL HTML FORMATTING RULES:
 - DO NOT use markdown syntax (**, *, _, etc.) in your output
@@ -655,7 +686,7 @@ CRITICAL HTML FORMATTING RULES:
 - Ensure all output is valid, clean HTML without any markdown artifacts
 
 CRITICAL REQUIREMENTS:
-1. Generate ALL 12 sections completely - do not stop early
+1. Generate ALL 11 sections completely - do not stop early
 2. Section 01 MUST use the EXACT calculated values provided:
    - Duration: ${duration}
    - Level of Risk (LOR): ${riskLevelHtml} (display as HTML with strong tags)
@@ -663,13 +694,14 @@ CRITICAL REQUIREMENTS:
 3. Section 01 MUST have editable input fields for Author, Author CET Level, and Approver
 4. Section 02 MUST show Customer: ${formData.customer} AND Site Address from location input
 5. Section 03 MUST use the EXACT format specified with tables for Work Area, Equipment Info, Personnel (NO '# of Facilities Personnel' field)
-6. Section 04 MUST include the EXACT 15-system table with Yes/No/N/A/Details columns
-7. Section 05 MUST base documentation on LOR ${riskLevel}
-8. Section 06 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
-9. Section 07 MUST include Risk Matrix, Assumptions, and Decision Points in table format
-10. Section 08 MUST use tables for Pre-checks, Procedure Steps, with Source column
-11. Section 09 MUST be titled "Back-out Procedures" with verification table
-12. Section 11 MUST ONLY have Technician Sign-off (no other content)
+6. Section 04 MUST include the EXACT 21-system table with Yes/No/N/A/Details columns
+7. Section 05 MUST include PPE table, Tools table, Emergency Contacts, and Site Hazards
+8. Section 06 MUST include Risk Matrix, Assumptions, and Decision Points in table format
+9. Section 07 MUST use tables for Pre-checks, Procedure Steps, with Source column
+10. Section 08 MUST be titled "Back-out Procedures" with verification table
+11. Section 09 MUST have the professional approval table format
+12. Section 10 MUST include AI-generated comments relevant to the equipment
+13. Section 11 MUST include comprehensive reference library tables
 
 Generate comprehensive, detailed content for ALL sections. Do NOT use placeholder text.`;
 
