@@ -560,6 +560,8 @@ Convert ALL subsections to table format:
 </table>
 
 Section 08: Back-out Procedures
+RENAME from "Escalation/Communication" to "Back-out Procedures"
+Move Section 7.3 Post-Procedure Verification content here as table:
 <h2>Section 08: Back-out Procedures</h2>
 <table>
   <tr>
@@ -614,9 +616,8 @@ Create a professional approval table matching the following format:
 Include approval requirements section and effective/expiration dates
 
 Section 10: SOP Comments
-Generate relevant operational comments for the specific equipment and procedure.
 Include:
-- AI-generated operational insights for the equipment
+- Relevant comments for the specific equipment and procedure
 - Post-operation requirements section
 - Additional notes field for technician observations
 
