@@ -25,26 +25,34 @@ START WITH:
 <h1>Emergency Operating Procedure (EOP)</h1>
 
 <div style="background: #dc3545; color: white; padding: 30px; margin: 20px 0; border-radius: 5px; text-align: center;">
-    <h2 style="font-size: 2.5em; margin: 0; color: white;">\${category} \${workDescription}</h2>
+    <h2 style="font-size: 2.5em; margin: 0; color: white;">\${component} \${emergencyType}</h2>
 </div>
 
 <h2>Section 01: EOP Identification & Control</h2>
 <table class="info-table">
     <tr>
         <td>EOP Title:</td>
-        <td>Emergency Operating Procedure for \${manufacturer} \${category} \${workDescription}</td>
+        <td>\${component} - \${emergencyType}</td>
     </tr>
     <tr>
         <td>EOP Identifier:</td>
-        <td></td>
+        <td><input type="text" placeholder="TO BE ASSIGNED" style="width:250px" /></td>
     </tr>
     <tr>
-        <td>Component Type:</td>
-        <td>\${category}</td>
+        <td>Version:</td>
+        <td><input type="text" value="V1" style="width:80px" /></td>
+    </tr>
+    <tr>
+        <td>Creation Date:</td>
+        <td>[current_date]</td>
     </tr>
     <tr>
         <td>Work Description:</td>
-        <td>\${workDescription}</td>
+        <td>\${emergencyType}</td>
+    </tr>
+    <tr>
+        <td>Component Type:</td>
+        <td>\${component}</td>
     </tr>
     <tr>
         <td>Manufacturer:</td>
@@ -67,36 +75,24 @@ START WITH:
         <td>\${location || 'Data Center'}</td>
     </tr>
     <tr>
-        <td>System:</td>
-        <td>\${system}</td>
+        <td>Duration:</td>
+        <td>${duration}</td>
     </tr>
     <tr>
-        <td>Critical Specs:</td>
-        <td>
-            <ul style="margin: 0; padding-left: 20px;">
-                <li><strong>Manufacturer:</strong> \${manufacturer}</li>
-                <li><strong>Model:</strong> \${modelNumber}</li>
-                <li><strong>Serial Number:</strong> \${serialNumber || 'UPDATE NEEDED'}</li>
-                <li><strong>Voltage:</strong> \${voltage || 'UPDATE NEEDED - Verify equipment voltage'}</li>
-                <li><strong>Phase:</strong> \${phase || 'UPDATE NEEDED - Verify phase configuration'}</li>
-                <li><strong>Full Load Amps (FLA):</strong> \${amperage || 'UPDATE NEEDED - Verify FLA rating'}</li>
-                <li><strong>Control System:</strong> \${controlSystem || 'UPDATE NEEDED - Verify control type'}</li>
-                <li><strong>Power Rating:</strong> \${powerRating || 'UPDATE NEEDED - Verify kW/HP rating'}</li>
-                <li><strong>Operating Weight:</strong> \${weight || 'UPDATE NEEDED - Verify equipment weight'}</li>
-            </ul>
-        </td>
+        <td>Level of Risk (LOR):</td>
+        <td>${riskLevelDisplay}</td>
     </tr>
     <tr>
-        <td>Version:</td>
-        <td><input type="text" value="1.0" style="width:80px" /></td>
-    </tr>
-    <tr>
-        <td>Date:</td>
-        <td><input type="text" value="[current_date]" style="width:150px" /></td>
+        <td>CET Level Required:</td>
+        <td>${cetLevelDisplay}</td>
     </tr>
     <tr>
         <td>Author:</td>
         <td><input type="text" placeholder="Enter Author Name" style="width:250px" /></td>
+    </tr>
+    <tr>
+        <td>Author CET Level:</td>
+        <td><input type="text" placeholder="Enter Author CET Level" style="width:250px" /></td>
     </tr>
     <tr>
         <td>Approver:</td>
@@ -840,7 +836,74 @@ export async function POST(request) {
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
     
-    // Prepare the prompt for Gemini
+    // Determine risk level based on component type and emergency type
+    let riskLevel = 3; // Default to High for emergencies
+    let riskJustification = "Emergency response procedure with critical system impact";
+    
+    const componentLower = (formData.component || '').toLowerCase();
+    const emergencyType = (formData.emergencyType || '').toLowerCase();
+    
+    // Risk level determination for EOP (emergencies are typically higher risk)
+    if (emergencyType.includes('power') && componentLower.includes('switchgear')) {
+      riskLevel = 4;
+      riskJustification = "Critical power failure affecting main switchgear - facility-wide impact";
+    } else if (emergencyType.includes('power') && (componentLower.includes('ups') || componentLower.includes('pdu'))) {
+      riskLevel = 4;
+      riskJustification = "Power failure on critical power distribution - IT load at risk";
+    } else if (emergencyType.includes('power') && componentLower.includes('generator')) {
+      riskLevel = 4;
+      riskJustification = "Emergency power system failure - no backup power available";
+    } else if (componentLower.includes('chiller') || componentLower.includes('crac')) {
+      riskLevel = 3;
+      riskJustification = "Critical cooling system emergency - temperature rise risk";
+    } else if (emergencyType.includes('fire') || emergencyType.includes('smoke')) {
+      riskLevel = 4;
+      riskJustification = "Life safety emergency - immediate response required";
+    } else if (emergencyType.includes('leak') || emergencyType.includes('flood')) {
+      riskLevel = 3;
+      riskJustification = "Water/refrigerant leak emergency - equipment damage risk";
+    }
+    
+    // CET level determination for emergency response
+    let cetLevel = 3; // Default to CET-3 for emergency response
+    let cetJustification = "Emergency response requiring technical expertise";
+    
+    // Determine CET level based on emergency complexity
+    if (componentLower.includes('switchgear') || emergencyType.includes('utility')) {
+      cetLevel = 4;
+      cetJustification = "High-voltage emergency response, utility coordination required";
+    } else if (componentLower.includes('ups') || componentLower.includes('pdu')) {
+      cetLevel = 3;
+      cetJustification = "Critical power system emergency response";
+    } else if (componentLower.includes('generator')) {
+      cetLevel = 3;
+      cetJustification = "Emergency generator system troubleshooting and recovery";
+    } else if (emergencyType.includes('alarm') || emergencyType.includes('monitoring')) {
+      cetLevel = 2;
+      cetJustification = "Alarm response and system monitoring";
+    }
+    
+    // Duration determination for emergency procedures
+    let duration = "30-60 minutes";
+    if (emergencyType.includes('power') && componentLower.includes('switchgear')) {
+      duration = "60-120 minutes";
+    } else if (emergencyType.includes('power') && componentLower.includes('ups')) {
+      duration = "30-90 minutes";
+    } else if (emergencyType.includes('power') && componentLower.includes('generator')) {
+      duration = "45-90 minutes";
+    } else if (componentLower.includes('chiller')) {
+      duration = "45-120 minutes";
+    } else if (emergencyType.includes('shutdown')) {
+      duration = "15-30 minutes";
+    } else if (emergencyType.includes('transfer') || emergencyType.includes('bypass')) {
+      duration = "30-60 minutes";
+    }
+    
+    // Format risk level and CET level for display
+    const riskLevelDisplay = `<strong>Level ${riskLevel}</strong> (${['Low', 'Medium', 'High', 'Critical'][riskLevel-1]})<br><em>${riskJustification}</em>`;
+    const cetLevelDisplay = `<strong>CET-${cetLevel} required to perform work</strong><br><em>${cetJustification}</em>`;
+    
+    // Prepare the prompt for Gemini with calculated values
     const prompt = `${PROJECT_INSTRUCTIONS.replace('[current_date]', currentDate)}
 
 CRITICAL EQUIPMENT TYPE: ${formData.component}
@@ -910,6 +973,13 @@ Emergency Details:
 - System: ${formData.system}
 - Component/Equipment Type: ${formData.component}
 - Emergency Type: ${formData.emergencyType}
+
+CALCULATED VALUES FOR SECTION 01:
+- Duration: ${duration}
+- Level of Risk (LOR): ${riskLevelDisplay}
+- CET Level Required: ${cetLevelDisplay}
+
+IMPORTANT: In Section 01, use these EXACT calculated values as provided above. The Duration, Level of Risk, and CET Level Required have been pre-calculated based on the equipment type and emergency scenario.
 
 Generate ONLY the content that goes inside the container div - no DOCTYPE, html, head, body, or container tags.
 Start with <h1>Emergency Operating Procedure (EOP)</h1> followed by the Quick Response header div, then proceed with sections using H2 headers.
