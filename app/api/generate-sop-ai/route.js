@@ -195,7 +195,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             border-radius: 3px;
         }
         .section-separator {
-            border-top: 2px solid #198754;
+            border-top: 2px solid #ccc;
             margin: 40px 0;
             border-bottom: none;
             border-left: none;
@@ -397,17 +397,6 @@ ${formData.workType === 'subcontractor' ? `- # of Contractors #1: ${formData.con
 - Post notifications required: [AI must research and explain based on equipment type and ${formData.workDescription}. FORMAT AS CLEAN HTML: Use <ul> and <li> tags if listing multiple items. Use <strong> tags for emphasis. DO NOT output markdown asterisks (**)]
 
 Section 04: Effect of SOP on Critical Facility
-The AI must follow this four-step analysis process:
-Step 1: Identify the ${formData.manufacturer} ${formData.modelNumber} equipment function and role in data center
-Step 2: Analyze maintenance scope for ${formData.workDescription} (shutdown needs, isolation requirements, components serviced)
-Step 3: Apply universal rules:
-  - Monitoring System is ALWAYS YES
-  - Annual/Semi-Annual maintenance requires Lockout/Tagout = YES
-  - Equipment being maintained is always affected by its own maintenance
-Step 4: Apply equipment-specific logic based on ${formData.componentType}
-
-IMPORTANT: Place a checkmark (✓) in the appropriate column (Yes, No, or N/A) for each system based on your analysis.
-
 Create table with EXACTLY these 21 systems and columns:
 | Facility Equipment or System | Yes | No | N/A | Details |
 
@@ -688,6 +677,7 @@ CRITICAL HTML FORMATTING RULES:
 
 CRITICAL REQUIREMENTS:
 1. Generate ALL 11 sections completely - do not stop early
+2. Add <div class="section-separator"></div> between each section for visual separation
 2. Section 01 MUST use the EXACT calculated values provided:
    - Duration: ${duration}
    - Level of Risk (LOR): ${riskLevelHtml} (display as HTML with strong tags)
