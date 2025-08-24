@@ -81,10 +81,11 @@ export async function enhanceSections1to3(htmlContent, formData) {
     5. For "PLACEHOLDER: AI must generate specific qualifications based on [work] complexity for [manufacturer] [model]":
        - Generate detailed qualifications with HTML formatting
        - Use <ul> and <li> tags for bullet points, <strong> tags for emphasis
-       - Include comprehensive qualifications:
+       - Include ONLY these two qualification categories:
          * <li><strong>Required Certifications:</strong> List specific certifications based on equipment</li>
          * <li><strong>Experience Level:</strong> Minimum years of experience with similar equipment</li>
-         * <li><strong>Manufacturer Training:</strong> Any OEM-specific training requirements</li>
+       - DO NOT include "Technical Skills", "Manufacturer Training", or any other categories beyond the two listed above
+       - Only generate "Required Certifications" and "Experience Level" - nothing else
        - Equipment-specific qualifications:
          * Chillers: <li><strong>EPA 608 Universal:</strong> Required for refrigerant handling</li>
          * Generators: <li><strong>Diesel Engine Certification:</strong> For engine maintenance procedures</li>
