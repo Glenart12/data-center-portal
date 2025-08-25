@@ -483,19 +483,33 @@ GENERATE DYNAMIC NUMBER OF ROWS HERE based on the analysis above:
 </table>
 
 <h2>Section 06: Communication & Escalation Protocol</h2>
-- Table with contact levels 0-3 plus emergency services
-- Phone number fields: <input type="text" placeholder="Enter phone" style="width:150px" />
-- Contact name fields where appropriate: <input type="text" placeholder="Enter contact name" style="width:200px" />
+
+<h3>Escalation Matrix</h3>
+Create an escalation table with contact levels 0-3 (DO NOT include emergency services row as they are in the Emergency Contacts table below):
+- Level 0: Initial Response Team
+- Level 1: Facility Manager/Supervisor  
+- Level 2: Operations Manager
+- Level 3: Executive/Director Level
+Include phone number fields: <input type="text" placeholder="Enter phone" style="width:150px" />
+Include contact name fields: <input type="text" placeholder="Enter contact name" style="width:200px" />
 
 <h3>Emergency Contacts</h3>
 Include a comprehensive Emergency Contacts table with columns: Service Type, Contact Name/Organization, Phone Number, Notes/Address
 
-Include these essential emergency contacts (use editable input fields for phone numbers):
-- Police Emergency: 911
-- Fire/EMS Emergency: 911  
+Include these essential emergency contacts:
+- Police/Fire/EMS Emergency: 911 (combined single row)
 - Electric Utility Emergency: <input type="text" placeholder="Enter utility emergency #" style="width:150px" />
-- Equipment Manufacturer Support: <input type="text" placeholder="Enter manufacturer support #" style="width:150px" />
+- Equipment Manufacturer Support: INTELLIGENTLY POPULATE based on [MANUFACTURER_PLACEHOLDER]:
+  * For Carrier equipment: Suggest "Carrier Commercial Service: 1-800-CARRIER (1-800-227-7437)"
+  * For Trane equipment: Suggest "Trane Commercial Service: 1-800-884-2653"
+  * For York equipment: Suggest "York Service: 1-800-861-1001"
+  * For Liebert/Vertiv equipment: Suggest "Vertiv Services: 1-800-543-2378"
+  * For Cummins generators: Suggest "Cummins Power Generation: 1-800-888-6626"
+  * For Caterpillar equipment: Suggest "CAT 24-Hour Support: 1-877-228-3519"
+  * For Eaton UPS: Suggest "Eaton Service: 1-800-356-5794"
+  * For other manufacturers: Use placeholder <input type="text" placeholder="Enter [MANUFACTURER_PLACEHOLDER] support #" style="width:150px" />
 - Electrical Contractor: <input type="text" placeholder="Enter contractor #" style="width:150px" />
+- Mechanical Contractor: <input type="text" placeholder="Enter contractor #" style="width:150px" />
 - Facilities Manager: <input type="text" placeholder="Enter facilities manager #" style="width:150px" />
 
 Add this important note at the bottom of the Emergency Contacts section:
