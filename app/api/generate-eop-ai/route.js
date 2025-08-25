@@ -271,67 +271,201 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 </div>
 </div>
 
+<h3>Internal Equipment Diagnostics for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</h3>
+<p><strong>Perform systematic internal component checks to identify the source of [WORK_DESCRIPTION]</strong></p>
 
-<h2>Section 05: [WORK_DESCRIPTION] Response Scenarios</h2>
+Generate intelligent diagnostic steps based on the SPECIFIC equipment type identified from [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:
+- For CHILLERS: Check compressor operation, condenser fans, evaporator flow, refrigerant pressures, oil levels, control board status, VFD operation, expansion valves
+- For UPS SYSTEMS: Check input rectifier, DC bus voltage, battery strings, inverter operation, static bypass switch, control cards, cooling fans, capacitor banks
+- For GENERATORS: Check fuel system, starting batteries, alternator output, voltage regulator, control panel, transfer switch operation, coolant levels, oil pressure
+- For PDUs: Check input breakers, transformer temperature, output breakers, monitoring cards, neutral connections, ground fault detection
+- For CRAC/CRAH UNITS: Check compressor operation, fan motors, humidifier, reheat elements, control valves, filters, condensate pumps, refrigerant levels
+- For SWITCHGEAR: Check main bus connections, breaker operation, protection relays, control power, metering, ground fault indicators, arc flash sensors
+- For PUMPS: Check motor windings, impeller, mechanical seals, bearings, VFD/starter, pressure sensors, flow switches
+- Adapt diagnostic steps intelligently for any other equipment type based on manufacturer and model
 
-Generate 4 scenarios based on the SPECIFIC EQUIPMENT TYPE and its typical installation:
-
-<h3>SCENARIO 1 - PRIMARY [WORK_DESCRIPTION] SOURCE FAILURE</h3>
-[Adapt based on equipment: utility for most equipment, upstream UPS for critical loads, generator for emergency systems, etc.]
-<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
-Trigger Conditions: (specific to how this equipment typically operates)
-</div>
-Verification Checks: (specific to this equipment's operational source)
 <table>
-Include verification steps with input fields for readings
+<tr>
+  <th>Step Number</th>
+  <th>Internal Component to Check</th>
+  <th>Expected Reading/Condition</th>
+  <th>Actual Reading</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td>Main Control Board/Panel for [MODEL_PLACEHOLDER]</td>
+  <td>No error codes, normal LED indicators per [MANUFACTURER_PLACEHOLDER] manual</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Primary Power Components (contactors/breakers specific to equipment type)</td>
+  <td>Closed position, no visible damage, proper continuity</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Control Voltage Transformer (if applicable)</td>
+  <td>Output voltage per equipment specs (typically 24VAC or 120VAC)</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>[Equipment-specific primary component based on type]</td>
+  <td>[Component-specific expected condition for this model]</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>[Equipment-specific secondary component based on type]</td>
+  <td>[Component-specific expected condition for this model]</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Safety Interlocks and Protection Devices</td>
+  <td>All interlocks reset, protection devices not tripped</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Communication/Network Interface (if applicable)</td>
+  <td>Active communication, proper LED indicators</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>[Additional equipment-specific components as needed]</td>
+  <td>[Expected conditions based on manufacturer specifications]</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
 </table>
 
-<h3>SCENARIO 2 - DISTRIBUTION FAILURE</h3>
-[Adapt based on equipment: MCC for motors, PDU for IT equipment, panelboard for HVAC, switchgear for large equipment, etc.]
-<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
-Trigger Conditions: (specific to this equipment's distribution type)
+Additional rows should be generated based on the specific equipment type and complexity. Include all major internal components that could cause [WORK_DESCRIPTION].
+
+<div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;">
+<strong>⚠️ WARNING:</strong> If internal diagnostics do not identify the cause of [WORK_DESCRIPTION], proceed to Section 05 for external equipment diagnostics.
 </div>
-Verification Checks: (appropriate for the distribution equipment)
+
+<h2>Section 05: [WORK_DESCRIPTION] Detection External Response Actions</h2>
+<p><strong>Verify all external equipment and systems that connect to or support the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
+
+Generate intelligent external equipment checks based on the SPECIFIC equipment type and its typical installation:
+- Identify upstream power sources (utility feeds, generators, UPS systems, ATS)
+- Check distribution equipment (switchgear, panelboards, MCCs, PDUs)
+- Verify supporting mechanical systems (cooling towers, pumps, chillers for CRAC units)
+- Examine control systems (BMS, SCADA, monitoring systems)
+- Inspect circuit protection devices (breakers, disconnect switches, fuses)
+- Check auxiliary support equipment specific to the equipment type
+
 <table>
-Include verification steps with input fields for readings
+<tr>
+  <th>Step Number</th>
+  <th>External Equipment/System to Check</th>
+  <th>Connection to [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</th>
+  <th>Verification Method</th>
+  <th>Actual Status</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td>Main Electrical Feed/Utility Source</td>
+  <td>Primary power supply to [MODEL_PLACEHOLDER]</td>
+  <td>Check voltage at main distribution panel</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Circuit Breaker/Disconnect Switch</td>
+  <td>Equipment-specific disconnect for [MODEL_PLACEHOLDER]</td>
+  <td>Verify breaker position and continuity</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Distribution Panel/MCC/PDU</td>
+  <td>Feeds power to [MODEL_PLACEHOLDER] circuit</td>
+  <td>Check bus voltage and breaker status</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Automatic Transfer Switch (if applicable)</td>
+  <td>Provides backup power path to equipment</td>
+  <td>Verify ATS position and source availability</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Generator System (if on emergency power)</td>
+  <td>Emergency power source for [MODEL_PLACEHOLDER]</td>
+  <td>Check generator running status and output</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>UPS System (if applicable)</td>
+  <td>Provides conditioned power to [MODEL_PLACEHOLDER]</td>
+  <td>Verify UPS output and bypass status</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>[Equipment-specific external system]</td>
+  <td>[Specific connection type to main equipment]</td>
+  <td>[Appropriate verification method]</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Building Management System/SCADA</td>
+  <td>Monitors and controls [MODEL_PLACEHOLDER]</td>
+  <td>Check for external shutdown commands or interlocks</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>VFD/Motor Starter (if applicable)</td>
+  <td>Controls motor operation for [MODEL_PLACEHOLDER]</td>
+  <td>Verify VFD status, faults, and output</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>[Additional external equipment as needed]</td>
+  <td>[Connection description]</td>
+  <td>[Verification method]</td>
+  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
 </table>
 
-<h3>SCENARIO 3 - FEEDER/CIRCUIT FAILURE</h3>
-[Adapt based on equipment: cable types, voltage levels, typical routing for this equipment]
-<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
-Trigger Conditions: (based on this equipment's typical circuit configuration)
-</div>
-Verification Checks: (appropriate tests for this voltage level and cable type)
-<table>
-Include verification steps with input fields for readings
-</table>
-
-<h3>SCENARIO 4 - LOCAL PROTECTION DEVICE FAILURE</h3>
-[Adapt based on equipment: disconnect type, breaker size, fusing, etc.]
-<div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
-Trigger Conditions: (specific to protection devices used with this equipment)
-</div>
-Verification Checks: (appropriate for this equipment's protection scheme)
-<table>
-Include verification steps with input fields for readings
-</table>
-
-For EACH scenario:
-- Tailor all checks to the specific equipment type
-- Include voltage levels appropriate for this equipment
-- Reference correct upstream systems for this equipment type
-- Include relevant safety considerations for the voltage/current levels
-- List appropriate spare parts for this specific equipment
-- Include escalation contacts relevant to this equipment type
-
-IMPORTANT EQUIPMENT-SPECIFIC ADAPTATIONS:
-- If equipment is a CHILLER: Focus on operational parameters (typically 480V for electrical), VFDs, control transformers (24V or 120V control), compressor contactors
-- If equipment is a UPS: Focus on input/output voltages, bypass sources, DC bus voltage, battery strings
-- If equipment is a GENERATOR: Focus on starting batteries (12V or 24V DC), transfer switches, control systems, field excitation
-- If equipment is a PDU: Focus on input breakers, monitoring circuits, branch circuits, transformer taps
-- If equipment is a CRAC/CRAH: Focus on fan motors, control systems (24VAC typical), humidification systems, reheat elements
-- If equipment is SWITCHGEAR: Focus on bus parameters, protection relays, control systems (125VDC typical), breaker charging motors
-- Adapt accordingly for any other equipment type
+EQUIPMENT-SPECIFIC EXTERNAL CHECKS:
+- For CHILLERS: Cooling towers, condenser water pumps, chilled water pumps, isolation valves, VFDs
+- For UPS SYSTEMS: Input switchgear, maintenance bypass, output distribution, battery disconnect switches
+- For GENERATORS: Fuel systems, day tanks, transfer switches, paralleling switchgear, load banks
+- For CRAC/CRAH UNITS: Chilled water supply, condenser water (if applicable), humidification water supply
+- For PDUs: Upstream switchgear, subfeed breakers, static transfer switches
+- For PUMPS: Upstream motor control center, pressure tanks, control valves, flow sensors
+- Generate additional relevant external equipment based on the specific [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
 
 <h2>Section 06: Communication & Escalation Protocol</h2>
 - Table with contact levels 0-3 plus emergency services
