@@ -274,16 +274,67 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 <h3>Internal Equipment Diagnostics for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</h3>
 <p><strong>Perform systematic internal component checks to identify the source of [WORK_DESCRIPTION]</strong></p>
 
-Generate intelligent diagnostic steps based on the SPECIFIC equipment type identified from [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:
-- For CHILLERS: Check compressor operation, condenser fans, evaporator flow, refrigerant pressures, oil levels, control board status, VFD operation, expansion valves
-- For UPS SYSTEMS: Check input rectifier, DC bus voltage, battery strings, inverter operation, static bypass switch, control cards, cooling fans, capacitor banks
-- For GENERATORS: Check fuel system, starting batteries, alternator output, voltage regulator, control panel, transfer switch operation, coolant levels, oil pressure
-- For PDUs: Check input breakers, transformer temperature, output breakers, monitoring cards, neutral connections, ground fault detection
-- For CRAC/CRAH UNITS: Check compressor operation, fan motors, humidifier, reheat elements, control valves, filters, condensate pumps, refrigerant levels
-- For SWITCHGEAR: Check main bus connections, breaker operation, protection relays, control power, metering, ground fault indicators, arc flash sensors
-- For PUMPS: Check motor windings, impeller, mechanical seals, bearings, VFD/starter, pressure sensors, flow switches
-- Adapt diagnostic steps intelligently for any other equipment type based on manufacturer and model
+CRITICAL AI INSTRUCTIONS FOR DYNAMIC DIAGNOSTIC GENERATION:
 
+1. ANALYZE THE SPECIFIC SITUATION:
+   - Equipment type from [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
+   - Emergency type from [WORK_DESCRIPTION]
+   - Determine the technical nature of the failure
+
+2. DETERMINE LOTO REQUIREMENT:
+   Analyze [WORK_DESCRIPTION] to determine if Lockout/Tagout is needed:
+   - LOTO REQUIRED for: electrical failures, mechanical repairs, internal component access, bearing failures, motor issues, compressor problems, any physical inspection of energized components
+   - LOTO NOT REQUIRED for: communication failures, software issues, sensor alarms only, network problems, monitoring issues, display errors
+   - CONDITIONAL LOTO: high temp alarms, flow issues - only if physical inspection needed
+
+3. GENERATE APPROPRIATE NUMBER OF DIAGNOSTIC STEPS:
+   Based on equipment complexity and emergency type:
+   - Simple sensor failure on basic equipment: Generate 3-5 diagnostic steps
+   - Complex compressor failure on chiller: Generate 15-25 diagnostic steps  
+   - UPS battery failure: Generate 10-15 diagnostic steps
+   - Generator won't start: Generate 20-30 diagnostic steps
+   - Communication loss: Generate 3-5 steps (no LOTO)
+   - Bearing failure on pump: Generate 10-15 steps (with LOTO)
+   
+4. IF LOTO IS REQUIRED - CRITICAL SEQUENCING:
+   Structure the diagnostic table in this EXACT order:
+   a) FIRST: Generate ALL diagnostic steps that can be done with power ON
+      - Control panel readings
+      - Display checks
+      - Voltage measurements at disconnect
+      - Current measurements
+      - Temperature readings
+      - Pressure readings
+      - Any remote diagnostics
+   
+   b) THEN: Insert a CLEAR LOTO STEP with red warning:
+      <tr style="background-color: #dc3545; color: white;">
+        <td>[step#]</td>
+        <td><strong>⚠️ CRITICAL: APPLY LOCKOUT/TAGOUT PROCEDURE NOW</strong></td>
+        <td>De-energize equipment per OSHA 1910.147 and verify zero energy state</td>
+        <td>LOTO Applied: <input type="checkbox" /></td>
+        <td>Verified: <input type="checkbox" /></td>
+      </tr>
+   
+   c) FINALLY: Generate ALL steps requiring de-energized state
+      - Physical component inspection
+      - Megohmmeter testing
+      - Mechanical checks
+      - Internal wiring inspection
+      - Component replacement checks
+
+5. IF LOTO NOT REQUIRED:
+   - Generate ONLY diagnostic steps that are safe with equipment energized
+   - DO NOT include any LOTO step
+   - Focus on control system checks, communication, software, displays
+
+6. EQUIPMENT-SPECIFIC DIAGNOSTIC EXAMPLES:
+   For CHILLERS with compressor failure: Check suction/discharge pressures, oil pressure, superheat, subcooling, motor amps, vibration, control board errors, safety switches, THEN LOTO, then check motor windings, mechanical components
+   For UPS with battery failure: Check DC bus voltage, individual battery voltages, charging current, temperature, THEN LOTO if replacing batteries
+   For GENERATORS that won't start: Check starting battery voltage, fuel pressure, control panel, safety shutdowns, transfer switch position, THEN LOTO for starter motor inspection
+   For PUMPS with bearing failure: Check vibration readings, motor amps, temperature, THEN LOTO, then inspect bearings, shaft alignment, coupling
+   For BMS communication loss: Check network connectivity, protocol settings, addressing - NO LOTO NEEDED
+   
 <table>
 <tr>
   <th>Step Number</th>
@@ -292,65 +343,16 @@ Generate intelligent diagnostic steps based on the SPECIFIC equipment type ident
   <th>Actual Reading</th>
   <th>Pass/Fail</th>
 </tr>
-<tr>
-  <td>1</td>
-  <td>Main Control Board/Panel for [MODEL_PLACEHOLDER]</td>
-  <td>No error codes, normal LED indicators per [MANUFACTURER_PLACEHOLDER] manual</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>2</td>
-  <td>Primary Power Components (contactors/breakers specific to equipment type)</td>
-  <td>Closed position, no visible damage, proper continuity</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>3</td>
-  <td>Control Voltage Transformer (if applicable)</td>
-  <td>Output voltage per equipment specs (typically 24VAC or 120VAC)</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>4</td>
-  <td>[Equipment-specific primary component based on type]</td>
-  <td>[Component-specific expected condition for this model]</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>5</td>
-  <td>[Equipment-specific secondary component based on type]</td>
-  <td>[Component-specific expected condition for this model]</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>6</td>
-  <td>Safety Interlocks and Protection Devices</td>
-  <td>All interlocks reset, protection devices not tripped</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>7</td>
-  <td>Communication/Network Interface (if applicable)</td>
-  <td>Active communication, proper LED indicators</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>8</td>
-  <td>[Additional equipment-specific components as needed]</td>
-  <td>[Expected conditions based on manufacturer specifications]</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-</table>
 
-Additional rows should be generated based on the specific equipment type and complexity. Include all major internal components that could cause [WORK_DESCRIPTION].
+GENERATE DYNAMIC NUMBER OF ROWS HERE based on the analysis above. 
+- Start with step 1 and continue sequentially
+- Number of steps must match the complexity determined in instruction #3
+- Follow the EXACT sequence from instruction #4 if LOTO is required
+- Each step must be specific to [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] and [WORK_DESCRIPTION]
+- Use proper technical terminology for the specific equipment type
+- Include measurement units (VAC, VDC, PSI, °F, Hz, etc.) where applicable
+
+</table>
 
 <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;">
 <strong>⚠️ WARNING:</strong> If internal diagnostics do not identify the cause of [WORK_DESCRIPTION], proceed to Section 05 for external equipment diagnostics.
@@ -359,113 +361,109 @@ Additional rows should be generated based on the specific equipment type and com
 <h2>Section 05: [WORK_DESCRIPTION] Detection External Response Actions</h2>
 <p><strong>Verify all external equipment and systems that connect to or support the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
 
-Generate intelligent external equipment checks based on the SPECIFIC equipment type and its typical installation:
-- Identify upstream power sources (utility feeds, generators, UPS systems, ATS)
-- Check distribution equipment (switchgear, panelboards, MCCs, PDUs)
-- Verify supporting mechanical systems (cooling towers, pumps, chillers for CRAC units)
-- Examine control systems (BMS, SCADA, monitoring systems)
-- Inspect circuit protection devices (breakers, disconnect switches, fuses)
-- Check auxiliary support equipment specific to the equipment type
+CRITICAL AI INSTRUCTIONS FOR DYNAMIC EXTERNAL EQUIPMENT ANALYSIS:
+
+1. IDENTIFY ALL CONNECTED SYSTEMS:
+   Analyze [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] to determine ALL external equipment that could affect or cause [WORK_DESCRIPTION]:
+   - POWER CHAIN: Trace from utility to equipment (transformers, switchgear, panels, breakers, ATS, generators, UPS)
+   - MECHANICAL SUPPORT: Identify cooling, ventilation, pumping systems
+   - CONTROL SYSTEMS: BMS, SCADA, VFDs, control panels
+   - AUXILIARY SYSTEMS: Any equipment this unit depends on or supplies
+
+2. DETERMINE NUMBER OF EXTERNAL CHECKS:
+   Based on system integration complexity:
+   - Simple standalone equipment (window AC, small pump): Generate 3-5 external checks
+   - Moderately integrated (CRAC unit, standard generator): Generate 6-10 external checks
+   - Highly integrated chiller system: Generate 12-18 external checks  
+   - Critical infrastructure UPS: Generate 10-15 external checks
+   - Complex switchgear/PDU: Generate 8-12 external checks
+
+3. PRIORITIZE BY FAILURE PROBABILITY:
+   Order checks from most likely to least likely cause of [WORK_DESCRIPTION]:
+   - If power failure: Start with immediate upstream power (breaker, panel, ATS)
+   - If cooling issue: Start with cooling support systems
+   - If communication failure: Start with network infrastructure
+   - If mechanical failure: Start with related mechanical systems
+
+4. EQUIPMENT-SPECIFIC EXTERNAL DEPENDENCIES:
+
+   CHILLERS require checking:
+   - Cooling tower operation and fans
+   - Condenser water pumps and flow
+   - Chilled water pumps and flow  
+   - Isolation and control valves
+   - VFDs controlling pumps
+   - BMS setpoints and commands
+   - Make-up water systems
+   
+   UPS SYSTEMS require checking:
+   - Input switchgear and breakers
+   - Maintenance bypass switch position
+   - Output distribution panels
+   - Static transfer switch
+   - Battery disconnect switches
+   - Parallel UPS modules (if applicable)
+   - Generator interface (if on emergency power)
+   
+   GENERATORS require checking:
+   - Fuel supply system and day tanks
+   - Transfer switches (all connected ATSs)
+   - Paralleling switchgear (if applicable)
+   - Load bank connections
+   - Battery charger operation
+   - Block heater operation
+   - Remote start signals
+   
+   CRAC/CRAH UNITS require checking:
+   - Chilled water supply temperature and flow
+   - Condenser water (if water-cooled)
+   - Humidification water supply
+   - Hot water/steam for reheat (if applicable)
+   - BMS control signals
+   - Static pressure sensors
+   
+   PDUs require checking:
+   - Upstream switchgear
+   - Input breakers from multiple sources
+   - Static transfer switches
+   - Subfeed breakers
+   - Monitoring system communication
+   
+   PUMPS require checking:
+   - Motor control center (MCC)
+   - Pressure tanks and switches
+   - Control/isolation valves
+   - Flow sensors and switches
+   - VFD or soft starter
+   - Suction source availability
+
+5. GENERATE FAILURE-MODE SPECIFIC CHECKS:
+   Each external check must explain:
+   - What specific failure mode it could cause
+   - How it connects to the main equipment
+   - What to verify to rule it out as the cause
 
 <table>
 <tr>
   <th>Step Number</th>
   <th>External Equipment/System to Check</th>
   <th>Connection to [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</th>
+  <th>Potential Failure Mode Causing [WORK_DESCRIPTION]</th>
   <th>Verification Method</th>
   <th>Actual Status</th>
   <th>Pass/Fail</th>
 </tr>
-<tr>
-  <td>1</td>
-  <td>Main Electrical Feed/Utility Source</td>
-  <td>Primary power supply to [MODEL_PLACEHOLDER]</td>
-  <td>Check voltage at main distribution panel</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>2</td>
-  <td>Circuit Breaker/Disconnect Switch</td>
-  <td>Equipment-specific disconnect for [MODEL_PLACEHOLDER]</td>
-  <td>Verify breaker position and continuity</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>3</td>
-  <td>Distribution Panel/MCC/PDU</td>
-  <td>Feeds power to [MODEL_PLACEHOLDER] circuit</td>
-  <td>Check bus voltage and breaker status</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>4</td>
-  <td>Automatic Transfer Switch (if applicable)</td>
-  <td>Provides backup power path to equipment</td>
-  <td>Verify ATS position and source availability</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>5</td>
-  <td>Generator System (if on emergency power)</td>
-  <td>Emergency power source for [MODEL_PLACEHOLDER]</td>
-  <td>Check generator running status and output</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>6</td>
-  <td>UPS System (if applicable)</td>
-  <td>Provides conditioned power to [MODEL_PLACEHOLDER]</td>
-  <td>Verify UPS output and bypass status</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>7</td>
-  <td>[Equipment-specific external system]</td>
-  <td>[Specific connection type to main equipment]</td>
-  <td>[Appropriate verification method]</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>8</td>
-  <td>Building Management System/SCADA</td>
-  <td>Monitors and controls [MODEL_PLACEHOLDER]</td>
-  <td>Check for external shutdown commands or interlocks</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>9</td>
-  <td>VFD/Motor Starter (if applicable)</td>
-  <td>Controls motor operation for [MODEL_PLACEHOLDER]</td>
-  <td>Verify VFD status, faults, and output</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-<tr>
-  <td>10</td>
-  <td>[Additional external equipment as needed]</td>
-  <td>[Connection description]</td>
-  <td>[Verification method]</td>
-  <td><input type="text" placeholder="Enter reading" style="width:100px" /></td>
-  <td><input type="checkbox" /></td>
-</tr>
-</table>
 
-EQUIPMENT-SPECIFIC EXTERNAL CHECKS:
-- For CHILLERS: Cooling towers, condenser water pumps, chilled water pumps, isolation valves, VFDs
-- For UPS SYSTEMS: Input switchgear, maintenance bypass, output distribution, battery disconnect switches
-- For GENERATORS: Fuel systems, day tanks, transfer switches, paralleling switchgear, load banks
-- For CRAC/CRAH UNITS: Chilled water supply, condenser water (if applicable), humidification water supply
-- For PDUs: Upstream switchgear, subfeed breakers, static transfer switches
-- For PUMPS: Upstream motor control center, pressure tanks, control valves, flow sensors
-- Generate additional relevant external equipment based on the specific [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
+GENERATE DYNAMIC NUMBER OF ROWS HERE based on the analysis above:
+- Start with step 1 and continue sequentially
+- Number of steps must match the complexity determined in instruction #2
+- Order by likelihood of causing [WORK_DESCRIPTION] per instruction #3
+- Each external system must be specific to the actual equipment installation
+- Include how each external system could specifically cause [WORK_DESCRIPTION]
+- Provide clear verification methods with expected values
+- Cover ALL systems that connect to or support [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
+
+</table>
 
 <h2>Section 06: Communication & Escalation Protocol</h2>
 - Table with contact levels 0-3 plus emergency services
