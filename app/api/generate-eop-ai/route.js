@@ -7,7 +7,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const PROJECT_INSTRUCTIONS = `You are creating Emergency Operating Procedures (EOPs) for data center technicians. Generate COMPLETE, DETAILED EOPs with NO placeholders or summaries.
 
-CRITICAL: This is for ${formData.emergencyType || formData.workDescription} emergency response. Adapt all procedures based on the specific equipment type provided.
+CRITICAL: This is for [EMERGENCY_TYPE_PLACEHOLDER] emergency response. Adapt all procedures based on the specific equipment type provided.
 
 CRITICAL HTML GENERATION RULES:
 - DO NOT generate DOCTYPE, html, head, body, or container div tags
