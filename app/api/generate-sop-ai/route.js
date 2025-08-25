@@ -441,19 +441,37 @@ Include these 21 systems exactly:
 
 Section 05: Safety Requirements
 <h3>REQUIRED PERSONAL PROTECTIVE EQUIPMENT (PPE)</h3>
+CRITICAL: List ONLY PPE that is MANDATORY (required by regulation, manufacturer, or safety protocol) for this SPECIFIC ${formData.workDescription} task on ${formData.manufacturer} ${formData.modelNumber} equipment.
+DO NOT list recommended or optional PPE. Only include PPE that workers MUST wear to legally and safely perform this exact task.
+
+Determine REQUIRED PPE based on:
+1. The SPECIFIC maintenance task: ${formData.workDescription}
+2. The EXACT equipment: ${formData.manufacturer} ${formData.modelNumber} Serial: ${formData.serialNumber}
+3. The actual procedural steps that will be performed
+4. Manufacturer's mandatory safety requirements for this specific equipment and task
+5. OSHA/NFPA regulations that MANDATE (not recommend) PPE for this specific operation
+
+Example: For ATS annual maintenance, if hearing protection is only recommended but NOT required by regulation or manufacturer, it should NOT appear in the list.
+
 <table>
   <tr>
-    <th>PPE Category</th>
-    <th>Specification</th>
-    <th>When Required</th>
+    <th>REQUIRED PPE Item</th>
+    <th>Specification/Standard</th>
+    <th>Regulatory/Safety Requirement</th>
+    <th>Specific Task Requiring This PPE</th>
   </tr>
-  <tr>
-    <td>Safety Glasses</td>
-    <td>ANSI Z87.1 compliant</td>
-    <td>Always in mechanical rooms</td>
-  </tr>
-  <!-- Add equipment-specific PPE based on manufacturer and model -->
+  <!-- Generate ONLY mandatory PPE items. Each row must include:
+       - The specific PPE item that is REQUIRED
+       - The exact specification/standard (e.g., ANSI Z87.1, Class 0 rated)
+       - The specific regulation/manufacturer requirement mandating it
+       - The exact task step where this PPE is required -->
 </table>
+
+IMPORTANT: If a PPE item is "recommended" or "suggested" but not explicitly REQUIRED by:
+- OSHA/NFPA/regulatory mandate for this specific task
+- Manufacturer's safety requirements for this specific equipment and procedure
+- Site-specific safety protocols for this exact operation
+Then DO NOT include it in the table.
 
 <h3>Required Tools & Test Equipment for [Manufacturer] [Model]:</h3>
 <table>
