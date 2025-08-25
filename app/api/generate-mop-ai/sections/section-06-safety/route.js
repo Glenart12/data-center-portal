@@ -258,10 +258,213 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
 </div>`;
     }
 
-    // Generate Tools Required table based on equipment
+    // Generate Tools Required table based on SPECIFIC equipment type and maintenance task
+    // Analyze equipment type and work description to determine EXACT tools needed
+    // workDesc already declared above, just reuse it
+    const equipType = (componentType || system || '').toLowerCase();
+    
+    // Determine equipment category for tool selection
+    const isElectricalEquipment = equipType.includes('ats') || equipType.includes('switchgear') || 
+                                  equipType.includes('pdu') || equipType.includes('panel') || 
+                                  equipType.includes('breaker') || equipType.includes('transfer switch');
+    
+    const isCoolingEquipment = equipType.includes('chiller') || equipType.includes('crac') || 
+                               equipType.includes('crah') || equipType.includes('cooling') || 
+                               equipType.includes('air handler') || equipType.includes('air conditioner');
+    
+    const isPowerEquipment = equipType.includes('ups') || equipType.includes('battery') || 
+                            equipType.includes('uninterruptible') || equipType.includes('power supply');
+    
+    const isMechanicalEquipment = equipType.includes('generator') || equipType.includes('engine') || 
+                                  equipType.includes('pump') || equipType.includes('motor') ||
+                                  equipType.includes('compressor') || equipType.includes('fan');
+    
+    // Build tool rows based on ACTUAL equipment type and maintenance task
+    let toolRows = '';
+    
+    // Electrical equipment tools - ONLY for electrical equipment
+    if (isElectricalEquipment) {
+        toolRows += `
+        <tr>
+            <td><strong>Electrical Test Equipment</strong></td>
+            <td>• Fluke 87V or equivalent multimeter<br>
+                • Fluke 376 FC clamp meter<br>
+                • Megger MIT1025 insulation tester<br>
+                • Phase rotation meter</td>
+            <td>Voltage verification, current measurement, insulation testing for ${simplifiedEquipmentName}</td>
+        </tr>
+        <tr>
+            <td><strong>Torque Tools</strong></td>
+            <td>• Torque wrench (10-250 ft-lbs)<br>
+                • Torque screwdriver set (5-50 in-lbs)<br>
+                • Digital torque adapter</td>
+            <td>Proper torquing of electrical connections per ${manufacturer} specifications</td>
+        </tr>
+        <tr>
+            <td><strong>Safety Tools</strong></td>
+            <td>• Lockout/tagout kit<br>
+                • Non-contact voltage detector<br>
+                • Ground fault tester<br>
+                • Arc flash boundary tape</td>
+            <td>Electrical safety and isolation for ${componentType} work</td>
+        </tr>
+        <tr>
+            <td><strong>Hand Tools</strong></td>
+            <td>• Insulated tool set (1000V rated)<br>
+                • Cable pulling tools<br>
+                • Wire strippers and crimpers</td>
+            <td>Electrical component service on ${simplifiedEquipmentName}</td>
+        </tr>`;
+    }
+    
+    // Cooling equipment tools - ONLY for cooling equipment
+    else if (isCoolingEquipment) {
+        toolRows += `
+        <tr>
+            <td><strong>Refrigerant Service Tools</strong></td>
+            <td>• Recovery machine (EPA certified)<br>
+                • Vacuum pump (2-stage, 5 CFM min)<br>
+                • Digital manifold gauge set<br>
+                • Electronic leak detector</td>
+            <td>Refrigerant service and leak detection for ${simplifiedEquipmentName}</td>
+        </tr>
+        <tr>
+            <td><strong>Temperature & Pressure</strong></td>
+            <td>• Infrared thermometer<br>
+                • Thermocouple probe set<br>
+                • Differential pressure gauge<br>
+                • Psychrometer</td>
+            <td>Temperature and pressure measurements for ${componentType} diagnostics</td>
+        </tr>
+        <tr>
+            <td><strong>Mechanical Tools</strong></td>
+            <td>• Socket set (metric and standard)<br>
+                • Pipe wrenches<br>
+                • Tube cutters and flaring tools<br>
+                • Fin comb set</td>
+            <td>Mechanical service on ${simplifiedEquipmentName} components</td>
+        </tr>
+        <tr>
+            <td><strong>Electrical Test Equipment</strong></td>
+            <td>• Multimeter<br>
+                • Clamp meter<br>
+                • Capacitor tester<br>
+                • Motor rotation tester</td>
+            <td>Electrical testing of ${componentType} controls and motors</td>
+        </tr>`;
+    }
+    
+    // Power equipment tools - ONLY for UPS/battery systems
+    else if (isPowerEquipment) {
+        toolRows += `
+        <tr>
+            <td><strong>Battery Test Equipment</strong></td>
+            <td>• Battery load tester<br>
+                • Digital hydrometer<br>
+                • Battery impedance tester<br>
+                • Thermal imaging camera</td>
+            <td>Battery testing and diagnostics for ${simplifiedEquipmentName}</td>
+        </tr>
+        <tr>
+            <td><strong>Electrical Test Equipment</strong></td>
+            <td>• Power quality analyzer<br>
+                • Oscilloscope<br>
+                • Multimeter (True RMS)<br>
+                • Insulation resistance tester</td>
+            <td>Power quality and electrical testing for ${componentType}</td>
+        </tr>
+        <tr>
+            <td><strong>Load Testing</strong></td>
+            <td>• Load bank (appropriately sized)<br>
+                • Power monitoring equipment<br>
+                • Data logging equipment</td>
+            <td>Load testing and verification of ${simplifiedEquipmentName} capacity</td>
+        </tr>
+        <tr>
+            <td><strong>Safety Tools</strong></td>
+            <td>• Acid spill kit<br>
+                • Battery lifting equipment<br>
+                • Insulated tools<br>
+                • Lockout/tagout kit</td>
+            <td>Safe handling and service of ${componentType} components</td>
+        </tr>`;
+    }
+    
+    // Mechanical equipment tools - ONLY for generators/engines/pumps
+    else if (isMechanicalEquipment) {
+        toolRows += `
+        <tr>
+            <td><strong>Engine Service Tools</strong></td>
+            <td>• Oil analysis kit<br>
+                • Coolant test kit<br>
+                • Compression tester<br>
+                • Fuel pressure gauge</td>
+            <td>Engine diagnostics and fluid analysis for ${simplifiedEquipmentName}</td>
+        </tr>
+        <tr>
+            <td><strong>Vibration Analysis</strong></td>
+            <td>• Vibration analyzer<br>
+                • Accelerometer sensors<br>
+                • Tachometer<br>
+                • Stroboscope</td>
+            <td>Vibration and alignment analysis for ${componentType}</td>
+        </tr>
+        <tr>
+            <td><strong>Mechanical Tools</strong></td>
+            <td>• Torque wrench set<br>
+                • Feeler gauges<br>
+                • Dial indicators<br>
+                • Alignment tools</td>
+            <td>Mechanical adjustments and alignments on ${simplifiedEquipmentName}</td>
+        </tr>
+        <tr>
+            <td><strong>Electrical Test Equipment</strong></td>
+            <td>• Multimeter<br>
+                • Megger tester<br>
+                • Load bank connections<br>
+                • Transfer switch test set</td>
+            <td>Electrical testing of ${componentType} controls and transfer equipment</td>
+        </tr>`;
+    }
+    
+    // Default minimal tools if equipment type cannot be determined
+    else {
+        toolRows += `
+        <tr>
+            <td><strong>Basic Test Equipment</strong></td>
+            <td>• Digital multimeter<br>
+                • Infrared thermometer<br>
+                • Flashlight</td>
+            <td>Basic diagnostics for ${simplifiedEquipmentName}</td>
+        </tr>
+        <tr>
+            <td><strong>Hand Tools</strong></td>
+            <td>• Screwdriver set<br>
+                • Wrench set<br>
+                • Pliers</td>
+            <td>General maintenance on ${simplifiedEquipmentName}</td>
+        </tr>`;
+    }
+    
+    // Always include safety equipment and manufacturer-specific tools
+    toolRows += `
+        <tr>
+            <td><strong>Safety Equipment</strong></td>
+            <td>• Lockout/tagout kit<br>
+                • First aid kit<br>
+                • Fire extinguisher (appropriate class)<br>
+                • Emergency eyewash (if chemicals present)</td>
+            <td>Safety equipment required for all maintenance work</td>
+        </tr>
+        <tr>
+            <td><strong>Specialized ${manufacturer} Tools</strong></td>
+            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter ${manufacturer}-specific service tools per manual" style="width:100%" /></td>
+            <td>Manufacturer-specific tools required per ${manufacturer} ${modelNumber} service manual</td>
+        </tr>`;
+    
     const toolsRequired = `
 <h3>TOOLS REQUIRED</h3>
-<p><strong>Specific tools required for ${simplifiedEquipmentName} based on manufacturer specifications:</strong></p>
+<p><strong>Specific tools required for ${simplifiedEquipmentName} ${workDescription || 'maintenance'} based on equipment type and task:</strong></p>
 <table>
     <thead>
         <tr>
@@ -271,67 +474,7 @@ ${relevantEOPs.map(eop => `        <li><strong>${eop.number}:</strong> ${eop.tit
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td><strong>Electrical Test Equipment</strong></td>
-            <td>• Fluke 87V or equivalent multimeter<br>
-                • Fluke 376 FC clamp meter<br>
-                • Megger MIT1025 insulation tester<br>
-                • Fluke 1587 FC insulation multimeter</td>
-            <td>Voltage verification, current measurement, insulation resistance testing for ${simplifiedEquipmentName}</td>
-        </tr>
-        <tr>
-            <td><strong>Torque Tools</strong></td>
-            <td>• Torque wrench (10-250 ft-lbs)<br>
-                • Torque screwdriver set (5-50 in-lbs)<br>
-                • Digital torque adapter</td>
-            <td>Proper torquing of ${simplifiedEquipmentName} electrical and mechanical connections per manufacturer specs</td>
-        </tr>
-        <tr>
-            <td><strong>Temperature & Pressure</strong></td>
-            <td>• Infrared thermometer (-58°F to 1022°F)<br>
-                • Digital manifold gauge set<br>
-                • Differential pressure gauge<br>
-                • Thermocouple probe set</td>
-            <td>Temperature and pressure measurements specific to ${componentType} operating parameters</td>
-        </tr>
-        <tr>
-            <td><strong>Vibration Analysis</strong></td>
-            <td>• Fluke 810 vibration tester<br>
-                • SKF CMXA 80 analyzer<br>
-                • Accelerometer sensors</td>
-            <td>Vibration analysis of rotating equipment in ${simplifiedEquipmentName}</td>
-        </tr>
-        <tr>
-            <td><strong>Refrigerant Service</strong></td>
-            <td>• Recovery machine (EPA certified)<br>
-                • Vacuum pump (2-stage, 5 CFM min)<br>
-                • Refrigerant scale<br>
-                • Leak detector (electronic)</td>
-            <td>${system.toLowerCase().includes('chiller') || system.toLowerCase().includes('cooling') ? 
-                `Refrigerant service for ${simplifiedEquipmentName}` : 
-                'If applicable to equipment type'}</td>
-        </tr>
-        <tr>
-            <td><strong>Hand Tools</strong></td>
-            <td>• Insulated tool set (1000V rated)<br>
-                • Socket set (metric and standard)<br>
-                • Allen key set<br>
-                • Channel lock pliers</td>
-            <td>General maintenance on ${simplifiedEquipmentName} components</td>
-        </tr>
-        <tr>
-            <td><strong>Safety Equipment</strong></td>
-            <td>• Lockout/tagout kit<br>
-                • Voltage detector (non-contact)<br>
-                • Ground fault tester<br>
-                • Arc flash boundary tape</td>
-            <td>Safety isolation and verification for work on ${simplifiedEquipmentName}</td>
-        </tr>
-        <tr>
-            <td><strong>Specialized ${manufacturer} Tools</strong></td>
-            <td><input type="text" class="update-needed-input" placeholder="UPDATE NEEDED - Enter ${manufacturer}-specific service tools" style="width:100%" /></td>
-            <td>Manufacturer-specific tools required for ${simplifiedEquipmentName} service</td>
-        </tr>
+        ${toolRows}
     </tbody>
 </table>`;
 
