@@ -15,23 +15,35 @@ export async function generateSection07(formData) {
     
     console.log('Section 08 Procedures: Equipment data:', { manufacturer, modelNumber, system });
     
-    // Generate equipment-specific data recording tables
-    const generateDataRecordingTable = (system, manufacturer, modelNumber) => {
-      const systemType = system.toLowerCase();
+    // Generate equipment-specific data recording tables - ONLY parameters that actually exist on equipment
+    const generateDataRecordingTable = (system, manufacturer, modelNumber, componentType, workDescription) => {
+      const systemType = (system || '').toLowerCase();
+      const compType = (componentType || '').toLowerCase();
+      const workDesc = (workDescription || '').toLowerCase();
       
-      if (systemType.includes('chiller')) {
+      // Determine exact equipment type for precise parameter selection
+      if (compType.includes('ats') || compType.includes('automatic transfer') || systemType.includes('ats')) {
+        return generateATSDataTable();
+      } else if (compType.includes('switchgear') || systemType.includes('switchgear')) {
+        return generateSwitchgearDataTable();
+      } else if (compType.includes('pdu') || compType.includes('power distribution') || systemType.includes('pdu')) {
+        return generatePDUDataTable();
+      } else if (systemType.includes('chiller') || compType.includes('chiller')) {
         const compressorCount = getCompressorCount(manufacturer, modelNumber);
         return generateChillerDataTable(compressorCount);
-      } else if (systemType.includes('generator')) {
+      } else if (systemType.includes('generator') || compType.includes('generator')) {
         return generateGeneratorDataTable();
-      } else if (systemType.includes('ups')) {
+      } else if (systemType.includes('ups') || compType.includes('ups') || compType.includes('uninterruptible')) {
         return generateUPSDataTable();
-      } else if (systemType.includes('cooling')) {
+      } else if (systemType.includes('cooling') || compType.includes('crac') || compType.includes('crah')) {
         return generateCoolingDataTable();
-      } else if (systemType.includes('transformer')) {
+      } else if (systemType.includes('transformer') || compType.includes('transformer')) {
         return generateTransformerDataTable();
+      } else if (compType.includes('battery') || systemType.includes('battery')) {
+        return generateBatteryDataTable();
       } else {
-        return generateGenericDataTable(system);
+        // For unknown equipment, provide minimal relevant parameters
+        return generateMinimalDataTable(system || componentType);
       }
     };
 
@@ -655,47 +667,377 @@ export async function generateSection07(formData) {
 </div>`;
     };
 
-    const generateGenericDataTable = (system) => {
+    // ATS-specific parameters - ONLY what ATS equipment actually has
+    const generateATSDataTable = () => {
       return `
-<h3>${system} System Data Log</h3>
+<h3>ATS (Automatic Transfer Switch) Data Log</h3>
 <div class="data-recording-wrapper">
 <table class="data-recording-table">
     <thead>
         <tr>
             <th>Parameter</th>
-            <th>As Found</th>
-            <th>As Left</th>
+            <th>Pre-Maintenance</th>
+            <th>Post-Maintenance</th>
+            <th>Units</th>
+            <th>Acceptable Range</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Normal Source Voltage L1-L2</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Normal Source Voltage L2-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Normal Source Voltage L1-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Emergency Source Voltage L1-L2</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Emergency Source Voltage L2-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Emergency Source Voltage L1-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Load Current L1</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td>Per rating</td>
+        </tr>
+        <tr>
+            <td>Load Current L2</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td>Per rating</td>
+        </tr>
+        <tr>
+            <td>Load Current L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td>Per rating</td>
+        </tr>
+        <tr>
+            <td>Frequency (Normal Source)</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Hz</td>
+            <td>60 ±0.5</td>
+        </tr>
+        <tr>
+            <td>Frequency (Emergency Source)</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Hz</td>
+            <td>60 ±0.5</td>
+        </tr>
+        <tr>
+            <td>Transfer Time (Normal to Emergency)</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Seconds</td>
+            <td><10 sec</td>
+        </tr>
+        <tr>
+            <td>Transfer Time (Emergency to Normal)</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Seconds</td>
+            <td>Per settings</td>
+        </tr>
+        <tr>
+            <td>Phase Rotation</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>ABC/CBA</td>
+            <td>ABC</td>
+        </tr>
+    </tbody>
+</table>
+</div>`;
+    };
+
+    // Switchgear-specific parameters
+    const generateSwitchgearDataTable = () => {
+      return `
+<h3>Switchgear Data Log</h3>
+<div class="data-recording-wrapper">
+<table class="data-recording-table">
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Pre-Maintenance</th>
+            <th>Post-Maintenance</th>
+            <th>Units</th>
+            <th>Acceptable Range</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Bus Voltage L1-L2</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>Per nameplate ±5%</td>
+        </tr>
+        <tr>
+            <td>Bus Voltage L2-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>Per nameplate ±5%</td>
+        </tr>
+        <tr>
+            <td>Bus Voltage L1-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>Per nameplate ±5%</td>
+        </tr>
+        <tr>
+            <td>Main Breaker Current L1</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td>Per load</td>
+        </tr>
+        <tr>
+            <td>Main Breaker Current L2</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td>Per load</td>
+        </tr>
+        <tr>
+            <td>Main Breaker Current L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td>Per load</td>
+        </tr>
+        <tr>
+            <td>Ground Fault Current</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>mA</td>
+            <td><5 mA</td>
+        </tr>
+        <tr>
+            <td>Insulation Resistance (Phase to Ground)</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>MΩ</td>
+            <td>>1000 MΩ</td>
+        </tr>
+        <tr>
+            <td>Bus Temperature</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>°F</td>
+            <td><140°F</td>
+        </tr>
+    </tbody>
+</table>
+</div>`;
+    };
+
+    // PDU-specific parameters
+    const generatePDUDataTable = () => {
+      return `
+<h3>PDU (Power Distribution Unit) Data Log</h3>
+<div class="data-recording-wrapper">
+<table class="data-recording-table">
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Pre-Maintenance</th>
+            <th>Post-Maintenance</th>
+            <th>Units</th>
+            <th>Acceptable Range</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Input Voltage L1-L2</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>208/480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Input Voltage L2-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>208/480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Input Voltage L1-L3</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VAC</td>
+            <td>208/480 ±5%</td>
+        </tr>
+        <tr>
+            <td>Total Load Current</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td><80% rating</td>
+        </tr>
+        <tr>
+            <td>Neutral Current</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>Amps</td>
+            <td><10% of phase</td>
+        </tr>
+        <tr>
+            <td>Power Factor</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>PF</td>
+            <td>>0.9</td>
+        </tr>
+        <tr>
+            <td>Total Harmonic Distortion</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>%THD</td>
+            <td><5%</td>
+        </tr>
+    </tbody>
+</table>
+</div>`;
+    };
+
+    // Battery system-specific parameters
+    const generateBatteryDataTable = () => {
+      return `
+<h3>Battery System Data Log</h3>
+<div class="data-recording-wrapper">
+<table class="data-recording-table">
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Pre-Maintenance</th>
+            <th>Post-Maintenance</th>
+            <th>Units</th>
+            <th>Acceptable Range</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>String Voltage</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VDC</td>
+            <td>Per spec ±2%</td>
+        </tr>
+        <tr>
+            <td>Float Voltage per Cell</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>VDC</td>
+            <td>2.25-2.27 VDC</td>
+        </tr>
+        <tr>
+            <td>Charging Current</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>ADC</td>
+            <td><10% capacity</td>
+        </tr>
+        <tr>
+            <td>Ambient Temperature</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>°F</td>
+            <td>68-77°F</td>
+        </tr>
+        <tr>
+            <td>Specific Gravity (pilot cell)</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>SG</td>
+            <td>1.215-1.225</td>
+        </tr>
+        <tr>
+            <td>Internal Resistance</td>
+            <td><input type="text" /></td>
+            <td><input type="text" /></td>
+            <td>mΩ</td>
+            <td>Per baseline ±30%</td>
+        </tr>
+    </tbody>
+</table>
+</div>`;
+    };
+
+    // Minimal data table for unknown equipment types
+    const generateMinimalDataTable = (equipmentName) => {
+      return `
+<h3>${equipmentName || 'Equipment'} Data Log</h3>
+<div class="data-recording-wrapper">
+<table class="data-recording-table">
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Pre-Maintenance</th>
+            <th>Post-Maintenance</th>
             <th>Units</th>
             <th>Notes</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Voltage Reading</td>
+            <td>Operating Status</td>
             <td><input type="text" /></td>
             <td><input type="text" /></td>
-            <td>VAC</td>
-            <td><input type="text" /></td>
-        </tr>
-        <tr>
-            <td>Current Reading</td>
-            <td><input type="text" /></td>
-            <td><input type="text" /></td>
-            <td>Amps</td>
+            <td>On/Off</td>
             <td><input type="text" /></td>
         </tr>
         <tr>
-            <td>Temperature</td>
+            <td>Visual Inspection</td>
             <td><input type="text" /></td>
             <td><input type="text" /></td>
-            <td>°F</td>
+            <td>Pass/Fail</td>
             <td><input type="text" /></td>
         </tr>
         <tr>
-            <td>Pressure</td>
+            <td>Alarm Status</td>
             <td><input type="text" /></td>
             <td><input type="text" /></td>
-            <td>PSI</td>
+            <td>Active/Clear</td>
             <td><input type="text" /></td>
         </tr>
     </tbody>
@@ -703,8 +1045,10 @@ export async function generateSection07(formData) {
 </div>`;
     };
 
-    // Generate the appropriate data table
-    let operationalDataTable = generateDataRecordingTable(system, manufacturer, modelNumber);
+    const generateGenericDataTable = generateMinimalDataTable;
+
+    // Generate the appropriate data table with equipment-specific parameters
+    let operationalDataTable = generateDataRecordingTable(system, manufacturer, modelNumber, componentType, workDescription);
 
     // Add fault/alarm history table for all equipment types
     operationalDataTable += `
