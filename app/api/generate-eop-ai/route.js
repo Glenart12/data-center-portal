@@ -869,7 +869,7 @@ export async function POST(request) {
     
     // Validate required fields
     if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
-        !formData?.component || !formData?.emergencyType) {
+        !formData?.component || !formData?.workDescription) {
       return NextResponse.json({ 
         error: 'Missing required fields',
         userMessage: 'Please fill in all required fields'
@@ -885,6 +885,7 @@ export async function POST(request) {
     }
     
     console.log('Starting EOP generation for:', formData.manufacturer, formData.modelNumber);
+    console.log('Work Description from user:', formData.workDescription);
     
     // Get current date for input fields
     const currentDate = new Date().toLocaleDateString('en-US');
@@ -894,7 +895,7 @@ export async function POST(request) {
     let riskJustification = "Emergency response procedure with critical system impact";
     
     const componentLower = (formData.component || '').toLowerCase();
-    const emergencyType = (formData.emergencyType || '').toLowerCase();
+    const emergencyType = (formData.workDescription || '').toLowerCase();
     
     // Risk level determination for EOP (emergencies are typically higher risk)
     if (emergencyType.includes('power') && componentLower.includes('switchgear')) {
@@ -967,7 +968,7 @@ export async function POST(request) {
       .replace(/\[SERIAL_PLACEHOLDER\]/g, formData.serialNumber || 'N/A')
       .replace(/\[EQUIPMENT_NUMBER_PLACEHOLDER\]/g, formData.equipmentNumber || 'N/A')
       .replace(/\[COMPONENT_PLACEHOLDER\]/g, formData.component || 'UPDATE NEEDED')
-      .replace(/\[EMERGENCY_TYPE_PLACEHOLDER\]/g, formData.emergencyType || formData.workDescription || 'Emergency Response')
+      .replace(/\[EMERGENCY_TYPE_PLACEHOLDER\]/g, formData.workDescription || 'Emergency Response')
       .replace(/\[LOCATION_PLACEHOLDER\]/g, formData.location || 'Data Center')
       .replace(/\[SYSTEM_PLACEHOLDER\]/g, formData.system || 'UPDATE NEEDED')
       .replace(/\[CUSTOMER_PLACEHOLDER\]/g, formData.customer || 'UPDATE NEEDED')
@@ -980,8 +981,8 @@ export async function POST(request) {
 CRITICAL EQUIPMENT TYPE: ${formData.component}
 THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are specific to ${formData.component}
 
-EMERGENCY TYPE FOCUS: ${formData.emergencyType}
-${formData.emergencyType.toLowerCase().includes('power') ? `
+EMERGENCY TYPE FOCUS: ${formData.workDescription}
+${(formData.workDescription || '').toLowerCase().includes('power') ? `
 POWER FAILURE EMERGENCY - This EOP is specifically for power failure response. 
 Section 04 MUST include comprehensive power diagnostics with voltage verification tables.
 Section 05 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
@@ -1043,7 +1044,7 @@ Emergency Details:
 - Location: ${formData.location || 'N/A'}
 - System: ${formData.system}
 - Component/Equipment Type: ${formData.component}
-- Emergency Type: ${formData.emergencyType}
+- Emergency Type: ${formData.workDescription}
 Variables for template use:
 - customer: ${formData.customer || 'UPDATE NEEDED'}
 - siteName: ${formData.siteName || 'UPDATE NEEDED'}
@@ -1112,7 +1113,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     }
     
     // Generate dynamic EOP title
-    const eopTitle = `EOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.emergencyType || formData.workDescription}`;
+    const eopTitle = `EOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.workDescription}`;
     
     // Build complete HTML with dynamic title
     const completeHtml = HTML_TEMPLATE
