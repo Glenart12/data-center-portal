@@ -287,7 +287,7 @@ export async function generateSection03(formData) {
         <td><input type="text" placeholder="Badge access, escort required, etc." style="width:400px" /></td>
     </tr>
     <tr>
-        <td>Delivery Method:</td>
+        <td>Self Delivered / Vendor:</td>
         <td>${deliveryMethod}</td>
     </tr>${contractorFields}
     <tr>

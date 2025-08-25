@@ -113,8 +113,11 @@ export async function generateSection04(formData) {
     <td>Specific explanation why affected</td>
   </tr>
   
-  IMPORTANT: Place a checkmark (✓) in the appropriate column (Yes, No, or N/A) based on your analysis.
-  Only put ✓ in ONE column per row. Leave other columns empty.
+  IMPORTANT RULES:
+  - Place a checkmark (✓) in the appropriate column (Yes, No, or N/A) based on your analysis
+  - Only put ✓ in ONE column per row. Leave other columns empty
+  - CRITICAL: If system is marked NO or N/A, leave the description cell COMPLETELY EMPTY (no text at all)
+  - Only generate descriptions for systems marked YES
   
   Generate ONLY the 18 <tr> rows.
 `;
