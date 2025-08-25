@@ -59,7 +59,7 @@ export async function POST(request) {
         <td><input type="text" placeholder="Badge access, escort required, etc." style="width:400px" /></td>
     </tr>
     <tr>
-        <td>Self Delivered / Vendor:</td>
+        <td>Delivery Method:</td>
         <td>${workType === 'subcontractor' ? 'Subcontractor' : 'Self-Delivered'}</td>
     </tr>
     <tr>

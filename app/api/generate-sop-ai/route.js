@@ -383,7 +383,7 @@ MUST format as table with these rows:
 - Work Area: <input type="text" placeholder="Enter work area" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Building/Floor/Room: <input type="text" placeholder="Enter building/floor/room" style="border: 1px solid #999; padding: 2px; width: 200px;">
 - Access Requirements: <input type="text" placeholder="Enter access requirements" style="border: 1px solid #999; padding: 2px; width: 300px;">
-- Delivery Method: ${formData.workType === 'subcontractor' ? 'Subcontractor' : 'Self-Delivered'}
+- Self Delivered / Vendor: ${formData.workType === 'subcontractor' ? 'Subcontractor' : 'Self-Delivered'}
 ${formData.workType === 'subcontractor' ? `- # of Contractors #1: ${formData.contractors1 || '<input type="text" placeholder="Enter number" style="border: 1px solid #999; padding: 2px; width: 80px;">'}
 - If Subcontractor - Company Name #1: ${formData.contractorCompany1 || '<input type="text" placeholder="Company name" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
 - If Subcontractor - Personnel Name #1: ${formData.contractorPersonnel1 || '<input type="text" placeholder="Personnel name" style="border: 1px solid #999; padding: 2px; width: 200px;">'}
@@ -401,9 +401,11 @@ Create table with EXACTLY these 21 systems and columns:
 | Facility Equipment or System | Yes | No | N/A | Details |
 
 For each row in the table:
-- If a system is affected: Put ✓ in the Yes column
-- If not affected: Put ✓ in the No column  
-- If not applicable: Put ✓ in the N/A column
+- If a system is affected: Put ✓ in the Yes column and provide a description in the Details column
+- If not affected: Put ✓ in the No column and leave the Details column COMPLETELY EMPTY (no text at all)
+- If not applicable: Put ✓ in the N/A column and leave the Details column COMPLETELY EMPTY (no text at all)
+
+CRITICAL: The Details column must be COMPLETELY BLANK (empty string) for any system marked as No or N/A. Only provide descriptions for systems marked Yes.
 
 Example format for table rows:
 <tr>
