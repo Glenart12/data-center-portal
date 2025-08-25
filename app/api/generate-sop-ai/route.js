@@ -473,15 +473,45 @@ IMPORTANT: If a PPE item is "recommended" or "suggested" but not explicitly REQU
 - Site-specific safety protocols for this exact operation
 Then DO NOT include it in the table.
 
-<h3>Required Tools & Test Equipment for [Manufacturer] [Model]:</h3>
+<h3>Required Tools & Test Equipment for ${formData.manufacturer} ${formData.modelNumber}:</h3>
+CRITICAL: List ONLY tools and test equipment that are SPECIFICALLY REQUIRED for this exact task: ${formData.workDescription}
+
+Analyze and determine required tools based on:
+1. The SPECIFIC maintenance task: ${formData.workDescription}
+2. The EXACT equipment being serviced: 
+   - Manufacturer: ${formData.manufacturer}
+   - Model: ${formData.modelNumber} 
+   - Serial: ${formData.serialNumber}
+3. Each procedural step that will be performed in Section 8
+4. Manufacturer's service manual requirements for this specific model and task
+5. The actual measurements, adjustments, and operations needed for this task
+
+DO NOT list generic tools. Each tool must be:
+- NECESSARY for a specific step in the procedure
+- APPROPRIATE for this exact equipment model
+- REQUIRED to complete the specific maintenance task
+
 <table>
   <tr>
     <th>Tool/Equipment</th>
-    <th>Specific Model/Type for [Model Number]</th>
-    <th>Available</th>
+    <th>Specification/Range</th>
+    <th>Specific Use in This Task</th>
+    <th>Procedure Step Requiring This Tool</th>
   </tr>
-  <!-- Generate equipment-specific tools -->
+  <!-- Generate tools specific to this exact task and equipment. Each row must include:
+       - The specific tool/equipment needed
+       - Exact specifications (e.g., torque range, accuracy, calibration requirements)
+       - What specific operation this tool performs in THIS task
+       - Which procedure step(s) require this tool -->
 </table>
+
+IMPORTANT: Think through each step of ${formData.workDescription} for ${formData.manufacturer} ${formData.modelNumber}:
+- What needs to be measured? (specific gauges, meters)
+- What needs to be adjusted? (specific wrenches, tools)
+- What needs to be tested? (specific test equipment)
+- What manufacturer-specific tools are required for this model?
+
+Example: For a "Weekly System Check" on a chiller, don't list every possible HVAC tool. List ONLY tools needed for the weekly check tasks like temperature probe for water temp verification, pressure gauge for the specific pressure ranges of this model, etc.
 
 <h3>EMERGENCY CONTACTS</h3>
 <table>
