@@ -7,7 +7,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const PROJECT_INSTRUCTIONS = `You are creating Emergency Operating Procedures (EOPs) for data center technicians. Generate COMPLETE, DETAILED EOPs with NO placeholders or summaries.
 
-CRITICAL: This is for POWER FAILURE emergency response. Adapt all procedures based on the specific equipment type provided.
+CRITICAL: This is for ${formData.emergencyType || formData.workDescription} emergency response. Adapt all procedures based on the specific equipment type provided.
 
 CRITICAL HTML GENERATION RULES:
 - DO NOT generate DOCTYPE, html, head, body, or container div tags
@@ -967,7 +967,7 @@ export async function POST(request) {
       .replace(/\[SERIAL_PLACEHOLDER\]/g, formData.serialNumber || 'N/A')
       .replace(/\[EQUIPMENT_NUMBER_PLACEHOLDER\]/g, formData.equipmentNumber || 'N/A')
       .replace(/\[COMPONENT_PLACEHOLDER\]/g, formData.component || 'UPDATE NEEDED')
-      .replace(/\[EMERGENCY_TYPE_PLACEHOLDER\]/g, formData.emergencyType || 'Power Failure')
+      .replace(/\[EMERGENCY_TYPE_PLACEHOLDER\]/g, formData.emergencyType || formData.workDescription || 'Emergency Response')
       .replace(/\[LOCATION_PLACEHOLDER\]/g, formData.location || 'Data Center')
       .replace(/\[SYSTEM_PLACEHOLDER\]/g, formData.system || 'UPDATE NEEDED')
       .replace(/\[CUSTOMER_PLACEHOLDER\]/g, formData.customer || 'UPDATE NEEDED')
@@ -1112,7 +1112,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     }
     
     // Generate dynamic EOP title
-    const eopTitle = `EOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.emergencyType}`;
+    const eopTitle = `EOP - ${formData.manufacturer} ${formData.modelNumber} - ${formData.emergencyType || formData.workDescription}`;
     
     // Build complete HTML with dynamic title
     const completeHtml = HTML_TEMPLATE
