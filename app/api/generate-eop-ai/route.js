@@ -173,7 +173,7 @@ START WITH:
     </tr>
 </table>
 
-<h2>Section 04: Immediate Emergency Actions - Power Failure Diagnostics</h2>
+<h2>Section 04: Immediate Emergency Actions - [WORK_DESCRIPTION] Diagnostics</h2>
 
 <h3>Pre-Action Safety & Equipment Requirements</h3>
 
@@ -271,12 +271,12 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 </div>
 </div>
 
-<h3>Step 1: Obvious Power Loss Indicators Check (BEFORE opening any equipment)</h3>
-<p><strong>Verify facility-wide power status indicators before approaching [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
+<h3>Step 1: Obvious [WORK_DESCRIPTION] Indicators Check (BEFORE opening any equipment)</h3>
+<p><strong>Verify facility-wide [WORK_DESCRIPTION] status indicators before approaching [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
 <table>
 <tr>
   <th>Check Item</th>
-  <th>Expected Condition if Power Lost</th>
+  <th>Expected Condition if [WORK_DESCRIPTION] Occurred</th>
   <th>Verification Method</th>
   <th>Data Reading Field</th>
   <th>Pass/Fail</th>
@@ -311,7 +311,7 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 </tr>
 <tr>
   <td>Facility Alarms</td>
-  <td>BMS/EPMS showing utility power loss alarms</td>
+  <td>BMS/EPMS showing [WORK_DESCRIPTION] alarms</td>
   <td>Check alarm panel or BMS workstation</td>
   <td><input type="text" placeholder="Alarms present" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
@@ -331,8 +331,8 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 </tr>
 <tr>
   <td>EPMS</td>
-  <td>Electrical Power Monitoring System</td>
-  <td>Power consumption for [MODEL_PLACEHOLDER]</td>
+  <td>Equipment Monitoring System</td>
+  <td>Operational parameters for [MODEL_PLACEHOLDER]</td>
   <td>0 kW if de-energized</td>
   <td><input type="text" placeholder="kW reading" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
@@ -357,7 +357,7 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
   <td>Generator Monitoring</td>
   <td>Generator Control Panel</td>
   <td>Load percentage and kW output</td>
-  <td>Load increased if utility power lost</td>
+  <td>Load changed if [WORK_DESCRIPTION] occurred</td>
   <td><input type="text" placeholder="% Load" style="width:100px" /></td>
   <td><input type="checkbox" /></td>
 </tr>
@@ -371,8 +371,8 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 </tr>
 </table>
 
-<h3>Step 3: Electrical Diagnostics</h3>
-<p><strong>Equipment-specific electrical verification for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
+<h3>Step 3: Equipment Diagnostics</h3>
+<p><strong>Equipment-specific verification for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</strong></p>
 
 First, identify the specific equipment type from the manufacturer and model provided. Determine:
 - Equipment category (chiller, UPS, generator, PDU, CRAC unit, etc.)
@@ -407,10 +407,10 @@ Each row should have:
 
 After the table, include:
 <div class="emergency-action">
-<h3>POWER DIAGNOSIS DETERMINATION:</h3>
+<h3>[WORK_DESCRIPTION] DIAGNOSIS DETERMINATION:</h3>
 <ul>
-<li>IF power is present at main input but equipment won't operate = INTERNAL POWER ISSUE (specify internal components for THIS equipment type)</li>
-<li>IF NO power at main input = EXTERNAL POWER ISSUE (proceed to Section 05)</li>
+<li>IF normal conditions present at main input but equipment won't operate = INTERNAL [WORK_DESCRIPTION] ISSUE (specify internal components for THIS equipment type)</li>
+<li>IF abnormal conditions at main input = EXTERNAL [WORK_DESCRIPTION] ISSUE (proceed to Section 05)</li>
 </ul>
 </div>
 
@@ -419,16 +419,16 @@ Include equipment-specific measurement requirements:
 - PPE requirements based on voltage levels
 - Lock-out/Tag-out specific to this equipment
 
-<h2>Section 05: External Power Supply Scenarios</h2>
+<h2>Section 05: [WORK_DESCRIPTION] Response Scenarios</h2>
 
 Generate 4 scenarios based on the SPECIFIC EQUIPMENT TYPE and its typical installation:
 
-<h3>SCENARIO 1 - PRIMARY POWER SOURCE FAILURE</h3>
+<h3>SCENARIO 1 - PRIMARY [WORK_DESCRIPTION] SOURCE FAILURE</h3>
 [Adapt based on equipment: utility for most equipment, upstream UPS for critical loads, generator for emergency systems, etc.]
 <div style="background: #f8d7da; color: #721c24; border: 2px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold;">
-Trigger Conditions: (specific to how this equipment is typically powered)
+Trigger Conditions: (specific to how this equipment typically operates)
 </div>
-Verification Checks: (specific to this equipment's power source)
+Verification Checks: (specific to this equipment's operational source)
 <table>
 Include verification steps with input fields for readings
 </table>
@@ -472,12 +472,12 @@ For EACH scenario:
 - Include escalation contacts relevant to this equipment type
 
 IMPORTANT EQUIPMENT-SPECIFIC ADAPTATIONS:
-- If equipment is a CHILLER: Focus on 3-phase power (typically 480V), VFDs, control transformers (24V or 120V control), compressor contactors
+- If equipment is a CHILLER: Focus on operational parameters (typically 480V for electrical), VFDs, control transformers (24V or 120V control), compressor contactors
 - If equipment is a UPS: Focus on input/output voltages, bypass sources, DC bus voltage, battery strings
-- If equipment is a GENERATOR: Focus on starting batteries (12V or 24V DC), transfer switches, control power, field excitation
+- If equipment is a GENERATOR: Focus on starting batteries (12V or 24V DC), transfer switches, control systems, field excitation
 - If equipment is a PDU: Focus on input breakers, monitoring circuits, branch circuits, transformer taps
-- If equipment is a CRAC/CRAH: Focus on fan motors, control power (24VAC typical), humidification power, reheat elements
-- If equipment is SWITCHGEAR: Focus on bus voltage, protection relays, control power (125VDC typical), breaker charging motors
+- If equipment is a CRAC/CRAH: Focus on fan motors, control systems (24VAC typical), humidification systems, reheat elements
+- If equipment is SWITCHGEAR: Focus on bus parameters, protection relays, control systems (125VDC typical), breaker charging motors
 - Adapt accordingly for any other equipment type
 
 <h2>Section 06: Communication & Escalation Protocol</h2>
@@ -500,15 +500,15 @@ Add this important note at the bottom of the Emergency Contacts section:
 "⚠️ IMPORTANT: Verify all emergency contact numbers for your specific facility location. Update phone numbers as needed."
 
 <h2>Section 07: Recovery & Return to Service</h2>
-<h3>Power Restoration and Equipment Recovery Procedures</h3>
-<p>Follow these steps in sequence to safely restore the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] to normal operation after power has been restored:</p>
+<h3>[WORK_DESCRIPTION] Resolution and Equipment Recovery Procedures</h3>
+<p>Follow these steps in sequence to safely restore the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] to normal operation after [WORK_DESCRIPTION] has been resolved:</p>
 
 <ol>
   <li>
-    <strong>Power Restoration Verification</strong>
-    <p>Confirm stable power supply is available at all distribution levels:</p>
+    <strong>[WORK_DESCRIPTION] Resolution Verification</strong>
+    <p>Confirm stable operating conditions are available at all system levels:</p>
     <ul>
-      <li>Verify utility power restoration at main switchgear</li>
+      <li>Verify [WORK_DESCRIPTION] resolution at main equipment</li>
       <li>Check automatic transfer switch position (should be on "Normal" source)</li>
       <li>Confirm voltage readings at equipment disconnect: <input type="text" placeholder="Enter voltage" style="width:100px" /> VAC</li>
       <li>Verify phase rotation if applicable</li>
@@ -522,7 +522,7 @@ Add this important note at the bottom of the Emergency Contacts section:
       <li>Verify all LOTO devices have been removed</li>
       <li>Confirm no personnel are working on the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</li>
       <li>Reset all emergency stops and safety interlocks</li>
-      <li>Check control power availability: <input type="text" placeholder="Control voltage" style="width:100px" /> VAC</li>
+      <li>Check control system availability: <input type="text" placeholder="Control parameters" style="width:100px" /> VAC</li>
     </ul>
   </li>
   
@@ -618,7 +618,7 @@ Add this important note at the bottom of the Emergency Contacts section:
     <td><input type="text" placeholder="Badge/Key required" style="width:150px" /></td>
   </tr>
   <tr>
-    <td><strong>Main Electrical Panel</strong></td>
+    <td><strong>Main Control Panel</strong></td>
     <td><input type="text" placeholder="Panel designation and location" style="width:250px" /></td>
     <td><input type="text" placeholder="Access requirements" style="width:150px" /></td>
   </tr>
@@ -672,7 +672,7 @@ Add this important note at the bottom of the Emergency Contacts section:
     <td><input type="text" placeholder="Location" style="width:200px" /></td>
   </tr>
   <tr>
-    <td>Power Supply Module</td>
+    <td>System Supply Module</td>
     <td><input type="text" placeholder="Part number" style="width:150px" /></td>
     <td><input type="text" placeholder="Qty" style="width:60px" /></td>
     <td><input type="text" placeholder="Location" style="width:200px" /></td>
@@ -687,11 +687,11 @@ Add this important note at the bottom of the Emergency Contacts section:
 
 <h3>Related Documents</h3>
 Make these clickable hyperlinks:
-- <a href="#" style="color: #0070f3; text-decoration: underline;">Equipment Electrical Drawings</a> (Internal Document)
+- <a href="#" style="color: #0070f3; text-decoration: underline;">Equipment System Drawings</a> (Internal Document)
 - <a href="#" style="color: #0070f3; text-decoration: underline;">Single Line Diagram</a> (Internal Document)
 - <a href="#" style="color: #0070f3; text-decoration: underline;">Arc Flash Study</a> (Internal Document)
-- <a href="https://www.osha.gov/electrical" target="_blank" style="color: #0070f3; text-decoration: underline;">OSHA Electrical Safety Standards</a>
-- <a href="https://www.nfpa.org/codes-and-standards/nfpa-70e" target="_blank" style="color: #0070f3; text-decoration: underline;">NFPA 70E Electrical Safety</a>
+- <a href="https://www.osha.gov/safety-and-health-topics" target="_blank" style="color: #0070f3; text-decoration: underline;">OSHA Safety Standards</a>
+- <a href="https://www.nfpa.org/codes-and-standards" target="_blank" style="color: #0070f3; text-decoration: underline;">NFPA Safety Standards</a>
 
 <h2>Section 09: EOP Approval & Review</h2>
 - Approval matrix table with editable fields:
@@ -900,13 +900,13 @@ export async function POST(request) {
     // Risk level determination for EOP (emergencies are typically higher risk)
     if (emergencyType.includes('power') && componentLower.includes('switchgear')) {
       riskLevel = 4;
-      riskJustification = "Critical power failure affecting main switchgear - facility-wide impact";
+      riskJustification = "Critical system failure affecting main switchgear - facility-wide impact";
     } else if (emergencyType.includes('power') && (componentLower.includes('ups') || componentLower.includes('pdu'))) {
       riskLevel = 4;
-      riskJustification = "Power failure on critical power distribution - IT load at risk";
+      riskJustification = "System failure on critical distribution - IT load at risk";
     } else if (emergencyType.includes('power') && componentLower.includes('generator')) {
       riskLevel = 4;
-      riskJustification = "Emergency power system failure - no backup power available";
+      riskJustification = "Emergency system failure - no backup available";
     } else if (componentLower.includes('chiller') || componentLower.includes('crac')) {
       riskLevel = 3;
       riskJustification = "Critical cooling system emergency - temperature rise risk";
@@ -928,7 +928,7 @@ export async function POST(request) {
       cetJustification = "High-voltage emergency response, utility coordination required";
     } else if (componentLower.includes('ups') || componentLower.includes('pdu')) {
       cetLevel = 3;
-      cetJustification = "Critical power system emergency response";
+      cetJustification = "Critical system emergency response";
     } else if (componentLower.includes('generator')) {
       cetLevel = 3;
       cetJustification = "Emergency generator system troubleshooting and recovery";
@@ -969,6 +969,7 @@ export async function POST(request) {
       .replace(/\[EQUIPMENT_NUMBER_PLACEHOLDER\]/g, formData.equipmentNumber || 'N/A')
       .replace(/\[COMPONENT_PLACEHOLDER\]/g, formData.component || 'UPDATE NEEDED')
       .replace(/\[EMERGENCY_TYPE_PLACEHOLDER\]/g, formData.workDescription || 'Emergency Response')
+      .replace(/\[WORK_DESCRIPTION\]/g, formData.workDescription || 'Emergency Response')
       .replace(/\[LOCATION_PLACEHOLDER\]/g, formData.location || 'Data Center')
       .replace(/\[SYSTEM_PLACEHOLDER\]/g, formData.system || 'UPDATE NEEDED')
       .replace(/\[CUSTOMER_PLACEHOLDER\]/g, formData.customer || 'UPDATE NEEDED')
@@ -983,9 +984,9 @@ THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are s
 
 EMERGENCY TYPE FOCUS: ${formData.workDescription}
 ${(formData.workDescription || '').toLowerCase().includes('power') ? `
-POWER FAILURE EMERGENCY - This EOP is specifically for power failure response. 
-Section 04 MUST include comprehensive power diagnostics with voltage verification tables.
-Section 05 MUST include the 4 external power supply scenarios with equipment-specific adaptations.
+EMERGENCY RESPONSE - This EOP is specifically for ${formData.workDescription} response. 
+Section 04 MUST include comprehensive diagnostics with verification tables.
+Section 05 MUST include the 4 response scenarios with equipment-specific adaptations.
 ` : ''}
 
 Equipment-Specific Details for ${formData.manufacturer} ${formData.modelNumber}:
@@ -1074,14 +1075,26 @@ CRITICAL FOR SECTION 04:
 - Include Pass/Fail checkboxes
 
 CRITICAL FOR SECTION 05:
-- Generate 4 complete scenarios for external power issues
+- Generate 4 complete scenarios for [WORK_DESCRIPTION] issues
 - Each scenario must be specific to ${formData.component} equipment type
 - Include verification tables with input fields
-- Reference appropriate upstream power sources for this equipment
+- Reference appropriate upstream systems for this equipment
 
 Use proper section numbering: "Section 01:", "Section 02:", etc. (zero-padded numbers).
 Make sure all critical actions use the .critical-text class and emergency warnings use the .emergency-action or .emergency-warning classes.
 CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, head, body, container div).`;
+
+    // Debug logging to track what's being sent to AI
+    console.log('=== AI PROMPT DEBUG ===');
+    console.log('Work Description being sent to AI:', formData.workDescription);
+    console.log('Equipment:', formData.manufacturer, formData.modelNumber);
+    console.log('Component:', formData.component);
+    console.log('Is power check triggered?:', (formData.workDescription || '').toLowerCase().includes('power'));
+    console.log('Full prompt snippet being sent (first 500 chars):', prompt.substring(0, 500));
+    console.log('Searching for hardcoded power references in prompt...');
+    const powerMatches = prompt.match(/power failure|power outage|electrical failure/gi);
+    console.log('Found hardcoded power references:', powerMatches ? powerMatches.length : 0, powerMatches || 'None');
+    console.log('=== END AI PROMPT DEBUG ===');
 
     // Generate content using Gemini
     const model = genAI.getGenerativeModel({ 
@@ -1091,6 +1104,14 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let generatedContent = response.text();
+    
+    // Debug logging for AI response
+    console.log('=== AI RESPONSE DEBUG ===');
+    console.log('AI Response length:', generatedContent.length);
+    console.log('AI Response snippet (first 300 chars):', generatedContent.substring(0, 300));
+    const responseWorkDescMatches = generatedContent.match(new RegExp(formData.workDescription, 'gi'));
+    console.log('Work description appears in response:', responseWorkDescMatches ? responseWorkDescMatches.length : 0, 'times');
+    console.log('=== END AI RESPONSE DEBUG ===');
     
     // Clean up the response
     generatedContent = generatedContent
