@@ -533,75 +533,383 @@ DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLAC
 <h3>Internal Equipment Diagnostics for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]</h3>
 <p><strong>Perform systematic internal component checks to identify the source of [WORK_DESCRIPTION]</strong></p>
 
-CRITICAL AI INSTRUCTIONS FOR DYNAMIC DIAGNOSTIC GENERATION:
+CRITICAL AI INSTRUCTIONS - FULLY DYNAMIC DIAGNOSTIC GENERATION BASED ON ACTUAL EMERGENCY:
 
-1. ANALYZE THE SPECIFIC SITUATION:
-   - Equipment type from [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
-   - Emergency type from [WORK_DESCRIPTION]
-   - Determine the technical nature of the failure
+STEP 1 - PARSE AND ANALYZE THE ACTUAL EMERGENCY:
+Extract the ACTUAL emergency type from [WORK_DESCRIPTION] and [EMERGENCY_TYPE_PLACEHOLDER].
+Common emergency patterns to detect:
+- REFRIGERANT/CHEMICAL: "leak", "refrigerant", "R-410A", "R-134a", "chemical", "oil"
+- ELECTRICAL/POWER: "power failure", "electrical fault", "breaker trip", "phase loss", "voltage", "outage"
+- COOLING/THERMAL: "high temp", "overheating", "cooling loss", "temperature alarm", "thermal"
+- MECHANICAL: "bearing", "vibration", "noise", "belt", "coupling", "motor failure", "mechanical"
+- WATER/FLOOD: "water", "flood", "moisture", "condensate", "drain", "leak" (with water context)
+- FIRE/SMOKE: "fire", "smoke", "burning", "smell", "hot spot"
+- UPS/BATTERY: "UPS", "battery", "DC bus", "inverter", "runtime"
+- GENERATOR: "generator", "fuel", "starting", "transfer", "genset"
+- NETWORK/COMM: "communication", "network", "BMS", "control", "monitoring"
 
-2. DETERMINE LOTO REQUIREMENT:
-   Analyze [WORK_DESCRIPTION] to determine if Lockout/Tagout is needed:
-   - LOTO REQUIRED for: electrical failures, mechanical repairs, internal component access, bearing failures, motor issues, compressor problems, any physical inspection of energized components
-   - LOTO NOT REQUIRED for: communication failures, software issues, sensor alarms only, network problems, monitoring issues, display errors
-   - CONDITIONAL LOTO: high temp alarms, flow issues - only if physical inspection needed
+STEP 2 - APPLY EMERGENCY-SPECIFIC DIAGNOSTIC LOGIC:
 
-3. GENERATE APPROPRIATE NUMBER OF DIAGNOSTIC STEPS:
-   Based on equipment complexity and emergency type:
-   - Simple sensor failure on basic equipment: Generate 3-5 diagnostic steps
-   - Complex compressor failure on chiller: Generate 15-25 diagnostic steps  
-   - UPS battery failure: Generate 10-15 diagnostic steps
-   - Generator won't start: Generate 20-30 diagnostic steps
-   - Communication loss: Generate 3-5 steps (no LOTO)
-   - Bearing failure on pump: Generate 10-15 steps (with LOTO)
-   
-4. IF LOTO IS REQUIRED - CRITICAL SEQUENCING:
-   Structure the diagnostic table in this EXACT order:
-   a) FIRST: Generate ALL diagnostic steps that can be done with power ON
-      - Control panel readings
-      - Display checks
-      - Voltage measurements at disconnect
-      - Current measurements
-      - Temperature readings
-      - Pressure readings
-      - Any remote diagnostics
-   
-   b) THEN: Insert a CLEAR LOTO STEP with red warning:
-      <tr style="background-color: #dc3545; color: white;">
-        <td>[step#]</td>
-        <td><strong>⚠️ CRITICAL: APPLY LOCKOUT/TAGOUT PROCEDURE NOW</strong></td>
-        <td>De-energize equipment per OSHA 1910.147 and verify zero energy state</td>
-        <td>LOTO Applied: <input type="checkbox" /></td>
-        <td>Verified: <input type="checkbox" /></td>
-      </tr>
-   
-   c) FINALLY: Generate ALL steps requiring de-energized state
-      - Physical component inspection
-      - Megohmmeter testing
-      - Mechanical checks
-      - Internal wiring inspection
-      - Component replacement checks
+FOR REFRIGERANT/CHEMICAL EMERGENCIES:
+<table>
+<tr>
+  <th>Step Number</th>
+  <th>Internal Component to Check</th>
+  <th>Expected Reading/Condition</th>
+  <th>Actual Reading</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td>Refrigerant system pressure - suction side</td>
+  <td>Normal operating range per manufacturer specs</td>
+  <td><input type="text" placeholder="PSI" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Refrigerant system pressure - discharge side</td>
+  <td>Normal operating range per manufacturer specs</td>
+  <td><input type="text" placeholder="PSI" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Visual inspection for oil traces at joints</td>
+  <td>No oil residue visible</td>
+  <td><input type="text" placeholder="Location if found" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Electronic leak detector sweep - compressor area</td>
+  <td>No refrigerant detected (<10 PPM)</td>
+  <td><input type="text" placeholder="PPM reading" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Electronic leak detector sweep - evaporator coil</td>
+  <td>No refrigerant detected (<10 PPM)</td>
+  <td><input type="text" placeholder="PPM reading" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Electronic leak detector sweep - condenser coil</td>
+  <td>No refrigerant detected (<10 PPM)</td>
+  <td><input type="text" placeholder="PPM reading" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Check service valve caps and cores</td>
+  <td>Tight, no hissing, caps present</td>
+  <td><input type="text" placeholder="Condition" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Soap bubble test on suspect joints</td>
+  <td>No bubbles forming</td>
+  <td><input type="text" placeholder="Results" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Check filter drier pressure drop</td>
+  <td><5 PSI differential</td>
+  <td><input type="text" placeholder="PSI diff" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Refrigerant sight glass inspection</td>
+  <td>Clear, no bubbles</td>
+  <td><input type="text" placeholder="Observation" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+IMPORTANT: NO LOTO REQUIRED for leak detection - not performing electrical work
+</table>
 
-5. IF LOTO NOT REQUIRED:
-   - Generate ONLY diagnostic steps that are safe with equipment energized
-   - DO NOT include any LOTO step
-   - Focus on control system checks, communication, software, displays
+FOR ELECTRICAL/POWER EMERGENCIES:
+<table>
+<tr>
+  <th>Step Number</th>
+  <th>Internal Component to Check</th>
+  <th>Expected Reading/Condition</th>
+  <th>Actual Reading</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td>Main disconnect voltage - all phases</td>
+  <td>Rated voltage ±10% on all phases</td>
+  <td><input type="text" placeholder="L1-L2, L2-L3, L1-L3" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Phase sequence verification</td>
+  <td>Correct rotation (ABC)</td>
+  <td><input type="text" placeholder="Sequence" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Control transformer secondary voltage</td>
+  <td>24VAC or 120VAC per specs</td>
+  <td><input type="text" placeholder="VAC" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Control fuse continuity check</td>
+  <td>All fuses show continuity</td>
+  <td><input type="text" placeholder="Status" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Main breaker status and trip indicators</td>
+  <td>Closed, no trip flags</td>
+  <td><input type="text" placeholder="Status" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr style="background-color: #dc3545; color: white;">
+  <td>6</td>
+  <td colspan="2"><strong>⚠️ CRITICAL: APPLY LOCKOUT/TAGOUT PROCEDURE NOW</strong><br>De-energize equipment per OSHA 1910.147 and verify zero energy state</td>
+  <td>LOTO Applied: <input type="checkbox" /></td>
+  <td>Verified: <input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Insulation resistance test - motor windings</td>
+  <td>>1 megohm minimum</td>
+  <td><input type="text" placeholder="Megohms" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Contactor inspection - pitting/burning</td>
+  <td>Clean contacts, no excessive wear</td>
+  <td><input type="text" placeholder="Condition" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Terminal connection tightness - torque check</td>
+  <td>Per manufacturer torque specs</td>
+  <td><input type="text" placeholder="Status" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Capacitor physical inspection (if present)</td>
+  <td>No bulging, leaking, or damage</td>
+  <td><input type="text" placeholder="Condition" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Ground fault test</td>
+  <td>No ground faults detected</td>
+  <td><input type="text" placeholder="Result" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
 
-6. EQUIPMENT-SPECIFIC DIAGNOSTIC EXAMPLES:
-   For CHILLERS with compressor failure: Check suction/discharge pressures, oil pressure, superheat, subcooling, motor amps, vibration, control board errors, safety switches, THEN LOTO, then check motor windings, mechanical components
-   For UPS with battery failure: Check DC bus voltage, individual battery voltages, charging current, temperature, THEN LOTO if replacing batteries
-   For GENERATORS that won't start: Check starting battery voltage, fuel pressure, control panel, safety shutdowns, transfer switch position, THEN LOTO for starter motor inspection
-   For PUMPS with bearing failure: Check vibration readings, motor amps, temperature, THEN LOTO, then inspect bearings, shaft alignment, coupling
-   For BMS communication loss: Check network connectivity, protocol settings, addressing - NO LOTO NEEDED
+FOR COOLING/THERMAL EMERGENCIES:
+<table>
+<tr>
+  <th>Step Number</th>
+  <th>Internal Component to Check</th>
+  <th>Expected Reading/Condition</th>
+  <th>Actual Reading</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td>Supply air temperature</td>
+  <td>Within setpoint range</td>
+  <td><input type="text" placeholder="°F" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Return air temperature</td>
+  <td>Normal return temp for load</td>
+  <td><input type="text" placeholder="°F" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Temperature differential (delta T)</td>
+  <td>15-20°F typical</td>
+  <td><input type="text" placeholder="°F delta" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Fan motor operation and RPM</td>
+  <td>Running at rated speed</td>
+  <td><input type="text" placeholder="RPM" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Airflow obstructions - filters</td>
+  <td>Clean, <1" w.g. pressure drop</td>
+  <td><input type="text" placeholder="Pressure drop" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Damper positions and actuators</td>
+  <td>Correct position per control signal</td>
+  <td><input type="text" placeholder="% open" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Cooling coil condition</td>
+  <td>Clean, no ice formation</td>
+  <td><input type="text" placeholder="Condition" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Refrigerant pressures (if DX)</td>
+  <td>Within operating range</td>
+  <td><input type="text" placeholder="Suction/Discharge PSI" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Chilled water flow (if chilled water)</td>
+  <td>Design GPM ±10%</td>
+  <td><input type="text" placeholder="GPM" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Hot gas bypass valve (if equipped)</td>
+  <td>Modulating correctly</td>
+  <td><input type="text" placeholder="% open" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Compressor staging/cycling</td>
+  <td>Proper sequence, no short cycling</td>
+  <td><input type="text" placeholder="Status" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>12</td>
+  <td>Control setpoints verification</td>
+  <td>Matches required conditions</td>
+  <td><input type="text" placeholder="Settings" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
 
-7. CRITICAL EQUIPMENT NAMING CONVENTION:
-   DO NOT generate fake equipment identifiers or numbers:
-   - DO NOT create identifiers like (PMP-CW-1), MCC-CH-1, CT-1, CHILLER-1, GEN-1, UPS-A, etc.
-   - Instead use generic descriptions: "condenser water pump", "upstream breaker", "cooling tower", "supply fan"
-   - Reference the main equipment as "the [MANUFACTURER_PLACEHOLDER] [equipment type]" (e.g., "the Carrier chiller", "the Cummins generator")
-   - If specific equipment designation is needed, use: "[Equipment ID to be verified on-site]"
-   - For components, use descriptive names: "main control board", "compressor motor", "discharge pressure sensor"
-   
+FOR MECHANICAL EMERGENCIES:
+<table>
+<tr>
+  <th>Step Number</th>
+  <th>Internal Component to Check</th>
+  <th>Expected Reading/Condition</th>
+  <th>Actual Reading</th>
+  <th>Pass/Fail</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td>Vibration analysis - motor DE bearing</td>
+  <td><0.3 in/sec velocity</td>
+  <td><input type="text" placeholder="in/sec" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Vibration analysis - motor NDE bearing</td>
+  <td><0.3 in/sec velocity</td>
+  <td><input type="text" placeholder="in/sec" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Bearing temperature - infrared scan</td>
+  <td><180°F, no hot spots</td>
+  <td><input type="text" placeholder="°F" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Motor current draw - all phases</td>
+  <td>Within FLA, balanced ±5%</td>
+  <td><input type="text" placeholder="A1/A2/A3" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Audible noise assessment</td>
+  <td>Normal operating sound</td>
+  <td><input type="text" placeholder="Description" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr style="background-color: #dc3545; color: white;">
+  <td>6</td>
+  <td colspan="2"><strong>⚠️ CRITICAL: APPLY LOCKOUT/TAGOUT PROCEDURE NOW</strong><br>De-energize equipment per OSHA 1910.147 and verify zero energy state</td>
+  <td>LOTO Applied: <input type="checkbox" /></td>
+  <td>Verified: <input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Belt tension check (if belt-driven)</td>
+  <td>1/2" deflection per ft span</td>
+  <td><input type="text" placeholder="Deflection" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Coupling alignment verification</td>
+  <td>Within 0.003" TIR</td>
+  <td><input type="text" placeholder="TIR reading" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Oil level and condition</td>
+  <td>Proper level, clear color</td>
+  <td><input type="text" placeholder="Condition" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Shaft play/end play check</td>
+  <td><0.010" axial play</td>
+  <td><input type="text" placeholder="Measurement" style="width:80px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Bearing physical inspection</td>
+  <td>No pitting, scoring, or damage</td>
+  <td><input type="text" placeholder="Condition" style="width:150px" /></td>
+  <td><input type="checkbox" /></td>
+</tr>
+</table>
+
+FOR ALL OTHER EMERGENCY TYPES:
+Generate appropriate diagnostic steps based on the specific emergency detected in [WORK_DESCRIPTION]:
+
+WATER/FLOOD: Focus on moisture detection, drain blockages, pump operation (LOTO for electrical safety)
+FIRE/SMOKE: Thermal imaging, connection inspection, immediate power isolation required
+UPS/BATTERY: DC bus checks, battery voltages, thermal runaway monitoring (LOTO for battery work)
+GENERATOR: Fuel system, starting batteries, transfer switch, governor (LOTO for mechanical access)
+NETWORK/COMM: Protocol verification, cable testing, configuration checks (NO LOTO needed)
+
 <table>
 <tr>
   <th>Step Number</th>
@@ -611,13 +919,12 @@ CRITICAL AI INSTRUCTIONS FOR DYNAMIC DIAGNOSTIC GENERATION:
   <th>Pass/Fail</th>
 </tr>
 
-GENERATE DYNAMIC NUMBER OF ROWS HERE based on the analysis above. 
-- Start with step 1 and continue sequentially
-- Number of steps must match the complexity determined in instruction #3
-- Follow the EXACT sequence from instruction #4 if LOTO is required
-- Each step must be specific to [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] and [WORK_DESCRIPTION]
-- Use proper technical terminology for the specific equipment type
-- Include measurement units (VAC, VDC, PSI, °F, Hz, etc.) where applicable
+AI MUST GENERATE 10-15 RELEVANT DIAGNOSTIC STEPS HERE based on analyzing [WORK_DESCRIPTION]:
+- Each step must directly relate to finding the ROOT CAUSE of the specific emergency
+- Order steps logically: safe checks first, then LOTO if needed, then invasive checks
+- Include appropriate measurement units and expected values
+- Reference [MANUFACTURER_PLACEHOLDER] specific procedures where applicable
+- DO NOT use fake equipment IDs - use descriptive names only
 
 </table>
 
