@@ -151,32 +151,100 @@ export async function generateSection05(formData) {
     
     console.log('PPE data extracted:', { hearingPPE: !!hearingPPE, electricalGloves: !!electricalGloves, arcFlashPPE: !!arcFlashPPE });
     
-    const ppeRows = `
+    // Determine REQUIRED PPE based on specific maintenance task and equipment
+    let ppeRows = '';
+    
+    // Analyze work description to determine which PPE is REQUIRED (not recommended)
+    const workDesc = (workDescription || '').toLowerCase();
+    const isElectricalWork = workDesc.includes('electrical') || workDesc.includes('power') || 
+                            workDesc.includes('voltage') || workDesc.includes('breaker') ||
+                            workDesc.includes('switchgear') || workDesc.includes('panel');
+    const isHotWork = workDesc.includes('hot work') || workDesc.includes('energized') || 
+                     workDesc.includes('live');
+    const isConfinedSpace = workDesc.includes('confined') || workDesc.includes('enclosed');
+    const isMechanicalWork = workDesc.includes('mechanical') || workDesc.includes('bearing') ||
+                            workDesc.includes('motor') || workDesc.includes('compressor');
+    const isChemicalWork = workDesc.includes('refrigerant') || workDesc.includes('chemical') ||
+                          workDesc.includes('oil') || workDesc.includes('cleaning');
+    
+    // Eye protection - ALWAYS required per OSHA for maintenance work
+    ppeRows += `
         <tr>
             <td><strong>Eye Protection</strong></td>
             <td>Safety glasses with side shields, ANSI Z87.1</td>
-            <td>At all times during maintenance work</td>
-        </tr>
+            <td>REQUIRED - At all times during maintenance work per OSHA 29 CFR 1910.133</td>
+        </tr>`;
+    
+    // Hearing protection - Only if equipment noise exceeds 85 dBA
+    if (componentType?.toLowerCase().includes('generator') || 
+        componentType?.toLowerCase().includes('compressor') ||
+        componentType?.toLowerCase().includes('chiller') ||
+        workDesc.includes('running')) {
+        ppeRows += `
         <tr>
             <td><strong>Hearing Protection</strong></td>
-            <td>${hearingPPE?.specification || 'Standard hearing protection required'}<br>Models: ${hearingPPE?.models?.join(', ') || 'TBD'}</td>
-            <td>Equipment room, running equipment</td>
-        </tr>
+            <td>${hearingPPE?.specification || 'Hearing protection meeting OSHA requirements'}<br>Models: ${hearingPPE?.models?.join(', ') || 'TBD'}</td>
+            <td>REQUIRED - When equipment noise exceeds 85 dBA per OSHA 29 CFR 1910.95</td>
+        </tr>`;
+    }
+    
+    // Electrical gloves - Only for actual electrical work
+    if (isElectricalWork) {
+        ppeRows += `
         <tr>
             <td><strong>Electrical Gloves</strong></td>
             <td>${electricalGloves?.specification || 'Class 0 insulated gloves'}<br>Models: ${electricalGloves?.models?.join(', ') || 'TBD'}</td>
-            <td>All electrical work</td>
-        </tr>
+            <td>REQUIRED - For electrical work per NFPA 70E and manufacturer specs for ${manufacturer} ${modelNumber}</td>
+        </tr>`;
+    }
+    
+    // Arc flash PPE - Only for energized electrical work
+    if (isElectricalWork && (isHotWork || workDesc.includes('panel') || workDesc.includes('switchgear'))) {
+        ppeRows += `
         <tr>
             <td><strong>Arc Flash PPE</strong></td>
-            <td>Category ${arcFlashPPE?.rating || '2'}<br>Models: ${arcFlashPPE?.models?.join(', ') || 'TBD'}</td>
-            <td>Electrical panel work</td>
-        </tr>
+            <td>Category ${arcFlashPPE?.rating || '2'} per arc flash study<br>Models: ${arcFlashPPE?.models?.join(', ') || 'TBD'}</td>
+            <td>REQUIRED - For work on energized electrical equipment per NFPA 70E</td>
+        </tr>`;
+    }
+    
+    // Safety footwear - ALWAYS required in equipment areas
+    ppeRows += `
         <tr>
             <td><strong>Safety Footwear</strong></td>
             <td>Steel-toed, slip-resistant, ASTM F2413</td>
-            <td>At all times in equipment areas</td>
+            <td>REQUIRED - At all times in equipment areas per site safety policy</td>
         </tr>`;
+    
+    // Chemical gloves - Only for refrigerant/chemical work
+    if (isChemicalWork) {
+        ppeRows += `
+        <tr>
+            <td><strong>Chemical Gloves</strong></td>
+            <td>Nitrile or neoprene gloves resistant to ${workDesc.includes('refrigerant') ? 'refrigerants' : 'chemicals'}</td>
+            <td>REQUIRED - When handling refrigerants or chemicals per ${manufacturer} MSDS</td>
+        </tr>`;
+    }
+    
+    // Respirator - Only for confined spaces or chemical exposure
+    if (isConfinedSpace || (isChemicalWork && workDesc.includes('leak'))) {
+        ppeRows += `
+        <tr>
+            <td><strong>Respiratory Protection</strong></td>
+            <td>Half-face respirator with appropriate cartridges or SCBA as required</td>
+            <td>REQUIRED - For confined space entry or chemical exposure per OSHA 29 CFR 1910.134</td>
+        </tr>`;
+    }
+    
+    // Fall protection - Only for elevated work
+    if (workDesc.includes('roof') || workDesc.includes('ladder') || workDesc.includes('elevated')) {
+        ppeRows += `
+        <tr>
+            <td><strong>Fall Protection</strong></td>
+            <td>Full body harness with shock-absorbing lanyard, ANSI Z359.1</td>
+            <td>REQUIRED - For work at heights above 6 feet per OSHA 29 CFR 1926.501</td>
+        </tr>`;
+    }
     
     // Build EOP references section
     let eopSection = '';
