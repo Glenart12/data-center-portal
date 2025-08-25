@@ -294,12 +294,42 @@ START WITH:
 <h4>⚠️ CRITICAL SAFETY CHECKPOINT - STOP Before Proceeding:</h4>
 <p><strong>Equipment-Specific PPE Requirements for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:</strong></p>
 
-Generate PPE requirements based on the SPECIFIC equipment type and voltage:
-- For 480V 3-phase equipment (chillers, large motors): Arc Flash Category 2 PPE minimum
-- For 208V/240V equipment: Arc Flash Category 1 PPE
-- For DC systems (UPS batteries): Acid-resistant gloves, face shield
-- For refrigerant systems: SCBA or respirator if leak suspected
-- For generators: Hearing protection, CO monitor
+CRITICAL AI INSTRUCTION - DETERMINE REQUIRED PPE BASED ON EMERGENCY ANALYSIS:
+ANALYZE THESE CRITICAL INPUTS FOR PPE DETERMINATION:
+1. Emergency Type: [EMERGENCY_TYPE_PLACEHOLDER] - Defines primary hazard exposure
+2. Equipment: [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] - Determines voltage, chemical, mechanical hazards
+3. Component Type: [COMPONENT_PLACEHOLDER] - Identifies system-specific PPE needs
+4. Serial Number: [SERIAL_PLACEHOLDER] - May indicate specific model variations
+
+INTELLIGENT PPE DETERMINATION BASED ON EMERGENCY + EQUIPMENT:
+
+FOR ELECTRICAL EMERGENCIES on [MANUFACTURER_PLACEHOLDER] equipment:
+- Power failure/electrical fault on 480V equipment: REQUIRE Arc Flash Category 2-4 PPE (based on incident energy)
+- UPS/PDU emergencies with DC bus exposure: REQUIRE Class 2 rubber gloves, arc flash suit, face shield
+- Generator electrical issues: REQUIRE Category 2 arc flash PPE, hearing protection mandatory
+- Control circuit work (24-120VAC): REQUIRE Category 0-1 PPE minimum
+
+FOR REFRIGERANT EMERGENCIES on [MANUFACTURER_PLACEHOLDER] chillers/CRAC:
+- Refrigerant leak on [MODEL_PLACEHOLDER]: REQUIRE SCBA or supplied air respirator, chemical gloves
+- R-134a leak: REQUIRE full-face respirator with organic vapor cartridge
+- R-410A high pressure leak: REQUIRE face shield, cryogenic gloves for liquid contact
+- Ammonia systems: REQUIRE Level B hazmat suit, SCBA mandatory
+
+FOR MECHANICAL/THERMAL EMERGENCIES:
+- Bearing failure/hot surface on rotating equipment: REQUIRE heat-resistant gloves (500°F rated)
+- Compressor failure with oil exposure: REQUIRE oil-resistant gloves, safety glasses
+- High temperature alarm response: REQUIRE heat-resistant PPE, infrared thermometer
+
+FOR MANUFACTURER-SPECIFIC REQUIREMENTS:
+- Carrier equipment: Follow Carrier Safety Manual PPE matrix for [MODEL_PLACEHOLDER]
+- Trane equipment: Comply with Trane Service First PPE requirements
+- Caterpillar generators: CAT-specified hearing protection (NRR 30+) and safety boots
+- Liebert/Vertiv UPS: Vertiv arc flash PPE per equipment label
+
+EMERGENCY SEVERITY MULTIPLIER:
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "fire" or "smoke": ADD SCBA, flame-resistant clothing
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "flood" or "water": ADD electrical boots, waterproof suit
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "chemical": ADD chemical suit appropriate to hazard
 
 <table>
 <tr>
@@ -331,11 +361,67 @@ Generate PPE requirements based on the SPECIFIC equipment type and voltage:
 
 <p><strong>Required Tools & Test Equipment for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:</strong></p>
 
-Generate tool list based on the SPECIFIC equipment model:
-- For Carrier 19XRV5P5: Carrier CCN interface tool, specific control board diagnostic tools
-- For Trane CVHE: Tracer SC+ interface, oil pressure gauges
-- For Caterpillar generators: CAT ET diagnostic tool
-- For Liebert UPS: Liebert monitoring interface cable
+CRITICAL AI INSTRUCTION - DETERMINE REQUIRED TOOLS BASED ON EMERGENCY + EQUIPMENT:
+ANALYZE THESE INPUTS FOR TOOL REQUIREMENTS:
+1. Emergency Type: [EMERGENCY_TYPE_PLACEHOLDER] - Determines diagnostic and response tools needed
+2. Manufacturer: [MANUFACTURER_PLACEHOLDER] - Defines proprietary diagnostic tools required
+3. Model Number: [MODEL_PLACEHOLDER] - Specifies exact interface tools and adapters
+4. Serial Number: [SERIAL_PLACEHOLDER] - May indicate special tool requirements for variants
+
+INTELLIGENT TOOL DETERMINATION BY EMERGENCY TYPE:
+
+FOR POWER/ELECTRICAL EMERGENCIES on [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]:
+- REQUIRE: True RMS multimeter (Fluke 87V or equivalent) rated for equipment voltage
+- REQUIRE: Clamp meter capable of measuring equipment FLA (Full Load Amps)
+- REQUIRE: Non-contact voltage detector appropriate for voltage level
+- REQUIRE: Insulation resistance tester (megohmmeter) for motor/transformer testing
+- REQUIRE: Power quality analyzer if power disturbance suspected
+- REQUIRE: Infrared thermal camera for hot spot detection
+
+FOR REFRIGERANT/COOLING EMERGENCIES on [MANUFACTURER_PLACEHOLDER] equipment:
+- REQUIRE: Digital refrigerant manifold gauges compatible with refrigerant type
+- REQUIRE: Electronic leak detector certified for refrigerant in [MODEL_PLACEHOLDER]
+- REQUIRE: Refrigerant recovery machine if leak repair needed
+- REQUIRE: Vacuum pump and micron gauge for system evacuation
+- REQUIRE: Temperature probes for superheat/subcooling calculations
+- REQUIRE: Refrigerant scale for charging
+
+FOR MECHANICAL EMERGENCIES:
+- REQUIRE: Vibration analyzer for bearing/alignment issues
+- REQUIRE: Dial indicators for shaft alignment verification
+- REQUIRE: Torque wrenches calibrated to manufacturer specs
+- REQUIRE: Borescope for internal inspection without disassembly
+- REQUIRE: Oil analysis kit for compressor/bearing diagnostics
+
+MANUFACTURER-SPECIFIC DIAGNOSTIC TOOLS:
+FOR CARRIER EQUIPMENT:
+- [MODEL_PLACEHOLDER] requires: CCN Service Tool, i-Vu interface, or Carrier Service Assistant
+- Carrier 19XR series: ComfortVIEW interface tool mandatory
+- Carrier 30XA/30HX: Pro-Dialog+ handheld required
+
+FOR TRANE EQUIPMENT:
+- [MODEL_PLACEHOLDER] requires: Tracer TU service tool or Tracer SC+ interface
+- CVHE/CVHF chillers: CH530 service tool required
+- IntelliPak units: Rover service tool needed
+
+FOR CATERPILLAR GENERATORS:
+- [MODEL_PLACEHOLDER] requires: CAT Electronic Technician (ET) with current license
+- CAT 3500 series: Multi-pin diagnostic adapter required
+- EMCP controllers: CAT Communication Adapter III
+
+FOR LIEBERT/VERTIV UPS:
+- [MODEL_PLACEHOLDER] requires: Liebert IntelliSlot communication cable
+- NX/NXL series: Unity card interface tool
+- APM series: Life.net diagnostic software
+
+FOR YORK EQUIPMENT:
+- [MODEL_PLACEHOLDER] requires: OptiView Control Center interface
+- YK chillers: ISN network tool required
+
+EMERGENCY-SPECIFIC ADDITIONS:
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "communication": ADD protocol analyzer, network tester
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "water/flood": ADD moisture meter, pump equipment
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "fire/smoke": ADD gas detector, thermal imaging camera
 
 <table>
 <tr>
@@ -371,12 +457,73 @@ Generate tool list based on the SPECIFIC equipment model:
 </table>
 
 <p><strong>[MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] Specific Safety Requirements:</strong></p>
+
+CRITICAL AI INSTRUCTION - GENERATE SAFETY REQUIREMENTS BASED ON EMERGENCY + EQUIPMENT:
+ANALYZE THESE INPUTS FOR SAFETY PROTOCOL DETERMINATION:
+1. Emergency Type: [EMERGENCY_TYPE_PLACEHOLDER] - Defines immediate safety priorities
+2. Manufacturer: [MANUFACTURER_PLACEHOLDER] - Determines OEM safety protocols
+3. Model Number: [MODEL_PLACEHOLDER] - Specifies exact safety procedures and hazards
+4. Component Type: [COMPONENT_PLACEHOLDER] - Identifies system-specific safety requirements
+
+INTELLIGENT SAFETY REQUIREMENTS BY MANUFACTURER AND EMERGENCY:
+
+FOR CARRIER EQUIPMENT EMERGENCIES:
 <ul>
-<li>□ Verify de-energization procedures per [MANUFACTURER_PLACEHOLDER] service manual</li>
-<li>□ Check for stored energy in [capacitors/VFDs/control circuits] specific to this model</li>
-<li>□ Review [MANUFACTURER_PLACEHOLDER] emergency shutdown sequence</li>
-<li>□ Confirm [equipment-specific hazards: refrigerant pressure, battery acid, hot surfaces, etc.]</li>
-<li>□ Emergency contact for [MANUFACTURER_PLACEHOLDER] technical support ready: <input type="text" placeholder="Support #" style="width:150px" /></li>
+<li>□ CRITICAL: For [MODEL_PLACEHOLDER] follow Carrier Emergency Response Protocol in Service Manual Section 3</li>
+<li>□ For electrical emergencies: Verify 5-minute capacitor discharge time on VFD before access</li>
+<li>□ For refrigerant emergencies: Confirm pressure relief valve operation, ventilation rate >4 ACH</li>
+<li>□ Carrier 19XR series: Wait 15 minutes after shutdown for bearing oil to settle</li>
+<li>□ Implement Carrier LOTO procedure: Main disconnect + control circuit breaker + VFD disconnect</li>
+<li>□ Emergency contact: Carrier 24/7 Support 1-800-CARRIER with contract #: <input type="text" placeholder="Contract #" style="width:100px" /></li>
+</ul>
+
+FOR TRANE EQUIPMENT EMERGENCIES:
+<ul>
+<li>□ CRITICAL: For [MODEL_PLACEHOLDER] implement Trane Emergency Shutdown Sequence per IOM manual</li>
+<li>□ For power emergencies: Verify Adaptive Frequency Drive capacitor discharge (10 minutes minimum)</li>
+<li>□ For refrigerant emergencies: Activate purge unit, verify ventilation before entry</li>
+<li>□ CVHE/CVHF: Check oil pressure must remain >18 PSID during coast-down</li>
+<li>□ Tracer controls: Place in Emergency Override mode before manual intervention</li>
+<li>□ Emergency contact: Trane Service 1-800-884-2653 with equipment serial: [SERIAL_PLACEHOLDER]</li>
+</ul>
+
+FOR CATERPILLAR GENERATOR EMERGENCIES:
+<ul>
+<li>□ CRITICAL: For [MODEL_PLACEHOLDER] press Emergency Stop, verify engine stopped, remove starting batteries</li>
+<li>□ For fuel emergencies: Close manual fuel valves, activate fire suppression if equipped</li>
+<li>□ For overspeed: Manually close air intake if emergency shutdown fails</li>
+<li>□ Block radiator fan before any front-end work (fan may auto-start)</li>
+<li>□ Verify zero energy: No AC output, DC control power isolated, starting air depleted</li>
+<li>□ Emergency contact: CAT 24-Hour 1-877-228-3519 with ESN: [SERIAL_PLACEHOLDER]</li>
+</ul>
+
+FOR LIEBERT/VERTIV UPS EMERGENCIES:
+<ul>
+<li>□ CRITICAL: For [MODEL_PLACEHOLDER] press EPO, verify inverter offline, open battery breaker</li>
+<li>□ For battery emergencies: Ventilate area (hydrogen gas), neutralize spills with baking soda</li>
+<li>□ For thermal events: Bypass to maintenance mode, verify cooling before investigation</li>
+<li>□ DC bus hazard: Wait 5 minutes after shutdown for capacitor discharge</li>
+<li>□ Battery safety: PPE required even after disconnect (stored energy present)</li>
+<li>□ Emergency contact: Vertiv 1-800-543-2378 with site ID: <input type="text" placeholder="Site ID" style="width:100px" /></li>
+</ul>
+
+FOR YORK EQUIPMENT EMERGENCIES:
+<ul>
+<li>□ CRITICAL: For [MODEL_PLACEHOLDER] activate QuickStop, verify compressor coast-down complete</li>
+<li>□ For refrigerant emergencies: OptiView panel to pumpdown mode, isolate sections</li>
+<li>□ For bearing emergencies: Monitor oil temperature during shutdown (<180°F)</li>
+<li>□ YK centrifugal: Verify guide vane closed position before service</li>
+<li>□ Micro panel: Download fault log before power removal</li>
+<li>□ Emergency contact: York Service 1-800-861-1001 with model/serial</li>
+</ul>
+
+EMERGENCY-SPECIFIC SAFETY OVERRIDES:
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "fire": EVACUATE FIRST, then implement shutdown
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "refrigerant leak": EVACUATE area, PPE mandatory before entry
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "electrical arc": DO NOT APPROACH, de-energize remotely
+- If [EMERGENCY_TYPE_PLACEHOLDER] includes "flood": Secure all power before entering area
+
+GENERATE ACTUAL MANUFACTURER-SPECIFIC PROCEDURES - Not generic safety steps
 </ul>
 
 <div style="background: #dc3545; color: white; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
