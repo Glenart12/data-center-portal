@@ -1082,17 +1082,17 @@ Include ALL 9 sections with complete, detailed content and INTERACTIVE INPUT FIE
 
 CRITICAL FOR SECTION 04:
 - FIRST add Pre-Action Safety & Equipment Requirements subsection with:
-  * PPE requirements specific to ${formData.component} voltage and hazards
-  * Tool requirements based on ${formData.manufacturer} ${formData.modelNumber}
+  * PPE requirements specific to [COMPONENT_PLACEHOLDER] voltage and hazards
+  * Tool requirements based on [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
   * Safety checkpoint with equipment-specific hazards
-- Create a detailed diagnostic table with voltage verification specific to ${formData.component}
+- Create a detailed diagnostic table with voltage verification specific to [COMPONENT_PLACEHOLDER]
 - Include actual expected voltages based on equipment type
 - Add input fields for technician readings
 - Include Pass/Fail checkboxes
 
 CRITICAL FOR SECTION 05:
 - Generate 4 complete scenarios for [WORK_DESCRIPTION] issues
-- Each scenario must be specific to ${formData.component} equipment type
+- Each scenario must be specific to [COMPONENT_PLACEHOLDER] equipment type
 - Include verification tables with input fields
 - Reference appropriate upstream systems for this equipment
 
@@ -1251,7 +1251,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     
     return NextResponse.json({ 
       error: 'Failed to generate EOP',
-      details: error.message,
+      details: error.message || error.toString() || 'Unknown error',
       userMessage: 'Unable to generate EOP. Please try again.'
     }, { status: 500 });
   }
