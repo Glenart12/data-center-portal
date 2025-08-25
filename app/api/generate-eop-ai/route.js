@@ -164,8 +164,8 @@ START WITH:
         <td>PLACEHOLDER: AI must generate specific qualifications based on [EMERGENCY_TYPE_PLACEHOLDER] response complexity for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]. Include certifications, training requirements, experience levels, and equipment-specific emergency response qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
     </tr>
     <tr>
-        <td>Advance notifications required:</td>
-        <td>PLACEHOLDER: AI must research and explain based on equipment type [COMPONENT_PLACEHOLDER] and emergency type [EMERGENCY_TYPE_PLACEHOLDER]. FORMAT AS CLEAN HTML: Use ul and li tags if listing multiple items. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
+        <td>Immediate notifications required:</td>
+        <td>PLACEHOLDER: AI must generate IMMEDIATE emergency notifications required based on equipment type [COMPONENT_PLACEHOLDER] and emergency type [EMERGENCY_TYPE_PLACEHOLDER]. These are IMMEDIATE notifications during an emergency, not advance notifications. Include who must be notified immediately upon emergency detection (operations team, facilities manager, customer representatives, etc.). FORMAT AS CLEAN HTML: Use ul and li tags for bullet points. Use strong tags for emphasis. DO NOT output markdown asterisks. Keep the same bullet point format as used in MOP/SOP.</td>
     </tr>
     <tr>
         <td>Post notifications required:</td>
