@@ -19,7 +19,8 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
     },
     system: '',
     category: '',
-    description: ''
+    description: '',
+    deliveryMethod: 'self'
   });
   
   const [supportingDocs, setSupportingDocs] = useState([]);
@@ -490,6 +491,37 @@ export default function EOPGenerationModal({ isOpen, onClose }) {
               }}
               placeholder="Describe the emergency operating procedure (e.g., emergency shutdown, power failure response, cooling failure mitigation)..."
             />
+          </div>
+
+          {/* Delivery Method */}
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+              Delivery Method
+            </label>
+            <div style={{ display: 'flex', gap: '30px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="deliveryMethod"
+                  value="self"
+                  checked={formData.deliveryMethod === 'self'}
+                  onChange={(e) => handleInputChange('deliveryMethod', e.target.value)}
+                  style={{ marginRight: '8px' }}
+                />
+                Self Delivered
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="deliveryMethod"
+                  value="subcontractor"
+                  checked={formData.deliveryMethod === 'subcontractor'}
+                  onChange={(e) => handleInputChange('deliveryMethod', e.target.value)}
+                  style={{ marginRight: '8px' }}
+                />
+                Subcontractor
+              </label>
+            </div>
           </div>
         </div>
 

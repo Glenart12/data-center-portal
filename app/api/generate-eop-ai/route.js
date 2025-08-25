@@ -137,23 +137,39 @@ START WITH:
     </tr>
 </table>
 
-<h2>Section 03: Purpose & Scope</h2>
+<h2>Section 03: EOP Overview</h2>
 <table class="info-table">
     <tr>
-        <td>Purpose:</td>
-        <td>This Emergency Operating Procedure provides step-by-step instructions for responding to power failure emergencies affecting the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] [SYSTEM_PLACEHOLDER]. This document ensures rapid, safe, and effective response to restore critical infrastructure operations.</td>
+        <td>EOP Title:</td>
+        <td>[COMPONENT_PLACEHOLDER] - [EMERGENCY_TYPE_PLACEHOLDER]</td>
     </tr>
     <tr>
-        <td>Scope:</td>
-        <td>This procedure applies to all data center operations personnel, facilities engineers, and emergency response teams responsible for maintaining the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] and associated critical infrastructure systems.</td>
+        <td>Work Area:</td>
+        <td><input type="text" placeholder="Enter work area" style="width:300px" /></td>
     </tr>
     <tr>
-        <td>Activation Criteria:</td>
-        <td>This EOP shall be activated when power loss is detected or suspected on the [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER], including but not limited to: utility power outages, automatic transfer switch failures, distribution panel failures, circuit breaker trips, or equipment-specific power supply failures.</td>
+        <td>Building/Floor/Room:</td>
+        <td><input type="text" placeholder="Enter building/floor/room" style="width:300px" /></td>
     </tr>
     <tr>
-        <td>Safety Notice:</td>
-        <td>All personnel must follow proper electrical safety procedures, use appropriate PPE, and verify de-energization before working on any electrical equipment.</td>
+        <td>Access Requirements:</td>
+        <td><input type="text" placeholder="Enter access requirements" style="width:400px" /></td>
+    </tr>
+    <tr>
+        <td>Delivery Method:</td>
+        <td>[DELIVERY_METHOD_PLACEHOLDER]</td>
+    </tr>
+    <tr>
+        <td>Qualifications Required:</td>
+        <td>PLACEHOLDER: AI must generate specific qualifications based on [EMERGENCY_TYPE_PLACEHOLDER] response complexity for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]. Include certifications, training requirements, experience levels, and equipment-specific emergency response qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
+    </tr>
+    <tr>
+        <td>Advance notifications required:</td>
+        <td>PLACEHOLDER: AI must research and explain based on equipment type [COMPONENT_PLACEHOLDER] and emergency type [EMERGENCY_TYPE_PLACEHOLDER]. FORMAT AS CLEAN HTML: Use ul and li tags if listing multiple items. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
+    </tr>
+    <tr>
+        <td>Post notifications required:</td>
+        <td>PLACEHOLDER: AI must research and explain based on equipment type [COMPONENT_PLACEHOLDER] and emergency type [EMERGENCY_TYPE_PLACEHOLDER]. FORMAT AS CLEAN HTML: Use ul and li tags if listing multiple items. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
     </tr>
 </table>
 
@@ -958,7 +974,8 @@ export async function POST(request) {
       .replace(/\[SITE_NAME_PLACEHOLDER\]/g, formData.siteName || 'UPDATE NEEDED')
       .replace(/\[SITE_ADDRESS_PLACEHOLDER\]/g, formData.address ? 
         `${formData.address.street || ''}, ${formData.address.city || ''}, ${formData.address.state || ''} ${formData.address.zipCode || ''}`.trim() || 'UPDATE NEEDED' : 
-        'UPDATE NEEDED')}
+        'UPDATE NEEDED')
+      .replace(/\[DELIVERY_METHOD_PLACEHOLDER\]/g, formData.deliveryMethod === 'subcontractor' ? 'Subcontractor' : 'Self-Delivered')}
 
 CRITICAL EQUIPMENT TYPE: ${formData.component}
 THIS IS A: ${formData.component?.toUpperCase()} - Make sure ALL procedures are specific to ${formData.component}
