@@ -161,15 +161,128 @@ START WITH:
     </tr>
     <tr>
         <td>Qualifications Required:</td>
-        <td>PLACEHOLDER: AI must generate specific qualifications based on [EMERGENCY_TYPE_PLACEHOLDER] response complexity for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]. Include certifications, training requirements, experience levels, and equipment-specific emergency response qualifications. FORMAT AS CLEAN HTML: Use ul and li tags. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
+        <td>CRITICAL AI INSTRUCTION - ANALYZE THESE INPUTS TO DETERMINE REQUIRED QUALIFICATIONS:
+        1. CET Level from Section 01: [CET_LEVEL_PLACEHOLDER] - This sets the MINIMUM certification level
+        2. Level of Risk (LOR) from Section 01: [RISK_LEVEL_PLACEHOLDER] - Higher risk = more stringent requirements
+        3. Equipment: [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] - Determines manufacturer-specific certifications
+        4. Emergency Type: [EMERGENCY_TYPE_PLACEHOLDER] - Defines specialized response skills needed
+        5. Component Type: [COMPONENT_PLACEHOLDER] - Identifies system-specific expertise required
+        
+        GENERATE INTELLIGENT REQUIREMENTS BASED ON ANALYSIS:
+        - For LOR 4 (Critical): REQUIRE lead technician with CET-4, manufacturer certification, 5+ years experience
+        - For LOR 3 (High): REQUIRE CET-3 minimum, equipment-specific training, 3+ years experience  
+        - For electrical emergencies on [MANUFACTURER_PLACEHOLDER] equipment: REQUIRE NFPA 70E certification, arc flash training
+        - For refrigerant leaks: REQUIRE EPA 608 Universal certification, HAZMAT response training
+        - For [MANUFACTURER_PLACEHOLDER] equipment: REQUIRE manufacturer-specific service certification (e.g., Carrier CCN certified, Trane Tracer certified)
+        - For fire/life safety: REQUIRE emergency response team training, first aid/CPR certification
+        - Based on [COMPONENT_PLACEHOLDER]: Add specific system expertise (chiller specialist, UPS technician, generator mechanic)
+        
+        OUTPUT FORMAT: Generate as clean HTML bullet list with REQUIRED (not suggested) qualifications:
+        <ul>
+        <li><strong>Minimum Certification:</strong> [Specific CET level based on inputs]</li>
+        <li><strong>Manufacturer Requirement:</strong> [Specific to MANUFACTURER_PLACEHOLDER]</li>
+        <li><strong>Emergency Response:</strong> [Based on EMERGENCY_TYPE_PLACEHOLDER severity]</li>
+        <li><strong>Safety Certifications:</strong> [Based on electrical/mechanical/refrigerant hazards]</li>
+        <li><strong>Experience Level:</strong> [Years based on LOR and complexity]</li>
+        </ul>
+        DO NOT use placeholders - generate actual requirements based on the emergency criticality</td>
     </tr>
     <tr>
         <td>Immediate notifications required:</td>
-        <td>PLACEHOLDER: AI must generate IMMEDIATE emergency notifications required based on equipment type [COMPONENT_PLACEHOLDER] and emergency type [EMERGENCY_TYPE_PLACEHOLDER]. These are IMMEDIATE notifications during an emergency, not advance notifications. Include who must be notified immediately upon emergency detection (operations team, facilities manager, customer representatives, etc.). FORMAT AS CLEAN HTML: Use ul and li tags for bullet points. Use strong tags for emphasis. DO NOT output markdown asterisks. Keep the same bullet point format as used in MOP/SOP.</td>
+        <td>CRITICAL AI INSTRUCTION - DETERMINE IMMEDIATE NOTIFICATIONS BASED ON EMERGENCY ANALYSIS:
+        ANALYZE THESE CRITICAL INPUTS:
+        1. Level of Risk (LOR): [RISK_LEVEL_PLACEHOLDER] - Higher LOR = more stakeholders must be notified
+        2. CET Level Required: [CET_LEVEL_PLACEHOLDER] - Higher CET = technical escalation required
+        3. Equipment Criticality: [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] on [COMPONENT_PLACEHOLDER]
+        4. Emergency Type: [EMERGENCY_TYPE_PLACEHOLDER] - Determines urgency and scope of notifications
+        5. System Impact: [SYSTEM_PLACEHOLDER] - Identifies affected systems and dependencies
+        
+        INTELLIGENT NOTIFICATION DETERMINATION RULES:
+        FOR LOR 4 (CRITICAL) EMERGENCIES:
+        - IMMEDIATELY notify: Site Director, Operations Manager, Customer Emergency Contact
+        - IMMEDIATELY notify: Manufacturer 24/7 support for [MANUFACTURER_PLACEHOLDER]
+        - IMMEDIATELY notify: All affected tenant representatives if multi-tenant facility
+        - IMMEDIATELY page: On-call CET-4 certified technician
+        
+        FOR LOR 3 (HIGH) EMERGENCIES:
+        - IMMEDIATELY notify: Facilities Manager, Shift Supervisor
+        - IMMEDIATELY notify: Customer technical contact
+        - IMMEDIATELY page: On-call CET-3 technician with [COMPONENT_PLACEHOLDER] expertise
+        
+        FOR SPECIFIC EMERGENCY TYPES:
+        - Power/Electrical failures: Notify utility emergency desk, electrical contractor on-call
+        - Cooling failures on [COMPONENT_PLACEHOLDER]: Notify mechanical contractor, adjacent zone managers
+        - Fire/Smoke: Call 911 FIRST, then notify all building occupants, fire marshal
+        - Refrigerant leak: Notify HAZMAT team, evacuate affected areas, EPA reporting if >50 lbs
+        - Generator failure: Notify fuel supplier, generator service contractor
+        - UPS failure: Notify all critical load customers within 5 minutes
+        
+        BASED ON [MANUFACTURER_PLACEHOLDER] EQUIPMENT:
+        - Include manufacturer's emergency support line with contract number
+        - Notify certified [MANUFACTURER_PLACEHOLDER] service partner in region
+        
+        OUTPUT FORMAT - Generate prioritized notification list as HTML:
+        <ul>
+        <li><strong>Priority 1 (0-5 minutes):</strong> [Most critical notifications based on emergency type]</li>
+        <li><strong>Priority 2 (5-15 minutes):</strong> [Secondary stakeholders based on LOR]</li>
+        <li><strong>Priority 3 (15-30 minutes):</strong> [Support and documentation contacts]</li>
+        <li><strong>Manufacturer Support:</strong> [Specific [MANUFACTURER_PLACEHOLDER] emergency line]</li>
+        <li><strong>Escalation Path:</strong> [Based on CET level and equipment criticality]</li>
+        </ul>
+        Generate ACTUAL REQUIRED notifications - not generic suggestions</td>
     </tr>
     <tr>
         <td>Post notifications required:</td>
-        <td>PLACEHOLDER: AI must research and explain based on equipment type [COMPONENT_PLACEHOLDER] and emergency type [EMERGENCY_TYPE_PLACEHOLDER]. FORMAT AS CLEAN HTML: Use ul and li tags if listing multiple items. Use strong tags for emphasis. DO NOT output markdown asterisks</td>
+        <td>CRITICAL AI INSTRUCTION - DETERMINE POST-EMERGENCY NOTIFICATIONS BASED ON RESOLUTION:
+        ANALYZE EMERGENCY RESOLUTION CONTEXT:
+        1. Level of Risk (LOR): [RISK_LEVEL_PLACEHOLDER] - Determines follow-up reporting requirements
+        2. CET Level: [CET_LEVEL_PLACEHOLDER] - Identifies technical review requirements
+        3. Equipment: [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER] - Warranty and service contract notifications
+        4. Emergency Type Resolved: [EMERGENCY_TYPE_PLACEHOLDER] - Determines regulatory reporting
+        5. Component Affected: [COMPONENT_PLACEHOLDER] - System restoration confirmations needed
+        
+        INTELLIGENT POST-NOTIFICATION RULES BASED ON EMERGENCY RESOLUTION:
+        
+        FOR LOR 4 (CRITICAL) RESOLUTION:
+        - NOTIFY within 1 hour: Executive team with incident summary and restoration confirmation
+        - NOTIFY within 2 hours: All affected customers with RFO (Reason for Outage) preliminary report
+        - NOTIFY within 4 hours: Insurance carrier if equipment damage occurred
+        - DOCUMENT within 24 hours: Full incident report for compliance records
+        
+        FOR LOR 3 (HIGH) RESOLUTION:
+        - NOTIFY within 2 hours: Operations Manager with restoration details
+        - NOTIFY within 4 hours: Customer technical contacts with service restoration confirmation
+        - UPDATE within 8 hours: CMMS system with work completed and parts used
+        
+        BASED ON EMERGENCY TYPE RESOLVED:
+        - Power restoration: Confirm with all affected tenants, update power quality logs
+        - Cooling restored: Verify temperature normalization with affected zones, trend data review
+        - Fire/Smoke cleared: Fire marshal final report, insurance documentation, air quality confirmation
+        - Refrigerant leak sealed: EPA reporting if required, environmental compliance documentation
+        - Generator restored: Update run-time logs, schedule follow-up load bank test
+        - UPS restored: Battery analysis report, runtime verification, bypass cleared confirmation
+        
+        FOR [MANUFACTURER_PLACEHOLDER] EQUIPMENT:
+        - Submit warranty claim if applicable for [MODEL_PLACEHOLDER]
+        - Update [MANUFACTURER_PLACEHOLDER] service portal with incident details
+        - Schedule follow-up inspection per manufacturer requirements
+        - Order replacement parts for emergency stock based on what was used
+        
+        REGULATORY/COMPLIANCE NOTIFICATIONS:
+        - Environmental: EPA notification for refrigerant loss >50 lbs within 24 hours
+        - Safety: OSHA reporting if injury occurred within 8 hours
+        - Utility: Coordinate with utility for power quality report if utility-caused
+        - Building: Update building management system logs and emergency response records
+        
+        OUTPUT FORMAT - Generate time-based post-notification requirements as HTML:
+        <ul>
+        <li><strong>Immediate (within 1 hour):</strong> [Critical stakeholder confirmations based on LOR]</li>
+        <li><strong>Short-term (1-4 hours):</strong> [Customer and management notifications]</li>
+        <li><strong>Documentation (4-24 hours):</strong> [Reports and regulatory filings based on emergency type]</li>
+        <li><strong>Follow-up (24-72 hours):</strong> [Manufacturer reporting, parts ordering, preventive actions]</li>
+        <li><strong>Compliance Requirements:</strong> [Specific regulatory notifications if applicable]</li>
+        </ul>
+        Generate SPECIFIC post-emergency requirements based on the criticality and type of emergency resolved</td>
     </tr>
 </table>
 
