@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/api/generate-mop-ai/route.js": {
+      "maxDuration": 300
+    }
+  }
+}
