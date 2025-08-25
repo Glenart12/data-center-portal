@@ -334,6 +334,14 @@ CRITICAL AI INSTRUCTIONS FOR DYNAMIC DIAGNOSTIC GENERATION:
    For GENERATORS that won't start: Check starting battery voltage, fuel pressure, control panel, safety shutdowns, transfer switch position, THEN LOTO for starter motor inspection
    For PUMPS with bearing failure: Check vibration readings, motor amps, temperature, THEN LOTO, then inspect bearings, shaft alignment, coupling
    For BMS communication loss: Check network connectivity, protocol settings, addressing - NO LOTO NEEDED
+
+7. CRITICAL EQUIPMENT NAMING CONVENTION:
+   DO NOT generate fake equipment identifiers or numbers:
+   - DO NOT create identifiers like (PMP-CW-1), MCC-CH-1, CT-1, CHILLER-1, GEN-1, UPS-A, etc.
+   - Instead use generic descriptions: "condenser water pump", "upstream breaker", "cooling tower", "supply fan"
+   - Reference the main equipment as "the [MANUFACTURER_PLACEHOLDER] [equipment type]" (e.g., "the Carrier chiller", "the Cummins generator")
+   - If specific equipment designation is needed, use: "[Equipment ID to be verified on-site]"
+   - For components, use descriptive names: "main control board", "compressor motor", "discharge pressure sensor"
    
 <table>
 <tr>
@@ -442,6 +450,15 @@ CRITICAL AI INSTRUCTIONS FOR DYNAMIC EXTERNAL EQUIPMENT ANALYSIS:
    - What specific failure mode it could cause
    - How it connects to the main equipment
    - What to verify to rule it out as the cause
+
+6. CRITICAL EQUIPMENT NAMING CONVENTION:
+   DO NOT generate fake equipment identifiers or numbers:
+   - DO NOT create identifiers like (PMP-CW-1), MCC-CH-1, CT-1, CHILLER-1, ATS-A, PDU-2B, etc.
+   - Instead use generic descriptions: "condenser water pump", "cooling tower fan", "upstream breaker", "distribution panel"
+   - Reference the main equipment as "the [MANUFACTURER_PLACEHOLDER] [equipment type]" (e.g., "the Trane chiller", "the Liebert UPS")
+   - For external equipment, use descriptive names: "main distribution panel", "automatic transfer switch", "building management system"
+   - If specific equipment designation is needed, use: "[Equipment ID to be verified on-site]"
+   - DO NOT use made-up designations like CHILLER-1, GEN-SET-A, UPS-B, PDU-1, etc.
 
 <table>
 <tr>
