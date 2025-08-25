@@ -524,7 +524,6 @@ EMERGENCY-SPECIFIC SAFETY OVERRIDES:
 - If [EMERGENCY_TYPE_PLACEHOLDER] includes "flood": Secure all power before entering area
 
 GENERATE ACTUAL MANUFACTURER-SPECIFIC PROCEDURES - Not generic safety steps
-</ul>
 
 <div style="background: #dc3545; color: white; padding: 10px; margin: 10px 0; font-weight: bold; text-align: center;">
 DO NOT PROCEED until all safety requirements are verified for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]
@@ -1372,14 +1371,40 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     console.log('Found hardcoded power references:', powerMatches ? powerMatches.length : 0, powerMatches || 'None');
     console.log('=== END AI PROMPT DEBUG ===');
 
-    // Generate content using Gemini
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-pro'
-    });
-    
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let generatedContent = response.text();
+    // Generate content using Gemini with error handling
+    let generatedContent = '';
+    try {
+      console.log('Initializing Gemini model...');
+      const model = genAI.getGenerativeModel({ 
+        model: 'gemini-2.5-pro'
+      });
+      
+      console.log('Calling Gemini API...');
+      const result = await model.generateContent(prompt);
+      
+      console.log('Getting response from Gemini...');
+      const response = await result.response;
+      
+      console.log('Extracting text from response...');
+      generatedContent = response.text();
+      
+      if (!generatedContent) {
+        throw new Error('Gemini returned empty content');
+      }
+      
+      console.log('Gemini generation successful, content length:', generatedContent.length);
+      
+    } catch (geminiError) {
+      console.error('=== GEMINI API ERROR ===');
+      console.error('Error during Gemini generation:', geminiError);
+      console.error('Error name:', geminiError.name);
+      console.error('Error message:', geminiError.message);
+      if (geminiError.response) {
+        console.error('Gemini response:', geminiError.response);
+      }
+      console.error('=== END GEMINI ERROR ===');
+      throw geminiError; // Re-throw to be caught by outer try-catch
+    }
     
     // Debug logging for AI response
     console.log('=== AI RESPONSE DEBUG ===');
@@ -1492,27 +1517,60 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     });
     
   } catch (error) {
-    console.error('EOP generation error:', error);
+    // Enhanced error logging
+    console.error('=== EOP GENERATION ERROR ===');
+    console.error('Error Type:', error.name);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
+    
+    // Log specific details if available
+    if (error.response) {
+      console.error('Error Response:', error.response);
+    }
+    if (error.status) {
+      console.error('Error Status:', error.status);
+    }
+    
+    // Log the last known state
+    console.error('Last Known Equipment:', formData?.manufacturer, formData?.modelNumber);
+    console.error('Last Known Emergency Type:', formData?.workDescription);
+    console.error('=== END ERROR LOG ===');
     
     // Handle specific error types
     if (error.message?.includes('429') || error.message?.includes('quota')) {
       return NextResponse.json({ 
         error: 'AI service is busy',
-        userMessage: 'The AI service is currently busy. Please wait 2-3 minutes and try again.'
+        userMessage: 'The AI service is currently busy. Please wait 2-3 minutes and try again.',
+        details: error.message
       }, { status: 429 });
     }
     
     if (error.message?.includes('API key') || error.message?.includes('API_KEY')) {
       return NextResponse.json({ 
         error: 'Configuration error',
-        userMessage: 'AI service is not properly configured. Please contact support.'
+        userMessage: 'AI service is not properly configured. Please contact support.',
+        details: error.message
       }, { status: 500 });
     }
     
+    // Check for Gemini-specific errors
+    if (error.message?.includes('Gemini') || error.message?.includes('generate')) {
+      return NextResponse.json({ 
+        error: 'AI generation failed',
+        userMessage: 'The AI model encountered an error generating the EOP. Please try again.',
+        details: error.message,
+        equipment: `${formData?.manufacturer} ${formData?.modelNumber}`,
+        emergency: formData?.workDescription
+      }, { status: 500 });
+    }
+    
+    // Default error response with more details
     return NextResponse.json({ 
       error: 'Failed to generate EOP',
       details: error.message || error.toString() || 'Unknown error',
-      userMessage: 'Unable to generate EOP. Please try again.'
+      userMessage: 'Unable to generate EOP. Please check the server logs for details.',
+      equipment: `${formData?.manufacturer} ${formData?.modelNumber}`,
+      emergency: formData?.workDescription
     }, { status: 500 });
   }
 }
