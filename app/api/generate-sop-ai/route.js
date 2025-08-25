@@ -654,6 +654,21 @@ Create a professional approval table matching the following format:
 
 Include approval requirements section and effective/expiration dates
 
+<div style="margin-top: 20px;">
+    <table style="width: 100%; margin-top: 20px;">
+        <tr>
+            <td style="width: 50%; padding: 10px;">
+                <strong>SOP Effective Date:</strong><br>
+                <input type="text" style="width:150px" placeholder="MM/DD/YYYY" />
+            </td>
+            <td style="width: 50%; padding: 10px;">
+                <strong>SOP Expiration Date:</strong><br>
+                <input type="text" style="width:150px" placeholder="MM/DD/YYYY" />
+            </td>
+        </tr>
+    </table>
+</div>
+
 Section 10: SOP Comments
 Include:
 - Relevant comments for the specific equipment and procedure
