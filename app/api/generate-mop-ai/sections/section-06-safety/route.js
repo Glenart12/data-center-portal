@@ -510,30 +510,159 @@ ${eopSection}
         </tr>
     </thead>
     <tbody>
+        ${(() => {
+            // Build safety procedures based on SPECIFIC equipment type and maintenance task
+            // Use existing variables already declared above
+            let safetyRows = '';
+            
+            // Pre-Work Safety Briefing - ALWAYS required
+            safetyRows += `
         <tr>
             <td><strong>Pre-Work Safety Briefing</strong></td>
-            <td>Conduct safety briefing with all personnel, review hazards, verify PPE</td>
+            <td>Conduct safety briefing with all personnel, review hazards specific to ${simplifiedEquipmentName} maintenance, verify PPE</td>
             <td><input type="text" class="small-input" /></td>
             <td><input type="text" class="small-input" /></td>
-        </tr>
+        </tr>`;
+            
+            // LOTO - Required for ALL equipment with electrical or mechanical energy
+            safetyRows += `
         <tr>
             <td><strong>Lockout/Tagout (LOTO)</strong></td>
-            <td>Follow site LOTO procedure per <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147" target="_blank">OSHA 29 CFR 1910.147</a> - The Control of Hazardous Energy</td>
+            <td>Follow site LOTO procedure per <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147" target="_blank">OSHA 29 CFR 1910.147</a> for ${componentType} isolation</td>
             <td><input type="text" class="small-input" /></td>
             <td><input type="text" class="small-input" /></td>
-        </tr>
+        </tr>`;
+            
+            // Arc Flash Boundaries - ONLY for electrical equipment work
+            if (isElectricalEquipment || (isElectricalWork && equipType.includes('panel'))) {
+                safetyRows += `
         <tr>
-            <td><strong>Confined Space Entry</strong></td>
-            <td>If applicable, follow permit-required confined space procedures</td>
+            <td><strong>Arc Flash Boundary</strong></td>
+            <td>Establish arc flash boundary per NFPA 70E and site arc flash study for ${componentType}</td>
             <td><input type="text" class="small-input" /></td>
             <td><input type="text" class="small-input" /></td>
-        </tr>
+        </tr>`;
+            }
+            
+            // Electrical Safety - ONLY for electrical work
+            if (isElectricalWork || isElectricalEquipment) {
+                safetyRows += `
+        <tr>
+            <td><strong>Electrical Safety Verification</strong></td>
+            <td>Verify zero energy state with meter, test meter on known source before and after</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Refrigerant Handling - ONLY for cooling equipment with refrigerant work
+            if (isCoolingEquipment && (workDesc.includes('refrigerant') || workDesc.includes('recharge') || workDesc.includes('leak'))) {
+                safetyRows += `
+        <tr>
+            <td><strong>Refrigerant Handling</strong></td>
+            <td>EPA 608 certified technician required, follow refrigerant recovery procedures for ${manufacturer} ${componentType}</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Chemical Safety - ONLY if chemicals are involved
+            if (isChemicalWork || workDesc.includes('chemical') || workDesc.includes('cleaning')) {
+                safetyRows += `
+        <tr>
+            <td><strong>Chemical Safety</strong></td>
+            <td>Review MSDS for all chemicals, ensure proper ventilation and PPE for ${workDesc.includes('refrigerant') ? 'refrigerant' : 'chemical'} exposure</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Hot Work Permit - ONLY if welding/cutting/grinding is required
+            if (workDesc.includes('weld') || workDesc.includes('cut') || workDesc.includes('grind') || workDesc.includes('torch')) {
+                safetyRows += `
         <tr>
             <td><strong>Hot Work Permit</strong></td>
-            <td>Required for any welding, cutting, or grinding operations</td>
+            <td>Required for welding, cutting, or grinding operations on ${componentType}</td>
             <td><input type="text" class="small-input" /></td>
             <td><input type="text" class="small-input" /></td>
-        </tr>
+        </tr>`;
+            }
+            
+            // Confined Space - ONLY if work involves confined spaces
+            if (workDesc.includes('confined') || workDesc.includes('tank') || workDesc.includes('vessel') || 
+                equipType.includes('tank') || equipType.includes('vessel')) {
+                safetyRows += `
+        <tr>
+            <td><strong>Confined Space Entry</strong></td>
+            <td>Follow permit-required confined space procedures for ${componentType} entry</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Fall Protection - ONLY if elevated work is required
+            if (workDesc.includes('roof') || workDesc.includes('ladder') || workDesc.includes('elevated') || 
+                workDesc.includes('lift') || location?.toLowerCase().includes('roof')) {
+                safetyRows += `
+        <tr>
+            <td><strong>Fall Protection</strong></td>
+            <td>Required for work above 6 feet, use proper fall arrest system for ${componentType} access</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Fuel Handling - ONLY for generators/engines
+            if (isMechanicalEquipment && (equipType.includes('generator') || equipType.includes('engine'))) {
+                if (workDesc.includes('fuel') || workDesc.includes('tank') || workDesc.includes('diesel')) {
+                    safetyRows += `
+        <tr>
+            <td><strong>Fuel System Safety</strong></td>
+            <td>Ensure proper ventilation, no ignition sources, spill kit available for ${componentType} fuel system work</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+                }
+            }
+            
+            // Battery Safety - ONLY for UPS/battery work
+            if (isPowerEquipment && (equipType.includes('battery') || equipType.includes('ups'))) {
+                safetyRows += `
+        <tr>
+            <td><strong>Battery Safety</strong></td>
+            <td>Ensure proper ventilation, acid spill kit available, use insulated tools for ${componentType} battery work</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Noise Control - ONLY for loud equipment when running
+            if ((isMechanicalEquipment || equipType.includes('compressor')) && 
+                (workDesc.includes('running') || workDesc.includes('operational') || workDesc.includes('test'))) {
+                safetyRows += `
+        <tr>
+            <td><strong>Noise Control</strong></td>
+            <td>Hearing protection required when ${componentType} is running (>85 dBA)</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+            }
+            
+            // Hot Surface Warning - ONLY for equipment with hot surfaces
+            if (isMechanicalEquipment || isCoolingEquipment) {
+                if (workDesc.includes('operational') || workDesc.includes('running') || !workDesc.includes('offline')) {
+                    safetyRows += `
+        <tr>
+            <td><strong>Hot Surface Warning</strong></td>
+            <td>Allow ${componentType} to cool before service, use thermal protection if required</td>
+            <td><input type="text" class="small-input" /></td>
+            <td><input type="text" class="small-input" /></td>
+        </tr>`;
+                }
+            }
+            
+            return safetyRows;
+        })()}
     </tbody>
 </table>
 
