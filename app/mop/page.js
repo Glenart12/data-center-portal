@@ -233,25 +233,14 @@ function MopPage() {
   const abbreviateWork = (work) => {
     if (!work) return work;
     
-    // Map full descriptions to abbreviated versions
-    const abbreviations = {
-      'Weekly Preventative Maintenance': 'Weekly PM',
-      'Monthly Preventative Maintenance': 'Monthly PM',
-      'Quarterly Preventative Maintenance': 'Quarterly PM',
-      'Semi Annual Preventative Maintenance': 'Semi-Annual PM',
-      'Annual Preventative Maintenance': 'Annual PM',
-      'Preventative Maintenance': 'PM'
-    };
+    // Simply replace "Preventative Maintenance" with "PM" while preserving everything else
+    // This handles all cases including: Weekly, Monthly, Quarterly, Semi Annual, Annual, etc.
+    let abbreviated = work.replace(/Preventative\s+Maintenance/gi, 'PM');
     
-    // Check if the work description matches any of our patterns (case-insensitive)
-    for (const [full, abbrev] of Object.entries(abbreviations)) {
-      if (work.toLowerCase() === full.toLowerCase()) {
-        return abbrev;
-      }
-    }
+    // Special case: fix "Semi Annual" to "Semi-Annual" for consistency
+    abbreviated = abbreviated.replace(/Semi Annual PM/i, 'Semi-Annual PM');
     
-    // If no exact match, try replacing "Preventative Maintenance" with "PM"
-    return work.replace(/Preventative Maintenance/i, 'PM');
+    return abbreviated;
   };
 
   return (
