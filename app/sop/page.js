@@ -528,13 +528,16 @@ function SopPage() {
                   <span style={{ fontSize: '32px', color: '#ffa500' }}>📋</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                      Component: {parsedInfo.componentType}
+                      <span style={{ fontWeight: 'bold' }}>Component:</span> {parsedInfo.componentType}
                     </div>
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                      Work: {parsedInfo.workDescription}
+                      <span style={{ fontWeight: 'bold' }}>Work:</span> {parsedInfo.workDescription}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                      <span style={{ fontWeight: 'bold' }}>Date:</span> {parsedInfo.date}
                     </div>
                     <div style={{ fontSize: '14px', color: '#666' }}>
-                      Date: {parsedInfo.date}
+                      <span style={{ fontWeight: 'bold' }}>Equipment Number:</span> {parsedInfo.equipmentId}
                     </div>
                   </div>
                 </div>
