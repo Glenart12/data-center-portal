@@ -421,10 +421,13 @@ export async function compileMOP(formData) {
       .replace(/[^A-Z0-9_]/g, ''); // Use full description with underscores
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
-    // Get the next version number based on equipment number and date
+    // Get the next version number based on all matching criteria
     const version = getNextVersion(
       existingFiles.blobs,
       equipmentId,
+      componentTypeForFilename,
+      manufacturer,
+      workDesc,
       currentDate
     );
     
