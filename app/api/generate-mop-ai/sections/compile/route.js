@@ -401,22 +401,29 @@ export async function compileMOP(formData) {
     const existingFiles = await list({ prefix: 'mops/' });
     
     // Extract work description from form data
-    const workDescription = formData.workDescription || formData.category || formData.system || 'MAINTENANCE';
+    const workDescription = formData.workDescription || formData.description || formData.category || formData.system || 'MAINTENANCE';
     
-    // Generate filename components
-    const cleanEquipmentNumber = sanitizeForFilename(formData.equipmentNumber || '');
-    const taskDescription = `${formData.category || ''} ${workDescription}`;
-    const cleanTask = abbreviateTask(taskDescription);
+    // Generate filename components according to new format
+    // TYPE_EQUIP_ID_MANUFACTURER_WORK_DESC_DATE_VERSION
+    const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens (GEN-3 → GEN3)
+    const manufacturer = (formData.manufacturer || 'UNKNOWN')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .substring(0, 10); // Max 10 chars, alphanumeric only
+    const workDesc = workDescription
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, ''); // Replace spaces with underscores
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
     // Get the next version number based on equipment number and date
     const version = getNextVersion(
       existingFiles.blobs,
-      cleanEquipmentNumber,
+      equipmentId,
       currentDate
     );
     
-    const filename = `MOP_${cleanEquipmentNumber}_${cleanTask}_${currentDate}_V${version}.html`;
+    const filename = `MOP_${equipmentId}_${manufacturer}_${workDesc}_${currentDate}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`mops/${filename}`, completeHtml, {

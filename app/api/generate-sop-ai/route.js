@@ -968,13 +968,18 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .replace('__SOP_TITLE__', sopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
-    // Generate filename
+    // Generate filename using new format: TYPE_EQUIP_ID_MANUFACTURER_WORK_DESC_DATE_VERSION
     const date = new Date().toISOString().split('T')[0];
-    const timestamp = Date.now();
-    const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-    const safeProcedure = formData.procedureType.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-    const filename = `SOP_${safeManufacturer}_${safeModel}_${safeProcedure}_${date}_${timestamp}.html`;
+    const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
+    const manufacturer = (formData.manufacturer || 'UNKNOWN')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .substring(0, 10); // Max 10 chars, alphanumeric only
+    const workDesc = (formData.procedureType || 'PROCEDURE')
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, ''); // Replace spaces with underscores
+    const filename = `SOP_${equipmentId}_${manufacturer}_${workDesc}_${date}_V1.html`;
 
     // Save to blob storage
     const blob = await put(`sops/${filename}`, completeHtml, {

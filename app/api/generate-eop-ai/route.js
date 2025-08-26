@@ -1811,64 +1811,19 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .replace('__EOP_TITLE__', eopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
-    // Extract EOP Identifier from generated content for filename
+    // Generate filename using new format: TYPE_EQUIP_ID_MANUFACTURER_WORK_DESC_DATE_VERSION
     let filename = '';
-    try {
-      // Try multiple regex patterns to extract EOP Identifier
-      const identifierPatterns = [
-        // Specific pattern for <b> or <strong> tags
-        /EOP Identifier:<\/(?:b|strong|span)>\s*([A-Z0-9\-_]+)/i,
-        // Broader pattern for any HTML tags after EOP Identifier:
-        /EOP Identifier:.*?>\s*([A-Z0-9\-_]+)/i,
-        // Even broader pattern that handles multiple tags and whitespace
-        /EOP Identifier:[^>]*>.*?([A-Z0-9\-_]{3,})/i,
-        // Simple pattern without HTML tags
-        /EOP Identifier:\s*([A-Z0-9\-_]+)/i
-      ];
-      
-      let eopIdentifier = '';
-      let matchedPattern = -1;
-      
-      for (let i = 0; i < identifierPatterns.length; i++) {
-        const identifierMatch = completeHtml.match(identifierPatterns[i]);
-        if (identifierMatch && identifierMatch[1] && identifierMatch[1].trim().length >= 3) {
-          eopIdentifier = identifierMatch[1].trim();
-          matchedPattern = i;
-          break;
-        }
-      }
-      
-      if (eopIdentifier) {
-        console.log(`Extracted EOP Identifier using pattern ${matchedPattern}:`, eopIdentifier);
-        
-        // Sanitize the identifier to remove invalid filename characters
-        const sanitizedIdentifier = eopIdentifier
-          .replace(/[<>:"/\\|?*]/g, '_')  // Replace invalid Windows filename characters
-          .replace(/\s+/g, '_')          // Replace spaces with underscores
-          .replace(/[^\w\-_.]/g, '')     // Keep only alphanumeric, dash, underscore, dot
-          .replace(/_{2,}/g, '_')        // Replace multiple underscores with single
-          .trim();
-        
-        filename = `${sanitizedIdentifier}.html`;
-      } else {
-        // Fallback to current naming convention
-        const date = new Date().toISOString().split('T')[0];
-        const timestamp = Date.now();
-        const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-        const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-        filename = `EOP_${safeManufacturer}_${safeModel}_${date}_${timestamp}.html`;
-        console.log('No EOP Identifier found, using current naming convention:', filename);
-      }
-    } catch (parseError) {
-      console.error('Error parsing EOP Identifier:', parseError);
-      // Fallback to current naming convention
-      const date = new Date().toISOString().split('T')[0];
-      const timestamp = Date.now();
-      const safeManufacturer = formData.manufacturer.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 20);
-      const safeModel = formData.modelNumber.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 15);
-      filename = `EOP_${safeManufacturer}_${safeModel}_${date}_${timestamp}.html`;
-      console.log('Error extracting identifier, using current naming convention:', filename);
-    }
+    const date = new Date().toISOString().split('T')[0];
+    const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
+    const manufacturer = (formData.manufacturer || 'UNKNOWN')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .substring(0, 10); // Max 10 chars, alphanumeric only
+    const workDesc = (formData.category || 'EMERGENCY')
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, ''); // Replace spaces with underscores
+    filename = `EOP_${equipmentId}_${manufacturer}_${workDesc}_${date}_V1.html`;
 
     // Save to blob storage
     console.log('Attempting to save to blob storage with filename:', filename);

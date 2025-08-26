@@ -6,6 +6,7 @@ import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import SOPGenerationModal from '../components/SOPGenerationModal';
 import HiddenFilesModal from '../components/HiddenFilesModal';
+import { parseFilename } from '@/lib/parseFilename';
 
 function SopPage() {
   const [files, setFiles] = useState([]);
@@ -371,7 +372,9 @@ function SopPage() {
               <p style={{ margin: 0, fontSize: '16px' }}>Upload PDFs to get started</p>
             </div>
           ) : (
-            filteredFiles.map((fileData) => (
+            filteredFiles.map((fileData) => {
+              const parsedInfo = parseFilename(fileData.filename);
+              return (
               <div key={fileData.filename} style={{ 
                 border: '1px solid #e0e0e0', 
                 padding: '25px 25px 70px 25px', 
@@ -523,19 +526,17 @@ function SopPage() {
                   paddingRight: '40px' // Make room for delete button
                 }}>
                   <span style={{ fontSize: '32px', color: '#ffa500' }}>📋</span>
-                  <h3 style={{ 
-                    margin: 0, 
-                    fontSize: '18px', 
-                    color: '#333',
-                    lineHeight: '1.4',
-                    flex: 1,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '100%'
-                  }}>
-                    {fileData.filename.replace('.pdf', '').replace('.txt', '').replace('.html', '')}
-                  </h3>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                      Component: {parsedInfo.componentType}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                      Work: {parsedInfo.workDescription}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#666' }}>
+                      Date: {parsedInfo.date}
+                    </div>
+                  </div>
                 </div>
                 
                 <div style={{ 
@@ -617,7 +618,7 @@ function SopPage() {
                   fontSize: '12px',
                   fontWeight: 'bold'
                 }}>
-                  V{extractVersion(fileData.filename)}
+                  {parsedInfo.version}
                 </div>
 
                 {/* File Type Badge */}
@@ -635,7 +636,8 @@ function SopPage() {
                   {getFileTypeLabel(fileData.filename)}
                 </div>
               </div>
-            ))
+            );
+            })
           )}
         </div>
         

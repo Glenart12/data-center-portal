@@ -7,6 +7,7 @@ import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import EOPGenerationModal from '../components/EOPGenerationModal';
 import HiddenFilesModal from '../components/HiddenFilesModal';
 import { extractEOPMetadata, groupEOPsByEquipment } from '@/lib/eop-version-manager';
+import { parseFilename } from '@/lib/parseFilename';
 
 function EopPage() {
   const [files, setFiles] = useState([]);
@@ -400,7 +401,7 @@ function EopPage() {
             filteredFiles.map((filename) => {
               const fileData = filesData[filename];
               const downloadUrl = fileData?.url || `/eops/${filename}`;
-              const displayName = filename.replace('.pdf', '').replace('.txt', '').replace('.html', '');
+              const parsedInfo = parseFilename(filename);
               
               // Extract version information
               const metadata = extractEOPMetadata(filename);
@@ -559,31 +560,15 @@ function EopPage() {
                   }}>
                     <span style={{ fontSize: '32px', color: '#dc3545', flexShrink: 0 }}>🚨</span>
                     <div style={{ flex: 1 }}>
-                      <h3 style={{ 
-                        margin: 0, 
-                        fontSize: '18px', 
-                        color: '#333',
-                        lineHeight: '1.4',
-                        overflow: 'hidden',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        wordBreak: 'break-word'
-                      }}
-                      title={displayName} // Show full name on hover
-                      >
-                        {displayName}
-                      </h3>
-                      {metadata.manufacturer && metadata.emergencyType && (
-                        <p style={{
-                          margin: '5px 0 0 0',
-                          fontSize: '13px',
-                          color: '#666',
-                          fontStyle: 'italic'
-                        }}>
-                          {metadata.manufacturer} {metadata.model} - {metadata.emergencyType.replace(/_/g, ' ')}
-                        </p>
-                      )}
+                      <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                        Component: {parsedInfo.componentType}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                        Work: {parsedInfo.workDescription}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#666' }}>
+                        Date: {parsedInfo.date}
+                      </div>
                     </div>
                   </div>
                   
@@ -655,21 +640,19 @@ function EopPage() {
                   </div>
 
                   {/* Version Badge */}
-                  {versionDisplay && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '30px',
-                      left: '15px',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
-                      padding: '4px 10px',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      fontWeight: 'bold'
-                    }}>
-                      {versionDisplay}
-                    </div>
-                  )}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '30px',
+                    left: '15px',
+                    backgroundColor: '#dc3545',
+                    color: 'white',
+                    padding: '4px 10px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    {parsedInfo.version}
+                  </div>
 
                   {/* File Type Badge */}
                   <div style={{

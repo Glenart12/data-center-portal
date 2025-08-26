@@ -6,6 +6,7 @@ import UploadButton from '../components/UploadButton';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import MOPGenerationModal from '../components/MOPGenerationModal';
 import HiddenFilesModal from '../components/HiddenFilesModal';
+import { parseFilename } from '@/lib/parseFilename';
 
 function MopPage() {
   const [files, setFiles] = useState([]);
@@ -405,7 +406,7 @@ function MopPage() {
             filteredFiles.map((filename) => {
               const fileData = filesData[filename];
               const downloadUrl = fileData?.url || `/mops/${filename}`;
-              const displayName = filename.replace('.pdf', '').replace('.txt', '').replace('.html', '');
+              const parsedInfo = parseFilename(filename);
               
               return (
                 <div key={filename} style={{ 
@@ -559,22 +560,17 @@ function MopPage() {
                     paddingRight: '40px' // Make room for delete button
                   }}>
                     <span style={{ fontSize: '32px', color: '#0f3456', flexShrink: 0 }}>⚙️</span>
-                    <h3 style={{ 
-                      margin: 0, 
-                      fontSize: '18px', 
-                      color: '#333',
-                      lineHeight: '1.4',
-                      flex: 1,
-                      overflow: 'hidden',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      wordBreak: 'break-word'
-                    }}
-                    title={displayName} // Show full name on hover
-                    >
-                      {displayName}
-                    </h3>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                        Component: {parsedInfo.componentType}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
+                        Work: {parsedInfo.workDescription}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#666' }}>
+                        Date: {parsedInfo.date}
+                      </div>
+                    </div>
                   </div>
                   
                   <div style={{ 
@@ -656,7 +652,7 @@ function MopPage() {
                     fontSize: '12px',
                     fontWeight: 'bold'
                   }}>
-                    V{extractVersion(filename)}
+                    {parsedInfo.version}
                   </div>
 
                   {/* File Type Badge */}
