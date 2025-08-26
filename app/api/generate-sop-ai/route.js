@@ -972,7 +972,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
     const date = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
-    const componentType = (formData.componentType || formData.system || 'EQUIPMENT')
+    const componentTypeForFilename = (formData.componentType || formData.system || 'EQUIPMENT')
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use full component type with underscores
@@ -984,7 +984,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use full procedure type with underscores
-    const filename = `SOP_${equipmentId}_${componentType}_${manufacturer}_${workDesc}_${date}_V1.html`;
+    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}_${workDesc}_${date}_V1.html`;
 
     // Save to blob storage
     const blob = await put(`sops/${filename}`, completeHtml, {
