@@ -229,6 +229,31 @@ function MopPage() {
     return match ? match[1] : '1';
   };
 
+  // Function to abbreviate work descriptions for display
+  const abbreviateWork = (work) => {
+    if (!work) return work;
+    
+    // Map full descriptions to abbreviated versions
+    const abbreviations = {
+      'Weekly Preventative Maintenance': 'Weekly PM',
+      'Monthly Preventative Maintenance': 'Monthly PM',
+      'Quarterly Preventative Maintenance': 'Quarterly PM',
+      'Semi Annual Preventative Maintenance': 'Semi-Annual PM',
+      'Annual Preventative Maintenance': 'Annual PM',
+      'Preventative Maintenance': 'PM'
+    };
+    
+    // Check if the work description matches any of our patterns (case-insensitive)
+    for (const [full, abbrev] of Object.entries(abbreviations)) {
+      if (work.toLowerCase() === full.toLowerCase()) {
+        return abbrev;
+      }
+    }
+    
+    // If no exact match, try replacing "Preventative Maintenance" with "PM"
+    return work.replace(/Preventative Maintenance/i, 'PM');
+  };
+
   return (
     <div style={{
       padding: '40px 20px',
@@ -408,6 +433,18 @@ function MopPage() {
               const downloadUrl = fileData?.url || `/mops/${filename}`;
               const parsedInfo = parseFilename(filename);
               
+              // Clean up component type to remove manufacturer if it's included
+              let cleanComponentType = parsedInfo.componentType;
+              if (cleanComponentType) {
+                // Remove common manufacturer names that might be appended
+                const manufacturers = ['Asco', 'Caterpillar', 'Cat', 'Trane', 'Carrier', 'York', 'Liebert', 'Eaton', 'Schneider', 'GE', 'Generac', 'Cummins', 'Kohler'];
+                for (const mfr of manufacturers) {
+                  // Check if the component type ends with the manufacturer name
+                  const regex = new RegExp(`\\s+${mfr}$`, 'i');
+                  cleanComponentType = cleanComponentType.replace(regex, '');
+                }
+              }
+              
               return (
                 <div key={filename} style={{ 
                   border: '1px solid #e0e0e0', 
@@ -562,10 +599,10 @@ function MopPage() {
                     <span style={{ fontSize: '32px', color: '#0f3456', flexShrink: 0 }}>⚙️</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                        <span style={{ fontWeight: 'bold' }}>Component:</span> {parsedInfo.componentType}
+                        <span style={{ fontWeight: 'bold' }}>Component:</span> {cleanComponentType}
                       </div>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                        <span style={{ fontWeight: 'bold' }}>Work:</span> {parsedInfo.workDescription}
+                        <span style={{ fontWeight: 'bold' }}>Work:</span> {abbreviateWork(parsedInfo.workDescription)}
                       </div>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
                         <span style={{ fontWeight: 'bold' }}>Date:</span> {parsedInfo.date}
