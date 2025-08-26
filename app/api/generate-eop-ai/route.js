@@ -1871,10 +1871,23 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     }
 
     // Save to blob storage
-    const blob = await put(`eops/${filename}`, completeHtml, {
-      access: 'public',
-      contentType: 'text/html'
-    });
+    console.log('Attempting to save to blob storage with filename:', filename);
+    let blob;
+    try {
+      blob = await put(`eops/${filename}`, completeHtml, {
+        access: 'public',
+        contentType: 'text/html'
+      });
+      console.log('Blob storage upload successful, URL:', blob.url);
+    } catch (blobError) {
+      console.error('=== BLOB STORAGE ERROR ===');
+      console.error('Error uploading to blob storage:', blobError);
+      console.error('Blob error message:', blobError.message);
+      console.error('Filename attempted:', filename);
+      console.error('Content length:', completeHtml?.length);
+      console.error('=== END BLOB ERROR ===');
+      throw new Error(`Blob storage upload failed: ${blobError.message || 'Unknown blob error'}`);
+    }
     
     console.log('EOP generation complete:', filename);
     
@@ -1936,10 +1949,10 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     // Default error response with more details
     return NextResponse.json({ 
       error: 'Failed to generate EOP',
-      details: error.message || error.toString() || 'Unknown error',
+      details: error.message || String(error) || 'Unknown error',
       userMessage: 'Unable to generate EOP. Please check the server logs for details.',
-      equipment: `${formData?.manufacturer} ${formData?.modelNumber}`,
-      emergency: formData?.workDescription
+      equipment: formData ? `${formData.manufacturer} ${formData.modelNumber}` : 'Unknown equipment',
+      emergency: formData?.workDescription || 'Unknown emergency'
     }, { status: 500 });
   }
 }
