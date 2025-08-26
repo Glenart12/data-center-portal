@@ -1891,12 +1891,12 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     
     console.log('EOP generation complete:', filename);
     
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       filename: filename,
-      url: blob.url,
+      url: blob.url || blob.downloadUrl || '',
       message: 'EOP generated successfully'
-    });
+    }, { status: 200 });
     
   } catch (error) {
     // Enhanced error logging
