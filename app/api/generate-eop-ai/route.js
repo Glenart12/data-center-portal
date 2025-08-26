@@ -1103,11 +1103,30 @@ Include phone number fields: <input type="text" placeholder="Enter phone" style=
 Include contact name fields: <input type="text" placeholder="Enter contact name" style="width:200px" />
 
 <h3>Emergency Contacts</h3>
+IMPORTANT: Use the site address from Section 02 ([SITE_ADDRESS_PLACEHOLDER]) to intelligently determine local emergency services.
+
 Include a comprehensive Emergency Contacts table with columns: Service Type, Contact Name/Organization, Phone Number, Notes/Address
 
-Include these essential emergency contacts:
-- Police/Fire/EMS Emergency: 911 (combined single row)
-- Electric Utility Emergency: <input type="text" placeholder="Enter utility emergency #" style="width:150px" />
+INTELLIGENT LOCAL SERVICE LOOKUP INSTRUCTIONS:
+1. Parse the site address from [SITE_ADDRESS_PLACEHOLDER] to extract city, state, and zip code
+2. Based on the location, research and provide ACTUAL local emergency services:
+   - Look up the actual local police department (non-emergency number) for that city
+   - Find the actual local fire department (non-emergency number) for that city  
+   - Identify the actual electric utility company serving that zip code:
+     * For Illinois ZIP codes starting with 60-62: Use ComEd (1-800-334-7661) or Ameren (1-800-755-5000) based on specific location
+     * For New York ZIP codes starting with 10-14: Use ConEd (1-800-752-6633) or National Grid (1-800-642-4272) based on borough/county
+     * For California: PG&E (1-800-743-5000) for northern CA, SCE (1-800-655-4555) for southern CA, SDG&E (1-800-411-7343) for San Diego area
+     * For Texas: Oncor (1-888-313-4747), CenterPoint (1-800-332-7143), or AEP Texas (1-866-223-8508) based on region
+     * For other states: Research and provide the actual utility company name and emergency number
+   - Find the nearest hospital emergency room to the site address
+   - Look up local mechanical/electrical contractors that service data centers in that region
+
+Include these essential emergency contacts with intelligent population:
+- Police/Fire/EMS Emergency: 911 (combined single row for immediate emergencies)
+- Local Police (Non-Emergency): [INTELLIGENTLY DETERMINE based on city from site address - provide actual department name and non-emergency number]
+- Local Fire (Non-Emergency): [INTELLIGENTLY DETERMINE based on city from site address - provide actual department name and non-emergency number]  
+- Nearest Hospital/Medical Center: [RESEARCH and provide actual hospital name, address, and phone number closest to site address]
+- Electric Utility Emergency: [INTELLIGENTLY DETERMINE based on zip code - provide actual utility company name and 24/7 emergency number]
 - Equipment Manufacturer Support: INTELLIGENTLY POPULATE based on [MANUFACTURER_PLACEHOLDER]:
   * For Carrier equipment: Suggest "Carrier Commercial Service: 1-800-CARRIER (1-800-227-7437)"
   * For Trane equipment: Suggest "Trane Commercial Service: 1-800-884-2653"
@@ -1117,12 +1136,12 @@ Include these essential emergency contacts:
   * For Caterpillar equipment: Suggest "CAT 24-Hour Support: 1-877-228-3519"
   * For Eaton UPS: Suggest "Eaton Service: 1-800-356-5794"
   * For other manufacturers: Use placeholder <input type="text" placeholder="Enter [MANUFACTURER_PLACEHOLDER] support #" style="width:150px" />
-- Electrical Contractor: <input type="text" placeholder="Enter contractor #" style="width:150px" />
-- Mechanical Contractor: <input type="text" placeholder="Enter contractor #" style="width:150px" />
+- Local Electrical Contractor: [RESEARCH local electrical contractors serving data centers in the region, provide name or use <input type="text" placeholder="Enter local electrical contractor #" style="width:150px" />]
+- Local Mechanical Contractor: [RESEARCH local mechanical contractors serving data centers in the region, provide name or use <input type="text" placeholder="Enter local mechanical contractor #" style="width:150px" />]
 - Facilities Manager: <input type="text" placeholder="Enter facilities manager #" style="width:150px" />
 
 Add this important note at the bottom of the Emergency Contacts section:
-"⚠️ IMPORTANT: Verify all emergency contact numbers for your specific facility location. Update phone numbers as needed."
+"✓ RESEARCHED: Contact information has been researched for the specific location at [SITE_ADDRESS_PLACEHOLDER]. Please verify current phone numbers before use as they may change over time."
 
 <h2>Section 07: Recovery & Return to Service</h2>
 <h3>[WORK_DESCRIPTION] Resolution and Equipment Recovery Procedures</h3>
