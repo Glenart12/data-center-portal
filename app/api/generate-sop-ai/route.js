@@ -258,7 +258,7 @@ export async function POST(request) {
     let riskLevel = 2;
     let riskJustification = "Standard operational procedure";
     
-    const workDesc = formData.workDescription || '';
+    let workDesc = formData.workDescription || '';
     const system = formData.system?.toLowerCase() || '';
     const componentType = formData.componentType?.toLowerCase() || '';
     
@@ -975,7 +975,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .toUpperCase()
       .replace(/[^A-Z0-9]/g, '')
       .substring(0, 10); // Max 10 chars, alphanumeric only
-    const workDesc = (formData.procedureType || 'PROCEDURE')
+    workDesc = (formData.procedureType || 'PROCEDURE')
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Replace spaces with underscores
