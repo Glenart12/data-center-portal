@@ -400,14 +400,14 @@ export async function compileMOP(formData) {
     // Get existing MOPs to determine version
     const existingFiles = await list({ prefix: 'mops/' });
     
-    // Extract work description and component type from form data
+    // Extract work description from form data
     const workDescription = formData.workDescription || formData.description || formData.category || formData.system || 'MAINTENANCE';
-    const componentType = formData.componentType || formData.system || 'EQUIPMENT';
+    // componentType already extracted from formData on line 388
     
     // Generate filename components according to new format with full values
     // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens (GEN-3 → GEN3)
-    const componentTypeForFilename = componentType
+    const componentTypeForFilename = (componentType || formData.system || 'EQUIPMENT')
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Replace spaces with underscores
