@@ -400,20 +400,25 @@ export async function compileMOP(formData) {
     // Get existing MOPs to determine version
     const existingFiles = await list({ prefix: 'mops/' });
     
-    // Extract work description from form data
+    // Extract work description and component type from form data
     const workDescription = formData.workDescription || formData.description || formData.category || formData.system || 'MAINTENANCE';
+    const componentType = formData.componentType || formData.system || 'EQUIPMENT';
     
-    // Generate filename components according to new format
-    // TYPE_EQUIP_ID_MANUFACTURER_WORK_DESC_DATE_VERSION
+    // Generate filename components according to new format with full values
+    // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens (GEN-3 → GEN3)
-    const manufacturer = (formData.manufacturer || 'UNKNOWN')
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '')
-      .substring(0, 10); // Max 10 chars, alphanumeric only
-    const workDesc = workDescription
+    const componentTypeForFilename = componentType
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Replace spaces with underscores
+    const manufacturer = (formData.manufacturer || 'UNKNOWN')
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, ''); // Use full name with underscores
+    const workDesc = workDescription
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, ''); // Use full description with underscores
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
     // Get the next version number based on equipment number and date
@@ -423,7 +428,7 @@ export async function compileMOP(formData) {
       currentDate
     );
     
-    const filename = `MOP_${equipmentId}_${manufacturer}_${workDesc}_${currentDate}_V${version}.html`;
+    const filename = `MOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}_${workDesc}_${currentDate}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`mops/${filename}`, completeHtml, {
