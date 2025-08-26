@@ -301,6 +301,23 @@ ANALYZE THESE CRITICAL INPUTS FOR PPE DETERMINATION:
 3. Component Type: [COMPONENT_PLACEHOLDER] - Identifies system-specific PPE needs
 4. Serial Number: [SERIAL_PLACEHOLDER] - May indicate specific model variations
 
+ENHANCED EMERGENCY TYPE DETECTION AND PPE FILTERING:
+FIRST, DETECT THE EMERGENCY TYPE FROM [WORK_DESCRIPTION] AND [EMERGENCY_TYPE_PLACEHOLDER]:
+- IF emergency contains "refrigerant", "leak", "chemical", "R-134a", "R-410A", "ammonia": 
+  SET PPE_FOCUS = CHEMICAL_RESPIRATORY
+  EXCLUDE arc flash PPE UNLESS [WORK_DESCRIPTION] explicitly mentions "opening electrical panels", "electrical isolation", or "power work"
+- IF emergency contains "electrical", "power", "voltage", "breaker", "transformer", "VFD":
+  SET PPE_FOCUS = ELECTRICAL_ARC_FLASH
+  REQUIRE full arc flash PPE based on voltage level
+- IF emergency contains "mechanical", "bearing", "vibration", "alignment", "belt":
+  SET PPE_FOCUS = MECHANICAL_HAZARDS
+  INCLUDE arc flash PPE ONLY if [WORK_DESCRIPTION] mentions "electrical isolation required" or "LOTO procedures"
+- IF emergency contains "cooling", "thermal", "temperature", "heat exchanger" (but NOT "leak"):
+  SET PPE_FOCUS = THERMAL_STANDARD
+  EXCLUDE arc flash PPE unless electrical work is explicitly mentioned
+
+APPLY PPE_FOCUS FILTER TO ALL FOLLOWING REQUIREMENTS (preserve all logic, filter output):
+
 INTELLIGENT PPE DETERMINATION BASED ON EMERGENCY + EQUIPMENT:
 
 FOR ELECTRICAL EMERGENCIES on [MANUFACTURER_PLACEHOLDER] equipment:
@@ -337,6 +354,11 @@ EMERGENCY SEVERITY MULTIPLIER:
   <th>Specification for [MODEL_PLACEHOLDER]</th>
   <th>Verified</th>
 </tr>
+APPLY PPE_FOCUS FILTER HERE:
+- IF PPE_FOCUS = CHEMICAL_RESPIRATORY: Skip arc flash row unless electrical work detected
+- IF PPE_FOCUS = ELECTRICAL_ARC_FLASH: Include arc flash row with full specifications
+- IF PPE_FOCUS = MECHANICAL_HAZARDS: Include arc flash row only if electrical isolation mentioned
+- IF PPE_FOCUS = THERMAL_STANDARD: Skip arc flash row unless electrical work mentioned
 <tr>
   <td>Arc Flash PPE</td>
   <td>Category [specify based on voltage] - [cal/cm²] rated</td>
@@ -367,6 +389,24 @@ ANALYZE THESE INPUTS FOR TOOL REQUIREMENTS:
 2. Manufacturer: [MANUFACTURER_PLACEHOLDER] - Defines proprietary diagnostic tools required
 3. Model Number: [MODEL_PLACEHOLDER] - Specifies exact interface tools and adapters
 4. Serial Number: [SERIAL_PLACEHOLDER] - May indicate special tool requirements for variants
+
+ENHANCED EMERGENCY TYPE DETECTION FOR LOTO REQUIREMENTS:
+FIRST, ANALYZE [WORK_DESCRIPTION] AND [EMERGENCY_TYPE_PLACEHOLDER] TO SET LOTO FLAG:
+- IF emergency contains "refrigerant", "leak", "chemical" AND NO mention of "electrical panels", "power isolation":
+  SET LOTO_REQUIRED = FALSE (refrigerant work without electrical involvement)
+  FOCUS on refrigerant tools, gauges, recovery equipment
+- IF emergency contains "electrical", "power", "breaker", "transformer", "VFD", "voltage":
+  SET LOTO_REQUIRED = TRUE (electrical work always requires LOTO)
+  INCLUDE full electrical LOTO procedures and devices
+- IF emergency contains "mechanical", "bearing", "vibration", "belt" AND mentions "accessing moving parts", "internal components":
+  SET LOTO_REQUIRED = TRUE (mechanical isolation needed)
+  INCLUDE mechanical and electrical LOTO as needed
+- IF emergency contains "cooling", "thermal", "temperature" WITHOUT "leak" AND NO mention of electrical work:
+  SET LOTO_REQUIRED = FALSE (monitoring/adjustment only)
+  FOCUS on diagnostic and temperature measurement tools
+- DEFAULT: If unclear or mixed hazards, SET LOTO_REQUIRED = TRUE (safer approach)
+
+APPLY LOTO_REQUIRED FLAG TO TOOL SELECTION (preserve all existing logic):
 
 INTELLIGENT TOOL DETERMINATION BY EMERGENCY TYPE:
 
@@ -449,6 +489,9 @@ EMERGENCY-SPECIFIC ADDITIONS:
   <td>[Specific tool for [MANUFACTURER_PLACEHOLDER] [MODEL_PLACEHOLDER]]</td>
   <td><input type="checkbox" /></td>
 </tr>
+APPLY LOTO_REQUIRED FLAG HERE:
+- IF LOTO_REQUIRED = TRUE: Include this LOTO row with full specifications
+- IF LOTO_REQUIRED = FALSE: Skip this LOTO row entirely (not needed for this emergency type)
 <tr>
   <td>LOTO Equipment</td>
   <td>Lockout devices for [breaker type/disconnect type]</td>
