@@ -1819,7 +1819,7 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     // Generate filename using new format matching MOP structure
     // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
     let filename = '';
-    const currentDate = new Date().toISOString().split('T')[0];
+    const dateForFilename = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
     const manufacturer = (formData.manufacturer || 'UNKNOWN')
       .toUpperCase()
@@ -1841,12 +1841,12 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       componentType,
       manufacturer,
       workDesc,
-      currentDate
+      dateForFilename
     );
     
     // Use double underscore as delimiter between component and work description
     // Match MOP structure: equipment → component → manufacturer → work → date
-    filename = `EOP_${equipmentId}_${componentType}_${manufacturer}__${workDesc}_${currentDate}_V${version}.html`;
+    filename = `EOP_${equipmentId}_${componentType}_${manufacturer}__${workDesc}_${dateForFilename}_V${version}.html`;
 
     // Save to blob storage
     console.log('Attempting to save to blob storage with filename:', filename);
