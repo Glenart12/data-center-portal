@@ -403,107 +403,90 @@ function EopPage() {
               const downloadUrl = fileData?.url || `/eops/${filename}`;
               const parsedInfo = parseFilename(filename);
               
-              // Fix EOP parsing: Parse from the end for reliable work description extraction
-              // EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_COMPRESSOR_FAILURE_2025-08-27_V1
-              // Position 0: EOP
-              // Position 1: Equipment ID
-              // Position 2: System
-              // Position 3: Manufacturer
-              // Position 4 to (date-n): Component type (variable length)
-              // Last n words before date: Work description (typically 1-3 words)
+              // Fix EOP parsing: Use double underscore delimiter to split component and work
+              // NEW FORMAT: EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER__COMPRESSOR_FAILURE_2025-08-27_V1
+              //                                                                 ^^ Double underscore delimiter
               let cleanComponentType = parsedInfo.componentType;
               let workDescription = parsedInfo.workDescription;
               
               if (filename.startsWith('EOP_')) {
-                // Parse the filename intelligently
-                const parts = filename.replace(/\.(html|pdf)$/i, '').split('_');
-                const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-                
-                // Known manufacturer names
-                const knownManufacturers = ['CARRIER', 'TRANE', 'YORK', 'LIEBERT', 'ASCO', 'CATERPILLAR', 'CAT', 
-                                           'EATON', 'SCHNEIDER', 'GE', 'GENERAC', 'CUMMINS', 'KOHLER', 
-                                           'JOHNSON', 'CONTROLS', 'SIEMENS', 'ABB', 'VERTIV'];
-                
-                // Find the date position
-                let dateIndex = -1;
-                for (let i = parts.length - 2; i >= 0; i--) {
-                  if (datePattern.test(parts[i])) {
-                    dateIndex = i;
-                    break;
-                  }
-                }
-                
-                // Find manufacturer position (typically position 3 for EOP)
-                let manufacturerIndex = -1;
-                for (let i = 3; i < dateIndex; i++) {
-                  if (knownManufacturers.includes(parts[i].toUpperCase())) {
-                    manufacturerIndex = i;
-                    break;
-                  }
-                }
-                
-                if (manufacturerIndex > 0 && dateIndex > 0) {
-                  // Parse from the END - work descriptions are typically last 1-3 words before date
-                  const allMiddleParts = parts.slice(manufacturerIndex + 1, dateIndex);
+                // Check if filename uses the new double underscore delimiter format
+                if (filename.includes('__')) {
+                  // NEW FORMAT with delimiter - parse exactly where component ends and work begins
+                  const cleanName = filename.replace(/\.(html|pdf)$/i, '');
+                  const [beforeWork, afterWork] = cleanName.split('__');
                   
-                  // Determine how many words to take as work description
-                  let workDescWordCount = 2; // Default to 2 words
+                  // Extract component type (last part before the delimiter)
+                  const beforeParts = beforeWork.split('_');
+                  // Find manufacturer position
+                  const knownManufacturers = ['CARRIER', 'TRANE', 'YORK', 'LIEBERT', 'ASCO', 'CATERPILLAR', 'CAT', 
+                                             'EATON', 'SCHNEIDER', 'GE', 'GENERAC', 'CUMMINS', 'KOHLER', 
+                                             'JOHNSON', 'CONTROLS', 'SIEMENS', 'ABB', 'VERTIV'];
                   
-                  // Check last word for common single-word emergencies
-                  const lastWord = allMiddleParts[allMiddleParts.length - 1];
-                  const singleWordEmergencies = ['FAILURE', 'FAULT', 'ALARM', 'TRIP', 'OVERLOAD', 
-                                                 'SHUTDOWN', 'RESTART', 'BYPASS', 'LOSS'];
-                  
-                  // Check for compound patterns (X_FAILURE, X_DETECTION, etc.)
-                  const secondToLastWord = allMiddleParts.length > 1 ? allMiddleParts[allMiddleParts.length - 2] : '';
-                  const compoundEndings = ['FAILURE', 'DETECTION', 'LOSS', 'FAULT', 'TRIP', 'ALARM', 
-                                          'SHUTDOWN', 'RESPONSE', 'RECOVERY'];
-                  
-                  if (allMiddleParts.length === 1) {
-                    // Only one word between manufacturer and date - it's the work description
-                    workDescWordCount = 1;
-                  } else if (singleWordEmergencies.includes(lastWord?.toUpperCase())) {
-                    // Last word is a common single emergency word
-                    workDescWordCount = 1;
-                  } else if (compoundEndings.includes(lastWord?.toUpperCase())) {
-                    // Last word suggests a compound emergency description
-                    workDescWordCount = Math.min(2, allMiddleParts.length);
-                  } else if (allMiddleParts.length <= 3) {
-                    // Very few words total - take last 1-2 as work
-                    workDescWordCount = Math.min(2, Math.ceil(allMiddleParts.length / 2));
-                  } else if (allMiddleParts.length > 6) {
-                    // Many words - likely long component name, take last 2-3 as work
-                    workDescWordCount = 3;
+                  let manufacturerIndex = -1;
+                  for (let i = 3; i < beforeParts.length; i++) {
+                    if (knownManufacturers.includes(beforeParts[i].toUpperCase())) {
+                      manufacturerIndex = i;
+                      break;
+                    }
                   }
                   
-                  // Split between component and work based on calculated count
-                  const componentEndIndex = allMiddleParts.length - workDescWordCount;
-                  
-                  // Extract component type
-                  const componentParts = allMiddleParts.slice(0, componentEndIndex);
-                  cleanComponentType = componentParts.join(' ')
-                    .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-                  
-                  // Extract work description
-                  const workParts = allMiddleParts.slice(componentEndIndex);
-                  workDescription = workParts.join(' ')
-                    .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-                  
-                  // Fallbacks if parsing resulted in empty values
-                  if (!cleanComponentType || cleanComponentType.trim() === '') {
-                    // If no component found, use all middle parts as component, system as work
-                    cleanComponentType = allMiddleParts.join(' ')
+                  if (manufacturerIndex > 0) {
+                    // Component type is everything after manufacturer until the delimiter
+                    const componentParts = beforeParts.slice(manufacturerIndex + 1);
+                    cleanComponentType = componentParts.join(' ')
                       .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-                    workDescription = parts[2] ? parts[2].replace(/_/g, ' ')
-                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) : 'Emergency';
                   }
-                  if (!workDescription || workDescription.trim() === '') {
-                    workDescription = 'Emergency Response';
+                  
+                  // Extract work description (everything after delimiter until date)
+                  if (afterWork) {
+                    const afterParts = afterWork.split('_');
+                    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+                    let dateIndex = -1;
+                    
+                    for (let i = 0; i < afterParts.length; i++) {
+                      if (datePattern.test(afterParts[i])) {
+                        dateIndex = i;
+                        break;
+                      }
+                    }
+                    
+                    if (dateIndex > 0) {
+                      const workParts = afterParts.slice(0, dateIndex);
+                      workDescription = workParts.join(' ')
+                        .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    }
                   }
                 } else {
-                  // Fallback if manufacturer not found - use original parsed values
-                  cleanComponentType = parsedInfo.workDescription || parsedInfo.componentType;
-                  workDescription = parsedInfo.componentType || 'Emergency Procedure';
+                  // OLD FORMAT without delimiter - fallback to parseFilename results
+                  // For old files, what parseFilename thinks is workDescription might be component
+                  // and what it thinks is componentType might be system/category
+                  const parts = filename.replace(/\.(html|pdf)$/i, '').split('_');
+                  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+                  
+                  // Find date to know where content ends
+                  let dateIndex = -1;
+                  for (let i = parts.length - 2; i >= 0; i--) {
+                    if (datePattern.test(parts[i])) {
+                      dateIndex = i;
+                      break;
+                    }
+                  }
+                  
+                  // For old format, assume position 4 onwards (after manufacturer) is component
+                  // Since there's no work description in old format
+                  if (dateIndex >= 5) {
+                    // Has enough parts for the old structure
+                    const componentParts = parts.slice(4, dateIndex);
+                    cleanComponentType = componentParts.join(' ')
+                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    workDescription = parts[2] ? parts[2].replace(/_/g, ' ')
+                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) : 'Emergency Procedure';
+                  } else {
+                    // Very old or malformed - use parseFilename fallback
+                    cleanComponentType = parsedInfo.workDescription || parsedInfo.componentType;
+                    workDescription = 'Emergency Procedure';
+                  }
                 }
               }
               

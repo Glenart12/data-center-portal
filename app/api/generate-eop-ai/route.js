@@ -1833,7 +1833,8 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use actual work description from form
-    filename = `EOP_${equipmentId}_${system}_${manufacturer}_${componentType}_${workDesc}_${date}_V1.html`;
+    // Use double underscore as delimiter between component and work description
+    filename = `EOP_${equipmentId}_${system}_${manufacturer}_${componentType}__${workDesc}_${date}_V1.html`;
 
     // Save to blob storage
     console.log('Attempting to save to blob storage with filename:', filename);
