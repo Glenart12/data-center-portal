@@ -1813,23 +1813,27 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .replace('{{CONTENT}}', generatedContent);
     
     // Generate filename using new format with component type and full values
-    // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
+    // TYPE_EQUIP_ID_SYSTEM_MANUFACTURER_COMPONENT_TYPE_WORK_DESC_DATE_VERSION
     let filename = '';
     const date = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
-    const componentType = (formData.componentType || formData.system || 'EQUIPMENT')
+    const system = (formData.system || 'SYSTEM')
       .toUpperCase()
       .replace(/\s+/g, '_')
-      .replace(/[^A-Z0-9_]/g, ''); // Use full component type with underscores
+      .replace(/[^A-Z0-9_]/g, ''); // System/category field
     const manufacturer = (formData.manufacturer || 'UNKNOWN')
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use full manufacturer name with underscores
-    const workDesc = (formData.category || 'EMERGENCY')
+    const componentType = (formData.component || formData.componentType || 'EQUIPMENT')
       .toUpperCase()
       .replace(/\s+/g, '_')
-      .replace(/[^A-Z0-9_]/g, ''); // Use full category with underscores
-    filename = `EOP_${equipmentId}_${componentType}_${manufacturer}_${workDesc}_${date}_V1.html`;
+      .replace(/[^A-Z0-9_]/g, ''); // Use full component type with underscores
+    const workDesc = (formData.workDescription || 'EMERGENCY_RESPONSE')
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, ''); // Use actual work description from form
+    filename = `EOP_${equipmentId}_${system}_${manufacturer}_${componentType}_${workDesc}_${date}_V1.html`;
 
     // Save to blob storage
     console.log('Attempting to save to blob storage with filename:', filename);

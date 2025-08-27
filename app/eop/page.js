@@ -403,22 +403,44 @@ function EopPage() {
               const downloadUrl = fileData?.url || `/eops/${filename}`;
               const parsedInfo = parseFilename(filename);
               
-              // Fix EOP parsing: EOP files have different structure
-              // EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_2025-08-27_V1
-              // Position 2: COOLING (system field, NOT component type)
+              // Fix EOP parsing: EOP files have NEW structure with work description
+              // NEW: EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_REFRIGERANT_LEAK_DETECTION_2025-08-27_V1
+              // Position 2: COOLING (system field)
               // Position 3: CARRIER (manufacturer)
-              // Position 4: WATER_COOLED_CHILLER (this IS the component type)
-              // Work description is missing from filename entirely
+              // Position 4: WATER_COOLED_CHILLER (component type)
+              // Position 5: REFRIGERANT_LEAK_DETECTION (work description)
               let cleanComponentType = parsedInfo.componentType;
               let workDescription = parsedInfo.workDescription;
               
               if (filename.startsWith('EOP_')) {
-                // In EOP: position 4 is component type (where MOP has work description)
-                cleanComponentType = parsedInfo.workDescription; // This is the actual component type
+                // Parse the filename parts to get correct positions
+                const parts = filename.split('_');
+                const datePattern = /^\d{4}-\d{2}-\d{2}$/;
                 
-                // Work description isn't in EOP filenames - use system field or generic text
-                // Use the system field (position 2) as work description, or fallback to generic
-                workDescription = parsedInfo.componentType || 'Emergency Procedure';
+                // Find the date position
+                let dateIndex = -1;
+                for (let i = parts.length - 2; i >= 0; i--) {
+                  if (datePattern.test(parts[i])) {
+                    dateIndex = i;
+                    break;
+                  }
+                }
+                
+                if (dateIndex >= 6) {
+                  // New format with work description included
+                  // Position 4 is component type, position 5+ (before date) is work description
+                  const componentParts = parts.slice(4, 5); // Position 4 is component type
+                  const workParts = parts.slice(5, dateIndex); // Everything between component and date is work
+                  
+                  cleanComponentType = componentParts.join(' ').replace(/_/g, ' ')
+                    .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                  workDescription = workParts.join(' ').replace(/_/g, ' ')
+                    .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                } else {
+                  // Old format without work description (fallback)
+                  cleanComponentType = parsedInfo.workDescription; // Position 4 is component type
+                  workDescription = parsedInfo.componentType || 'Emergency Procedure'; // Use system field
+                }
               }
               
               // Clean up component type to remove manufacturer if it's included
