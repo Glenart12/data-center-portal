@@ -403,19 +403,26 @@ function EopPage() {
               const downloadUrl = fileData?.url || `/eops/${filename}`;
               const parsedInfo = parseFilename(filename);
               
-              // Fix EOP parsing: EOP files have NEW structure with work description
-              // NEW: EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_REFRIGERANT_LEAK_DETECTION_2025-08-27_V1
-              // Position 2: COOLING (system field)
-              // Position 3: CARRIER (manufacturer)
-              // Position 4: WATER_COOLED_CHILLER (component type)
-              // Position 5: REFRIGERANT_LEAK_DETECTION (work description)
+              // Fix EOP parsing: EOP files have structure with multi-word fields
+              // EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_REFRIGERANT_LEAK_DETECTION_2025-08-27_V1
+              // Position 0: EOP
+              // Position 1: Equipment ID (CHILLER1)
+              // Position 2: System (COOLING)
+              // Position 3: Manufacturer (CARRIER) - KEY TO PARSING!
+              // Position 4+: Component type (can be multi-word)
+              // After component: Work description (can be multi-word)
               let cleanComponentType = parsedInfo.componentType;
               let workDescription = parsedInfo.workDescription;
               
               if (filename.startsWith('EOP_')) {
-                // Parse the filename parts to get correct positions
-                const parts = filename.split('_');
+                // Parse using manufacturer position like MOP parsing does
+                const parts = filename.replace(/\.(html|pdf)$/i, '').split('_');
                 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+                
+                // Known manufacturer names (same as in parseFilename)
+                const knownManufacturers = ['CARRIER', 'TRANE', 'YORK', 'LIEBERT', 'ASCO', 'CATERPILLAR', 'CAT', 
+                                           'EATON', 'SCHNEIDER', 'GE', 'GENERAC', 'CUMMINS', 'KOHLER', 
+                                           'JOHNSON', 'CONTROLS', 'SIEMENS', 'ABB', 'VERTIV'];
                 
                 // Find the date position
                 let dateIndex = -1;
@@ -426,20 +433,58 @@ function EopPage() {
                   }
                 }
                 
-                if (dateIndex >= 6) {
-                  // New format with work description included
-                  // Position 4 is component type, position 5+ (before date) is work description
-                  const componentParts = parts.slice(4, 5); // Position 4 is component type
-                  const workParts = parts.slice(5, dateIndex); // Everything between component and date is work
+                // Find manufacturer position (should be at position 3 for EOP)
+                let manufacturerIndex = -1;
+                for (let i = 3; i < dateIndex; i++) {
+                  if (knownManufacturers.includes(parts[i].toUpperCase())) {
+                    manufacturerIndex = i;
+                    break;
+                  }
+                }
+                
+                if (manufacturerIndex > 0 && dateIndex > 0) {
+                  // EOP structure: EOP_EQUIP_SYSTEM_MANUFACTURER_COMPONENT_WORK_DATE_VERSION
+                  // Component type: everything between manufacturer and work description
+                  // Work description: needs to be identified by keywords or position
                   
-                  cleanComponentType = componentParts.join(' ').replace(/_/g, ' ')
+                  // Look for emergency/work keywords to find where work description starts
+                  const workKeywords = ['POWER', 'FAILURE', 'LEAK', 'DETECTION', 'EMERGENCY', 'RESPONSE', 
+                                       'SHUTDOWN', 'RESTART', 'ALARM', 'FAULT', 'RECOVERY', 'BYPASS',
+                                       'REFRIGERANT', 'ELECTRICAL', 'MECHANICAL', 'OVERLOAD', 'TRIP'];
+                  
+                  let workStartIndex = -1;
+                  for (let i = manufacturerIndex + 1; i < dateIndex; i++) {
+                    if (workKeywords.includes(parts[i].toUpperCase())) {
+                      workStartIndex = i;
+                      break;
+                    }
+                  }
+                  
+                  if (workStartIndex === -1) {
+                    // If no keywords found, assume component is 1-3 words after manufacturer
+                    // and the rest is work description
+                    workStartIndex = Math.min(manufacturerIndex + 4, dateIndex - 1);
+                  }
+                  
+                  // Extract component type (between manufacturer and work start)
+                  const componentParts = parts.slice(manufacturerIndex + 1, workStartIndex);
+                  cleanComponentType = componentParts.join(' ')
                     .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-                  workDescription = workParts.join(' ').replace(/_/g, ' ')
+                  
+                  // Extract work description (between work start and date)
+                  const workParts = parts.slice(workStartIndex, dateIndex);
+                  workDescription = workParts.join(' ')
                     .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                  
+                  // If no work description found, use system as fallback
+                  if (!workDescription || workDescription.trim() === '') {
+                    workDescription = parts[2] ? parts[2].replace(/_/g, ' ')
+                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) : 'Emergency Procedure';
+                  }
                 } else {
-                  // Old format without work description (fallback)
-                  cleanComponentType = parsedInfo.workDescription; // Position 4 is component type
-                  workDescription = parsedInfo.componentType || 'Emergency Procedure'; // Use system field
+                  // Fallback to simple parsing if manufacturer not found
+                  cleanComponentType = parsedInfo.workDescription;
+                  workDescription = parsedInfo.componentType || 'Emergency Procedure';
                 }
               }
               
