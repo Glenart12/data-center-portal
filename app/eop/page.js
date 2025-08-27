@@ -403,8 +403,21 @@ function EopPage() {
               const downloadUrl = fileData?.url || `/eops/${filename}`;
               const parsedInfo = parseFilename(filename);
               
-              // Clean up component type to remove manufacturer if it's included
+              // Fix EOP parsing: EOP files have different structure
+              // EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_2025-08-27_V1
+              // Where COOLING is category/system and WATER_COOLED_CHILLER is the actual component type
               let cleanComponentType = parsedInfo.componentType;
+              let workDescription = parsedInfo.workDescription;
+              
+              if (filename.startsWith('EOP')) {
+                // For EOP files, swap the fields because:
+                // - What parseFilename thinks is workDescription is actually the component type
+                // - What parseFilename thinks is componentType is actually the category/system
+                cleanComponentType = parsedInfo.workDescription; // This is the actual component type
+                workDescription = parsedInfo.componentType; // This is the category/system
+              }
+              
+              // Clean up component type to remove manufacturer if it's included
               if (cleanComponentType) {
                 // Remove common manufacturer names that might be appended
                 const manufacturers = ['Asco', 'Caterpillar', 'Cat', 'Trane', 'Carrier', 'York', 'Liebert', 'Eaton', 'Schneider', 'GE', 'Generac', 'Cummins', 'Kohler'];
@@ -576,7 +589,7 @@ function EopPage() {
                         <span style={{ fontWeight: 'bold' }}>Component:</span> {cleanComponentType}
                       </div>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                        <span style={{ fontWeight: 'bold' }}>Work:</span> {parsedInfo.workDescription}
+                        <span style={{ fontWeight: 'bold' }}>Work:</span> {workDescription}
                       </div>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
                         <span style={{ fontWeight: 'bold' }}>Date:</span> {parsedInfo.date}
