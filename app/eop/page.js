@@ -404,8 +404,8 @@ function EopPage() {
               const parsedInfo = parseFilename(filename);
               
               // Fix EOP parsing: Use double underscore delimiter to split component and work
-              // NEW FORMAT: EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER__COMPRESSOR_FAILURE_2025-08-27_V1
-              //                                                                 ^^ Double underscore delimiter
+              // NEW FORMAT (matches MOP): EOP_CHILLER1_WATER_COOLED_CHILLER_CARRIER__COMPRESSOR_FAILURE_2025-08-27_V1
+              //                                       component_type       manufacturer ^^ delimiter work_desc
               let cleanComponentType = parsedInfo.componentType;
               let workDescription = parsedInfo.workDescription;
               
@@ -416,15 +416,17 @@ function EopPage() {
                   const cleanName = filename.replace(/\.(html|pdf)$/i, '');
                   const [beforeWork, afterWork] = cleanName.split('__');
                   
-                  // Extract component type (last part before the delimiter)
+                  // Extract component type and manufacturer
                   const beforeParts = beforeWork.split('_');
-                  // Find manufacturer position
+                  
+                  // Known manufacturer names
                   const knownManufacturers = ['CARRIER', 'TRANE', 'YORK', 'LIEBERT', 'ASCO', 'CATERPILLAR', 'CAT', 
                                              'EATON', 'SCHNEIDER', 'GE', 'GENERAC', 'CUMMINS', 'KOHLER', 
                                              'JOHNSON', 'CONTROLS', 'SIEMENS', 'ABB', 'VERTIV'];
                   
+                  // Find manufacturer position (start from position 2 since system field is removed)
                   let manufacturerIndex = -1;
-                  for (let i = 3; i < beforeParts.length; i++) {
+                  for (let i = 2; i < beforeParts.length; i++) {
                     if (knownManufacturers.includes(beforeParts[i].toUpperCase())) {
                       manufacturerIndex = i;
                       break;
@@ -432,8 +434,14 @@ function EopPage() {
                   }
                   
                   if (manufacturerIndex > 0) {
-                    // Component type is everything after manufacturer until the delimiter
-                    const componentParts = beforeParts.slice(manufacturerIndex + 1);
+                    // Component type is everything from position 2 until manufacturer
+                    const componentParts = beforeParts.slice(2, manufacturerIndex);
+                    cleanComponentType = componentParts.join(' ')
+                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                  } else {
+                    // If manufacturer not found, assume last word before delimiter is manufacturer
+                    // and everything from position 2 to that is component
+                    const componentParts = beforeParts.slice(2, beforeParts.length - 1);
                     cleanComponentType = componentParts.join(' ')
                       .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
                   }
@@ -455,12 +463,16 @@ function EopPage() {
                       const workParts = afterParts.slice(0, dateIndex);
                       workDescription = workParts.join(' ')
                         .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    } else if (dateIndex === -1) {
+                      // No date found, take everything as work description
+                      const workParts = afterParts.filter(part => !part.match(/^V\d+$/i));
+                      workDescription = workParts.join(' ')
+                        .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
                     }
                   }
                 } else {
-                  // OLD FORMAT without delimiter - fallback to parseFilename results
-                  // For old files, what parseFilename thinks is workDescription might be component
-                  // and what it thinks is componentType might be system/category
+                  // OLD FORMAT - may have system field at position 2
+                  // OLD: EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_2025-08-27_V1
                   const parts = filename.replace(/\.(html|pdf)$/i, '').split('_');
                   const datePattern = /^\d{4}-\d{2}-\d{2}$/;
                   
@@ -473,17 +485,16 @@ function EopPage() {
                     }
                   }
                   
-                  // For old format, assume position 4 onwards (after manufacturer) is component
-                  // Since there's no work description in old format
+                  // For old format with system field, component starts at position 4
                   if (dateIndex >= 5) {
-                    // Has enough parts for the old structure
                     const componentParts = parts.slice(4, dateIndex);
                     cleanComponentType = componentParts.join(' ')
                       .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    // Use system field as work description fallback
                     workDescription = parts[2] ? parts[2].replace(/_/g, ' ')
                       .toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) : 'Emergency Procedure';
                   } else {
-                    // Very old or malformed - use parseFilename fallback
+                    // Fallback to parseFilename
                     cleanComponentType = parsedInfo.workDescription || parsedInfo.componentType;
                     workDescription = 'Emergency Procedure';
                   }

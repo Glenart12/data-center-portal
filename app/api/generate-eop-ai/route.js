@@ -1812,15 +1812,11 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .replace('__EOP_TITLE__', eopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
-    // Generate filename using new format with component type and full values
-    // TYPE_EQUIP_ID_SYSTEM_MANUFACTURER_COMPONENT_TYPE_WORK_DESC_DATE_VERSION
+    // Generate filename using new format matching MOP structure
+    // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
     let filename = '';
     const date = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
-    const system = (formData.system || 'SYSTEM')
-      .toUpperCase()
-      .replace(/\s+/g, '_')
-      .replace(/[^A-Z0-9_]/g, ''); // System/category field
     const manufacturer = (formData.manufacturer || 'UNKNOWN')
       .toUpperCase()
       .replace(/\s+/g, '_')
@@ -1834,7 +1830,8 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use actual work description from form
     // Use double underscore as delimiter between component and work description
-    filename = `EOP_${equipmentId}_${system}_${manufacturer}_${componentType}__${workDesc}_${date}_V1.html`;
+    // Match MOP structure: equipment → component → manufacturer → work → date
+    filename = `EOP_${equipmentId}_${componentType}_${manufacturer}__${workDesc}_${date}_V1.html`;
 
     // Save to blob storage
     console.log('Attempting to save to blob storage with filename:', filename);
