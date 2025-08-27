@@ -763,7 +763,7 @@ function EopPage() {
                     fontSize: '12px',
                     fontWeight: 'bold'
                   }}>
-                    {parsedInfo.version}
+                    {versionDisplay || parsedInfo.version || 'V1'}
                   </div>
 
                   {/* File Type Badge */}

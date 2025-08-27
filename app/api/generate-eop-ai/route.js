@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { put } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
+import { getNextVersion } from '@/lib/mop-version-manager';
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -1812,10 +1813,13 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .replace('__EOP_TITLE__', eopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
+    // Get existing EOPs to determine version
+    const existingFiles = await list({ prefix: 'eops/' });
+    
     // Generate filename using new format matching MOP structure
     // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
     let filename = '';
-    const date = new Date().toISOString().split('T')[0];
+    const currentDate = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
     const manufacturer = (formData.manufacturer || 'UNKNOWN')
       .toUpperCase()
@@ -1829,9 +1833,20 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use actual work description from form
+    
+    // Get the next version number based on all matching criteria
+    const version = getNextVersion(
+      existingFiles.blobs,
+      equipmentId,
+      componentType,
+      manufacturer,
+      workDesc,
+      currentDate
+    );
+    
     // Use double underscore as delimiter between component and work description
     // Match MOP structure: equipment → component → manufacturer → work → date
-    filename = `EOP_${equipmentId}_${componentType}_${manufacturer}__${workDesc}_${date}_V1.html`;
+    filename = `EOP_${equipmentId}_${componentType}_${manufacturer}__${workDesc}_${currentDate}_V${version}.html`;
 
     // Save to blob storage
     console.log('Attempting to save to blob storage with filename:', filename);
