@@ -1507,9 +1507,10 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 </html>`;
 
 export async function POST(request) {
+  let formData; // Declare formData outside try block so it's accessible in catch
   try {
     const body = await request.json();
-    const { formData } = body;
+    formData = body.formData; // Assign formData from body
     
     // Validate required fields
     if (!formData?.manufacturer || !formData?.modelNumber || !formData?.system || 
@@ -1836,7 +1837,8 @@ CRITICAL: Generate content only - NO document structure tags (DOCTYPE, html, hea
     try {
       blob = await put(`eops/${filename}`, completeHtml, {
         access: 'public',
-        contentType: 'text/html'
+        contentType: 'text/html',
+        allowOverwrite: true
       });
       console.log('Blob storage upload successful, URL:', blob.url);
     } catch (blobError) {
