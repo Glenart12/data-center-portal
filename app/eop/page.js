@@ -403,6 +403,18 @@ function EopPage() {
               const downloadUrl = fileData?.url || `/eops/${filename}`;
               const parsedInfo = parseFilename(filename);
               
+              // Clean up component type to remove manufacturer if it's included
+              let cleanComponentType = parsedInfo.componentType;
+              if (cleanComponentType) {
+                // Remove common manufacturer names that might be appended
+                const manufacturers = ['Asco', 'Caterpillar', 'Cat', 'Trane', 'Carrier', 'York', 'Liebert', 'Eaton', 'Schneider', 'GE', 'Generac', 'Cummins', 'Kohler'];
+                for (const mfr of manufacturers) {
+                  // Check if the component type ends with the manufacturer name
+                  const regex = new RegExp(`\\s+${mfr}$`, 'i');
+                  cleanComponentType = cleanComponentType.replace(regex, '');
+                }
+              }
+              
               // Extract version information
               const metadata = extractEOPMetadata(filename);
               const versionDisplay = metadata.version ? `V${metadata.version}` : '';
@@ -561,7 +573,7 @@ function EopPage() {
                     <span style={{ fontSize: '32px', color: '#dc3545', flexShrink: 0 }}>🚨</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                        <span style={{ fontWeight: 'bold' }}>Component:</span> {parsedInfo.componentType}
+                        <span style={{ fontWeight: 'bold' }}>Component:</span> {cleanComponentType}
                       </div>
                       <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
                         <span style={{ fontWeight: 'bold' }}>Work:</span> {parsedInfo.workDescription}
