@@ -984,10 +984,10 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use full manufacturer name with underscores
-    workDesc = (formData.procedureType || 'PROCEDURE')
+    const workDescForFilename = (formData.workDescription || workDesc || 'STANDARD')
       .toUpperCase()
       .replace(/\s+/g, '_')
-      .replace(/[^A-Z0-9_]/g, ''); // Use full procedure type with underscores
+      .replace(/[^A-Z0-9_]/g, ''); // Use actual work description from form
     
     // Get the next version number based on all matching criteria
     const version = getNextVersion(
@@ -995,12 +995,12 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       equipmentId,
       componentTypeForFilename,
       manufacturer,
-      workDesc,
+      workDescForFilename,
       dateForFilename
     );
     
     // Use double underscore as delimiter between manufacturer and work description
-    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}__${workDesc}_${dateForFilename}_V${version}.html`;
+    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}__${workDescForFilename}_${dateForFilename}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`sops/${filename}`, completeHtml, {
