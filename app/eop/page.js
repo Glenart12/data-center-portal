@@ -405,16 +405,20 @@ function EopPage() {
               
               // Fix EOP parsing: EOP files have different structure
               // EOP_CHILLER1_COOLING_CARRIER_WATER_COOLED_CHILLER_2025-08-27_V1
-              // Where COOLING is category/system and WATER_COOLED_CHILLER is the actual component type
+              // Position 2: COOLING (system field, NOT component type)
+              // Position 3: CARRIER (manufacturer)
+              // Position 4: WATER_COOLED_CHILLER (this IS the component type)
+              // Work description is missing from filename entirely
               let cleanComponentType = parsedInfo.componentType;
               let workDescription = parsedInfo.workDescription;
               
-              if (filename.startsWith('EOP')) {
-                // For EOP files, swap the fields because:
-                // - What parseFilename thinks is workDescription is actually the component type
-                // - What parseFilename thinks is componentType is actually the category/system
+              if (filename.startsWith('EOP_')) {
+                // In EOP: position 4 is component type (where MOP has work description)
                 cleanComponentType = parsedInfo.workDescription; // This is the actual component type
-                workDescription = parsedInfo.componentType; // This is the category/system
+                
+                // Work description isn't in EOP filenames - use system field or generic text
+                // Use the system field (position 2) as work description, or fallback to generic
+                workDescription = parsedInfo.componentType || 'Emergency Procedure';
               }
               
               // Clean up component type to remove manufacturer if it's included
