@@ -974,7 +974,7 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
     
     // Generate filename using new format with component type and full values
     // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER__WORK_DESC_DATE_VERSION
-    const currentDate = new Date().toISOString().split('T')[0];
+    const dateForFilename = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
     const componentTypeForFilename = (formData.componentType || formData.system || 'EQUIPMENT')
       .toUpperCase()
@@ -996,11 +996,11 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       componentTypeForFilename,
       manufacturer,
       workDesc,
-      currentDate
+      dateForFilename
     );
     
     // Use double underscore as delimiter between manufacturer and work description
-    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}__${workDesc}_${currentDate}_V${version}.html`;
+    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}__${workDesc}_${dateForFilename}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`sops/${filename}`, completeHtml, {
