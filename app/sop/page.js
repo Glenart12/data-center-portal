@@ -374,6 +374,88 @@ function SopPage() {
           ) : (
             filteredFiles.map((fileData) => {
               const parsedInfo = parseFilename(fileData.filename);
+              
+              // Fix SOP parsing: Use double underscore delimiter to split component and work
+              // FORMAT: SOP_CHILLER1_WATER_COOLED_CHILLER_CARRIER__DAILY_STARTUP_PROCEDURE_2025-08-27_V1
+              let cleanComponentType = parsedInfo.componentType;
+              let workDescription = parsedInfo.workDescription;
+              
+              if (fileData.filename.startsWith('SOP_')) {
+                // Check if filename uses the new double underscore delimiter format
+                if (fileData.filename.includes('__')) {
+                  // NEW FORMAT with delimiter - parse exactly where component ends and work begins
+                  const cleanName = fileData.filename.replace(/\.(html|pdf)$/i, '');
+                  const [beforeWork, afterWork] = cleanName.split('__');
+                  
+                  // Extract component type and manufacturer
+                  const beforeParts = beforeWork.split('_');
+                  
+                  // Known manufacturer names
+                  const knownManufacturers = ['CARRIER', 'TRANE', 'YORK', 'LIEBERT', 'ASCO', 'CATERPILLAR', 'CAT', 
+                                             'EATON', 'SCHNEIDER', 'GE', 'GENERAC', 'CUMMINS', 'KOHLER', 
+                                             'JOHNSON', 'CONTROLS', 'SIEMENS', 'ABB', 'VERTIV'];
+                  
+                  // Find manufacturer position (start from position 2)
+                  let manufacturerIndex = -1;
+                  for (let i = 2; i < beforeParts.length; i++) {
+                    if (knownManufacturers.includes(beforeParts[i].toUpperCase())) {
+                      manufacturerIndex = i;
+                      break;
+                    }
+                  }
+                  
+                  if (manufacturerIndex > 0) {
+                    // Component type is everything from position 2 until manufacturer
+                    const componentParts = beforeParts.slice(2, manufacturerIndex);
+                    cleanComponentType = componentParts.join(' ')
+                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                  } else {
+                    // If manufacturer not found, assume last word before delimiter is manufacturer
+                    const componentParts = beforeParts.slice(2, beforeParts.length - 1);
+                    cleanComponentType = componentParts.join(' ')
+                      .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                  }
+                  
+                  // Extract work description (everything after delimiter until date)
+                  if (afterWork) {
+                    const afterParts = afterWork.split('_');
+                    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+                    let dateIndex = -1;
+                    
+                    for (let i = 0; i < afterParts.length; i++) {
+                      if (datePattern.test(afterParts[i])) {
+                        dateIndex = i;
+                        break;
+                      }
+                    }
+                    
+                    if (dateIndex > 0) {
+                      const workParts = afterParts.slice(0, dateIndex);
+                      workDescription = workParts.join(' ')
+                        .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    } else if (dateIndex === -1) {
+                      // No date found, take everything as work description except version
+                      const workParts = afterParts.filter(part => !part.match(/^V\d+$/i));
+                      workDescription = workParts.join(' ')
+                        .toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    }
+                  }
+                } else {
+                  // OLD FORMAT without delimiter - use parseFilename results as-is
+                  cleanComponentType = parsedInfo.componentType;
+                  workDescription = parsedInfo.workDescription;
+                }
+              }
+              
+              // Clean up component type to remove manufacturer if it's included
+              if (cleanComponentType) {
+                const manufacturers = ['Asco', 'Caterpillar', 'Cat', 'Trane', 'Carrier', 'York', 'Liebert', 'Eaton', 'Schneider', 'GE', 'Generac', 'Cummins', 'Kohler'];
+                for (const mfr of manufacturers) {
+                  const regex = new RegExp(`\\s+${mfr}$`, 'i');
+                  cleanComponentType = cleanComponentType.replace(regex, '');
+                }
+              }
+              
               return (
               <div key={fileData.filename} style={{ 
                 border: '1px solid #e0e0e0', 
@@ -528,10 +610,10 @@ function SopPage() {
                   <span style={{ fontSize: '32px', color: '#ffa500' }}>📋</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                      <span style={{ fontWeight: 'bold' }}>Component:</span> {parsedInfo.componentType}
+                      <span style={{ fontWeight: 'bold' }}>Component:</span> {cleanComponentType}
                     </div>
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
-                      <span style={{ fontWeight: 'bold' }}>Work:</span> {parsedInfo.workDescription}
+                      <span style={{ fontWeight: 'bold' }}>Work:</span> {workDescription}
                     </div>
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '2px' }}>
                       <span style={{ fontWeight: 'bold' }}>Date:</span> {parsedInfo.date}

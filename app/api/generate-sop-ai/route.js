@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { put } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
+import { getNextVersion } from '@/lib/mop-version-manager';
 import { enhancePromptWithSearchResults } from '@/lib/eop-generation/search-enhancement-adapter';
 
 // Initialize Gemini AI
@@ -968,9 +969,12 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .replace('__SOP_TITLE__', sopTitle)
       .replace('{{CONTENT}}', generatedContent);
     
+    // Get existing SOPs to determine version
+    const existingFiles = await list({ prefix: 'sops/' });
+    
     // Generate filename using new format with component type and full values
-    // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER_WORK_DESC_DATE_VERSION
-    const date = new Date().toISOString().split('T')[0];
+    // TYPE_EQUIP_ID_COMPONENT_TYPE_MANUFACTURER__WORK_DESC_DATE_VERSION
+    const currentDate = new Date().toISOString().split('T')[0];
     const equipmentId = (formData.equipmentNumber || '').replace(/-/g, ''); // Remove hyphens
     const componentTypeForFilename = (formData.componentType || formData.system || 'EQUIPMENT')
       .toUpperCase()
@@ -984,7 +988,19 @@ Generate comprehensive, detailed content for ALL sections. Do NOT use placeholde
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/[^A-Z0-9_]/g, ''); // Use full procedure type with underscores
-    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}_${workDesc}_${date}_V1.html`;
+    
+    // Get the next version number based on all matching criteria
+    const version = getNextVersion(
+      existingFiles.blobs,
+      equipmentId,
+      componentTypeForFilename,
+      manufacturer,
+      workDesc,
+      currentDate
+    );
+    
+    // Use double underscore as delimiter between manufacturer and work description
+    const filename = `SOP_${equipmentId}_${componentTypeForFilename}_${manufacturer}__${workDesc}_${currentDate}_V${version}.html`;
 
     // Save to blob storage
     const blob = await put(`sops/${filename}`, completeHtml, {
