@@ -68,7 +68,13 @@ function Dashboard() {
   return (
     <div style={{
       padding: '32px',
-      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+      backgroundImage: `
+        linear-gradient(180deg, rgba(10, 22, 40, 0.02) 0%, rgba(10, 22, 40, 0.05) 100%),
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.03'%3E%3Crect x='0' y='0' width='20' height='100' fill='%230A1628'/%3E%3Crect x='40' y='0' width='20' height='100' fill='%230A1628'/%3E%3Crect x='80' y='0' width='20' height='100' fill='%230A1628'/%3E%3Crect x='10' y='10' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='25' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='40' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='55' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='70' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='85' width='80' height='5' fill='%231E3A5F'/%3E%3C/g%3E%3C/svg%3E")
+      `,
+      backgroundSize: 'cover, 400px 400px',
+      backgroundColor: '#FAFBFC'
     }}>
       <div style={{
         maxWidth: '1200px',
