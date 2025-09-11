@@ -43,7 +43,7 @@ function Dashboard() {
       href: '/mop',
       title: 'MOPs',
       subtitle: 'Methods of Procedure',
-      color: '#0f3456',
+      color: '#0A1628',
       count: fileCounts.mops,
       icon: '📄'
     },
@@ -51,7 +51,7 @@ function Dashboard() {
       href: '/sop',
       title: 'SOPs',
       subtitle: 'Standard Operating Procedures',
-      color: '#1e5f8b',
+      color: '#1E3A5F',
       count: fileCounts.sops,
       icon: '📋'
     },
@@ -59,7 +59,7 @@ function Dashboard() {
       href: '/eop',
       title: 'EOPs',
       subtitle: 'Emergency Operating Procedures',
-      color: '#dc3545',
+      color: '#DC2626',
       count: fileCounts.eops,
       icon: '🚨'
     }
@@ -67,18 +67,18 @@ function Dashboard() {
 
   return (
     <div style={{
-      padding: '40px',
-      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+      padding: '32px',
+      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
     }}>
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto'
       }}>
         <h1 style={{
-          color: '#0f3456',
-          fontSize: '2.5em',
+          color: '#0A1628',
+          fontSize: '2.25rem',
           textAlign: 'center',
-          marginBottom: '40px',
+          marginBottom: '32px',
           textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
         }}>
           Welcome to the Operations Portal
@@ -86,16 +86,16 @@ function Dashboard() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '30px',
-          marginTop: '40px'
+          gap: '24px',
+          marginTop: '32px'
         }}>
           {cardData.map(({ href, title, subtitle, color, count, icon }) => (
             <a key={href} href={href} style={{ textDecoration: 'none' }}>
               <div style={{
-                background: 'rgba(255, 255, 255, 0.9)',
-                padding: '40px 30px',
-                borderRadius: '15px',
-                border: '1px solid rgba(0,0,0,0.1)',
+                background: 'rgba(255, 255, 255, 0.95)',
+                padding: '32px 24px',
+                borderRadius: '8px',
+                border: '1px solid #E2E8F0',
                 textAlign: 'center',
                 transition: 'all 0.3s ease',
                 backdropFilter: 'blur(10px)',
@@ -113,7 +113,7 @@ function Dashboard() {
                   right: '15px',
                   backgroundColor: color,
                   color: 'white',
-                  borderRadius: '20px',
+                  borderRadius: '6px',
                   padding: '8px 16px',
                   fontSize: '14px',
                   fontWeight: 'bold',
@@ -124,7 +124,7 @@ function Dashboard() {
 
                 <div style={{
                   fontSize: '3em',
-                  marginBottom: '20px',
+                  marginBottom: '16px',
                   opacity: 0.8
                 }}>
                   {icon}
@@ -132,28 +132,28 @@ function Dashboard() {
 
                 <h2 style={{
                   color: color,
-                  marginBottom: '15px',
-                  fontSize: '2.2em',
-                  fontWeight: 'bold'
+                  marginBottom: '16px',
+                  fontSize: '1.875rem',
+                  fontWeight: '600'
                 }}>
                   {title}
                 </h2>
 
                 <p style={{
-                  color: '#666',
-                  fontSize: '1.1em',
+                  color: '#4A5568',
+                  fontSize: '1rem',
                   margin: 0,
-                  lineHeight: '1.4',
-                  marginBottom: '15px'
+                  lineHeight: '1.5',
+                  marginBottom: '16px'
                 }}>
                   {subtitle}
                 </p>
 
                 <div style={{
-                  marginTop: '15px',
+                  marginTop: '16px',
                   padding: '8px 16px',
                   backgroundColor: count > 0 ? 'rgba(40, 167, 69, 0.1)' : 'rgba(108, 117, 125, 0.1)',
-                  borderRadius: '20px',
+                  borderRadius: '6px',
                   fontSize: '14px',
                   color: count > 0 ? '#28a745' : '#6c757d',
                   fontWeight: '600'
@@ -167,57 +167,57 @@ function Dashboard() {
 
         {/* Summary Stats */}
         <div style={{
-          marginTop: '50px',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          borderRadius: '15px',
-          padding: '30px',
+          marginTop: '32px',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '8px',
+          padding: '24px',
           backdropFilter: 'blur(10px)',
           boxShadow: '0 5px 20px rgba(0,0,0,0.1)',
           textAlign: 'center'
         }}>
           <h3 style={{
-            color: '#0f3456',
-            marginBottom: '20px',
-            fontSize: '1.5em'
+            color: '#0A1628',
+            marginBottom: '16px',
+            fontSize: '1.25rem'
           }}>
             Document Library Summary
           </h3>
           <div style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: '40px',
+            gap: '32px',
             flexWrap: 'wrap'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '15px 25px',
-              backgroundColor: 'rgba(15, 52, 86, 0.1)',
-              borderRadius: '10px'
+              gap: '8px',
+              padding: '16px 24px',
+              backgroundColor: 'rgba(10, 22, 40, 0.1)',
+              borderRadius: '6px'
             }}>
               <span style={{ fontSize: '1.5em' }}>📚</span>
               <div>
-                <div style={{ fontSize: '1.8em', fontWeight: 'bold', color: '#0f3456' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: '600', color: '#0A1628' }}>
                   {fileCounts.mops + fileCounts.sops + fileCounts.eops}
                 </div>
-                <div style={{ fontSize: '0.9em', color: '#666' }}>Total Documents</div>
+                <div style={{ fontSize: '0.875rem', color: '#4A5568' }}>Total Documents</div>
               </div>
             </div>
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '15px 25px',
+              gap: '8px',
+              padding: '16px 24px',
               backgroundColor: 'rgba(40, 167, 69, 0.1)',
-              borderRadius: '10px'
+              borderRadius: '6px'
             }}>
               <span style={{ fontSize: '1.5em' }}>✅</span>
               <div>
-                <div style={{ fontSize: '1.8em', fontWeight: 'bold', color: '#28a745' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: '600', color: '#28a745' }}>
                   {[fileCounts.mops, fileCounts.sops, fileCounts.eops].filter(count => count > 0).length}
                 </div>
-                <div style={{ fontSize: '0.9em', color: '#666' }}>Active Categories</div>
+                <div style={{ fontSize: '0.875rem', color: '#4A5568' }}>Active Categories</div>
               </div>
             </div>
           </div>

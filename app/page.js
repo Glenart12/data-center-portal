@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 export default async function Home() {
   // Await cookies to ensure proper async handling in Next.js 15
   const cookieStore = await cookies();
-  const session = await getSession();
+  const session = await getSession(cookieStore);
   if (session) {
     redirect('/dashboard');
   }
