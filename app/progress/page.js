@@ -1,7 +1,6 @@
 'use client';
 
-// React imports first
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 // Default task data - defined before component imports to avoid initialization issues
@@ -128,59 +127,7 @@ const defaultTasks = [
   }
 ];
 
-// Component imports after constants
-import EditTaskModal from './components/EditTaskModal';
-import AddTaskModal from './components/AddTaskModal';
-import ImportPreviewModal from './components/ImportPreviewModal';
-import ErrorBoundary from './components/ErrorBoundary';
-
 function Progress() {
-  // Initialization safety check
-  if (!defaultTasks || !Array.isArray(defaultTasks)) {
-    console.error('defaultTasks is not properly initialized');
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#F9FAFB'
-      }}>
-        <div style={{
-          textAlign: 'center',
-          backgroundColor: '#FFFFFF',
-          padding: '32px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔄</div>
-          <h2 style={{ color: '#DC2626', marginBottom: '8px', fontSize: '1.5rem' }}>
-            Initialization Error
-          </h2>
-          <p style={{ color: '#4A5568', fontSize: '14px', marginBottom: '24px' }}>
-            Failed to load task data. Please refresh the page.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              padding: '10px 24px',
-              borderRadius: '4px',
-              border: 'none',
-              backgroundColor: '#0A1628',
-              color: '#FFFFFF',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Century Gothic", sans-serif'
-            }}
-          >
-            Refresh Page
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -2033,33 +1980,708 @@ function Progress() {
       </div>
 
       {/* Edit Modal */}
-      <EditTaskModal 
-        editingTask={editingTask}
-        editForm={editForm}
-        setEditForm={setEditForm}
-        saveTask={saveTask}
-        deleteTask={deleteTask}
-        cancelEdit={cancelEdit}
-      />
+      {editingTask && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '8px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              color: '#0A1628',
+              marginBottom: '24px',
+              fontSize: '1.5rem'
+            }}>
+              Edit Task
+            </h2>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                color: '#4A5568',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                Task Name
+              </label>
+              <input
+                type="text"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid #E2E8F0',
+                  fontSize: '14px',
+                  fontFamily: '"Century Gothic", sans-serif'
+                }}
+              />
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  color: '#4A5568',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  Start Week
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="16"
+                  value={editForm.startWeek}
+                  onChange={(e) => setEditForm({ 
+                    ...editForm, 
+                    startWeek: parseInt(e.target.value) || 1 
+                  })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '14px',
+                    fontFamily: '"Century Gothic", sans-serif'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  color: '#4A5568',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  End Week
+                </label>
+                <input
+                  type="number"
+                  min={editForm.startWeek}
+                  max="16"
+                  value={editForm.endWeek}
+                  onChange={(e) => setEditForm({ 
+                    ...editForm, 
+                    endWeek: parseInt(e.target.value) || editForm.startWeek 
+                  })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '14px',
+                    fontFamily: '"Century Gothic", sans-serif'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                color: '#4A5568',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                Task Color
+              </label>
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                flexWrap: 'wrap'
+              }}>
+                {['#2196F3', '#FFC107', '#4CAF50', '#FF5722', '#9C27B0', '#00BCD4'].map(color => (
+                  <div
+                    key={color}
+                    onClick={() => setEditForm({ ...editForm, color })}
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      backgroundColor: color,
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      border: editForm.color === color ? '3px solid #0A1628' : '1px solid #E2E8F0',
+                      transition: 'all 0.2s ease'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              justifyContent: 'space-between'
+            }}>
+              <button
+                onClick={deleteTask}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: '#DC2626',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Century Gothic", sans-serif',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#B91C1C';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#DC2626';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              >
+                🗑️ Delete Task
+              </button>
+              
+              <div style={{
+                display: 'flex',
+                gap: '16px'
+              }}>
+                <button
+                  onClick={cancelEdit}
+                  style={{
+                    padding: '8px 24px',
+                    borderRadius: '4px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#4A5568',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: '"Century Gothic", sans-serif',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#F9FAFB';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#FFFFFF';
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveTask}
+                  style={{
+                    padding: '8px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    backgroundColor: '#0A1628',
+                    color: '#FFFFFF',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: '"Century Gothic", sans-serif',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#0F1E36';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#0A1628';
+                  }}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Task Modal */}
-      <AddTaskModal 
-        showAddModal={showAddModal}
-        setShowAddModal={setShowAddModal}
-        newTaskForm={newTaskForm}
-        setNewTaskForm={setNewTaskForm}
-        addNewTask={addNewTask}
-        tasks={tasks}
-      />
+      {showAddModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '8px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              color: '#0A1628',
+              marginBottom: '24px',
+              fontSize: '1.5rem'
+            }}>
+              Add New Task
+            </h2>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                color: '#4A5568',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                Task Type
+              </label>
+              <select
+                value={newTaskForm.isParent ? 'parent' : 'child'}
+                onChange={(e) => setNewTaskForm({ 
+                  ...newTaskForm, 
+                  isParent: e.target.value === 'parent',
+                  parentId: e.target.value === 'parent' ? '' : newTaskForm.parentId
+                })}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid #E2E8F0',
+                  fontSize: '14px',
+                  fontFamily: '"Century Gothic", sans-serif'
+                }}
+              >
+                <option value="child">Child Task</option>
+                <option value="parent">Parent Task</option>
+              </select>
+            </div>
+
+            {!newTaskForm.isParent && (
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#4A5568',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  Parent Task
+                </label>
+                <select
+                  value={newTaskForm.parentId}
+                  onChange={(e) => setNewTaskForm({ ...newTaskForm, parentId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '14px',
+                    fontFamily: '"Century Gothic", sans-serif'
+                  }}
+                >
+                  <option value="">No Parent (Standalone)</option>
+                  {tasks.filter(t => t.isParent).map(parent => (
+                    <option key={parent.id} value={parent.id}>{parent.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                color: '#4A5568',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                Task Name
+              </label>
+              <input
+                type="text"
+                value={newTaskForm.name}
+                onChange={(e) => setNewTaskForm({ ...newTaskForm, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid #E2E8F0',
+                  fontSize: '14px',
+                  fontFamily: '"Century Gothic", sans-serif'
+                }}
+                placeholder="Enter task name"
+              />
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  color: '#4A5568',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  Start Week
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="16"
+                  value={newTaskForm.startWeek}
+                  onChange={(e) => setNewTaskForm({ 
+                    ...newTaskForm, 
+                    startWeek: parseInt(e.target.value) || 1 
+                  })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '14px',
+                    fontFamily: '"Century Gothic", sans-serif'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  color: '#4A5568',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  End Week
+                </label>
+                <input
+                  type="number"
+                  min={newTaskForm.startWeek}
+                  max="16"
+                  value={newTaskForm.endWeek}
+                  onChange={(e) => setNewTaskForm({ 
+                    ...newTaskForm, 
+                    endWeek: parseInt(e.target.value) || newTaskForm.startWeek 
+                  })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '14px',
+                    fontFamily: '"Century Gothic", sans-serif'
+                  }}
+                />
+              </div>
+            </div>
+
+            {!newTaskForm.isParent && (
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#4A5568',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  Task Color
+                </label>
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  flexWrap: 'wrap'
+                }}>
+                  {['#2196F3', '#FFC107', '#4CAF50', '#FF5722', '#9C27B0', '#00BCD4'].map(color => (
+                    <div
+                      key={color}
+                      onClick={() => setNewTaskForm({ ...newTaskForm, color })}
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        backgroundColor: color,
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        border: newTaskForm.color === color ? '3px solid #0A1628' : '1px solid #E2E8F0',
+                        transition: 'all 0.2s ease'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              justifyContent: 'flex-end'
+            }}>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setNewTaskForm({
+                    name: '',
+                    startWeek: 1,
+                    endWeek: 2,
+                    color: '#2196F3',
+                    isParent: false,
+                    parentId: '',
+                    completed: false
+                  });
+                }}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '4px',
+                  border: '1px solid #E2E8F0',
+                  backgroundColor: '#FFFFFF',
+                  color: '#4A5568',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Century Gothic", sans-serif',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#F9FAFB';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#FFFFFF';
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={addNewTask}
+                disabled={!newTaskForm.name}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: newTaskForm.name ? '#0A1628' : '#E2E8F0',
+                  color: newTaskForm.name ? '#FFFFFF' : '#9CA3AF',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: newTaskForm.name ? 'pointer' : 'not-allowed',
+                  fontFamily: '"Century Gothic", sans-serif',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (newTaskForm.name) {
+                    e.target.style.backgroundColor = '#0F1E36';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (newTaskForm.name) {
+                    e.target.style.backgroundColor = '#0A1628';
+                  }
+                }}
+              >
+                Add Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Import Preview Modal */}
-      <ImportPreviewModal 
-        showImportModal={showImportModal}
-        setShowImportModal={setShowImportModal}
-        importPreview={importPreview}
-        setImportPreview={setImportPreview}
-        confirmImport={confirmImport}
-      />
+      {showImportModal && importPreview && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '8px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              color: '#0A1628',
+              marginBottom: '24px',
+              fontSize: '1.5rem'
+            }}>
+              Import Timeline Preview
+            </h2>
+
+            <div style={{
+              backgroundColor: '#F9FAFB',
+              borderRadius: '6px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <p style={{
+                fontSize: '14px',
+                color: '#4A5568',
+                margin: '0 0 8px 0'
+              }}>
+                <strong>Export Date:</strong> {new Date(importPreview.exportDate).toLocaleString()}
+              </p>
+              <p style={{
+                fontSize: '14px',
+                color: '#4A5568',
+                margin: '0 0 8px 0'
+              }}>
+                <strong>Total Tasks:</strong> {importPreview.metadata?.totalTasks || importPreview.tasks.filter(t => !t.isParent).length}
+              </p>
+              <p style={{
+                fontSize: '14px',
+                color: '#4A5568',
+                margin: 0
+              }}>
+                <strong>Completed:</strong> {importPreview.metadata?.completedTasks || importPreview.tasks.filter(t => !t.isParent && t.completed).length}
+              </p>
+            </div>
+
+            <div style={{
+              marginBottom: '24px'
+            }}>
+              <h3 style={{
+                fontSize: '16px',
+                color: '#0A1628',
+                marginBottom: '12px'
+              }}>
+                Tasks to Import:
+              </h3>
+              <div style={{
+                maxHeight: '200px',
+                overflowY: 'auto',
+                border: '1px solid #E2E8F0',
+                borderRadius: '6px',
+                padding: '12px'
+              }}>
+                {importPreview.tasks.map(task => (
+                  <div key={task.id} style={{
+                    padding: '4px 0',
+                    fontSize: '13px',
+                    color: task.isParent ? '#0A1628' : '#4A5568',
+                    fontWeight: task.isParent ? 'bold' : 'normal',
+                    paddingLeft: task.isParent ? '0' : '20px'
+                  }}>
+                    {task.name} (Week {task.startWeek}-{task.endWeek})
+                    {task.completed && ' ✅'}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              backgroundColor: '#FFF3E0',
+              borderRadius: '6px',
+              padding: '12px',
+              marginBottom: '24px'
+            }}>
+              <p style={{
+                fontSize: '13px',
+                color: '#E65100',
+                margin: 0,
+                fontWeight: '600'
+              }}>
+                ⚠️ Warning: Importing will replace all current tasks!
+              </p>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              justifyContent: 'flex-end'
+            }}>
+              <button
+                onClick={() => {
+                  setShowImportModal(false);
+                  setImportPreview(null);
+                }}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '4px',
+                  border: '1px solid #E2E8F0',
+                  backgroundColor: '#FFFFFF',
+                  color: '#4A5568',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Century Gothic", sans-serif',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#F9FAFB';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#FFFFFF';
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmImport}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: '#0A1628',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Century Gothic", sans-serif',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#0F1E36';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#0A1628';
+                }}
+              >
+                Import Tasks
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Success Toast */}
       {showSuccessToast && (
         <div style={{
@@ -2173,12 +2795,4 @@ function Progress() {
   }
 }
 
-function ProgressWithErrorBoundary() {
-  return (
-    <ErrorBoundary>
-      <Progress />
-    </ErrorBoundary>
-  );
-}
-
-export default withPageAuthRequired(ProgressWithErrorBoundary);
+export default withPageAuthRequired(Progress);
