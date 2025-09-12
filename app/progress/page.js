@@ -290,6 +290,7 @@ function ProgressPage() {
             overflow: 'hidden'
           }}>
             <div style={{ overflow: 'auto' }}>
+              <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             {/* Timeline Header */}
             <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
               {timeline.map((period, index) => (
@@ -398,8 +399,8 @@ function ProgressPage() {
                 ))}
               </div>
             ))}
+              </div>
             </div>
-          </div>
           </div>
         </div>
       
@@ -426,6 +427,7 @@ function ProgressPage() {
           boxSizing: 'border-box',
           overflow: 'hidden'
         }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Percentage Complete Section */}
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px' }}>
           Percentage Complete
@@ -532,6 +534,7 @@ function ProgressPage() {
               </div>
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>
