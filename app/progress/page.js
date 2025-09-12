@@ -31,8 +31,10 @@ function Progress() {
   const [showSettings, setShowSettings] = useState(false);
   const [projectSettings, setProjectSettings] = useState({
     startDate: new Date('2025-01-01').toISOString().split('T')[0],
+    endDate: new Date('2025-04-30').toISOString().split('T')[0],
     displayMode: 'weeks' // 'weeks' or 'dates'
   });
+  const [zoomLevel, setZoomLevel] = useState(75); // Default 75px per week
 
   const defaultTasks = [
     // MOP Parent and Children
@@ -91,10 +93,18 @@ function Progress() {
   }
 
   const weeks = Array.from({ length: 16 }, (_, i) => i + 1);
-  const chartWidth = 1200;
+  const weekWidth = zoomLevel;
+  const chartWidth = weekWidth * 16;
   const rowHeight = 30;
   const headerHeight = 40;
-  const weekWidth = chartWidth / 16;
+  
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(120, prev + 10));
+  };
+  
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(40, prev - 10));
+  };
   
   const handleTaskClick = (task) => {
     setEditingTask(task);
@@ -146,14 +156,27 @@ function Progress() {
   };
   
   const getDateFromWeek = (weekNumber) => {
+    if (projectSettings.displayMode === 'weeks') {
+      return `Week ${weekNumber}`;
+    }
+    
     const startDate = new Date(projectSettings.startDate);
+    const endDate = new Date(projectSettings.endDate);
+    const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const daysPerWeek = totalDays / 16;
+    
     const weekStart = new Date(startDate);
-    weekStart.setDate(startDate.getDate() + (weekNumber - 1) * 7);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
+    weekStart.setDate(startDate.getDate() + Math.floor((weekNumber - 1) * daysPerWeek));
+    const weekEnd = new Date(startDate);
+    weekEnd.setDate(startDate.getDate() + Math.floor(weekNumber * daysPerWeek) - 1);
     
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${weekEnd.getDate()}`;
+    
+    if (weekStart.getMonth() === weekEnd.getMonth()) {
+      return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${weekEnd.getDate()}`;
+    } else {
+      return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${monthNames[weekEnd.getMonth()]} ${weekEnd.getDate()}`;
+    }
   };
   
   const handleCreateDependency = () => {
@@ -252,7 +275,54 @@ function Progress() {
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ fontFamily: 'Century Gothic, sans-serif', marginBottom: '20px' }}>Project Gantt Chart</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ fontFamily: 'Century Gothic, sans-serif', margin: 0 }}>Project Gantt Chart</h2>
+          
+          {/* Zoom Controls */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'Century Gothic, sans-serif' }}>Zoom:</span>
+            <button
+              onClick={handleZoomOut}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '4px',
+                border: '1px solid #E5E7EB',
+                backgroundColor: 'white',
+                color: '#6B7280',
+                fontSize: '12px',
+                fontFamily: 'Century Gothic, sans-serif',
+                cursor: zoomLevel > 40 ? 'pointer' : 'not-allowed',
+                opacity: zoomLevel > 40 ? 1 : 0.5,
+                transition: 'all 0.2s'
+              }}
+              disabled={zoomLevel <= 40}
+              onMouseEnter={(e) => { if (zoomLevel > 40) e.target.style.backgroundColor = '#F9FAFB'; }}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+            >
+              - Zoom Out
+            </button>
+            <button
+              onClick={handleZoomIn}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '4px',
+                border: '1px solid #E5E7EB',
+                backgroundColor: 'white',
+                color: '#6B7280',
+                fontSize: '12px',
+                fontFamily: 'Century Gothic, sans-serif',
+                cursor: zoomLevel < 120 ? 'pointer' : 'not-allowed',
+                opacity: zoomLevel < 120 ? 1 : 0.5,
+                transition: 'all 0.2s'
+              }}
+              disabled={zoomLevel >= 120}
+              onMouseEnter={(e) => { if (zoomLevel < 120) e.target.style.backgroundColor = '#F9FAFB'; }}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+            >
+              + Zoom In
+            </button>
+          </div>
+        </div>
         
         {/* Control Bar */}
         <div style={{
@@ -289,15 +359,15 @@ function Progress() {
               padding: '10px 20px',
               borderRadius: '6px',
               border: 'none',
-              backgroundColor: '#6f42c1',
+              backgroundColor: '#9C27B0',
               color: 'white',
               fontFamily: 'Century Gothic, sans-serif',
               fontWeight: 'bold',
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#5a32a3'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#6f42c1'}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#7B1FA2'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#9C27B0'}
           >
             🔗 Add Dependency
           </button>
@@ -308,15 +378,15 @@ function Progress() {
               padding: '10px 20px',
               borderRadius: '6px',
               border: 'none',
-              backgroundColor: '#6c757d',
+              backgroundColor: '#6B7280',
               color: 'white',
               fontFamily: 'Century Gothic, sans-serif',
               fontWeight: 'bold',
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#5a6268'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#6c757d'}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#4B5563'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6B7280'}
           >
             ⚙️ Timeline Settings
           </button>
@@ -333,8 +403,10 @@ function Progress() {
         
         <div style={{ 
           overflowX: 'auto',
+          overflowY: 'hidden',
           border: '1px solid #e0e0e0',
-          borderRadius: '8px'
+          borderRadius: '8px',
+          maxHeight: '600px'
         }}>
           {/* Chart Container */}
           <div style={{ minWidth: `${chartWidth}px`, position: 'relative' }}>
@@ -357,7 +429,7 @@ function Progress() {
                   fontSize: '12px',
                   fontFamily: 'Century Gothic, sans-serif'
                 }}>
-                  {projectSettings.displayMode === 'weeks' ? `Week ${week}` : getDateFromWeek(week)}
+                  {getDateFromWeek(week)}
                 </div>
               ))}
             </div>
@@ -1006,7 +1078,7 @@ function Progress() {
                   padding: '10px 20px',
                   borderRadius: '6px',
                   border: 'none',
-                  backgroundColor: '#6f42c1',
+                  backgroundColor: '#9C27B0',
                   color: 'white',
                   fontFamily: 'Century Gothic, sans-serif',
                   cursor: 'pointer',
@@ -1066,6 +1138,30 @@ function Progress() {
                 type="date"
                 value={projectSettings.startDate}
                 onChange={(e) => setProjectSettings({ ...projectSettings, startDate: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* Project End Date */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Project End Date
+              </label>
+              <input
+                type="date"
+                value={projectSettings.endDate}
+                onChange={(e) => setProjectSettings({ ...projectSettings, endDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -1144,7 +1240,7 @@ function Progress() {
                   padding: '10px 20px',
                   borderRadius: '6px',
                   border: 'none',
-                  backgroundColor: '#6c757d',
+                  backgroundColor: '#6B7280',
                   color: 'white',
                   fontFamily: 'Century Gothic, sans-serif',
                   cursor: 'pointer',
