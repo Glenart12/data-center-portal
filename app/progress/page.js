@@ -394,6 +394,93 @@ function ProgressPage() {
         </div>
       </div>
 
+      {/* Dashboard Section */}
+      <div style={{
+        marginTop: '32px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        padding: '24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        {/* Percentage Complete Section */}
+        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px' }}>
+          Percentage Complete
+        </h2>
+        
+        {/* Progress Bars */}
+        <div style={{ marginBottom: '32px' }}>
+          {[
+            { type: 'MOP', complete: 75, current: 12, total: 16 },
+            { type: 'SOP', complete: 50, current: 8, total: 16 },
+            { type: 'EOP', complete: 25, current: 4, total: 16 }
+          ].map(item => (
+            <div key={item.type} style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ width: '60px', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                  {item.type}
+                </div>
+                <div style={{ flex: 1, position: 'relative' }}>
+                  <div style={{
+                    height: '24px',
+                    backgroundColor: '#E5E7EB',
+                    borderRadius: '4px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${item.complete}%`,
+                      background: item.complete <= 33 ? '#EF4444' : 
+                                 item.complete <= 66 ? '#F59E0B' : '#10B981',
+                      transition: 'width 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: '8px'
+                    }}>
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                        {item.complete}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ fontSize: '14px', color: '#6B7280' }}>
+                  {item.current}/{item.total} Documents
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Category Dials Section */}
+        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0A1628', marginBottom: '20px' }}>
+          Category Breakdown
+        </h3>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+          {['MOP', 'SOP', 'EOP'].map(category => (
+            <div key={category}>
+              <h4 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0A1628', marginBottom: '16px', textAlign: 'center' }}>
+                {category}
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                {[
+                  { label: 'Mechanical', value: 85 },
+                  { label: 'Electrical', value: 60 },
+                  { label: 'White Space', value: 40 },
+                  { label: 'Misc.', value: 95 }
+                ].map(gauge => (
+                  <div key={gauge.label} style={{ textAlign: 'center' }}>
+                    <HalfCircleGauge percentage={gauge.value} />
+                    <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                      {gauge.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Add Task Modal */}
       {showAddTask && (
         <TaskModal
@@ -450,6 +537,60 @@ function ProgressPage() {
         />
       )}
     </>
+  );
+}
+
+// Half Circle Gauge Component
+function HalfCircleGauge({ percentage }) {
+  const radius = 50;
+  const strokeWidth = 8;
+  const normalizedRadius = radius - strokeWidth / 2;
+  const circumference = normalizedRadius * Math.PI;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  
+  // Determine color based on percentage
+  const color = percentage <= 33 ? '#EF4444' : 
+                percentage <= 66 ? '#F59E0B' : '#10B981';
+  
+  return (
+    <div style={{ position: 'relative', width: '120px', height: '60px', margin: '0 auto' }}>
+      <svg
+        width="120"
+        height="70"
+        viewBox="0 0 120 70"
+        style={{ transform: 'rotate(180deg)' }}
+      >
+        {/* Background arc */}
+        <path
+          d="M 10 60 A 50 50 0 0 1 110 60"
+          fill="none"
+          stroke="#E5E7EB"
+          strokeWidth={strokeWidth}
+        />
+        {/* Filled arc */}
+        <path
+          d="M 10 60 A 50 50 0 0 1 110 60"
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={strokeDashoffset}
+          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+        />
+      </svg>
+      {/* Percentage text */}
+      <div style={{
+        position: 'absolute',
+        top: '35px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        color: '#0A1628'
+      }}>
+        {percentage}%
+      </div>
+    </div>
   );
 }
 
