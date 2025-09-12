@@ -2,11 +2,8 @@
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
-import { useNotifications } from '../contexts/NotificationContext';
 
 function Progress() {
-  const { setNotificationCount } = useNotifications();
-  
   // Default task data with completion tracking
   const defaultTasks = [
     {
@@ -661,10 +658,15 @@ function Progress() {
 
   const notificationCount = overdueTasks.length + upcomingTasks.length;
 
-  // Update notification count in context
+  // Update notification count in localStorage for Header to read
   useEffect(() => {
-    setNotificationCount(notificationCount);
-  }, [notificationCount, setNotificationCount]);
+    localStorage.setItem('progressNotificationCount', notificationCount.toString());
+    
+    // Dispatch a custom event to notify Header
+    window.dispatchEvent(new CustomEvent('notificationUpdate', { 
+      detail: { count: notificationCount } 
+    }));
+  }, [notificationCount]);
 
   // Save notification dismissal state
   const dismissNotification = (type) => {

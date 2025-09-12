@@ -1,6 +1,5 @@
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import Header from './components/Header';
-import { NotificationProvider } from './contexts/NotificationContext';
 
 export default function RootLayout({ children }) {
   return (
@@ -18,15 +17,13 @@ export default function RootLayout({ children }) {
         minHeight: '100vh'
       }}>
         <UserProvider>
-          <NotificationProvider>
-            <Header />
-            <main style={{
-              position: 'relative',
-              zIndex: 1
-            }}>
-              {children}
-            </main>
-          </NotificationProvider>
+          <Header />
+          <main style={{
+            position: 'relative',
+            zIndex: 1
+          }}>
+            {children}
+          </main>
         </UserProvider>
       </body>
     </html>

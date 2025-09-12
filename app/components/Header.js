@@ -2,12 +2,45 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { usePathname } from 'next/navigation';
-import { useNotifications } from '../contexts/NotificationContext';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
-  const { notificationCount } = useNotifications();
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    // Load initial notification count from localStorage
+    const loadNotificationCount = () => {
+      const stored = localStorage.getItem('notificationCount');
+      if (stored) {
+        setNotificationCount(parseInt(stored, 10));
+      }
+    };
+
+    loadNotificationCount();
+
+    // Listen for notification updates
+    const handleNotificationUpdate = (event) => {
+      setNotificationCount(event.detail.count);
+    };
+
+    window.addEventListener('notificationUpdate', handleNotificationUpdate);
+    
+    // Also listen for storage events (for cross-tab updates)
+    const handleStorageChange = (e) => {
+      if (e.key === 'notificationCount') {
+        setNotificationCount(parseInt(e.newValue || '0', 10));
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('notificationUpdate', handleNotificationUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   if (isLoading) return null;
 
