@@ -594,7 +594,6 @@ function ProgressPage() {
           onClose={() => setShowTimeline(false)}
         />
       )}
-    </>
   );
 }
 
