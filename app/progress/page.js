@@ -9,30 +9,29 @@ function Progress() {
   const [editingTask, setEditingTask] = useState(null);
   const [editForm, setEditForm] = useState({
     name: '',
-    startWeek: 1,
-    endWeek: 1,
+    startDate: '',
+    endDate: '',
     color: '#4A90E2'
   });
   const [creatingTask, setCreatingTask] = useState(false);
   const [createForm, setCreateForm] = useState({
     name: '',
     parentId: 1,
-    startWeek: 1,
-    endWeek: 1,
+    startDate: '',
+    endDate: '',
     color: '#4A90E2',
     completed: false
   });
   const [creatingDependency, setCreatingDependency] = useState(false);
   const [dependencyForm, setDependencyForm] = useState({
     name: '',
-    startWeek: 1,
-    endWeek: 8
+    startDate: '',
+    endDate: ''
   });
   const [showSettings, setShowSettings] = useState(false);
   const [projectSettings, setProjectSettings] = useState({
     startDate: new Date('2025-01-01').toISOString().split('T')[0],
-    endDate: new Date('2025-04-30').toISOString().split('T')[0],
-    displayMode: 'weeks' // 'weeks' or 'dates'
+    endDate: new Date('2025-04-30').toISOString().split('T')[0]
   });
   const [zoomLevel, setZoomLevel] = useState(75); // Default 75px per week
 
@@ -110,8 +109,8 @@ function Progress() {
     setEditingTask(task);
     setEditForm({
       name: task.name,
-      startWeek: task.startWeek,
-      endWeek: task.endWeek,
+      startDate: getDateFromWeekNumber(task.startWeek),
+      endDate: getDateFromWeekNumber(task.endWeek),
       color: task.color
     });
   };
@@ -122,8 +121,8 @@ function Progress() {
         return {
           ...task,
           name: editForm.name,
-          startWeek: parseInt(editForm.startWeek),
-          endWeek: parseInt(editForm.endWeek),
+          startWeek: getWeekFromDate(editForm.startDate),
+          endWeek: getWeekFromDate(editForm.endDate),
           color: editForm.color
         };
       }
@@ -152,14 +151,10 @@ function Progress() {
   
   const handleCancelEdit = () => {
     setEditingTask(null);
-    setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
+    setEditForm({ name: '', startDate: '', endDate: '', color: '#4A90E2' });
   };
   
   const getDateFromWeek = (weekNumber) => {
-    if (projectSettings.displayMode === 'weeks') {
-      return `Week ${weekNumber}`;
-    }
-    
     const startDate = new Date(projectSettings.startDate);
     const endDate = new Date(projectSettings.endDate);
     const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
@@ -172,11 +167,34 @@ function Progress() {
     
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    if (weekStart.getMonth() === weekEnd.getMonth()) {
+    // Format: "Jan 1-7" or "Dec 31-Jan 6" for cross-month boundaries
+    if (weekStart.getMonth() === weekEnd.getMonth() && weekStart.getFullYear() === weekEnd.getFullYear()) {
       return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${weekEnd.getDate()}`;
+    } else if (weekStart.getFullYear() !== weekEnd.getFullYear()) {
+      // Cross-year boundary - use abbreviated format
+      return `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
     } else {
-      return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${monthNames[weekEnd.getMonth()]} ${weekEnd.getDate()}`;
+      // Cross-month boundary
+      return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${monthNames[weekEnd.getMonth()]} ${weekEnd.getDate()}`;
     }
+  };
+  
+  const getWeekFromDate = (date) => {
+    const startDate = new Date(projectSettings.startDate);
+    const targetDate = new Date(date);
+    const daysDiff = Math.ceil((targetDate - startDate) / (1000 * 60 * 60 * 24));
+    return Math.max(1, Math.min(16, Math.ceil((daysDiff / (Math.ceil((new Date(projectSettings.endDate) - startDate) / (1000 * 60 * 60 * 24)) / 16)) + 1)));
+  };
+  
+  const getDateFromWeekNumber = (weekNumber) => {
+    const startDate = new Date(projectSettings.startDate);
+    const endDate = new Date(projectSettings.endDate);
+    const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const daysPerWeek = totalDays / 16;
+    
+    const resultDate = new Date(startDate);
+    resultDate.setDate(startDate.getDate() + Math.floor((weekNumber - 1) * daysPerWeek));
+    return resultDate.toISOString().split('T')[0];
   };
   
   const handleCreateDependency = () => {
@@ -185,8 +203,8 @@ function Progress() {
       id: newId,
       name: dependencyForm.name,
       type: 'parent',
-      startWeek: parseInt(dependencyForm.startWeek),
-      endWeek: parseInt(dependencyForm.endWeek),
+      startWeek: getWeekFromDate(dependencyForm.startDate),
+      endWeek: getWeekFromDate(dependencyForm.endDate),
       color: '#0A1628',
       completed: false
     };
@@ -195,7 +213,7 @@ function Progress() {
     setTasks(newTasks);
     localStorage.setItem('ganttChartTasks', JSON.stringify(newTasks));
     setCreatingDependency(false);
-    setDependencyForm({ name: '', startWeek: 1, endWeek: 8 });
+    setDependencyForm({ name: '', startDate: '', endDate: '' });
   };
   
   const handleSaveSettings = () => {
@@ -225,7 +243,7 @@ function Progress() {
       setTasks(updatedTasks);
       localStorage.setItem('ganttChartTasks', JSON.stringify(updatedTasks));
       setEditingTask(null);
-      setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
+      setEditForm({ name: '', startDate: '', endDate: '', color: '#4A90E2' });
     }
   };
   
@@ -236,8 +254,8 @@ function Progress() {
       name: createForm.name,
       type: 'child',
       parentId: parseInt(createForm.parentId),
-      startWeek: parseInt(createForm.startWeek),
-      endWeek: parseInt(createForm.endWeek),
+      startWeek: getWeekFromDate(createForm.startDate),
+      endWeek: getWeekFromDate(createForm.endDate),
       color: createForm.color,
       completed: false
     };
@@ -247,7 +265,7 @@ function Progress() {
     setTasks(updatedTasks);
     localStorage.setItem('ganttChartTasks', JSON.stringify(updatedTasks));
     setCreatingTask(false);
-    setCreateForm({ name: '', parentId: 1, startWeek: 1, endWeek: 1, color: '#4A90E2', completed: false });
+    setCreateForm({ name: '', parentId: 1, startDate: '', endDate: '', color: '#4A90E2', completed: false });
   };
   
   const handleToggleComplete = (taskId) => {
@@ -369,7 +387,7 @@ function Progress() {
             onMouseEnter={(e) => e.target.style.backgroundColor = '#7B1FA2'}
             onMouseLeave={(e) => e.target.style.backgroundColor = '#9C27B0'}
           >
-            🔗 Add Dependency
+            🔗 Add Parent Task
           </button>
           
           <button
@@ -420,14 +438,19 @@ function Progress() {
               {weeks.map(week => (
                 <div key={week} style={{
                   width: `${weekWidth}px`,
+                  minWidth: '80px',
                   height: `${headerHeight}px`,
                   borderRight: '1px solid #ddd',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 'bold',
-                  fontSize: '12px',
-                  fontFamily: 'Century Gothic, sans-serif'
+                  fontSize: weekWidth < 80 ? '10px' : '11px',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  padding: '0 2px'
                 }}>
                   {getDateFromWeek(week)}
                 </div>
@@ -517,31 +540,6 @@ function Progress() {
           </div>
         </div>
         
-        {/* Legend */}
-        <div style={{ 
-          marginTop: '24px', 
-          display: 'flex', 
-          gap: '20px',
-          fontFamily: 'Century Gothic, sans-serif',
-          fontSize: '14px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '20px', height: '20px', backgroundColor: '#0A1628', borderRadius: '4px' }}></div>
-            <span>Parent Tasks</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '20px', height: '20px', backgroundColor: '#4A90E2', borderRadius: '4px' }}></div>
-            <span>MOP Tasks</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '20px', height: '20px', backgroundColor: '#50C878', borderRadius: '4px' }}></div>
-            <span>SOP Tasks</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '20px', height: '20px', backgroundColor: '#FF6B6B', borderRadius: '4px' }}></div>
-            <span>EOP Tasks</span>
-          </div>
-        </div>
       </div>
       
       {/* Edit Modal */}
@@ -597,7 +595,7 @@ function Progress() {
               />
             </div>
             
-            {/* Start Week Input */}
+            {/* Start Date Input */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
@@ -605,14 +603,14 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                Start Week (1-16)
+                Start Date
               </label>
               <input
-                type="number"
-                min="1"
-                max="16"
-                value={editForm.startWeek}
-                onChange={(e) => setEditForm({ ...editForm, startWeek: e.target.value })}
+                type="date"
+                value={editForm.startDate}
+                min={projectSettings.startDate}
+                max={projectSettings.endDate}
+                onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -623,7 +621,7 @@ function Progress() {
               />
             </div>
             
-            {/* End Week Input */}
+            {/* End Date Input */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
@@ -631,14 +629,14 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                End Week (1-16)
+                End Date
               </label>
               <input
-                type="number"
-                min="1"
-                max="16"
-                value={editForm.endWeek}
-                onChange={(e) => setEditForm({ ...editForm, endWeek: e.target.value })}
+                type="date"
+                value={editForm.endDate}
+                min={projectSettings.startDate}
+                max={projectSettings.endDate}
+                onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -820,7 +818,7 @@ function Progress() {
               </select>
             </div>
             
-            {/* Start Week Input */}
+            {/* Start Date Input */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
@@ -828,14 +826,14 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                Start Week (1-16)
+                Start Date
               </label>
               <input
-                type="number"
-                min="1"
-                max="16"
-                value={createForm.startWeek}
-                onChange={(e) => setCreateForm({ ...createForm, startWeek: e.target.value })}
+                type="date"
+                value={createForm.startDate}
+                min={projectSettings.startDate}
+                max={projectSettings.endDate}
+                onChange={(e) => setCreateForm({ ...createForm, startDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -846,7 +844,7 @@ function Progress() {
               />
             </div>
             
-            {/* End Week Input */}
+            {/* End Date Input */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
@@ -854,14 +852,14 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                End Week (1-16)
+                End Date
               </label>
               <input
-                type="number"
-                min="1"
-                max="16"
-                value={createForm.endWeek}
-                onChange={(e) => setCreateForm({ ...createForm, endWeek: e.target.value })}
+                type="date"
+                value={createForm.endDate}
+                min={projectSettings.startDate}
+                max={projectSettings.endDate}
+                onChange={(e) => setCreateForm({ ...createForm, endDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -906,7 +904,7 @@ function Progress() {
               <button
                 onClick={() => {
                   setCreatingTask(false);
-                  setCreateForm({ name: '', parentId: 1, startWeek: 1, endWeek: 1, color: '#4A90E2', completed: false });
+                  setCreateForm({ name: '', parentId: 1, startDate: '', endDate: '', color: '#4A90E2', completed: false });
                 }}
                 style={{
                   padding: '10px 20px',
@@ -971,7 +969,7 @@ function Progress() {
               marginBottom: '20px',
               color: '#0A1628'
             }}>
-              Add New Dependency
+              Add New Parent Task
             </h3>
             
             {/* Dependency Name Input */}
@@ -982,7 +980,7 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                Dependency Name
+                Parent Task Name
               </label>
               <input
                 type="text"
@@ -999,7 +997,7 @@ function Progress() {
               />
             </div>
             
-            {/* Start Week Input */}
+            {/* Start Date Input */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
@@ -1007,14 +1005,14 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                Start Week (1-16)
+                Start Date
               </label>
               <input
-                type="number"
-                min="1"
-                max="16"
-                value={dependencyForm.startWeek}
-                onChange={(e) => setDependencyForm({ ...dependencyForm, startWeek: e.target.value })}
+                type="date"
+                value={dependencyForm.startDate}
+                min={projectSettings.startDate}
+                max={projectSettings.endDate}
+                onChange={(e) => setDependencyForm({ ...dependencyForm, startDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -1025,7 +1023,7 @@ function Progress() {
               />
             </div>
             
-            {/* End Week Input */}
+            {/* End Date Input */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
@@ -1033,14 +1031,14 @@ function Progress() {
                 fontSize: '14px',
                 fontFamily: 'Century Gothic, sans-serif'
               }}>
-                End Week (1-16)
+                End Date
               </label>
               <input
-                type="number"
-                min="1"
-                max="16"
-                value={dependencyForm.endWeek}
-                onChange={(e) => setDependencyForm({ ...dependencyForm, endWeek: e.target.value })}
+                type="date"
+                value={dependencyForm.endDate}
+                min={projectSettings.startDate}
+                max={projectSettings.endDate}
+                onChange={(e) => setDependencyForm({ ...dependencyForm, endDate: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
@@ -1056,7 +1054,7 @@ function Progress() {
               <button
                 onClick={() => {
                   setCreatingDependency(false);
-                  setDependencyForm({ name: '', startWeek: 1, endWeek: 8 });
+                  setDependencyForm({ name: '', startDate: '', endDate: '' });
                 }}
                 style={{
                   padding: '10px 20px',
@@ -1088,7 +1086,7 @@ function Progress() {
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#6f42c1'}
                 disabled={!dependencyForm.name}
               >
-                Create Dependency
+                Create Parent Task
               </button>
             </div>
           </div>
@@ -1172,49 +1170,6 @@ function Progress() {
               />
             </div>
             
-            {/* Display Mode Toggle */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Display Mode
-              </label>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={() => setProjectSettings({ ...projectSettings, displayMode: 'weeks' })}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '6px',
-                    border: '1px solid #ddd',
-                    backgroundColor: projectSettings.displayMode === 'weeks' ? '#0A1628' : 'white',
-                    color: projectSettings.displayMode === 'weeks' ? 'white' : '#333',
-                    fontFamily: 'Century Gothic, sans-serif',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  Weeks
-                </button>
-                <button
-                  onClick={() => setProjectSettings({ ...projectSettings, displayMode: 'dates' })}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '6px',
-                    border: '1px solid #ddd',
-                    backgroundColor: projectSettings.displayMode === 'dates' ? '#0A1628' : 'white',
-                    color: projectSettings.displayMode === 'dates' ? 'white' : '#333',
-                    fontFamily: 'Century Gothic, sans-serif',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  Dates
-                </button>
-              </div>
-            </div>
             
             {/* Buttons */}
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
