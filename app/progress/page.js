@@ -463,7 +463,14 @@ function ProgressPage() {
         </div>
 
         {/* Category Dials Section */}
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0A1628', marginBottom: '20px' }}>
+        <h3 style={{ 
+          fontSize: '20px',
+          fontWeight: 'bold',
+          color: '#0A1628',
+          marginBottom: '24px',
+          marginTop: '32px',
+          fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+        }}>
           Category Breakdown
         </h3>
         
