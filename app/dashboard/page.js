@@ -67,21 +67,27 @@ function Dashboard() {
 
   return (
     <>
-      {/* Background Pattern - EXACT from frontend globals.css */}
+      {/* Background gradient */}
       <div style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundImage: `
-          linear-gradient(180deg, rgba(10, 22, 40, 0.02) 0%, rgba(10, 22, 40, 0.05) 100%),
-          url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.03'%3E%3Crect x='0' y='0' width='20' height='100' fill='%230A1628'/%3E%3Crect x='40' y='0' width='20' height='100' fill='%230A1628'/%3E%3Crect x='80' y='0' width='20' height='100' fill='%230A1628'/%3E%3Crect x='10' y='10' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='25' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='40' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='55' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='70' width='80' height='5' fill='%231E3A5F'/%3E%3Crect x='10' y='85' width='80' height='5' fill='%231E3A5F'/%3E%3C/g%3E%3C/svg%3E")
-        `,
-        backgroundSize: 'cover, 400px 400px',
-        backgroundPosition: 'center, 0 0',
-        backgroundRepeat: 'no-repeat, repeat',
-        opacity: 0.4,
+        background: 'linear-gradient(to bottom, #FFFFFF, #F9FAFB)',
+        zIndex: -2
+      }} />
+      
+      {/* Circuit pattern overlay - EXACT from frontend */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.02,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10h10v10h10v-10h10v10h10v10h10v10h-10v10h10v10h10v10h-10v10h-10v-10h-10v10h-10v-10h-10v-10h-10v-10h10v-10h-10v-10h-10v-10h10v-10zm20 20h10v10h-10v-10zm20 0h10v10h-10v-10zm0 20h10v10h-10v-10zm-20 0h10v10h-10v-10z' fill='%23001f3f' fill-opacity='1'/%3E%3C/svg%3E")`,
+        backgroundSize: '100px 100px',
         zIndex: -1,
         pointerEvents: 'none'
       }} />
