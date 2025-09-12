@@ -13,28 +13,37 @@ function Progress() {
     endWeek: 1,
     color: '#4A90E2'
   });
+  const [creatingTask, setCreatingTask] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    name: '',
+    parentId: 1,
+    startWeek: 1,
+    endWeek: 1,
+    color: '#4A90E2',
+    completed: false
+  });
 
   const defaultTasks = [
     // MOP Parent and Children
-    { id: 1, name: 'ALL MOP WORK', type: 'parent', startWeek: 1, endWeek: 8, color: '#0A1628' },
-    { id: 2, name: 'MOP Planning', type: 'child', parentId: 1, startWeek: 1, endWeek: 2, color: '#4A90E2' },
-    { id: 3, name: 'MOP Documentation', type: 'child', parentId: 1, startWeek: 2, endWeek: 4, color: '#4A90E2' },
-    { id: 4, name: 'MOP Review', type: 'child', parentId: 1, startWeek: 4, endWeek: 6, color: '#4A90E2' },
-    { id: 5, name: 'MOP Implementation', type: 'child', parentId: 1, startWeek: 6, endWeek: 8, color: '#4A90E2' },
+    { id: 1, name: 'ALL MOP WORK', type: 'parent', startWeek: 1, endWeek: 8, color: '#0A1628', completed: false },
+    { id: 2, name: 'MOP Planning', type: 'child', parentId: 1, startWeek: 1, endWeek: 2, color: '#4A90E2', completed: false },
+    { id: 3, name: 'MOP Documentation', type: 'child', parentId: 1, startWeek: 2, endWeek: 4, color: '#4A90E2', completed: false },
+    { id: 4, name: 'MOP Review', type: 'child', parentId: 1, startWeek: 4, endWeek: 6, color: '#4A90E2', completed: false },
+    { id: 5, name: 'MOP Implementation', type: 'child', parentId: 1, startWeek: 6, endWeek: 8, color: '#4A90E2', completed: false },
     
     // SOP Parent and Children
-    { id: 6, name: 'ALL SOP WORK', type: 'parent', startWeek: 8, endWeek: 12, color: '#0A1628' },
-    { id: 7, name: 'SOP Development', type: 'child', parentId: 6, startWeek: 8, endWeek: 9, color: '#50C878' },
-    { id: 8, name: 'SOP Testing', type: 'child', parentId: 6, startWeek: 9, endWeek: 10, color: '#50C878' },
-    { id: 9, name: 'SOP Training', type: 'child', parentId: 6, startWeek: 10, endWeek: 11, color: '#50C878' },
-    { id: 10, name: 'SOP Deployment', type: 'child', parentId: 6, startWeek: 11, endWeek: 12, color: '#50C878' },
+    { id: 6, name: 'ALL SOP WORK', type: 'parent', startWeek: 8, endWeek: 12, color: '#0A1628', completed: false },
+    { id: 7, name: 'SOP Development', type: 'child', parentId: 6, startWeek: 8, endWeek: 9, color: '#50C878', completed: false },
+    { id: 8, name: 'SOP Testing', type: 'child', parentId: 6, startWeek: 9, endWeek: 10, color: '#50C878', completed: false },
+    { id: 9, name: 'SOP Training', type: 'child', parentId: 6, startWeek: 10, endWeek: 11, color: '#50C878', completed: false },
+    { id: 10, name: 'SOP Deployment', type: 'child', parentId: 6, startWeek: 11, endWeek: 12, color: '#50C878', completed: false },
     
     // EOP Parent and Children
-    { id: 11, name: 'ALL EOP WORK', type: 'parent', startWeek: 12, endWeek: 16, color: '#0A1628' },
-    { id: 12, name: 'EOP Assessment', type: 'child', parentId: 11, startWeek: 12, endWeek: 13, color: '#FF6B6B' },
-    { id: 13, name: 'EOP Procedures', type: 'child', parentId: 11, startWeek: 13, endWeek: 14, color: '#FF6B6B' },
-    { id: 14, name: 'EOP Drills', type: 'child', parentId: 11, startWeek: 14, endWeek: 15, color: '#FF6B6B' },
-    { id: 15, name: 'EOP Finalization', type: 'child', parentId: 11, startWeek: 15, endWeek: 16, color: '#FF6B6B' }
+    { id: 11, name: 'ALL EOP WORK', type: 'parent', startWeek: 12, endWeek: 16, color: '#0A1628', completed: false },
+    { id: 12, name: 'EOP Assessment', type: 'child', parentId: 11, startWeek: 12, endWeek: 13, color: '#FF6B6B', completed: false },
+    { id: 13, name: 'EOP Procedures', type: 'child', parentId: 11, startWeek: 13, endWeek: 14, color: '#FF6B6B', completed: false },
+    { id: 14, name: 'EOP Drills', type: 'child', parentId: 11, startWeek: 14, endWeek: 15, color: '#FF6B6B', completed: false },
+    { id: 15, name: 'EOP Finalization', type: 'child', parentId: 11, startWeek: 15, endWeek: 16, color: '#FF6B6B', completed: false }
   ];
 
   useEffect(() => {
@@ -128,6 +137,66 @@ function Progress() {
     }
   };
   
+  const updateParentTasks = (taskList) => {
+    return taskList.map(task => {
+      if (task.type === 'parent') {
+        const children = taskList.filter(t => t.parentId === task.id);
+        if (children.length > 0) {
+          const minStart = Math.min(...children.map(c => c.startWeek));
+          const maxEnd = Math.max(...children.map(c => c.endWeek));
+          const allCompleted = children.every(c => c.completed);
+          return { ...task, startWeek: minStart, endWeek: maxEnd, completed: allCompleted };
+        }
+      }
+      return task;
+    });
+  };
+  
+  const handleDeleteTask = () => {
+    if (confirm(`Are you sure you want to delete "${editingTask.name}"?`)) {
+      const filteredTasks = tasks.filter(task => task.id !== editingTask.id);
+      const updatedTasks = updateParentTasks(filteredTasks);
+      setTasks(updatedTasks);
+      localStorage.setItem('ganttChartTasks', JSON.stringify(updatedTasks));
+      setEditingTask(null);
+      setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
+    }
+  };
+  
+  const handleCreateTask = () => {
+    const newId = Math.max(...tasks.map(t => t.id)) + 1;
+    const newTask = {
+      id: newId,
+      name: createForm.name,
+      type: 'child',
+      parentId: parseInt(createForm.parentId),
+      startWeek: parseInt(createForm.startWeek),
+      endWeek: parseInt(createForm.endWeek),
+      color: createForm.color,
+      completed: false
+    };
+    
+    const newTasks = [...tasks, newTask];
+    const updatedTasks = updateParentTasks(newTasks);
+    setTasks(updatedTasks);
+    localStorage.setItem('ganttChartTasks', JSON.stringify(updatedTasks));
+    setCreatingTask(false);
+    setCreateForm({ name: '', parentId: 1, startWeek: 1, endWeek: 1, color: '#4A90E2', completed: false });
+  };
+  
+  const handleToggleComplete = (taskId) => {
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        return { ...task, completed: !task.completed };
+      }
+      return task;
+    });
+    
+    const finalTasks = updateParentTasks(updatedTasks);
+    setTasks(finalTasks);
+    localStorage.setItem('ganttChartTasks', JSON.stringify(finalTasks));
+  };
+  
   const presetColors = ['#4A90E2', '#50C878', '#FF6B6B', '#FFD700', '#9B59B6', '#FF8C00', '#00CED1'];
 
   return (
@@ -188,6 +257,25 @@ function Progress() {
             onMouseLeave={(e) => e.target.style.backgroundColor = '#fd7e14'}
           >
             🔄 Reset to Default
+          </button>
+          
+          <button
+            onClick={() => setCreatingTask(true)}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#007bff',
+              color: 'white',
+              fontFamily: 'Century Gothic, sans-serif',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
+          >
+            ➕ Add Task
           </button>
           
           <div style={{
@@ -252,6 +340,22 @@ function Progress() {
                       }} />
                     ))}
                     
+                    {/* Checkbox for child tasks */}
+                    {task.type === 'child' && (
+                      <input
+                        type="checkbox"
+                        checked={task.completed || false}
+                        onChange={() => handleToggleComplete(task.id)}
+                        style={{
+                          position: 'absolute',
+                          left: `${taskLeft - 20}px`,
+                          top: '8px',
+                          cursor: 'pointer',
+                          zIndex: 1
+                        }}
+                      />
+                    )}
+                    
                     {/* Task bar */}
                     <div 
                       onClick={() => handleTaskClick(task)}
@@ -261,7 +365,7 @@ function Progress() {
                         top: '5px',
                         width: `${taskWidth - 4}px`,
                         height: '20px',
-                        backgroundColor: task.color,
+                        backgroundColor: task.completed ? '#9ca3af' : task.color,
                         borderRadius: '4px',
                         display: 'flex',
                         alignItems: 'center',
@@ -277,15 +381,16 @@ function Progress() {
                         boxShadow: task.type === 'parent' ? '0 2px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.1)',
                         cursor: task.type === 'child' ? 'pointer' : 'default',
                         transition: 'opacity 0.2s',
-                        '&:hover': { opacity: task.type === 'child' ? 0.9 : 1 }
+                        textDecoration: task.completed ? 'line-through' : 'none',
+                        opacity: task.completed ? 0.7 : 1
                       }}
                       onMouseEnter={(e) => {
-                        if (task.type === 'child') {
+                        if (task.type === 'child' && !task.completed) {
                           e.currentTarget.style.opacity = '0.9';
                         }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.opacity = task.completed ? '0.7' : '1';
                       }}
                     >
                       {task.name}
@@ -459,9 +564,28 @@ function Progress() {
             </div>
             
             {/* Buttons */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
               <button
-                onClick={handleCancelEdit}
+                onClick={handleDeleteTask}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+              >
+                🗑️ Delete
+              </button>
+              
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={handleCancelEdit}
                 style={{
                   padding: '10px 20px',
                   borderRadius: '6px',
@@ -492,6 +616,214 @@ function Progress() {
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#0A1628'}
               >
                 Save Changes
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Create Task Modal */}
+      {creatingTask && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '24px',
+            minWidth: '400px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ 
+              fontFamily: 'Century Gothic, sans-serif', 
+              marginBottom: '20px',
+              color: '#0A1628'
+            }}>
+              Add New Task
+            </h3>
+            
+            {/* Task Name Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Task Name
+              </label>
+              <input
+                type="text"
+                value={createForm.name}
+                onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* Parent Task Selection */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Parent Task
+              </label>
+              <select
+                value={createForm.parentId}
+                onChange={(e) => setCreateForm({ ...createForm, parentId: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              >
+                {tasks.filter(t => t.type === 'parent').map(parent => (
+                  <option key={parent.id} value={parent.id}>
+                    {parent.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Start Week Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Start Week (1-16)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="16"
+                value={createForm.startWeek}
+                onChange={(e) => setCreateForm({ ...createForm, startWeek: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* End Week Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                End Week (1-16)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="16"
+                value={createForm.endWeek}
+                onChange={(e) => setCreateForm({ ...createForm, endWeek: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* Color Picker */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Task Color
+              </label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {presetColors.map(color => (
+                  <div
+                    key={color}
+                    onClick={() => setCreateForm({ ...createForm, color })}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: color,
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      border: createForm.color === color ? '3px solid #0A1628' : '2px solid #ddd',
+                      transition: 'all 0.2s'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setCreatingTask(false);
+                  setCreateForm({ name: '', parentId: 1, startWeek: 1, endWeek: 1, color: '#4A90E2', completed: false });
+                }}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateTask}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#218838'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#28a745'}
+                disabled={!createForm.name}
+              >
+                ➕ Create Task
               </button>
             </div>
           </div>
