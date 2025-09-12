@@ -10,7 +10,8 @@ function Progress() {
   const [showAddParent, setShowAddParent] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [columnWidth, setColumnWidth] = useState(80);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const baseColumnWidth = 80;
   
   const [projectSettings, setProjectSettings] = useState({
     startDate: '2025-01-01',
@@ -40,6 +41,7 @@ function Progress() {
     const end = new Date(projectSettings.endDate);
     let current = new Date(start);
     
+    // Calculate standard periods
     while (current <= end) {
       const periodStart = new Date(current);
       const periodEnd = new Date(current);
@@ -52,10 +54,30 @@ function Progress() {
       periods.push({
         start: periodStart,
         end: periodEnd,
-        label: formatPeriodLabel(periodStart, periodEnd)
+        label: formatPeriodLabel(periodStart, periodEnd),
+        isPostProject: false
       });
       
       current.setDate(current.getDate() + 7);
+    }
+    
+    // Add extra periods when zoomed out
+    if (zoomLevel < 1) {
+      const extraPeriods = Math.ceil((1 - zoomLevel) * 8);
+      for (let i = 0; i < extraPeriods; i++) {
+        const periodStart = new Date(current);
+        const periodEnd = new Date(current);
+        periodEnd.setDate(periodEnd.getDate() + 6);
+        
+        periods.push({
+          start: periodStart,
+          end: periodEnd,
+          label: formatPeriodLabel(periodStart, periodEnd),
+          isPostProject: true
+        });
+        
+        current.setDate(current.getDate() + 7);
+      }
     }
     
     return periods;
@@ -77,21 +99,25 @@ function Progress() {
   
   const getTaskPosition = (startDate, endDate) => {
     const projectStart = new Date(projectSettings.startDate);
-    const projectEnd = new Date(projectSettings.endDate);
     const taskStart = new Date(startDate);
     const taskEnd = new Date(endDate);
     
-    const totalDays = (projectEnd - projectStart) / (1000 * 60 * 60 * 24);
+    const periods = getDatePeriods();
+    const totalPeriods = periods.filter(p => !p.isPostProject).length;
+    const totalDays = totalPeriods * 7;
+    
     const startDays = (taskStart - projectStart) / (1000 * 60 * 60 * 24);
     const duration = (taskEnd - taskStart) / (1000 * 60 * 60 * 24) + 1;
     
-    const periods = getDatePeriods();
-    const startPercent = (startDays / totalDays) * 100;
-    const widthPercent = (duration / totalDays) * 100;
+    const columnWidth = baseColumnWidth * zoomLevel;
+    const totalWidth = periods.length * columnWidth;
+    
+    const leftPx = (startDays / 7) * columnWidth;
+    const widthPx = (duration / 7) * columnWidth;
     
     return {
-      left: `${startPercent}%`,
-      width: `${widthPercent}%`
+      left: `${leftPx}px`,
+      width: `${widthPx}px`
     };
   };
   
@@ -355,40 +381,45 @@ function Progress() {
           Timeline Settings
         </button>
         
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'Century Gothic, sans-serif' }}>
+            Zoom: {Math.round(zoomLevel * 100)}%
+          </span>
           <button
-            onClick={() => setColumnWidth(Math.max(50, columnWidth - 10))}
+            onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
+            disabled={zoomLevel <= 0.5}
             style={{
               padding: '6px 12px',
-              backgroundColor: 'white',
-              color: '#6B7280',
+              backgroundColor: zoomLevel <= 0.5 ? '#F3F4F6' : 'white',
+              color: zoomLevel <= 0.5 ? '#9CA3AF' : '#6B7280',
               border: '1px solid #E5E7EB',
               borderRadius: '4px',
-              cursor: 'pointer',
+              cursor: zoomLevel <= 0.5 ? 'not-allowed' : 'pointer',
               fontSize: '12px',
               fontFamily: 'Century Gothic, sans-serif',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => { e.target.style.backgroundColor = '#F9FAFB'; e.target.style.borderColor = '#9CA3AF'; }}
-            onMouseLeave={(e) => { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#E5E7EB'; }}
+            onMouseEnter={(e) => { if (zoomLevel > 0.5) { e.target.style.backgroundColor = '#F9FAFB'; e.target.style.borderColor = '#9CA3AF'; }}}
+            onMouseLeave={(e) => { if (zoomLevel > 0.5) { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#E5E7EB'; }}}
           >
             Zoom Out -
           </button>
           <button
-            onClick={() => setColumnWidth(Math.min(150, columnWidth + 10))}
+            onClick={() => setZoomLevel(Math.min(2, zoomLevel + 0.25))}
+            disabled={zoomLevel >= 2}
             style={{
               padding: '6px 12px',
-              backgroundColor: 'white',
-              color: '#6B7280',
+              backgroundColor: zoomLevel >= 2 ? '#F3F4F6' : 'white',
+              color: zoomLevel >= 2 ? '#9CA3AF' : '#6B7280',
               border: '1px solid #E5E7EB',
               borderRadius: '4px',
-              cursor: 'pointer',
+              cursor: zoomLevel >= 2 ? 'not-allowed' : 'pointer',
               fontSize: '12px',
               fontFamily: 'Century Gothic, sans-serif',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => { e.target.style.backgroundColor = '#F9FAFB'; e.target.style.borderColor = '#9CA3AF'; }}
-            onMouseLeave={(e) => { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#E5E7EB'; }}
+            onMouseEnter={(e) => { if (zoomLevel < 2) { e.target.style.backgroundColor = '#F9FAFB'; e.target.style.borderColor = '#9CA3AF'; }}}
+            onMouseLeave={(e) => { if (zoomLevel < 2) { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#E5E7EB'; }}}
           >
             Zoom In +
           </button>
@@ -401,25 +432,31 @@ function Progress() {
         borderRadius: '8px', 
         border: '1px solid #D1D5DB',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
+        overflow: 'auto',
+        maxWidth: '100%'
       }}>
         {/* Date Headers */}
         <div style={{ 
           display: 'flex', 
           borderBottom: '2px solid #374151',
-          backgroundColor: '#F3F4F6'
+          backgroundColor: '#F3F4F6',
+          position: 'sticky',
+          top: 0,
+          zIndex: 10
         }}>
           {periods.map((period, index) => (
             <div
               key={index}
               style={{
-                width: `${columnWidth}px`,
+                width: `${baseColumnWidth * zoomLevel}px`,
+                minWidth: `${baseColumnWidth * zoomLevel}px`,
                 padding: '12px 4px',
                 textAlign: 'center',
                 borderRight: '1px solid #D1D5DB',
                 fontSize: '11px',
                 fontWeight: 'bold',
-                color: '#1F2937',
+                color: period.isPostProject ? '#9CA3AF' : '#1F2937',
+                backgroundColor: period.isPostProject ? '#F9FAFB' : '#F3F4F6',
                 fontFamily: 'Century Gothic, sans-serif',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -432,26 +469,39 @@ function Progress() {
         </div>
         
         {/* Tasks Container */}
-        <div style={{ position: 'relative', padding: '16px' }}>
+        <div style={{ 
+          position: 'relative',
+          minWidth: `${periods.length * baseColumnWidth * zoomLevel}px`,
+          padding: '16px'
+        }}>
           {/* Grid Background */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}>
-            {periods.map((_, colIndex) => (
+          <div style={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            pointerEvents: 'none',
+            zIndex: 2
+          }}>
+            {periods.map((period, colIndex) => (
               <div
                 key={colIndex}
                 style={{
                   position: 'absolute',
-                  left: `${colIndex * columnWidth}px`,
+                  left: `${colIndex * baseColumnWidth * zoomLevel}px`,
                   top: 0,
                   width: '1px',
                   height: '100%',
-                  backgroundColor: '#E5E7EB'
+                  backgroundColor: period.isPostProject ? '#D1D5DB' : '#E5E7EB',
+                  opacity: period.isPostProject ? 0.5 : 1
                 }}
               />
             ))}
           </div>
           
           {/* Tasks */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', zIndex: 3 }}>
             {parentTasks.map((parent, parentIndex) => {
               const children = tasks.filter(t => t.parentId === parent.id);
               let rowIndex = 0;
@@ -466,13 +516,18 @@ function Progress() {
                   <div style={{ 
                     position: 'relative', 
                     height: '40px', 
-                    marginBottom: '8px',
-                    backgroundColor: rowIndex % 2 === 0 ? 'white' : '#F9FAFB',
-                    marginLeft: '-16px',
-                    marginRight: '-16px',
-                    paddingLeft: '16px',
-                    paddingRight: '16px'
+                    marginBottom: '8px'
                   }}>
+                    {/* Row Background */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '-16px',
+                      right: '-16px',
+                      height: '100%',
+                      backgroundColor: rowIndex % 2 === 0 ? 'white' : '#F9FAFB',
+                      zIndex: 1
+                    }} />
                     <div
                       onClick={() => handleEditTask(parent)}
                       style={{
@@ -491,7 +546,8 @@ function Progress() {
                         cursor: 'pointer',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
                         transition: 'transform 0.2s, box-shadow 0.2s',
-                        fontFamily: 'Century Gothic, sans-serif'
+                        fontFamily: 'Century Gothic, sans-serif',
+                        zIndex: 3
                       }}
                       onMouseEnter={(e) => { 
                         e.currentTarget.style.transform = 'scale(1.02)';
@@ -513,13 +569,18 @@ function Progress() {
                       <div key={child.id} style={{ 
                         position: 'relative', 
                         height: '32px', 
-                        marginBottom: '4px',
-                        backgroundColor: rowIndex % 2 === 0 ? 'white' : '#F9FAFB',
-                        marginLeft: '-16px',
-                        marginRight: '-16px',
-                        paddingLeft: '36px',
-                        paddingRight: '16px'
+                        marginBottom: '4px'
                       }}>
+                        {/* Row Background */}
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: '-16px',
+                          right: '-16px',
+                          height: '100%',
+                          backgroundColor: rowIndex % 2 === 0 ? 'white' : '#F9FAFB',
+                          zIndex: 1
+                        }} />
                         <div
                           onClick={() => handleEditTask(child)}
                           style={{
@@ -532,12 +593,14 @@ function Progress() {
                             display: 'flex',
                             alignItems: 'center',
                             paddingLeft: '10px',
+                            marginLeft: '20px',
                             color: 'white',
                             fontSize: '12px',
                             cursor: 'pointer',
                             transition: 'transform 0.2s, box-shadow 0.2s',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                            fontFamily: 'Century Gothic, sans-serif'
+                            fontFamily: 'Century Gothic, sans-serif',
+                            zIndex: 3
                           }}
                           onMouseEnter={(e) => { 
                             e.currentTarget.style.transform = 'scale(1.02)';
