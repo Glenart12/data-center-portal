@@ -593,7 +593,7 @@ function ProgressPage() {
           }}
           onClose={() => setShowTimeline(false)}
         />
-      )}
+      )} {/* end modals */}
     </>
   );
 }
