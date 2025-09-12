@@ -409,9 +409,9 @@ function ProgressPage() {
         {/* Progress Bars */}
         <div style={{ marginBottom: '32px' }}>
           {[
-            { type: 'MOP', complete: 75, current: 12, total: 16 },
-            { type: 'SOP', complete: 50, current: 8, total: 16 },
-            { type: 'EOP', complete: 25, current: 4, total: 16 }
+            { type: 'MOP', complete: 85, current: 137, total: 162 },
+            { type: 'SOP', complete: 58, current: 87, total: 151 },
+            { type: 'EOP', complete: 25, current: 41, total: 164 }
           ].map(item => (
             <div key={item.type} style={{ marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
