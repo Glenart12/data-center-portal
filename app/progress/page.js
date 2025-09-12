@@ -1,13 +1,10 @@
 'use client';
 
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+// React imports first
 import { useState, useEffect, useMemo } from 'react';
-import EditTaskModal from './components/EditTaskModal';
-import AddTaskModal from './components/AddTaskModal';
-import ImportPreviewModal from './components/ImportPreviewModal';
-import ErrorBoundary from './components/ErrorBoundary';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
-// Default task data - moved outside component to prevent re-creation
+// Default task data - defined before component imports to avoid initialization issues
 const defaultTasks = [
   {
     id: 'mop-parent',
@@ -131,7 +128,59 @@ const defaultTasks = [
   }
 ];
 
+// Component imports after constants
+import EditTaskModal from './components/EditTaskModal';
+import AddTaskModal from './components/AddTaskModal';
+import ImportPreviewModal from './components/ImportPreviewModal';
+import ErrorBoundary from './components/ErrorBoundary';
+
 function Progress() {
+  // Initialization safety check
+  if (!defaultTasks || !Array.isArray(defaultTasks)) {
+    console.error('defaultTasks is not properly initialized');
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#F9FAFB'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          backgroundColor: '#FFFFFF',
+          padding: '32px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔄</div>
+          <h2 style={{ color: '#DC2626', marginBottom: '8px', fontSize: '1.5rem' }}>
+            Initialization Error
+          </h2>
+          <p style={{ color: '#4A5568', fontSize: '14px', marginBottom: '24px' }}>
+            Failed to load task data. Please refresh the page.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 24px',
+              borderRadius: '4px',
+              border: 'none',
+              backgroundColor: '#0A1628',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Century Gothic", sans-serif'
+            }}
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
