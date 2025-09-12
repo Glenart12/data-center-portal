@@ -162,16 +162,14 @@ function Progress() {
   const [importPreview, setImportPreview] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
   const [hoveredButton, setHoveredButton] = useState(null);
-  const [dismissedNotifications, setDismissedNotifications] = useState({
-    () => {
+  const [dismissedNotifications, setDismissedNotifications] = useState(() => {
     const saved = localStorage.getItem('dismissedNotifications');
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Reset if it's a new day
-      if (parsed.date !== new Date().toDateString()) {
-        return { date: new Date().toDateString(), overdue: false, upcoming: false };
+      const today = new Date().toDateString();
+      if (parsed.date === today) {
+        return parsed;
       }
-      return parsed;
     }
     return { date: new Date().toDateString(), overdue: false, upcoming: false };
   });
