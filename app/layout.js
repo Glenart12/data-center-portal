@@ -13,23 +13,9 @@ export default function RootLayout({ children }) {
         margin: 0,
         padding: 0,
         fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
-        backgroundImage: 'url("/Data-Centre-Stock-04.jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
+        backgroundColor: '#FFFFFF',
         minHeight: '100vh'
       }}>
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(8px)',
-          zIndex: -1
-        }} />
-        
         <UserProvider>
           <Header />
           <main style={{
