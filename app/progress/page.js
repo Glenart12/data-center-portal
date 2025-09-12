@@ -411,7 +411,8 @@ function ProgressPage() {
           backgroundColor: 'white',
           borderRadius: '8px',
           padding: '24px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          overflow: 'hidden'
         }}>
         {/* Percentage Complete Section */}
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px' }}>
@@ -419,7 +420,7 @@ function ProgressPage() {
         </h2>
         
         {/* Progress Bars */}
-        <div style={{ marginBottom: '32px' }}>
+        <div style={{ marginBottom: '32px', maxWidth: '100%' }}>
           {[
             { type: 'MOP', complete: 85, current: 137, total: 162 },
             { type: 'SOP', complete: 58, current: 87, total: 151 },
@@ -430,7 +431,7 @@ function ProgressPage() {
                 <div style={{ width: '60px', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
                   {item.type}
                 </div>
-                <div style={{ flex: 1, position: 'relative' }}>
+                <div style={{ flex: 1, position: 'relative', maxWidth: '100%' }}>
                   <div style={{
                     height: '24px',
                     backgroundColor: '#E5E7EB',
@@ -466,7 +467,7 @@ function ProgressPage() {
           Category Breakdown
         </h3>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '100%' }}>
           {[
             { 
               category: 'MOP',
@@ -500,7 +501,7 @@ function ProgressPage() {
               <h4 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0A1628', marginBottom: '16px', textAlign: 'center' }}>
                 {item.category}
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', maxWidth: '100%' }}>
                 {item.gauges.map(gauge => (
                   <div key={gauge.label} style={{ textAlign: 'center' }}>
                     <HalfCircleGauge percentage={gauge.value} />
