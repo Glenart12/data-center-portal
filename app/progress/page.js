@@ -22,6 +22,17 @@ function Progress() {
     color: '#4A90E2',
     completed: false
   });
+  const [creatingDependency, setCreatingDependency] = useState(false);
+  const [dependencyForm, setDependencyForm] = useState({
+    name: '',
+    startWeek: 1,
+    endWeek: 8
+  });
+  const [showSettings, setShowSettings] = useState(false);
+  const [projectSettings, setProjectSettings] = useState({
+    startDate: new Date('2025-01-01').toISOString().split('T')[0],
+    displayMode: 'weeks' // 'weeks' or 'dates'
+  });
 
   const defaultTasks = [
     // MOP Parent and Children
@@ -62,6 +73,17 @@ function Progress() {
     } else {
       setTasks(defaultTasks);
     }
+    
+    // Load settings from localStorage
+    const savedSettings = localStorage.getItem('ganttChartSettings');
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings);
+        setProjectSettings(parsedSettings);
+      } catch (error) {
+        console.error('Error loading saved settings:', error);
+      }
+    }
   }, []);
 
   if (!mounted) {
@@ -75,15 +97,13 @@ function Progress() {
   const weekWidth = chartWidth / 16;
   
   const handleTaskClick = (task) => {
-    if (task.type === 'child') {
-      setEditingTask(task);
-      setEditForm({
-        name: task.name,
-        startWeek: task.startWeek,
-        endWeek: task.endWeek,
-        color: task.color
-      });
-    }
+    setEditingTask(task);
+    setEditForm({
+      name: task.name,
+      startWeek: task.startWeek,
+      endWeek: task.endWeek,
+      color: task.color
+    });
   };
   
   const handleSaveEdit = () => {
@@ -114,7 +134,7 @@ function Progress() {
     });
     
     setTasks(finalTasks);
-    // Save to localStorage
+    // Auto-save to localStorage
     localStorage.setItem('ganttChartTasks', JSON.stringify(finalTasks));
     setEditingTask(null);
     setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
@@ -125,16 +145,39 @@ function Progress() {
     setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
   };
   
-  const handleSaveAll = () => {
-    localStorage.setItem('ganttChartTasks', JSON.stringify(tasks));
-    alert('All changes saved successfully!');
+  const getDateFromWeek = (weekNumber) => {
+    const startDate = new Date(projectSettings.startDate);
+    const weekStart = new Date(startDate);
+    weekStart.setDate(startDate.getDate() + (weekNumber - 1) * 7);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${weekEnd.getDate()}`;
   };
   
-  const handleResetToDefault = () => {
-    if (confirm('Are you sure you want to reset to default tasks? This will remove all your changes.')) {
-      setTasks(defaultTasks);
-      localStorage.setItem('ganttChartTasks', JSON.stringify(defaultTasks));
-    }
+  const handleCreateDependency = () => {
+    const newId = Math.max(...tasks.map(t => t.id), 0) + 1;
+    const newDependency = {
+      id: newId,
+      name: dependencyForm.name,
+      type: 'parent',
+      startWeek: parseInt(dependencyForm.startWeek),
+      endWeek: parseInt(dependencyForm.endWeek),
+      color: '#0A1628',
+      completed: false
+    };
+    
+    const newTasks = [...tasks, newDependency];
+    setTasks(newTasks);
+    localStorage.setItem('ganttChartTasks', JSON.stringify(newTasks));
+    setCreatingDependency(false);
+    setDependencyForm({ name: '', startWeek: 1, endWeek: 8 });
+  };
+  
+  const handleSaveSettings = () => {
+    localStorage.setItem('ganttChartSettings', JSON.stringify(projectSettings));
+    setShowSettings(false);
   };
   
   const updateParentTasks = (taskList) => {
@@ -222,44 +265,6 @@ function Progress() {
           alignItems: 'center'
         }}>
           <button
-            onClick={handleSaveAll}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: '#28a745',
-              color: 'white',
-              fontFamily: 'Century Gothic, sans-serif',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#218838'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#28a745'}
-          >
-            💾 Save All Changes
-          </button>
-          
-          <button
-            onClick={handleResetToDefault}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: '#fd7e14',
-              color: 'white',
-              fontFamily: 'Century Gothic, sans-serif',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#e56b00'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#fd7e14'}
-          >
-            🔄 Reset to Default
-          </button>
-          
-          <button
             onClick={() => setCreatingTask(true)}
             style={{
               padding: '10px 20px',
@@ -278,13 +283,51 @@ function Progress() {
             ➕ Add Task
           </button>
           
+          <button
+            onClick={() => setCreatingDependency(true)}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#6f42c1',
+              color: 'white',
+              fontFamily: 'Century Gothic, sans-serif',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#5a32a3'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6f42c1'}
+          >
+            🔗 Add Dependency
+          </button>
+          
+          <button
+            onClick={() => setShowSettings(true)}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#6c757d',
+              color: 'white',
+              fontFamily: 'Century Gothic, sans-serif',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#5a6268'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6c757d'}
+          >
+            ⚙️ Timeline Settings
+          </button>
+          
           <div style={{
             marginLeft: 'auto',
             fontSize: '12px',
             color: '#6c757d',
             fontFamily: 'Century Gothic, sans-serif'
           }}>
-            Click on child tasks to edit them
+            All changes are auto-saved
           </div>
         </div>
         
@@ -314,7 +357,7 @@ function Progress() {
                   fontSize: '12px',
                   fontFamily: 'Century Gothic, sans-serif'
                 }}>
-                  Week {week}
+                  {projectSettings.displayMode === 'weeks' ? `Week ${week}` : getDateFromWeek(week)}
                 </div>
               ))}
             </div>
@@ -340,7 +383,7 @@ function Progress() {
                       }} />
                     ))}
                     
-                    {/* Checkbox for child tasks */}
+                    {/* Checkbox for child tasks only */}
                     {task.type === 'child' && (
                       <input
                         type="checkbox"
@@ -379,13 +422,13 @@ function Progress() {
                         textOverflow: 'ellipsis',
                         marginLeft: task.type === 'child' ? '20px' : '0',
                         boxShadow: task.type === 'parent' ? '0 2px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.1)',
-                        cursor: task.type === 'child' ? 'pointer' : 'default',
+                        cursor: 'pointer',
                         transition: 'opacity 0.2s',
                         textDecoration: task.completed ? 'line-through' : 'none',
                         opacity: task.completed ? 0.7 : 1
                       }}
                       onMouseEnter={(e) => {
-                        if (task.type === 'child' && !task.completed) {
+                        if (!task.completed) {
                           e.currentTarget.style.opacity = '0.9';
                         }
                       }}
@@ -824,6 +867,293 @@ function Progress() {
                 disabled={!createForm.name}
               >
                 ➕ Create Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Create Dependency Modal */}
+      {creatingDependency && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '24px',
+            minWidth: '400px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ 
+              fontFamily: 'Century Gothic, sans-serif', 
+              marginBottom: '20px',
+              color: '#0A1628'
+            }}>
+              Add New Dependency
+            </h3>
+            
+            {/* Dependency Name Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Dependency Name
+              </label>
+              <input
+                type="text"
+                value={dependencyForm.name}
+                onChange={(e) => setDependencyForm({ ...dependencyForm, name: e.target.value })}
+                placeholder="e.g., Infrastructure Setup"
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* Start Week Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Start Week (1-16)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="16"
+                value={dependencyForm.startWeek}
+                onChange={(e) => setDependencyForm({ ...dependencyForm, startWeek: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* End Week Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                End Week (1-16)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="16"
+                value={dependencyForm.endWeek}
+                onChange={(e) => setDependencyForm({ ...dependencyForm, endWeek: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setCreatingDependency(false);
+                  setDependencyForm({ name: '', startWeek: 1, endWeek: 8 });
+                }}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateDependency}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: '#6f42c1',
+                  color: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#5a32a3'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#6f42c1'}
+                disabled={!dependencyForm.name}
+              >
+                Create Dependency
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Timeline Settings Modal */}
+      {showSettings && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '24px',
+            minWidth: '400px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ 
+              fontFamily: 'Century Gothic, sans-serif', 
+              marginBottom: '20px',
+              color: '#0A1628'
+            }}>
+              Timeline Settings
+            </h3>
+            
+            {/* Project Start Date */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Project Start Date
+              </label>
+              <input
+                type="date"
+                value={projectSettings.startDate}
+                onChange={(e) => setProjectSettings({ ...projectSettings, startDate: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                  fontFamily: 'Century Gothic, sans-serif'
+                }}
+              />
+            </div>
+            
+            {/* Display Mode Toggle */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontFamily: 'Century Gothic, sans-serif'
+              }}>
+                Display Mode
+              </label>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setProjectSettings({ ...projectSettings, displayMode: 'weeks' })}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
+                    backgroundColor: projectSettings.displayMode === 'weeks' ? '#0A1628' : 'white',
+                    color: projectSettings.displayMode === 'weeks' ? 'white' : '#333',
+                    fontFamily: 'Century Gothic, sans-serif',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Weeks
+                </button>
+                <button
+                  onClick={() => setProjectSettings({ ...projectSettings, displayMode: 'dates' })}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
+                    backgroundColor: projectSettings.displayMode === 'dates' ? '#0A1628' : 'white',
+                    color: projectSettings.displayMode === 'dates' ? 'white' : '#333',
+                    fontFamily: 'Century Gothic, sans-serif',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Dates
+                </button>
+              </div>
+            </div>
+            
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowSettings(false)}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveSettings}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#5a6268'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#6c757d'}
+              >
+                Save Settings
               </button>
             </div>
           </div>
