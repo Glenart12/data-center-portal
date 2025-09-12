@@ -2,10 +2,12 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { usePathname } from 'next/navigation';
+import { useNotifications } from '../contexts/NotificationContext';
 
 export default function Header() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
+  const { notificationCount } = useNotifications();
 
   if (isLoading) return null;
 
@@ -121,7 +123,8 @@ export default function Header() {
           justifyContent: 'center'
         }}>
           {[
-            { href: '/', label: 'Home' },
+            { href: '/', label: 'Dashboard' },
+            { href: '/progress', label: 'Progress' },
             { href: '/mop', label: 'MOPs' },
             { href: '/sop', label: 'SOPs' },
             { href: '/eop', label: 'EOPs' }
@@ -170,6 +173,28 @@ export default function Header() {
               }}
             >
               {label}
+              {/* Notification Badge for Progress */}
+              {href === '/progress' && notificationCount > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  backgroundColor: '#DC2626',
+                  color: '#FFFFFF',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.3)',
+                  border: '2px solid white'
+                }}>
+                  {notificationCount > 9 ? '9+' : notificationCount}
+                </div>
+              )}
               {isActivePage(href) && (
                 <div style={{
                   position: 'absolute',
