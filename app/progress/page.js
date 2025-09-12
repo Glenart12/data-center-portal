@@ -14,34 +14,45 @@ function Progress() {
     color: '#4A90E2'
   });
 
+  const defaultTasks = [
+    // MOP Parent and Children
+    { id: 1, name: 'ALL MOP WORK', type: 'parent', startWeek: 1, endWeek: 8, color: '#0A1628' },
+    { id: 2, name: 'MOP Planning', type: 'child', parentId: 1, startWeek: 1, endWeek: 2, color: '#4A90E2' },
+    { id: 3, name: 'MOP Documentation', type: 'child', parentId: 1, startWeek: 2, endWeek: 4, color: '#4A90E2' },
+    { id: 4, name: 'MOP Review', type: 'child', parentId: 1, startWeek: 4, endWeek: 6, color: '#4A90E2' },
+    { id: 5, name: 'MOP Implementation', type: 'child', parentId: 1, startWeek: 6, endWeek: 8, color: '#4A90E2' },
+    
+    // SOP Parent and Children
+    { id: 6, name: 'ALL SOP WORK', type: 'parent', startWeek: 8, endWeek: 12, color: '#0A1628' },
+    { id: 7, name: 'SOP Development', type: 'child', parentId: 6, startWeek: 8, endWeek: 9, color: '#50C878' },
+    { id: 8, name: 'SOP Testing', type: 'child', parentId: 6, startWeek: 9, endWeek: 10, color: '#50C878' },
+    { id: 9, name: 'SOP Training', type: 'child', parentId: 6, startWeek: 10, endWeek: 11, color: '#50C878' },
+    { id: 10, name: 'SOP Deployment', type: 'child', parentId: 6, startWeek: 11, endWeek: 12, color: '#50C878' },
+    
+    // EOP Parent and Children
+    { id: 11, name: 'ALL EOP WORK', type: 'parent', startWeek: 12, endWeek: 16, color: '#0A1628' },
+    { id: 12, name: 'EOP Assessment', type: 'child', parentId: 11, startWeek: 12, endWeek: 13, color: '#FF6B6B' },
+    { id: 13, name: 'EOP Procedures', type: 'child', parentId: 11, startWeek: 13, endWeek: 14, color: '#FF6B6B' },
+    { id: 14, name: 'EOP Drills', type: 'child', parentId: 11, startWeek: 14, endWeek: 15, color: '#FF6B6B' },
+    { id: 15, name: 'EOP Finalization', type: 'child', parentId: 11, startWeek: 15, endWeek: 16, color: '#FF6B6B' }
+  ];
+
   useEffect(() => {
     setMounted(true);
     
-    // Initialize default tasks
-    const defaultTasks = [
-      // MOP Parent and Children
-      { id: 1, name: 'ALL MOP WORK', type: 'parent', startWeek: 1, endWeek: 8, color: '#0A1628' },
-      { id: 2, name: 'MOP Planning', type: 'child', parentId: 1, startWeek: 1, endWeek: 2, color: '#4A90E2' },
-      { id: 3, name: 'MOP Documentation', type: 'child', parentId: 1, startWeek: 2, endWeek: 4, color: '#4A90E2' },
-      { id: 4, name: 'MOP Review', type: 'child', parentId: 1, startWeek: 4, endWeek: 6, color: '#4A90E2' },
-      { id: 5, name: 'MOP Implementation', type: 'child', parentId: 1, startWeek: 6, endWeek: 8, color: '#4A90E2' },
-      
-      // SOP Parent and Children
-      { id: 6, name: 'ALL SOP WORK', type: 'parent', startWeek: 8, endWeek: 12, color: '#0A1628' },
-      { id: 7, name: 'SOP Development', type: 'child', parentId: 6, startWeek: 8, endWeek: 9, color: '#50C878' },
-      { id: 8, name: 'SOP Testing', type: 'child', parentId: 6, startWeek: 9, endWeek: 10, color: '#50C878' },
-      { id: 9, name: 'SOP Training', type: 'child', parentId: 6, startWeek: 10, endWeek: 11, color: '#50C878' },
-      { id: 10, name: 'SOP Deployment', type: 'child', parentId: 6, startWeek: 11, endWeek: 12, color: '#50C878' },
-      
-      // EOP Parent and Children
-      { id: 11, name: 'ALL EOP WORK', type: 'parent', startWeek: 12, endWeek: 16, color: '#0A1628' },
-      { id: 12, name: 'EOP Assessment', type: 'child', parentId: 11, startWeek: 12, endWeek: 13, color: '#FF6B6B' },
-      { id: 13, name: 'EOP Procedures', type: 'child', parentId: 11, startWeek: 13, endWeek: 14, color: '#FF6B6B' },
-      { id: 14, name: 'EOP Drills', type: 'child', parentId: 11, startWeek: 14, endWeek: 15, color: '#FF6B6B' },
-      { id: 15, name: 'EOP Finalization', type: 'child', parentId: 11, startWeek: 15, endWeek: 16, color: '#FF6B6B' }
-    ];
-    
-    setTasks(defaultTasks);
+    // Load tasks from localStorage if they exist
+    const savedTasks = localStorage.getItem('ganttChartTasks');
+    if (savedTasks) {
+      try {
+        const parsedTasks = JSON.parse(savedTasks);
+        setTasks(parsedTasks);
+      } catch (error) {
+        console.error('Error loading saved tasks:', error);
+        setTasks(defaultTasks);
+      }
+    } else {
+      setTasks(defaultTasks);
+    }
   }, []);
 
   if (!mounted) {
@@ -94,6 +105,8 @@ function Progress() {
     });
     
     setTasks(finalTasks);
+    // Save to localStorage
+    localStorage.setItem('ganttChartTasks', JSON.stringify(finalTasks));
     setEditingTask(null);
     setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
   };
@@ -101,6 +114,18 @@ function Progress() {
   const handleCancelEdit = () => {
     setEditingTask(null);
     setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
+  };
+  
+  const handleSaveAll = () => {
+    localStorage.setItem('ganttChartTasks', JSON.stringify(tasks));
+    alert('All changes saved successfully!');
+  };
+  
+  const handleResetToDefault = () => {
+    if (confirm('Are you sure you want to reset to default tasks? This will remove all your changes.')) {
+      setTasks(defaultTasks);
+      localStorage.setItem('ganttChartTasks', JSON.stringify(defaultTasks));
+    }
   };
   
   const presetColors = ['#4A90E2', '#50C878', '#FF6B6B', '#FFD700', '#9B59B6', '#FF8C00', '#00CED1'];
@@ -116,6 +141,64 @@ function Progress() {
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
       }}>
         <h2 style={{ fontFamily: 'Century Gothic, sans-serif', marginBottom: '20px' }}>Project Gantt Chart</h2>
+        
+        {/* Control Bar */}
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          marginBottom: '20px',
+          padding: '12px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          alignItems: 'center'
+        }}>
+          <button
+            onClick={handleSaveAll}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#28a745',
+              color: 'white',
+              fontFamily: 'Century Gothic, sans-serif',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#218838'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#28a745'}
+          >
+            💾 Save All Changes
+          </button>
+          
+          <button
+            onClick={handleResetToDefault}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#fd7e14',
+              color: 'white',
+              fontFamily: 'Century Gothic, sans-serif',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#e56b00'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#fd7e14'}
+          >
+            🔄 Reset to Default
+          </button>
+          
+          <div style={{
+            marginLeft: 'auto',
+            fontSize: '12px',
+            color: '#6c757d',
+            fontFamily: 'Century Gothic, sans-serif'
+          }}>
+            Click on child tasks to edit them
+          </div>
+        </div>
         
         <div style={{ 
           overflowX: 'auto',
