@@ -479,7 +479,6 @@ function ProgressPage() {
           ))}
         </div>
       </div>
-      </div>
     </div>
 
     {/* Add Task Modal */}
