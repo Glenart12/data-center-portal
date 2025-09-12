@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import Header from '../components/Header';
 
 function ProgressPage() {
   const [tasks, setTasks] = useState([]);
@@ -150,17 +149,14 @@ function ProgressPage() {
   const timeline = generateTimeline();
 
   return (
-    <div style={{ fontFamily: 'Century Gothic, sans-serif', backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
-      <Header />
-      
-      <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
-        <h1 style={{ color: '#0A1628', fontSize: '32px', marginBottom: '24px', fontWeight: 'bold' }}>
-          Project Timeline
-        </h1>
+    <div style={{ fontFamily: 'Century Gothic, sans-serif', padding: '32px' }}>
+      <h1 style={{ color: '#0A1628', fontSize: '32px', marginBottom: '24px', fontWeight: 'bold' }}>
+        Project Timeline
+      </h1>
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-          <button
+      {/* Action Buttons */}
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
+        <button
             onClick={() => setShowAddTask(true)}
             style={{
               padding: '12px 24px',
@@ -205,17 +201,13 @@ function ProgressPage() {
           >
             Timeline Settings
           </button>
-        </div>
+      </div>
 
-        {/* Gantt Chart */}
-        <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          {/* Timeline Header */}
-          <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
-            <div style={{ width: '200px', paddingRight: '16px', color: '#6B7280', fontSize: '14px', fontWeight: '600' }}>
-              Task Name
-            </div>
-            <div style={{ flex: 1, display: 'flex', position: 'relative' }}>
-              {timeline.map((period, index) => (
+      {/* Gantt Chart */}
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        {/* Timeline Header */}
+        <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
+          {timeline.map((period, index) => (
                 <div
                   key={index}
                   style={{
@@ -229,21 +221,16 @@ function ProgressPage() {
                 >
                   {period.label}
                 </div>
-              ))}
-            </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Tasks */}
-          <div style={{ position: 'relative' }}>
-            {parentTasks.map(parent => (
+        {/* Tasks */}
+        <div style={{ position: 'relative' }}>
+          {parentTasks.map(parent => (
               <div key={parent.id}>
                 {/* Parent Task */}
-                <div style={{ display: 'flex', marginBottom: '8px', alignItems: 'center', minHeight: '40px' }}>
-                  <div style={{ width: '200px', paddingRight: '16px', fontWeight: 'bold', color: '#0A1628' }}>
-                    {parent.name}
-                  </div>
-                  <div style={{ flex: 1, position: 'relative', height: '32px' }}>
-                    {/* Grid lines */}
+                <div style={{ position: 'relative', marginBottom: '8px', height: '40px' }}>
+                  {/* Grid lines */}
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex' }}>
                       {timeline.map((_, index) => (
                         <div
@@ -254,13 +241,13 @@ function ProgressPage() {
                           }}
                         />
                       ))}
-                    </div>
-                    {/* Parent bar */}
-                    <div
-                      onClick={() => setEditingParent(parent)}
-                      style={{
-                        position: 'absolute',
-                        top: '4px',
+                  </div>
+                  {/* Parent bar */}
+                  <div
+                    onClick={() => setEditingParent(parent)}
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
                         height: '24px',
                         backgroundColor: '#0A1628',
                         borderRadius: '4px',
@@ -275,35 +262,30 @@ function ProgressPage() {
                       }}
                     >
                       {parent.name}
-                    </div>
                   </div>
                 </div>
 
                 {/* Child Tasks */}
                 {tasks.filter(t => t.parentId === parent.id).map(task => (
-                  <div key={task.id} style={{ display: 'flex', marginBottom: '8px', alignItems: 'center', minHeight: '36px' }}>
-                    <div style={{ width: '200px', paddingRight: '16px', paddingLeft: '24px', color: '#374151', fontSize: '14px' }}>
-                      {task.name}
+                  <div key={task.id} style={{ position: 'relative', marginBottom: '8px', height: '36px', paddingLeft: '24px' }}>
+                    {/* Grid lines */}
+                    <div style={{ position: 'absolute', top: 0, left: '-24px', right: 0, bottom: 0, display: 'flex' }}>
+                      {timeline.map((_, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            flex: 1,
+                            borderLeft: index > 0 ? '1px solid #F3F4F6' : 'none'
+                          }}
+                        />
+                      ))}
                     </div>
-                    <div style={{ flex: 1, position: 'relative', height: '28px' }}>
-                      {/* Grid lines */}
-                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex' }}>
-                        {timeline.map((_, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              flex: 1,
-                              borderLeft: index > 0 ? '1px solid #F3F4F6' : 'none'
-                            }}
-                          />
-                        ))}
-                      </div>
-                      {/* Task bar */}
-                      <div
-                        onClick={() => setEditingTask(task)}
-                        style={{
-                          position: 'absolute',
-                          top: '4px',
+                    {/* Task bar */}
+                    <div
+                      onClick={() => setEditingTask(task)}
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
                           height: '20px',
                           backgroundColor: task.color || '#3B82F6',
                           borderRadius: '4px',
@@ -318,13 +300,11 @@ function ProgressPage() {
                         }}
                       >
                         {task.name}
-                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ))}
-          </div>
         </div>
       </div>
 
