@@ -201,30 +201,52 @@ function ProgressPage() {
           <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
             <button
               onClick={() => setShowAddTask(true)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#2563EB',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}
-          >
-            Add Task
-          </button>
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#0A1628',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#1A2738';
+                e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#0A1628';
+                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              Add Task
+            </button>
           <button
             onClick={() => setShowAddParent(true)}
             style={{
               padding: '12px 24px',
               backgroundColor: '#0A1628',
-              color: 'white',
+              color: '#FFFFFF',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '500'
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#1A2738';
+              e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#0A1628';
+              e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
             }}
           >
             Add Parent Task
@@ -233,13 +255,24 @@ function ProgressPage() {
             onClick={() => setShowTimeline(true)}
             style={{
               padding: '12px 24px',
-              backgroundColor: '#6B7280',
-              color: 'white',
+              backgroundColor: '#0A1628',
+              color: '#FFFFFF',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '500'
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#1A2738';
+              e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#0A1628';
+              e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
             }}
           >
             Timeline Settings
