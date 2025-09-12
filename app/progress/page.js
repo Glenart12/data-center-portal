@@ -275,9 +275,17 @@ function Progress() {
   const periods = getDatePeriods();
   const parentTasks = tasks.filter(t => t.type === 'parent');
   
+  // Calculate all tasks for row coloring
+  const allTasksOrdered = [];
+  parentTasks.forEach(parent => {
+    allTasksOrdered.push(parent);
+    const children = tasks.filter(t => t.parentId === parent.id);
+    allTasksOrdered.push(...children);
+  });
+  
   return (
     <div style={{ padding: '24px', fontFamily: 'Century Gothic, sans-serif' }}>
-      <h1 style={{ marginBottom: '24px' }}>Progress Tracking</h1>
+      <h1 style={{ marginBottom: '24px', fontFamily: 'Century Gothic, sans-serif' }}>Progress Tracking</h1>
       
       {/* Control Bar */}
       <div style={{ 
@@ -299,8 +307,12 @@ function Progress() {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            fontFamily: 'Century Gothic, sans-serif',
+            transition: 'background-color 0.2s'
           }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#1D4ED8'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#2563EB'}
         >
           Add Task
         </button>
@@ -314,8 +326,12 @@ function Progress() {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            fontFamily: 'Century Gothic, sans-serif',
+            transition: 'background-color 0.2s'
           }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#7C3AED'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#8B5CF6'}
         >
           Add Parent Task
         </button>
@@ -329,8 +345,12 @@ function Progress() {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            fontFamily: 'Century Gothic, sans-serif',
+            transition: 'background-color 0.2s'
           }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#4B5563'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#6B7280'}
         >
           Timeline Settings
         </button>
@@ -345,8 +365,12 @@ function Progress() {
               border: '1px solid #E5E7EB',
               borderRadius: '4px',
               cursor: 'pointer',
-              fontSize: '12px'
+              fontSize: '12px',
+              fontFamily: 'Century Gothic, sans-serif',
+              transition: 'all 0.2s'
             }}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = '#F9FAFB'; e.target.style.borderColor = '#9CA3AF'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#E5E7EB'; }}
           >
             Zoom Out -
           </button>
@@ -359,8 +383,12 @@ function Progress() {
               border: '1px solid #E5E7EB',
               borderRadius: '4px',
               cursor: 'pointer',
-              fontSize: '12px'
+              fontSize: '12px',
+              fontFamily: 'Century Gothic, sans-serif',
+              transition: 'all 0.2s'
             }}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = '#F9FAFB'; e.target.style.borderColor = '#9CA3AF'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#E5E7EB'; }}
           >
             Zoom In +
           </button>
@@ -368,20 +396,34 @@ function Progress() {
       </div>
       
       {/* Gantt Chart */}
-      <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <div style={{ 
+        backgroundColor: 'white', 
+        borderRadius: '8px', 
+        border: '1px solid #D1D5DB',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
+      }}>
         {/* Date Headers */}
-        <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', marginBottom: '20px' }}>
+        <div style={{ 
+          display: 'flex', 
+          borderBottom: '2px solid #374151',
+          backgroundColor: '#F3F4F6'
+        }}>
           {periods.map((period, index) => (
             <div
               key={index}
               style={{
                 width: `${columnWidth}px`,
-                padding: '10px 0',
+                padding: '12px 4px',
                 textAlign: 'center',
-                borderRight: '1px solid #E5E7EB',
-                fontSize: '12px',
+                borderRight: '1px solid #D1D5DB',
+                fontSize: '11px',
                 fontWeight: 'bold',
-                color: '#374151'
+                color: '#1F2937',
+                fontFamily: 'Century Gothic, sans-serif',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}
             >
               {period.label}
@@ -389,62 +431,132 @@ function Progress() {
           ))}
         </div>
         
-        {/* Tasks */}
-        <div style={{ position: 'relative' }}>
-          {parentTasks.map(parent => {
-            const children = tasks.filter(t => t.parentId === parent.id);
-            return (
-              <div key={parent.id}>
-                {/* Parent Task */}
-                <div style={{ position: 'relative', height: '40px', marginBottom: '8px' }}>
-                  <div
-                    onClick={() => handleEditTask(parent)}
-                    style={{
-                      position: 'absolute',
-                      ...getTaskPosition(parent.startDate, parent.endDate),
-                      height: '32px',
-                      backgroundColor: parent.color,
-                      borderRadius: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      paddingLeft: '8px',
-                      color: 'white',
-                      fontWeight: 'bold',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    {parent.name}
-                  </div>
-                </div>
-                
-                {/* Child Tasks */}
-                {children.map(child => (
-                  <div key={child.id} style={{ position: 'relative', height: '32px', marginBottom: '4px', marginLeft: '20px' }}>
+        {/* Tasks Container */}
+        <div style={{ position: 'relative', padding: '16px' }}>
+          {/* Grid Background */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}>
+            {periods.map((_, colIndex) => (
+              <div
+                key={colIndex}
+                style={{
+                  position: 'absolute',
+                  left: `${colIndex * columnWidth}px`,
+                  top: 0,
+                  width: '1px',
+                  height: '100%',
+                  backgroundColor: '#E5E7EB'
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Tasks */}
+          <div style={{ position: 'relative' }}>
+            {parentTasks.map((parent, parentIndex) => {
+              const children = tasks.filter(t => t.parentId === parent.id);
+              let rowIndex = 0;
+              for (let i = 0; i < parentIndex; i++) {
+                rowIndex++;
+                rowIndex += tasks.filter(t => t.parentId === parentTasks[i].id).length;
+              }
+              
+              return (
+                <div key={parent.id}>
+                  {/* Parent Task */}
+                  <div style={{ 
+                    position: 'relative', 
+                    height: '40px', 
+                    marginBottom: '8px',
+                    backgroundColor: rowIndex % 2 === 0 ? 'white' : '#F9FAFB',
+                    marginLeft: '-16px',
+                    marginRight: '-16px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px'
+                  }}>
                     <div
-                      onClick={() => handleEditTask(child)}
+                      onClick={() => handleEditTask(parent)}
                       style={{
                         position: 'absolute',
-                        ...getTaskPosition(child.startDate, child.endDate),
-                        height: '24px',
-                        backgroundColor: child.color,
-                        borderRadius: '4px',
+                        ...getTaskPosition(parent.startDate, parent.endDate),
+                        top: '4px',
+                        height: '32px',
+                        backgroundColor: parent.color,
+                        borderRadius: '6px',
                         display: 'flex',
                         alignItems: 'center',
-                        paddingLeft: '8px',
+                        paddingLeft: '12px',
                         color: 'white',
-                        fontSize: '12px',
-                        cursor: 'pointer'
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                        transition: 'transform 0.2s, box-shadow 0.2s',
+                        fontFamily: 'Century Gothic, sans-serif'
+                      }}
+                      onMouseEnter={(e) => { 
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                      }}
+                      onMouseLeave={(e) => { 
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.15)';
                       }}
                     >
-                      {child.name}
+                      {parent.name}
                     </div>
                   </div>
-                ))}
-              </div>
-            );
-          })}
+                  
+                  {/* Child Tasks */}
+                  {children.map((child, childIndex) => {
+                    rowIndex++;
+                    return (
+                      <div key={child.id} style={{ 
+                        position: 'relative', 
+                        height: '32px', 
+                        marginBottom: '4px',
+                        backgroundColor: rowIndex % 2 === 0 ? 'white' : '#F9FAFB',
+                        marginLeft: '-16px',
+                        marginRight: '-16px',
+                        paddingLeft: '36px',
+                        paddingRight: '16px'
+                      }}>
+                        <div
+                          onClick={() => handleEditTask(child)}
+                          style={{
+                            position: 'absolute',
+                            ...getTaskPosition(child.startDate, child.endDate),
+                            top: '4px',
+                            height: '24px',
+                            backgroundColor: child.color,
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            paddingLeft: '10px',
+                            color: 'white',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                            fontFamily: 'Century Gothic, sans-serif'
+                          }}
+                          onMouseEnter={(e) => { 
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+                          }}
+                          onMouseLeave={(e) => { 
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.12)';
+                          }}
+                        >
+                          {child.name}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
       
@@ -466,32 +578,46 @@ function Progress() {
             backgroundColor: 'white',
             borderRadius: '8px',
             padding: '24px',
-            width: '400px'
+            width: '420px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
           }}>
-            <h2 style={{ marginBottom: '16px' }}>Add Task</h2>
+            <h2 style={{ marginBottom: '24px', fontSize: '22px', fontWeight: 'bold', fontFamily: 'Century Gothic, sans-serif', color: '#1F2937' }}>
+              Add Task
+            </h2>
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Task Name
+            </label>
             <input
-              placeholder="Task Name"
+              placeholder="Enter task name"
               value={taskForm.name}
               onChange={(e) => setTaskForm({ ...taskForm, name: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Parent Task
+            </label>
             <select
               value={taskForm.parentId}
               onChange={(e) => setTaskForm({ ...taskForm, parentId: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px',
+                backgroundColor: 'white'
               }}
             >
               <option value="">Select Parent Task</option>
@@ -500,44 +626,71 @@ function Progress() {
               ))}
             </select>
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Start Date
+            </label>
             <input
               type="date"
               value={taskForm.startDate}
               onChange={(e) => setTaskForm({ ...taskForm, startDate: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              End Date
+            </label>
             <input
               type="date"
               value={taskForm.endDate}
               onChange={(e) => setTaskForm({ ...taskForm, endDate: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Task Color
+            </label>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
               {colors.map(color => (
                 <div
                   key={color}
                   onClick={() => setTaskForm({ ...taskForm, color })}
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '40px',
+                    height: '40px',
                     backgroundColor: color,
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     cursor: 'pointer',
-                    border: taskForm.color === color ? '2px solid #000' : '2px solid transparent'
+                    border: taskForm.color === color ? '3px solid #1F2937' : '2px solid transparent',
+                    transition: 'all 0.2s',
+                    transform: taskForm.color === color ? 'scale(1.1)' : 'scale(1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (taskForm.color !== color) {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                      e.currentTarget.style.border = '2px solid #9CA3AF';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (taskForm.color !== color) {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.border = '2px solid transparent';
+                    }
                   }}
                 />
               ))}
@@ -550,25 +703,36 @@ function Progress() {
                   setTaskForm({ name: '', parentId: null, startDate: '', endDate: '', color: '#2563EB' });
                 }}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   backgroundColor: '#F3F4F6',
+                  color: '#374151',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#F3F4F6'}
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddTask}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   backgroundColor: '#2563EB',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: 'bold',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#1D4ED8'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#2563EB'}
               >
                 Create Task
               </button>
@@ -595,46 +759,64 @@ function Progress() {
             backgroundColor: 'white',
             borderRadius: '8px',
             padding: '24px',
-            width: '400px'
+            width: '420px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
           }}>
-            <h2 style={{ marginBottom: '16px' }}>Add Parent Task</h2>
+            <h2 style={{ marginBottom: '24px', fontSize: '22px', fontWeight: 'bold', fontFamily: 'Century Gothic, sans-serif', color: '#1F2937' }}>
+              Add Parent Task
+            </h2>
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Parent Task Name
+            </label>
             <input
-              placeholder="Parent Task Name"
+              placeholder="Enter parent task name"
               value={parentForm.name}
               onChange={(e) => setParentForm({ ...parentForm, name: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Start Date
+            </label>
             <input
               type="date"
               value={parentForm.startDate}
               onChange={(e) => setParentForm({ ...parentForm, startDate: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              End Date
+            </label>
             <input
               type="date"
               value={parentForm.endDate}
               onChange={(e) => setParentForm({ ...parentForm, endDate: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '24px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
@@ -645,25 +827,36 @@ function Progress() {
                   setParentForm({ name: '', startDate: '', endDate: '' });
                 }}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   backgroundColor: '#F3F4F6',
+                  color: '#374151',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#F3F4F6'}
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddParent}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   backgroundColor: '#8B5CF6',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: 'bold',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#7C3AED'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#8B5CF6'}
               >
                 Create Parent Task
               </button>
@@ -690,12 +883,18 @@ function Progress() {
             backgroundColor: 'white',
             borderRadius: '8px',
             padding: '24px',
-            width: '400px'
+            width: '420px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
           }}>
-            <h2 style={{ marginBottom: '16px' }}>Edit {editingTask.type === 'parent' ? 'Parent Task' : 'Task'}</h2>
+            <h2 style={{ marginBottom: '24px', fontSize: '22px', fontWeight: 'bold', fontFamily: 'Century Gothic, sans-serif', color: '#1F2937' }}>
+              Edit {editingTask.type === 'parent' ? 'Parent Task' : 'Task'}
+            </h2>
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              {editingTask.type === 'parent' ? 'Parent Task Name' : 'Task Name'}
+            </label>
             <input
-              placeholder="Name"
+              placeholder="Enter name"
               value={editingTask.type === 'child' ? taskForm.name : parentForm.name}
               onChange={(e) => {
                 if (editingTask.type === 'child') {
@@ -706,32 +905,45 @@ function Progress() {
               }}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
             {editingTask.type === 'child' && (
-              <select
-                value={taskForm.parentId}
-                onChange={(e) => setTaskForm({ ...taskForm, parentId: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  marginBottom: '12px',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '4px'
-                }}
-              >
-                <option value="">Select Parent Task</option>
-                {parentTasks.map(parent => (
-                  <option key={parent.id} value={parent.id}>{parent.name}</option>
-                ))}
-              </select>
+              <>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+                  Parent Task
+                </label>
+                <select
+                  value={taskForm.parentId}
+                  onChange={(e) => setTaskForm({ ...taskForm, parentId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    marginBottom: '16px',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '6px',
+                    fontFamily: 'Century Gothic, sans-serif',
+                    fontSize: '14px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Select Parent Task</option>
+                  {parentTasks.map(parent => (
+                    <option key={parent.id} value={parent.id}>{parent.name}</option>
+                  ))}
+                </select>
+              </>
             )}
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              Start Date
+            </label>
             <input
               type="date"
               value={editingTask.type === 'child' ? taskForm.startDate : parentForm.startDate}
@@ -744,13 +956,18 @@ function Progress() {
               }}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+              End Date
+            </label>
             <input
               type="date"
               value={editingTask.type === 'child' ? taskForm.endDate : parentForm.endDate}
@@ -763,43 +980,69 @@ function Progress() {
               }}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: editingTask.type === 'child' ? '16px' : '24px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
             {editingTask.type === 'child' && (
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                {colors.map(color => (
-                  <div
-                    key={color}
-                    onClick={() => setTaskForm({ ...taskForm, color })}
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      backgroundColor: color,
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      border: taskForm.color === color ? '2px solid #000' : '2px solid transparent'
-                    }}
-                  />
-                ))}
-              </div>
+              <>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
+                  Task Color
+                </label>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
+                  {colors.map(color => (
+                    <div
+                      key={color}
+                      onClick={() => setTaskForm({ ...taskForm, color })}
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: color,
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        border: taskForm.color === color ? '3px solid #1F2937' : '2px solid transparent',
+                        transition: 'all 0.2s',
+                        transform: taskForm.color === color ? 'scale(1.1)' : 'scale(1)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (taskForm.color !== color) {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.border = '2px solid #9CA3AF';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (taskForm.color !== color) {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.border = '2px solid transparent';
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
             )}
             
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <button
                 onClick={handleDeleteTask}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 20px',
                   backgroundColor: '#EF4444',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: 'bold',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#DC2626'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#EF4444'}
               >
                 🗑️ Delete
               </button>
@@ -808,25 +1051,36 @@ function Progress() {
                 <button
                   onClick={() => setEditingTask(null)}
                   style={{
-                    padding: '8px 16px',
+                    padding: '10px 24px',
                     backgroundColor: '#F3F4F6',
+                    color: '#374151',
                     border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontFamily: 'Century Gothic, sans-serif',
+                    fontWeight: '600',
+                    transition: 'background-color 0.2s'
                   }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#F3F4F6'}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateTask}
                   style={{
-                    padding: '8px 16px',
+                    padding: '10px 24px',
                     backgroundColor: editingTask.type === 'parent' ? '#8B5CF6' : '#2563EB',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontFamily: 'Century Gothic, sans-serif',
+                    fontWeight: 'bold',
+                    transition: 'background-color 0.2s'
                   }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = editingTask.type === 'parent' ? '#7C3AED' : '#1D4ED8'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = editingTask.type === 'parent' ? '#8B5CF6' : '#2563EB'}
                 >
                   Save Changes
                 </button>
@@ -854,11 +1108,14 @@ function Progress() {
             backgroundColor: 'white',
             borderRadius: '8px',
             padding: '24px',
-            width: '400px'
+            width: '420px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
           }}>
-            <h2 style={{ marginBottom: '16px' }}>Timeline Settings</h2>
+            <h2 style={{ marginBottom: '24px', fontSize: '22px', fontWeight: 'bold', fontFamily: 'Century Gothic, sans-serif', color: '#1F2937' }}>
+              Timeline Settings
+            </h2>
             
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#374151' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
               Project Start Date
             </label>
             <input
@@ -867,14 +1124,16 @@ function Progress() {
               onChange={(e) => setProjectSettings({ ...projectSettings, startDate: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '16px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '20px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#374151' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#4A5568', fontFamily: 'Century Gothic, sans-serif' }}>
               Project End Date
             </label>
             <input
@@ -883,10 +1142,12 @@ function Progress() {
               onChange={(e) => setProjectSettings({ ...projectSettings, endDate: e.target.value })}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '16px',
-                border: '1px solid #E5E7EB',
-                borderRadius: '4px'
+                padding: '10px',
+                marginBottom: '24px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '14px'
               }}
             />
             
@@ -894,12 +1155,18 @@ function Progress() {
               <button
                 onClick={() => setShowSettings(false)}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   backgroundColor: '#F3F4F6',
+                  color: '#374151',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#F3F4F6'}
               >
                 Cancel
               </button>
@@ -909,13 +1176,18 @@ function Progress() {
                   localStorage.setItem('ganttSettings', JSON.stringify(projectSettings));
                 }}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   backgroundColor: '#6B7280',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontWeight: 'bold',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4B5563'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#6B7280'}
               >
                 Save Settings
               </button>
