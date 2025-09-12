@@ -291,6 +291,7 @@ function ProgressPage() {
                     textAlign: 'center',
                     fontSize: '12px',
                     color: '#6B7280',
+                    fontWeight: 'bold',
                     borderLeft: index > 0 ? '1px solid #E5E7EB' : 'none',
                     paddingLeft: '4px'
                   }}
@@ -333,6 +334,7 @@ function ProgressPage() {
                         paddingLeft: '8px',
                         color: 'white',
                         fontSize: '12px',
+                        fontWeight: 'bold',
                         zIndex: 1,
                         ...calculateBarPosition(parent.startDate, parent.endDate)
                       }}
@@ -548,18 +550,34 @@ function TaskModal({ title, task, parentTasks, onSave, onDelete, onClose }) {
 
         <div style={{ marginBottom: '24px' }}>
           <label style={{ display: 'block', marginBottom: '8px', color: '#374151', fontSize: '14px' }}>Color</label>
-          <input
-            type="color"
-            value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-            style={{
-              width: '60px',
-              height: '40px',
-              border: '1px solid #D1D5DB',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          />
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {['#EF4444', '#F59E0B', '#10B981', '#2563EB'].map(color => (
+              <div
+                key={color}
+                onClick={() => setFormData({ ...formData, color })}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  backgroundColor: color,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  border: formData.color === color ? '3px solid #0A1628' : '2px solid transparent',
+                  opacity: formData.color === color ? 1 : 0.8,
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (formData.color !== color) {
+                    e.currentTarget.style.opacity = '1';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (formData.color !== color) {
+                    e.currentTarget.style.opacity = '0.8';
+                  }
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
