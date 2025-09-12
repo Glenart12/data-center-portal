@@ -57,7 +57,7 @@ export default function Header() {
 
   return (
     <header style={{
-      background: 'linear-gradient(135deg, #0f3456 0%, #1e4a72 100%)',
+      backgroundColor: '#0A1628',
       backdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
       position: 'sticky',
