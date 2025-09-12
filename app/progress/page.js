@@ -6,543 +6,673 @@ import { useState, useEffect } from 'react';
 function Progress() {
   const [mounted, setMounted] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [showAddParent, setShowAddParent] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [editForm, setEditForm] = useState({
+  const [columnWidth, setColumnWidth] = useState(80);
+  
+  const [projectSettings, setProjectSettings] = useState({
+    startDate: '2025-01-01',
+    endDate: '2025-04-30'
+  });
+  
+  const [taskForm, setTaskForm] = useState({
     name: '',
+    parentId: null,
     startDate: '',
     endDate: '',
-    color: '#4A90E2'
+    color: '#2563EB'
   });
-  const [creatingTask, setCreatingTask] = useState(false);
-  const [createForm, setCreateForm] = useState({
-    name: '',
-    parentId: 1,
-    startDate: '',
-    endDate: '',
-    color: '#4A90E2',
-    completed: false
-  });
-  const [creatingDependency, setCreatingDependency] = useState(false);
-  const [dependencyForm, setDependencyForm] = useState({
+  
+  const [parentForm, setParentForm] = useState({
     name: '',
     startDate: '',
     endDate: ''
   });
-  const [showSettings, setShowSettings] = useState(false);
-  const [projectSettings, setProjectSettings] = useState({
-    startDate: new Date('2025-01-01').toISOString().split('T')[0],
-    endDate: new Date('2025-04-30').toISOString().split('T')[0]
-  });
-  const [zoomLevel, setZoomLevel] = useState(75); // Default 75px per week
-
-  const defaultTasks = [
-    // MOP Parent and Children
-    { id: 1, name: 'ALL MOP WORK', type: 'parent', startWeek: 1, endWeek: 8, color: '#0A1628', completed: false },
-    { id: 2, name: 'MOP Planning', type: 'child', parentId: 1, startWeek: 1, endWeek: 2, color: '#4A90E2', completed: false },
-    { id: 3, name: 'MOP Documentation', type: 'child', parentId: 1, startWeek: 2, endWeek: 4, color: '#4A90E2', completed: false },
-    { id: 4, name: 'MOP Review', type: 'child', parentId: 1, startWeek: 4, endWeek: 6, color: '#4A90E2', completed: false },
-    { id: 5, name: 'MOP Implementation', type: 'child', parentId: 1, startWeek: 6, endWeek: 8, color: '#4A90E2', completed: false },
+  
+  const colors = ['#0A1628', '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+  
+  // Calculate date periods (7-day chunks)
+  const getDatePeriods = () => {
+    const periods = [];
+    const start = new Date(projectSettings.startDate);
+    const end = new Date(projectSettings.endDate);
+    let current = new Date(start);
     
-    // SOP Parent and Children
-    { id: 6, name: 'ALL SOP WORK', type: 'parent', startWeek: 8, endWeek: 12, color: '#0A1628', completed: false },
-    { id: 7, name: 'SOP Development', type: 'child', parentId: 6, startWeek: 8, endWeek: 9, color: '#50C878', completed: false },
-    { id: 8, name: 'SOP Testing', type: 'child', parentId: 6, startWeek: 9, endWeek: 10, color: '#50C878', completed: false },
-    { id: 9, name: 'SOP Training', type: 'child', parentId: 6, startWeek: 10, endWeek: 11, color: '#50C878', completed: false },
-    { id: 10, name: 'SOP Deployment', type: 'child', parentId: 6, startWeek: 11, endWeek: 12, color: '#50C878', completed: false },
+    while (current <= end) {
+      const periodStart = new Date(current);
+      const periodEnd = new Date(current);
+      periodEnd.setDate(periodEnd.getDate() + 6);
+      
+      if (periodEnd > end) {
+        periodEnd.setTime(end.getTime());
+      }
+      
+      periods.push({
+        start: periodStart,
+        end: periodEnd,
+        label: formatPeriodLabel(periodStart, periodEnd)
+      });
+      
+      current.setDate(current.getDate() + 7);
+    }
     
-    // EOP Parent and Children
-    { id: 11, name: 'ALL EOP WORK', type: 'parent', startWeek: 12, endWeek: 16, color: '#0A1628', completed: false },
-    { id: 12, name: 'EOP Assessment', type: 'child', parentId: 11, startWeek: 12, endWeek: 13, color: '#FF6B6B', completed: false },
-    { id: 13, name: 'EOP Procedures', type: 'child', parentId: 11, startWeek: 13, endWeek: 14, color: '#FF6B6B', completed: false },
-    { id: 14, name: 'EOP Drills', type: 'child', parentId: 11, startWeek: 14, endWeek: 15, color: '#FF6B6B', completed: false },
-    { id: 15, name: 'EOP Finalization', type: 'child', parentId: 11, startWeek: 15, endWeek: 16, color: '#FF6B6B', completed: false }
-  ];
-
+    return periods;
+  };
+  
+  const formatPeriodLabel = (start, end) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const startMonth = months[start.getMonth()];
+    const endMonth = months[end.getMonth()];
+    const startDay = start.getDate();
+    const endDay = end.getDate();
+    
+    if (start.getMonth() === end.getMonth()) {
+      return `${startMonth} ${startDay}-${endDay}`;
+    } else {
+      return `${startMonth} ${startDay}-${endMonth} ${endDay}`;
+    }
+  };
+  
+  const getTaskPosition = (startDate, endDate) => {
+    const projectStart = new Date(projectSettings.startDate);
+    const projectEnd = new Date(projectSettings.endDate);
+    const taskStart = new Date(startDate);
+    const taskEnd = new Date(endDate);
+    
+    const totalDays = (projectEnd - projectStart) / (1000 * 60 * 60 * 24);
+    const startDays = (taskStart - projectStart) / (1000 * 60 * 60 * 24);
+    const duration = (taskEnd - taskStart) / (1000 * 60 * 60 * 24) + 1;
+    
+    const periods = getDatePeriods();
+    const startPercent = (startDays / totalDays) * 100;
+    const widthPercent = (duration / totalDays) * 100;
+    
+    return {
+      left: `${startPercent}%`,
+      width: `${widthPercent}%`
+    };
+  };
+  
+  // Default tasks with dates
+  const getDefaultTasks = () => {
+    const start = new Date(projectSettings.startDate);
+    const end = new Date(projectSettings.endDate);
+    const totalDays = (end - start) / (1000 * 60 * 60 * 24);
+    const periodDays = totalDays / 4; // Divide into 4 quarters
+    
+    const mopStart = new Date(start);
+    const mopEnd = new Date(start);
+    mopEnd.setDate(mopEnd.getDate() + periodDays);
+    
+    const sopStart = new Date(mopEnd);
+    sopStart.setDate(sopStart.getDate() + 1);
+    const sopEnd = new Date(sopStart);
+    sopEnd.setDate(sopEnd.getDate() + periodDays);
+    
+    const eopStart = new Date(sopEnd);
+    eopStart.setDate(eopStart.getDate() + 1);
+    const eopEnd = new Date(eopStart);
+    eopEnd.setDate(eopEnd.getDate() + periodDays);
+    
+    return [
+      // MOP Tasks
+      { id: 1, name: 'ALL MOP WORK', type: 'parent', startDate: mopStart.toISOString().split('T')[0], endDate: mopEnd.toISOString().split('T')[0], color: '#0A1628' },
+      { id: 2, name: 'MOP Planning', type: 'child', parentId: 1, startDate: mopStart.toISOString().split('T')[0], endDate: new Date(mopStart.getTime() + periodDays * 0.25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#2563EB' },
+      { id: 3, name: 'MOP Documentation', type: 'child', parentId: 1, startDate: new Date(mopStart.getTime() + periodDays * 0.25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(mopStart.getTime() + periodDays * 0.5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#2563EB' },
+      { id: 4, name: 'MOP Review', type: 'child', parentId: 1, startDate: new Date(mopStart.getTime() + periodDays * 0.5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(mopStart.getTime() + periodDays * 0.75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#2563EB' },
+      { id: 5, name: 'MOP Implementation', type: 'child', parentId: 1, startDate: new Date(mopStart.getTime() + periodDays * 0.75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: mopEnd.toISOString().split('T')[0], color: '#2563EB' },
+      
+      // SOP Tasks
+      { id: 6, name: 'ALL SOP WORK', type: 'parent', startDate: sopStart.toISOString().split('T')[0], endDate: sopEnd.toISOString().split('T')[0], color: '#0A1628' },
+      { id: 7, name: 'SOP Development', type: 'child', parentId: 6, startDate: sopStart.toISOString().split('T')[0], endDate: new Date(sopStart.getTime() + periodDays * 0.3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#10B981' },
+      { id: 8, name: 'SOP Testing', type: 'child', parentId: 6, startDate: new Date(sopStart.getTime() + periodDays * 0.3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(sopStart.getTime() + periodDays * 0.6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#10B981' },
+      { id: 9, name: 'SOP Training', type: 'child', parentId: 6, startDate: new Date(sopStart.getTime() + periodDays * 0.6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: sopEnd.toISOString().split('T')[0], color: '#10B981' },
+      
+      // EOP Tasks
+      { id: 10, name: 'ALL EOP WORK', type: 'parent', startDate: eopStart.toISOString().split('T')[0], endDate: eopEnd.toISOString().split('T')[0], color: '#0A1628' },
+      { id: 11, name: 'EOP Assessment', type: 'child', parentId: 10, startDate: eopStart.toISOString().split('T')[0], endDate: new Date(eopStart.getTime() + periodDays * 0.33 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#EF4444' },
+      { id: 12, name: 'EOP Procedures', type: 'child', parentId: 10, startDate: new Date(eopStart.getTime() + periodDays * 0.33 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(eopStart.getTime() + periodDays * 0.66 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#EF4444' },
+      { id: 13, name: 'EOP Finalization', type: 'child', parentId: 10, startDate: new Date(eopStart.getTime() + periodDays * 0.66 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: eopEnd.toISOString().split('T')[0], color: '#EF4444' }
+    ];
+  };
+  
   useEffect(() => {
     setMounted(true);
     
-    // Load tasks from localStorage if they exist
-    const savedTasks = localStorage.getItem('ganttChartTasks');
-    if (savedTasks) {
-      try {
-        const parsedTasks = JSON.parse(savedTasks);
-        setTasks(parsedTasks);
-      } catch (error) {
-        console.error('Error loading saved tasks:', error);
-        setTasks(defaultTasks);
-      }
-    } else {
-      setTasks(defaultTasks);
+    // Load saved data
+    const savedTasks = localStorage.getItem('ganttTasks');
+    const savedSettings = localStorage.getItem('ganttSettings');
+    
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      setProjectSettings(settings);
     }
     
-    // Load settings from localStorage
-    const savedSettings = localStorage.getItem('ganttChartSettings');
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings);
-        setProjectSettings(parsedSettings);
-      } catch (error) {
-        console.error('Error loading saved settings:', error);
-      }
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    } else {
+      setTasks(getDefaultTasks());
     }
   }, []);
-
-  if (!mounted) {
-    return <div>Loading...</div>;
-  }
-
-  const weeks = Array.from({ length: 16 }, (_, i) => i + 1);
-  const weekWidth = zoomLevel;
-  const chartWidth = weekWidth * 16;
-  const rowHeight = 30;
-  const headerHeight = 40;
   
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(120, prev + 10));
+  useEffect(() => {
+    if (mounted && tasks.length > 0) {
+      localStorage.setItem('ganttTasks', JSON.stringify(tasks));
+    }
+  }, [tasks, mounted]);
+  
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('ganttSettings', JSON.stringify(projectSettings));
+    }
+  }, [projectSettings, mounted]);
+  
+  const handleAddTask = () => {
+    const newId = Math.max(...tasks.map(t => t.id), 0) + 1;
+    const newTask = {
+      id: newId,
+      name: taskForm.name,
+      type: 'child',
+      parentId: parseInt(taskForm.parentId),
+      startDate: taskForm.startDate,
+      endDate: taskForm.endDate,
+      color: taskForm.color
+    };
+    
+    // Update parent dates
+    const updatedTasks = [...tasks, newTask];
+    const parent = updatedTasks.find(t => t.id === parseInt(taskForm.parentId));
+    if (parent) {
+      const children = updatedTasks.filter(t => t.parentId === parent.id);
+      const minDate = children.reduce((min, child) => child.startDate < min ? child.startDate : min, children[0].startDate);
+      const maxDate = children.reduce((max, child) => child.endDate > max ? child.endDate : max, children[0].endDate);
+      parent.startDate = minDate;
+      parent.endDate = maxDate;
+    }
+    
+    setTasks(updatedTasks);
+    setShowAddTask(false);
+    setTaskForm({ name: '', parentId: null, startDate: '', endDate: '', color: '#2563EB' });
   };
   
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(40, prev - 10));
+  const handleAddParent = () => {
+    const newId = Math.max(...tasks.map(t => t.id), 0) + 1;
+    const newParent = {
+      id: newId,
+      name: parentForm.name,
+      type: 'parent',
+      startDate: parentForm.startDate,
+      endDate: parentForm.endDate,
+      color: '#0A1628'
+    };
+    
+    setTasks([...tasks, newParent]);
+    setShowAddParent(false);
+    setParentForm({ name: '', startDate: '', endDate: '' });
   };
   
-  const handleTaskClick = (task) => {
+  const handleEditTask = (task) => {
     setEditingTask(task);
-    setEditForm({
-      name: task.name,
-      startDate: getDateFromWeekNumber(task.startWeek),
-      endDate: getDateFromWeekNumber(task.endWeek),
-      color: task.color
-    });
-  };
-  
-  const handleSaveEdit = () => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === editingTask.id) {
-        return {
-          ...task,
-          name: editForm.name,
-          startWeek: getWeekFromDate(editForm.startDate),
-          endWeek: getWeekFromDate(editForm.endDate),
-          color: editForm.color
-        };
-      }
-      return task;
-    });
-    
-    // Update parent task dates based on children
-    const finalTasks = updatedTasks.map(task => {
-      if (task.type === 'parent') {
-        const children = updatedTasks.filter(t => t.parentId === task.id);
-        if (children.length > 0) {
-          const minStart = Math.min(...children.map(c => c.startWeek));
-          const maxEnd = Math.max(...children.map(c => c.endWeek));
-          return { ...task, startWeek: minStart, endWeek: maxEnd };
-        }
-      }
-      return task;
-    });
-    
-    setTasks(finalTasks);
-    // Auto-save to localStorage
-    localStorage.setItem('ganttChartTasks', JSON.stringify(finalTasks));
-    setEditingTask(null);
-    setEditForm({ name: '', startWeek: 1, endWeek: 1, color: '#4A90E2' });
-  };
-  
-  const handleCancelEdit = () => {
-    setEditingTask(null);
-    setEditForm({ name: '', startDate: '', endDate: '', color: '#4A90E2' });
-  };
-  
-  const getDateFromWeek = (weekNumber) => {
-    const startDate = new Date(projectSettings.startDate);
-    const endDate = new Date(projectSettings.endDate);
-    const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-    const daysPerWeek = totalDays / 16;
-    
-    const weekStart = new Date(startDate);
-    weekStart.setDate(startDate.getDate() + Math.floor((weekNumber - 1) * daysPerWeek));
-    const weekEnd = new Date(startDate);
-    weekEnd.setDate(startDate.getDate() + Math.floor(weekNumber * daysPerWeek) - 1);
-    
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    // Format: "Jan 1-7" or "Dec 31-Jan 6" for cross-month boundaries
-    if (weekStart.getMonth() === weekEnd.getMonth() && weekStart.getFullYear() === weekEnd.getFullYear()) {
-      return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${weekEnd.getDate()}`;
-    } else if (weekStart.getFullYear() !== weekEnd.getFullYear()) {
-      // Cross-year boundary - use abbreviated format
-      return `${weekStart.getMonth() + 1}/${weekStart.getDate()}-${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+    if (task.type === 'child') {
+      setTaskForm({
+        name: task.name,
+        parentId: task.parentId,
+        startDate: task.startDate,
+        endDate: task.endDate,
+        color: task.color
+      });
     } else {
-      // Cross-month boundary
-      return `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()}-${monthNames[weekEnd.getMonth()]} ${weekEnd.getDate()}`;
+      setParentForm({
+        name: task.name,
+        startDate: task.startDate,
+        endDate: task.endDate
+      });
     }
   };
   
-  const getWeekFromDate = (date) => {
-    const startDate = new Date(projectSettings.startDate);
-    const targetDate = new Date(date);
-    const daysDiff = Math.ceil((targetDate - startDate) / (1000 * 60 * 60 * 24));
-    return Math.max(1, Math.min(16, Math.ceil((daysDiff / (Math.ceil((new Date(projectSettings.endDate) - startDate) / (1000 * 60 * 60 * 24)) / 16)) + 1)));
-  };
-  
-  const getDateFromWeekNumber = (weekNumber) => {
-    const startDate = new Date(projectSettings.startDate);
-    const endDate = new Date(projectSettings.endDate);
-    const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-    const daysPerWeek = totalDays / 16;
-    
-    const resultDate = new Date(startDate);
-    resultDate.setDate(startDate.getDate() + Math.floor((weekNumber - 1) * daysPerWeek));
-    return resultDate.toISOString().split('T')[0];
-  };
-  
-  const handleCreateDependency = () => {
-    const newId = Math.max(...tasks.map(t => t.id), 0) + 1;
-    const newDependency = {
-      id: newId,
-      name: dependencyForm.name,
-      type: 'parent',
-      startWeek: getWeekFromDate(dependencyForm.startDate),
-      endWeek: getWeekFromDate(dependencyForm.endDate),
-      color: '#0A1628',
-      completed: false
-    };
-    
-    const newTasks = [...tasks, newDependency];
-    setTasks(newTasks);
-    localStorage.setItem('ganttChartTasks', JSON.stringify(newTasks));
-    setCreatingDependency(false);
-    setDependencyForm({ name: '', startDate: '', endDate: '' });
-  };
-  
-  const handleSaveSettings = () => {
-    localStorage.setItem('ganttChartSettings', JSON.stringify(projectSettings));
-    setShowSettings(false);
-  };
-  
-  const updateParentTasks = (taskList) => {
-    return taskList.map(task => {
-      if (task.type === 'parent') {
-        const children = taskList.filter(t => t.parentId === task.id);
-        if (children.length > 0) {
-          const minStart = Math.min(...children.map(c => c.startWeek));
-          const maxEnd = Math.max(...children.map(c => c.endWeek));
-          const allCompleted = children.every(c => c.completed);
-          return { ...task, startWeek: minStart, endWeek: maxEnd, completed: allCompleted };
+  const handleUpdateTask = () => {
+    const updatedTasks = tasks.map(t => {
+      if (t.id === editingTask.id) {
+        if (t.type === 'child') {
+          return { ...t, ...taskForm };
+        } else {
+          return { ...t, ...parentForm, color: '#0A1628' };
         }
       }
-      return task;
+      return t;
     });
+    
+    // Update parent dates if child was edited
+    if (editingTask.type === 'child') {
+      const parent = updatedTasks.find(t => t.id === taskForm.parentId);
+      if (parent) {
+        const children = updatedTasks.filter(t => t.parentId === parent.id);
+        const minDate = children.reduce((min, child) => child.startDate < min ? child.startDate : min, children[0].startDate);
+        const maxDate = children.reduce((max, child) => child.endDate > max ? child.endDate : max, children[0].endDate);
+        parent.startDate = minDate;
+        parent.endDate = maxDate;
+      }
+    }
+    
+    setTasks(updatedTasks);
+    setEditingTask(null);
   };
   
   const handleDeleteTask = () => {
-    if (confirm(`Are you sure you want to delete "${editingTask.name}"?`)) {
-      const filteredTasks = tasks.filter(task => task.id !== editingTask.id);
-      const updatedTasks = updateParentTasks(filteredTasks);
-      setTasks(updatedTasks);
-      localStorage.setItem('ganttChartTasks', JSON.stringify(updatedTasks));
+    if (confirm(`Delete "${editingTask.name}"?`)) {
+      const filteredTasks = tasks.filter(t => t.id !== editingTask.id && t.parentId !== editingTask.id);
+      setTasks(filteredTasks);
       setEditingTask(null);
-      setEditForm({ name: '', startDate: '', endDate: '', color: '#4A90E2' });
     }
   };
   
-  const handleCreateTask = () => {
-    const newId = Math.max(...tasks.map(t => t.id)) + 1;
-    const newTask = {
-      id: newId,
-      name: createForm.name,
-      type: 'child',
-      parentId: parseInt(createForm.parentId),
-      startWeek: getWeekFromDate(createForm.startDate),
-      endWeek: getWeekFromDate(createForm.endDate),
-      color: createForm.color,
-      completed: false
-    };
-    
-    const newTasks = [...tasks, newTask];
-    const updatedTasks = updateParentTasks(newTasks);
-    setTasks(updatedTasks);
-    localStorage.setItem('ganttChartTasks', JSON.stringify(updatedTasks));
-    setCreatingTask(false);
-    setCreateForm({ name: '', parentId: 1, startDate: '', endDate: '', color: '#4A90E2', completed: false });
-  };
+  if (!mounted) {
+    return <div>Loading...</div>;
+  }
   
-  const handleToggleComplete = (taskId) => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === taskId) {
-        return { ...task, completed: !task.completed };
-      }
-      return task;
-    });
-    
-    const finalTasks = updateParentTasks(updatedTasks);
-    setTasks(finalTasks);
-    localStorage.setItem('ganttChartTasks', JSON.stringify(finalTasks));
-  };
+  const periods = getDatePeriods();
+  const parentTasks = tasks.filter(t => t.type === 'parent');
   
-  const presetColors = ['#4A90E2', '#50C878', '#FF6B6B', '#FFD700', '#9B59B6', '#FF8C00', '#00CED1'];
-
   return (
-    <div style={{ padding: '24px' }}>
-      <h1 style={{ fontFamily: 'Century Gothic, sans-serif', marginBottom: '24px' }}>Progress Tracking</h1>
+    <div style={{ padding: '24px', fontFamily: 'Century Gothic, sans-serif' }}>
+      <h1 style={{ marginBottom: '24px' }}>Progress Tracking</h1>
       
+      {/* Control Bar */}
       <div style={{ 
-        backgroundColor: 'white', 
-        padding: '24px', 
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        display: 'flex', 
+        gap: '12px', 
+        marginBottom: '24px',
+        padding: '16px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        alignItems: 'center'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ fontFamily: 'Century Gothic, sans-serif', margin: 0 }}>Project Gantt Chart</h2>
-          
-          {/* Zoom Controls */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'Century Gothic, sans-serif' }}>Zoom:</span>
-            <button
-              onClick={handleZoomOut}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid #E5E7EB',
-                backgroundColor: 'white',
-                color: '#6B7280',
-                fontSize: '12px',
-                fontFamily: 'Century Gothic, sans-serif',
-                cursor: zoomLevel > 40 ? 'pointer' : 'not-allowed',
-                opacity: zoomLevel > 40 ? 1 : 0.5,
-                transition: 'all 0.2s'
-              }}
-              disabled={zoomLevel <= 40}
-              onMouseEnter={(e) => { if (zoomLevel > 40) e.target.style.backgroundColor = '#F9FAFB'; }}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-            >
-              - Zoom Out
-            </button>
-            <button
-              onClick={handleZoomIn}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid #E5E7EB',
-                backgroundColor: 'white',
-                color: '#6B7280',
-                fontSize: '12px',
-                fontFamily: 'Century Gothic, sans-serif',
-                cursor: zoomLevel < 120 ? 'pointer' : 'not-allowed',
-                opacity: zoomLevel < 120 ? 1 : 0.5,
-                transition: 'all 0.2s'
-              }}
-              disabled={zoomLevel >= 120}
-              onMouseEnter={(e) => { if (zoomLevel < 120) e.target.style.backgroundColor = '#F9FAFB'; }}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-            >
-              + Zoom In
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => setShowAddTask(true)}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2563EB',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Add Task
+        </button>
         
-        {/* Control Bar */}
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          marginBottom: '20px',
-          padding: '12px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          alignItems: 'center'
-        }}>
-          <button
-            onClick={() => setCreatingTask(true)}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: '#007bff',
-              color: 'white',
-              fontFamily: 'Century Gothic, sans-serif',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
-          >
-            ➕ Add Task
-          </button>
-          
-          <button
-            onClick={() => setCreatingDependency(true)}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: '#9C27B0',
-              color: 'white',
-              fontFamily: 'Century Gothic, sans-serif',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#7B1FA2'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#9C27B0'}
-          >
-            🔗 Add Parent Task
-          </button>
-          
-          <button
-            onClick={() => setShowSettings(true)}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: '#6B7280',
-              color: 'white',
-              fontFamily: 'Century Gothic, sans-serif',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#4B5563'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#6B7280'}
-          >
-            ⚙️ Timeline Settings
-          </button>
-          
-          <div style={{
-            marginLeft: 'auto',
-            fontSize: '12px',
-            color: '#6c757d',
-            fontFamily: 'Century Gothic, sans-serif'
-          }}>
-            All changes are auto-saved
-          </div>
-        </div>
+        <button
+          onClick={() => setShowAddParent(true)}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#8B5CF6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Add Parent Task
+        </button>
         
-        <div style={{ 
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          maxHeight: '600px'
-        }}>
-          {/* Chart Container */}
-          <div style={{ minWidth: `${chartWidth}px`, position: 'relative' }}>
-            
-            {/* Week Headers */}
-            <div style={{ 
-              display: 'flex', 
-              borderBottom: '2px solid #333',
-              backgroundColor: '#f5f5f5'
-            }}>
-              {weeks.map(week => (
-                <div key={week} style={{
-                  width: `${weekWidth}px`,
-                  minWidth: '80px',
-                  height: `${headerHeight}px`,
-                  borderRight: '1px solid #ddd',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  fontSize: weekWidth < 80 ? '10px' : '11px',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  padding: '0 2px'
-                }}>
-                  {getDateFromWeek(week)}
-                </div>
-              ))}
+        <button
+          onClick={() => setShowSettings(true)}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#6B7280',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Timeline Settings
+        </button>
+        
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setColumnWidth(Math.max(50, columnWidth - 10))}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: 'white',
+              color: '#6B7280',
+              border: '1px solid #E5E7EB',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            Zoom Out -
+          </button>
+          <button
+            onClick={() => setColumnWidth(Math.min(150, columnWidth + 10))}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: 'white',
+              color: '#6B7280',
+              border: '1px solid #E5E7EB',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            Zoom In +
+          </button>
+        </div>
+      </div>
+      
+      {/* Gantt Chart */}
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        {/* Date Headers */}
+        <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', marginBottom: '20px' }}>
+          {periods.map((period, index) => (
+            <div
+              key={index}
+              style={{
+                width: `${columnWidth}px`,
+                padding: '10px 0',
+                textAlign: 'center',
+                borderRight: '1px solid #E5E7EB',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                color: '#374151'
+              }}
+            >
+              {period.label}
             </div>
-            
-            {/* Tasks */}
-            <div style={{ position: 'relative' }}>
-              {tasks.map((task, index) => {
-                const taskLeft = (task.startWeek - 1) * weekWidth;
-                const taskWidth = (task.endWeek - task.startWeek + 1) * weekWidth;
-                const taskTop = index * rowHeight;
+          ))}
+        </div>
+        
+        {/* Tasks */}
+        <div style={{ position: 'relative' }}>
+          {parentTasks.map(parent => {
+            const children = tasks.filter(t => t.parentId === parent.id);
+            return (
+              <div key={parent.id}>
+                {/* Parent Task */}
+                <div style={{ position: 'relative', height: '40px', marginBottom: '8px' }}>
+                  <div
+                    onClick={() => handleEditTask(parent)}
+                    style={{
+                      position: 'absolute',
+                      ...getTaskPosition(parent.startDate, parent.endDate),
+                      height: '32px',
+                      backgroundColor: parent.color,
+                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: '8px',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {parent.name}
+                  </div>
+                </div>
                 
-                return (
-                  <div key={task.id} style={{ position: 'relative', height: `${rowHeight}px` }}>
-                    {/* Grid lines */}
-                    {weeks.map(week => (
-                      <div key={week} style={{
-                        position: 'absolute',
-                        left: `${(week - 1) * weekWidth}px`,
-                        width: `${weekWidth}px`,
-                        height: '100%',
-                        borderRight: '1px solid #e0e0e0',
-                        borderBottom: '1px solid #f0f0f0'
-                      }} />
-                    ))}
-                    
-                    {/* Checkbox for child tasks only */}
-                    {task.type === 'child' && (
-                      <input
-                        type="checkbox"
-                        checked={task.completed || false}
-                        onChange={() => handleToggleComplete(task.id)}
-                        style={{
-                          position: 'absolute',
-                          left: `${taskLeft - 20}px`,
-                          top: '8px',
-                          cursor: 'pointer',
-                          zIndex: 1
-                        }}
-                      />
-                    )}
-                    
-                    {/* Task bar */}
-                    <div 
-                      onClick={() => handleTaskClick(task)}
+                {/* Child Tasks */}
+                {children.map(child => (
+                  <div key={child.id} style={{ position: 'relative', height: '32px', marginBottom: '4px', marginLeft: '20px' }}>
+                    <div
+                      onClick={() => handleEditTask(child)}
                       style={{
                         position: 'absolute',
-                        left: `${taskLeft}px`,
-                        top: '5px',
-                        width: `${taskWidth - 4}px`,
-                        height: '20px',
-                        backgroundColor: task.completed ? '#9ca3af' : task.color,
+                        ...getTaskPosition(child.startDate, child.endDate),
+                        height: '24px',
+                        backgroundColor: child.color,
                         borderRadius: '4px',
                         display: 'flex',
                         alignItems: 'center',
                         paddingLeft: '8px',
-                        fontSize: task.type === 'parent' ? '12px' : '11px',
-                        fontWeight: task.type === 'parent' ? 'bold' : 'normal',
                         color: 'white',
-                        fontFamily: 'Century Gothic, sans-serif',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                        marginLeft: task.type === 'child' ? '20px' : '0',
-                        boxShadow: task.type === 'parent' ? '0 2px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.1)',
-                        cursor: 'pointer',
-                        transition: 'opacity 0.2s',
-                        textDecoration: task.completed ? 'line-through' : 'none',
-                        opacity: task.completed ? 0.7 : 1
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!task.completed) {
-                          e.currentTarget.style.opacity = '0.9';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = task.completed ? '0.7' : '1';
+                        fontSize: '12px',
+                        cursor: 'pointer'
                       }}
                     >
-                      {task.name}
+                      {child.name}
                     </div>
                   </div>
-                );
-              })}
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Add Task Modal */}
+      {showAddTask && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            width: '400px'
+          }}>
+            <h2 style={{ marginBottom: '16px' }}>Add Task</h2>
+            
+            <input
+              placeholder="Task Name"
+              value={taskForm.name}
+              onChange={(e) => setTaskForm({ ...taskForm, name: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            <select
+              value={taskForm.parentId}
+              onChange={(e) => setTaskForm({ ...taskForm, parentId: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            >
+              <option value="">Select Parent Task</option>
+              {parentTasks.map(parent => (
+                <option key={parent.id} value={parent.id}>{parent.name}</option>
+              ))}
+            </select>
+            
+            <input
+              type="date"
+              value={taskForm.startDate}
+              onChange={(e) => setTaskForm({ ...taskForm, startDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            <input
+              type="date"
+              value={taskForm.endDate}
+              onChange={(e) => setTaskForm({ ...taskForm, endDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              {colors.map(color => (
+                <div
+                  key={color}
+                  onClick={() => setTaskForm({ ...taskForm, color })}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    backgroundColor: color,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    border: taskForm.color === color ? '2px solid #000' : '2px solid transparent'
+                  }}
+                />
+              ))}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setShowAddTask(false);
+                  setTaskForm({ name: '', parentId: null, startDate: '', endDate: '', color: '#2563EB' });
+                }}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#F3F4F6',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddTask}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#2563EB',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Create Task
+              </button>
             </div>
           </div>
         </div>
-        
-      </div>
+      )}
       
-      {/* Edit Modal */}
+      {/* Add Parent Task Modal */}
+      {showAddParent && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            width: '400px'
+          }}>
+            <h2 style={{ marginBottom: '16px' }}>Add Parent Task</h2>
+            
+            <input
+              placeholder="Parent Task Name"
+              value={parentForm.name}
+              onChange={(e) => setParentForm({ ...parentForm, name: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            <input
+              type="date"
+              value={parentForm.startDate}
+              onChange={(e) => setParentForm({ ...parentForm, startDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            <input
+              type="date"
+              value={parentForm.endDate}
+              onChange={(e) => setParentForm({ ...parentForm, endDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setShowAddParent(false);
+                  setParentForm({ name: '', startDate: '', endDate: '' });
+                }}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#F3F4F6',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddParent}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#8B5CF6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Create Parent Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Task Modal */}
       {editingTask && (
         <div style={{
           position: 'fixed',
@@ -550,7 +680,7 @@ function Progress() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0,0,0,0.5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -558,536 +688,149 @@ function Progress() {
         }}>
           <div style={{
             backgroundColor: 'white',
-            borderRadius: '12px',
+            borderRadius: '8px',
             padding: '24px',
-            minWidth: '400px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+            width: '400px'
           }}>
-            <h3 style={{ 
-              fontFamily: 'Century Gothic, sans-serif', 
-              marginBottom: '20px',
-              color: '#0A1628'
-            }}>
-              Edit Task
-            </h3>
+            <h2 style={{ marginBottom: '16px' }}>Edit {editingTask.type === 'parent' ? 'Parent Task' : 'Task'}</h2>
             
-            {/* Task Name Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Task Name
-              </label>
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+            <input
+              placeholder="Name"
+              value={editingTask.type === 'child' ? taskForm.name : parentForm.name}
+              onChange={(e) => {
+                if (editingTask.type === 'child') {
+                  setTaskForm({ ...taskForm, name: e.target.value });
+                } else {
+                  setParentForm({ ...parentForm, name: e.target.value });
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
+            
+            {editingTask.type === 'child' && (
+              <select
+                value={taskForm.parentId}
+                onChange={(e) => setTaskForm({ ...taskForm, parentId: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
+                  marginBottom: '12px',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '4px'
                 }}
-              />
-            </div>
+              >
+                <option value="">Select Parent Task</option>
+                {parentTasks.map(parent => (
+                  <option key={parent.id} value={parent.id}>{parent.name}</option>
+                ))}
+              </select>
+            )}
             
-            {/* Start Date Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={editForm.startDate}
-                min={projectSettings.startDate}
-                max={projectSettings.endDate}
-                onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
+            <input
+              type="date"
+              value={editingTask.type === 'child' ? taskForm.startDate : parentForm.startDate}
+              onChange={(e) => {
+                if (editingTask.type === 'child') {
+                  setTaskForm({ ...taskForm, startDate: e.target.value });
+                } else {
+                  setParentForm({ ...parentForm, startDate: e.target.value });
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
             
-            {/* End Date Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                End Date
-              </label>
-              <input
-                type="date"
-                value={editForm.endDate}
-                min={projectSettings.startDate}
-                max={projectSettings.endDate}
-                onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
+            <input
+              type="date"
+              value={editingTask.type === 'child' ? taskForm.endDate : parentForm.endDate}
+              onChange={(e) => {
+                if (editingTask.type === 'child') {
+                  setTaskForm({ ...taskForm, endDate: e.target.value });
+                } else {
+                  setParentForm({ ...parentForm, endDate: e.target.value });
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
             
-            {/* Color Picker */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Task Color
-              </label>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {presetColors.map(color => (
+            {editingTask.type === 'child' && (
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                {colors.map(color => (
                   <div
                     key={color}
-                    onClick={() => setEditForm({ ...editForm, color })}
+                    onClick={() => setTaskForm({ ...taskForm, color })}
                     style={{
-                      width: '40px',
-                      height: '40px',
+                      width: '32px',
+                      height: '32px',
                       backgroundColor: color,
-                      borderRadius: '8px',
+                      borderRadius: '4px',
                       cursor: 'pointer',
-                      border: editForm.color === color ? '3px solid #0A1628' : '2px solid #ddd',
-                      transition: 'all 0.2s'
+                      border: taskForm.color === color ? '2px solid #000' : '2px solid transparent'
                     }}
                   />
                 ))}
               </div>
-            </div>
+            )}
             
-            {/* Buttons */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <button
                 onClick={handleDeleteTask}
                 style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: '#dc3545',
+                  padding: '8px 16px',
+                  backgroundColor: '#EF4444',
                   color: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
               >
                 🗑️ Delete
               </button>
               
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button
-                  onClick={handleCancelEdit}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: '#0A1628',
-                  color: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2638'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#0A1628'}
-              >
-                Save Changes
-              </button>
+                  onClick={() => setEditingTask(null)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#F3F4F6',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateTask}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: editingTask.type === 'parent' ? '#8B5CF6' : '#2563EB',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Save Changes
+                </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Create Task Modal */}
-      {creatingTask && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '24px',
-            minWidth: '400px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
-          }}>
-            <h3 style={{ 
-              fontFamily: 'Century Gothic, sans-serif', 
-              marginBottom: '20px',
-              color: '#0A1628'
-            }}>
-              Add New Task
-            </h3>
-            
-            {/* Task Name Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Task Name
-              </label>
-              <input
-                type="text"
-                value={createForm.name}
-                onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
-            
-            {/* Parent Task Selection */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Parent Task
-              </label>
-              <select
-                value={createForm.parentId}
-                onChange={(e) => setCreateForm({ ...createForm, parentId: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              >
-                {tasks.filter(t => t.type === 'parent').map(parent => (
-                  <option key={parent.id} value={parent.id}>
-                    {parent.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Start Date Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={createForm.startDate}
-                min={projectSettings.startDate}
-                max={projectSettings.endDate}
-                onChange={(e) => setCreateForm({ ...createForm, startDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
-            
-            {/* End Date Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                End Date
-              </label>
-              <input
-                type="date"
-                value={createForm.endDate}
-                min={projectSettings.startDate}
-                max={projectSettings.endDate}
-                onChange={(e) => setCreateForm({ ...createForm, endDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
-            
-            {/* Color Picker */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Task Color
-              </label>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {presetColors.map(color => (
-                  <div
-                    key={color}
-                    onClick={() => setCreateForm({ ...createForm, color })}
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      backgroundColor: color,
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      border: createForm.color === color ? '3px solid #0A1628' : '2px solid #ddd',
-                      transition: 'all 0.2s'
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            {/* Buttons */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => {
-                  setCreatingTask(false);
-                  setCreateForm({ name: '', parentId: 1, startDate: '', endDate: '', color: '#4A90E2', completed: false });
-                }}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateTask}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#218838'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#28a745'}
-                disabled={!createForm.name}
-              >
-                ➕ Create Task
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Create Dependency Modal */}
-      {creatingDependency && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '24px',
-            minWidth: '400px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
-          }}>
-            <h3 style={{ 
-              fontFamily: 'Century Gothic, sans-serif', 
-              marginBottom: '20px',
-              color: '#0A1628'
-            }}>
-              Add New Parent Task
-            </h3>
-            
-            {/* Dependency Name Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Parent Task Name
-              </label>
-              <input
-                type="text"
-                value={dependencyForm.name}
-                onChange={(e) => setDependencyForm({ ...dependencyForm, name: e.target.value })}
-                placeholder="e.g., Infrastructure Setup"
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
-            
-            {/* Start Date Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={dependencyForm.startDate}
-                min={projectSettings.startDate}
-                max={projectSettings.endDate}
-                onChange={(e) => setDependencyForm({ ...dependencyForm, startDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
-            
-            {/* End Date Input */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                End Date
-              </label>
-              <input
-                type="date"
-                value={dependencyForm.endDate}
-                min={projectSettings.startDate}
-                max={projectSettings.endDate}
-                onChange={(e) => setDependencyForm({ ...dependencyForm, endDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
-            
-            {/* Buttons */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => {
-                  setCreatingDependency(false);
-                  setDependencyForm({ name: '', startDate: '', endDate: '' });
-                }}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateDependency}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: '#9C27B0',
-                  color: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#5a32a3'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#6f42c1'}
-                disabled={!dependencyForm.name}
-              >
-                Create Parent Task
-              </button>
             </div>
           </div>
         </div>
@@ -1101,7 +844,7 @@ function Progress() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0,0,0,0.5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1109,100 +852,70 @@ function Progress() {
         }}>
           <div style={{
             backgroundColor: 'white',
-            borderRadius: '12px',
+            borderRadius: '8px',
             padding: '24px',
-            minWidth: '400px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+            width: '400px'
           }}>
-            <h3 style={{ 
-              fontFamily: 'Century Gothic, sans-serif', 
-              marginBottom: '20px',
-              color: '#0A1628'
-            }}>
-              Timeline Settings
-            </h3>
+            <h2 style={{ marginBottom: '16px' }}>Timeline Settings</h2>
             
-            {/* Project Start Date */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Project Start Date
-              </label>
-              <input
-                type="date"
-                value={projectSettings.startDate}
-                onChange={(e) => setProjectSettings({ ...projectSettings, startDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#374151' }}>
+              Project Start Date
+            </label>
+            <input
+              type="date"
+              value={projectSettings.startDate}
+              onChange={(e) => setProjectSettings({ ...projectSettings, startDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '16px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
             
-            {/* Project End Date */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontFamily: 'Century Gothic, sans-serif'
-              }}>
-                Project End Date
-              </label>
-              <input
-                type="date"
-                value={projectSettings.endDate}
-                onChange={(e) => setProjectSettings({ ...projectSettings, endDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd',
-                  fontFamily: 'Century Gothic, sans-serif'
-                }}
-              />
-            </div>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#374151' }}>
+              Project End Date
+            </label>
+            <input
+              type="date"
+              value={projectSettings.endDate}
+              onChange={(e) => setProjectSettings({ ...projectSettings, endDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '16px',
+                border: '1px solid #E5E7EB',
+                borderRadius: '4px'
+              }}
+            />
             
-            
-            {/* Buttons */}
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setShowSettings(false)}
                 style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
+                  padding: '8px 16px',
+                  backgroundColor: '#F3F4F6',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
               >
                 Cancel
               </button>
               <button
-                onClick={handleSaveSettings}
+                onClick={() => {
+                  setShowSettings(false);
+                  localStorage.setItem('ganttSettings', JSON.stringify(projectSettings));
+                }}
                 style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
-                  border: 'none',
+                  padding: '8px 16px',
                   backgroundColor: '#6B7280',
                   color: 'white',
-                  fontFamily: 'Century Gothic, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#5a6268'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#6c757d'}
               >
                 Save Settings
               </button>
@@ -1214,4 +927,4 @@ function Progress() {
   );
 }
 
-export default withPageAuthRequired(Progress);// Deploy trigger
+export default withPageAuthRequired(Progress);
