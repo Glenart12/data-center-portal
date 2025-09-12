@@ -197,10 +197,10 @@ function ProgressPage() {
             Project Timeline
           </h1>
 
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-        <button
-            onClick={() => setShowAddTask(true)}
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
+            <button
+              onClick={() => setShowAddTask(true)}
             style={{
               padding: '12px 24px',
               backgroundColor: '#2563EB',
@@ -244,13 +244,13 @@ function ProgressPage() {
           >
             Timeline Settings
           </button>
-      </div>
+          </div>
 
-      {/* Gantt Chart */}
-      <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        {/* Timeline Header */}
-        <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
-          {timeline.map((period, index) => (
+          {/* Gantt Chart */}
+          <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            {/* Timeline Header */}
+            <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
+              {timeline.map((period, index) => (
                 <div
                   key={index}
                   style={{
@@ -264,13 +264,13 @@ function ProgressPage() {
                 >
                   {period.label}
                 </div>
-          ))}
-        </div>
+              ))}
+            </div>
 
-        {/* Tasks */}
-        <div style={{ position: 'relative' }}>
-          {parentTasks.map(parent => (
-              <div key={parent.id}>
+            {/* Tasks */}
+            <div style={{ position: 'relative' }}>
+              {parentTasks.map(parent => (
+                <div key={parent.id}>
                 {/* Parent Task */}
                 <div style={{ position: 'relative', marginBottom: '8px', height: '40px' }}>
                   {/* Grid lines */}
@@ -348,7 +348,8 @@ function ProgressPage() {
                 ))}
               </div>
             ))}
-        </div>
+            </div>
+          </div>
         </div>
       </div>
 
