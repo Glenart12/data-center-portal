@@ -455,18 +455,41 @@ function ProgressPage() {
         </h3>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-          {['MOP', 'SOP', 'EOP'].map(category => (
-            <div key={category}>
+          {[
+            { 
+              category: 'MOP',
+              gauges: [
+                { label: 'Mechanical', value: 88 },
+                { label: 'Electrical', value: 85 },
+                { label: 'White Space', value: 84 },
+                { label: 'Misc.', value: 79 }
+              ]
+            },
+            {
+              category: 'SOP',
+              gauges: [
+                { label: 'Mechanical', value: 60 },
+                { label: 'Electrical', value: 58 },
+                { label: 'White Space', value: 57 },
+                { label: 'Misc.', value: 56 }
+              ]
+            },
+            {
+              category: 'EOP',
+              gauges: [
+                { label: 'Mechanical', value: 27 },
+                { label: 'Electrical', value: 24 },
+                { label: 'White Space', value: 23 },
+                { label: 'Misc.', value: 26 }
+              ]
+            }
+          ].map(item => (
+            <div key={item.category}>
               <h4 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0A1628', marginBottom: '16px', textAlign: 'center' }}>
-                {category}
+                {item.category}
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-                {[
-                  { label: 'Mechanical', value: 85 },
-                  { label: 'Electrical', value: 60 },
-                  { label: 'White Space', value: 40 },
-                  { label: 'Misc.', value: 95 }
-                ].map(gauge => (
+                {item.gauges.map(gauge => (
                   <div key={gauge.label} style={{ textAlign: 'center' }}>
                     <HalfCircleGauge percentage={gauge.value} />
                     <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
