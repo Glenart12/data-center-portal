@@ -280,7 +280,16 @@ function ProgressPage() {
           </div>
 
           {/* Gantt Chart */}
-          <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ 
+            backgroundColor: 'white', 
+            borderRadius: '8px', 
+            padding: '24px', 
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            width: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ overflow: 'auto' }}>
             {/* Timeline Header */}
             <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
               {timeline.map((period, index) => (
@@ -391,6 +400,7 @@ function ProgressPage() {
             ))}
             </div>
           </div>
+          </div>
         </div>
       
         {/* Dashboard Section */}
@@ -412,6 +422,8 @@ function ProgressPage() {
           borderRadius: '8px',
           padding: '24px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          width: '100%',
+          boxSizing: 'border-box',
           overflow: 'hidden'
         }}>
         {/* Percentage Complete Section */}
@@ -474,7 +486,7 @@ function ProgressPage() {
           Category Breakdown
         </h3>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '100%' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px', width: '100%', overflow: 'hidden' }}>
           {[
             { 
               category: 'MOP',
@@ -508,7 +520,7 @@ function ProgressPage() {
               <h4 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0A1628', marginBottom: '16px', textAlign: 'center' }}>
                 {item.category}
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', maxWidth: '100%' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', width: '100%' }}>
                 {item.gauges.map(gauge => (
                   <div key={gauge.label} style={{ textAlign: 'center' }}>
                     <HalfCircleGauge percentage={gauge.value} />
