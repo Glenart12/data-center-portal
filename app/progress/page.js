@@ -306,7 +306,7 @@ function ProgressPage() {
               {parentTasks.map(parent => (
                 <div key={parent.id}>
                 {/* Parent Task */}
-                <div style={{ position: 'relative', marginBottom: '8px', height: '40px' }}>
+                <div style={{ position: 'relative', marginBottom: '4px', minHeight: '40px', height: 'auto' }}>
                   {/* Grid lines */}
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex' }}>
                       {timeline.map((_, index) => (
@@ -325,16 +325,19 @@ function ProgressPage() {
                     style={{
                       position: 'absolute',
                       top: '8px',
-                        height: '24px',
+                        minHeight: '32px',
+                        height: 'auto',
                         backgroundColor: '#0A1628',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        paddingLeft: '8px',
+                        padding: '4px 8px',
                         color: 'white',
                         fontSize: '12px',
                         fontWeight: 'bold',
+                        whiteSpace: 'normal',
+                        wordWrap: 'break-word',
                         zIndex: 1,
                         ...calculateBarPosition(parent.startDate, parent.endDate)
                       }}
@@ -345,7 +348,7 @@ function ProgressPage() {
 
                 {/* Child Tasks */}
                 {tasks.filter(t => t.parentId === parent.id).map(task => (
-                  <div key={task.id} style={{ position: 'relative', marginBottom: '8px', height: '36px', paddingLeft: '24px' }}>
+                  <div key={task.id} style={{ position: 'relative', marginBottom: '4px', minHeight: '36px', height: 'auto', paddingLeft: '24px' }}>
                     {/* Grid lines */}
                     <div style={{ position: 'absolute', top: 0, left: '-24px', right: 0, bottom: 0, display: 'flex' }}>
                       {timeline.map((_, index) => (
@@ -364,15 +367,18 @@ function ProgressPage() {
                       style={{
                         position: 'absolute',
                         top: '8px',
-                          height: '20px',
+                          minHeight: '24px',
+                          height: 'auto',
                           backgroundColor: task.color || '#3B82F6',
                           borderRadius: '4px',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          paddingLeft: '8px',
+                          padding: '4px 8px',
                           color: 'white',
                           fontSize: '11px',
+                          whiteSpace: 'normal',
+                          wordWrap: 'break-word',
                           zIndex: 1,
                           ...calculateBarPosition(task.startDate, task.endDate)
                         }}
