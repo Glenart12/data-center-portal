@@ -78,73 +78,21 @@ export default function Header() {
         fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
         gap: '20px'
       }}>
-        {/* Left side - Logo and Company Name */}
+        {/* Left side - Logo only */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '20px',
           flex: '0 1 auto'
         }}>
-          {/* Logo - Display directly without container */}
           <img 
-            src="/Cream_Logo.svg" 
-            alt="Glenart Group Logo" 
-            style={{ 
-              height: '70px',
-              width: '70px',
-              objectFit: 'contain'
-            }}
-            onError={(e) => {
-              // If logo doesn't exist, show initials
-              e.target.style.display = 'none';
-              const fallback = document.createElement('span');
-              fallback.style.color = '#ffffff';
-              fallback.style.fontWeight = 'bold';
-              fallback.style.fontSize = '28px';
-              fallback.textContent = 'GG';
-              e.target.parentNode.replaceChild(fallback, e.target);
+            src="/Glenart (3).svg" 
+            alt="Glenart Group"
+            style={{
+              height: '50px',
+              width: 'auto',
+              filter: 'brightness(0) invert(1)'
             }}
           />
-          
-          {/* Divider Line */}
-          <div style={{
-            width: '1px',
-            height: '40px',
-            background: 'linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.5), transparent)',
-            margin: '0 4px'
-          }}></div>
-          
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            gap: '2px'
-          }}>
-            <h1 style={{ 
-              margin: 0, 
-              fontSize: 'clamp(14px, 2vw, 24px)',
-              fontWeight: '600',
-              fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
-              color: 'white',
-              letterSpacing: '1px',
-              textShadow: '0 2px 6px rgba(0,0,0,0.3)',
-              lineHeight: '1.1',
-              textTransform: 'uppercase'
-            }}>
-              <div>Automated Procedure</div>
-              <div>Generator</div>
-            </h1>
-            <div style={{
-              fontSize: '12px',
-              color: 'rgba(255, 255, 255, 0.8)',
-              letterSpacing: '0.5px',
-              fontWeight: '400',
-              lineHeight: '1.2'
-            }}>
-              <div>Data Center Operations</div>
-              <div>Portal</div>
-            </div>
-          </div>
         </div>
 
         {/* Center - Navigation */}
