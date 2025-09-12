@@ -392,16 +392,15 @@ function ProgressPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Dashboard Section */}
-      <div style={{
-        marginTop: '32px',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        padding: '24px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-      }}>
+      
+        {/* Dashboard Section */}
+        <div style={{
+          marginTop: '16px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
         {/* Percentage Complete Section */}
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px' }}>
           Percentage Complete
@@ -480,9 +479,11 @@ function ProgressPage() {
           ))}
         </div>
       </div>
+      </div>
+    </div>
 
-      {/* Add Task Modal */}
-      {showAddTask && (
+    {/* Add Task Modal */}
+    {showAddTask && (
         <TaskModal
           title="Add Task"
           task={{}}
