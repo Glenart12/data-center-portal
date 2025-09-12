@@ -1,134 +1,142 @@
 'use client';
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import EditTaskModal from './components/EditTaskModal';
+import AddTaskModal from './components/AddTaskModal';
+import ImportPreviewModal from './components/ImportPreviewModal';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Default task data - moved outside component to prevent re-creation
+const defaultTasks = [
+  {
+    id: 'mop-parent',
+    name: 'ALL MOP WORK',
+    startWeek: 1,
+    endWeek: 8,
+    color: '#0A1628',
+    isParent: true,
+    children: ['mop-mechanical', 'mop-electrical', 'mop-whitespace'],
+    completed: false
+  },
+  {
+    id: 'mop-mechanical',
+    name: 'Mechanical MOP',
+    startWeek: 1,
+    endWeek: 4,
+    color: '#2196F3',
+    isParent: false,
+    parentId: 'mop-parent',
+    completed: false
+  },
+  {
+    id: 'mop-electrical',
+    name: 'Electrical MOP',
+    startWeek: 4,
+    endWeek: 6,
+    color: '#FFC107',
+    isParent: false,
+    parentId: 'mop-parent',
+    completed: false
+  },
+  {
+    id: 'mop-whitespace',
+    name: 'White Space MOP',
+    startWeek: 6,
+    endWeek: 8,
+    color: '#4CAF50',
+    isParent: false,
+    parentId: 'mop-parent',
+    completed: false
+  },
+  {
+    id: 'sop-parent',
+    name: 'ALL SOP WORK',
+    startWeek: 8,
+    endWeek: 12,
+    color: '#0A1628',
+    isParent: true,
+    children: ['sop-mechanical', 'sop-electrical', 'sop-whitespace'],
+    completed: false
+  },
+  {
+    id: 'sop-mechanical',
+    name: 'Mechanical SOP',
+    startWeek: 8,
+    endWeek: 10,
+    color: '#2196F3',
+    isParent: false,
+    parentId: 'sop-parent',
+    completed: false
+  },
+  {
+    id: 'sop-electrical',
+    name: 'Electrical SOP',
+    startWeek: 10,
+    endWeek: 11,
+    color: '#FFC107',
+    isParent: false,
+    parentId: 'sop-parent',
+    completed: false
+  },
+  {
+    id: 'sop-whitespace',
+    name: 'White Space SOP',
+    startWeek: 11,
+    endWeek: 12,
+    color: '#4CAF50',
+    isParent: false,
+    parentId: 'sop-parent',
+    completed: false
+  },
+  {
+    id: 'eop-parent',
+    name: 'ALL EOP WORK',
+    startWeek: 12,
+    endWeek: 16,
+    color: '#0A1628',
+    isParent: true,
+    children: ['eop-mechanical', 'eop-electrical', 'eop-whitespace'],
+    completed: false
+  },
+  {
+    id: 'eop-mechanical',
+    name: 'Mechanical EOP',
+    startWeek: 12,
+    endWeek: 14,
+    color: '#2196F3',
+    isParent: false,
+    parentId: 'eop-parent',
+    completed: false
+  },
+  {
+    id: 'eop-electrical',
+    name: 'Electrical EOP',
+    startWeek: 14,
+    endWeek: 15,
+    color: '#FFC107',
+    isParent: false,
+    parentId: 'eop-parent',
+    completed: false
+  },
+  {
+    id: 'eop-whitespace',
+    name: 'White Space EOP',
+    startWeek: 15,
+    endWeek: 16,
+    color: '#4CAF50',
+    isParent: false,
+    parentId: 'eop-parent',
+    completed: false
+  }
+];
 
 function Progress() {
-  // Default task data with completion tracking
-  const defaultTasks = [
-    {
-      id: 'mop-parent',
-      name: 'ALL MOP WORK',
-      startWeek: 1,
-      endWeek: 8,
-      color: '#0A1628',
-      isParent: true,
-      children: ['mop-mechanical', 'mop-electrical', 'mop-whitespace'],
-      completed: false
-    },
-    {
-      id: 'mop-mechanical',
-      name: 'Mechanical MOP',
-      startWeek: 1,
-      endWeek: 4,
-      color: '#2196F3',
-      isParent: false,
-      parentId: 'mop-parent',
-      completed: false
-    },
-    {
-      id: 'mop-electrical',
-      name: 'Electrical MOP',
-      startWeek: 4,
-      endWeek: 6,
-      color: '#FFC107',
-      isParent: false,
-      parentId: 'mop-parent',
-      completed: false
-    },
-    {
-      id: 'mop-whitespace',
-      name: 'White Space MOP',
-      startWeek: 6,
-      endWeek: 8,
-      color: '#4CAF50',
-      isParent: false,
-      parentId: 'mop-parent',
-      completed: false
-    },
-    {
-      id: 'sop-parent',
-      name: 'ALL SOP WORK',
-      startWeek: 8,
-      endWeek: 12,
-      color: '#0A1628',
-      isParent: true,
-      children: ['sop-mechanical', 'sop-electrical', 'sop-whitespace'],
-      completed: false
-    },
-    {
-      id: 'sop-mechanical',
-      name: 'Mechanical SOP',
-      startWeek: 8,
-      endWeek: 10,
-      color: '#2196F3',
-      isParent: false,
-      parentId: 'sop-parent',
-      completed: false
-    },
-    {
-      id: 'sop-electrical',
-      name: 'Electrical SOP',
-      startWeek: 10,
-      endWeek: 11,
-      color: '#FFC107',
-      isParent: false,
-      parentId: 'sop-parent',
-      completed: false
-    },
-    {
-      id: 'sop-whitespace',
-      name: 'White Space SOP',
-      startWeek: 11,
-      endWeek: 12,
-      color: '#4CAF50',
-      isParent: false,
-      parentId: 'sop-parent',
-      completed: false
-    },
-    {
-      id: 'eop-parent',
-      name: 'ALL EOP WORK',
-      startWeek: 12,
-      endWeek: 16,
-      color: '#0A1628',
-      isParent: true,
-      children: ['eop-mechanical', 'eop-electrical', 'eop-whitespace'],
-      completed: false
-    },
-    {
-      id: 'eop-mechanical',
-      name: 'Mechanical EOP',
-      startWeek: 12,
-      endWeek: 14,
-      color: '#2196F3',
-      isParent: false,
-      parentId: 'eop-parent',
-      completed: false
-    },
-    {
-      id: 'eop-electrical',
-      name: 'Electrical EOP',
-      startWeek: 14,
-      endWeek: 15,
-      color: '#FFC107',
-      isParent: false,
-      parentId: 'eop-parent',
-      completed: false
-    },
-    {
-      id: 'eop-whitespace',
-      name: 'White Space EOP',
-      startWeek: 15,
-      endWeek: 16,
-      color: '#4CAF50',
-      isParent: false,
-      parentId: 'eop-parent',
-      completed: false
-    }
-  ];
-
-  // Initialize tasks from localStorage or use defaults
+  // Loading and error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Main state hooks - all at the top
   const [tasks, setTasks] = useState(defaultTasks);
   const [editingTask, setEditingTask] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -138,7 +146,7 @@ function Progress() {
     color: '#2196F3',
     completed: false
   });
-  const [saveStatus, setSaveStatus] = useState(''); // 'saved', 'saving', ''
+  const [saveStatus, setSaveStatus] = useState('');
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTaskForm, setNewTaskForm] = useState({
@@ -154,7 +162,8 @@ function Progress() {
   const [importPreview, setImportPreview] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
   const [hoveredButton, setHoveredButton] = useState(null);
-  const [dismissedNotifications, setDismissedNotifications] = useState(() => {
+  const [dismissedNotifications, setDismissedNotifications] = useState({
+    () => {
     const saved = localStorage.getItem('dismissedNotifications');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -167,17 +176,21 @@ function Progress() {
     return { date: new Date().toDateString(), overdue: false, upcoming: false };
   });
 
-  // Load tasks from localStorage on mount
+  // Load tasks from localStorage on mount with error handling
   useEffect(() => {
-    const savedTasks = localStorage.getItem('ganttChartTasks');
-    if (savedTasks) {
-      try {
+    try {
+      setIsLoading(true);
+      const savedTasks = localStorage.getItem('ganttChartTasks');
+      if (savedTasks) {
         const parsedTasks = JSON.parse(savedTasks);
         setTasks(parsedTasks);
-      } catch (error) {
-        console.error('Error loading saved tasks:', error);
-        setTasks(defaultTasks);
       }
+    } catch (error) {
+      console.error('Error loading saved tasks:', error);
+      setError('Failed to load saved tasks. Using defaults.');
+      setTasks(defaultTasks);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -712,8 +725,104 @@ function Progress() {
     return '#DC2626';
   };
 
-  return (
-    <>
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#F9FAFB'
+      }}>
+        <div style={{
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '3px solid #E2E8F0',
+            borderTop: '3px solid #0A1628',
+            borderRadius: '50%',
+            margin: '0 auto 16px',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <p style={{
+            color: '#4A5568',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>Loading timeline...</p>
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#F9FAFB'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          backgroundColor: '#FFFFFF',
+          padding: '32px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          maxWidth: '400px'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            marginBottom: '16px'
+          }}>⚠️</div>
+          <h2 style={{
+            color: '#DC2626',
+            marginBottom: '8px',
+            fontSize: '1.5rem'
+          }}>Error Loading Timeline</h2>
+          <p style={{
+            color: '#4A5568',
+            fontSize: '14px',
+            marginBottom: '24px'
+          }}>{error}</p>
+          <button
+            onClick={() => {
+              setError(null);
+              setIsLoading(false);
+            }}
+            style={{
+              padding: '8px 24px',
+              borderRadius: '4px',
+              border: 'none',
+              backgroundColor: '#0A1628',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Century Gothic", sans-serif'
+            }}
+          >
+            Continue with Defaults
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Main render with error boundary
+  try {
+    return (
+      <>
       {/* Background gradient */}
       <div style={{
         position: 'fixed',
@@ -1877,7 +1986,34 @@ function Progress() {
       </div>
 
       {/* Edit Modal */}
-      {editingTask && (
+      <EditTaskModal 
+        editingTask={editingTask}
+        editForm={editForm}
+        setEditForm={setEditForm}
+        saveTask={saveTask}
+        deleteTask={deleteTask}
+        cancelEdit={cancelEdit}
+      />
+
+      {/* Add Task Modal */}
+      <AddTaskModal 
+        showAddModal={showAddModal}
+        setShowAddModal={setShowAddModal}
+        newTaskForm={newTaskForm}
+        setNewTaskForm={setNewTaskForm}
+        addNewTask={addNewTask}
+        tasks={tasks}
+      />
+
+      {/* Import Preview Modal */}
+      <ImportPreviewModal 
+        showImportModal={showImportModal}
+        setShowImportModal={setShowImportModal}
+        importPreview={importPreview}
+        setImportPreview={setImportPreview}
+        confirmImport={confirmImport}
+      />
+
         <div style={{
           position: 'fixed',
           top: 0,
@@ -2119,14 +2255,6 @@ function Progress() {
           </div>
         </div>
       )}
-
-      {/* Add New Task Modal */}
-      {showAddModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
@@ -2411,14 +2539,6 @@ function Progress() {
           </div>
         </div>
       )}
-
-      {/* Import Preview Modal */}
-      {showImportModal && importPreview && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
@@ -2638,7 +2758,67 @@ function Progress() {
         }
       `}</style>
     </>
+    );
+  } catch (renderError) {
+    console.error('Render error:', renderError);
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#F9FAFB'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          backgroundColor: '#FFFFFF',
+          padding: '32px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          maxWidth: '400px'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            marginBottom: '16px'
+          }}>🚨</div>
+          <h2 style={{
+            color: '#DC2626',
+            marginBottom: '8px',
+            fontSize: '1.5rem'
+          }}>Something went wrong</h2>
+          <p style={{
+            color: '#4A5568',
+            fontSize: '14px',
+            marginBottom: '24px'
+          }}>An unexpected error occurred while rendering the timeline.</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '8px 24px',
+              borderRadius: '4px',
+              border: 'none',
+              backgroundColor: '#0A1628',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Century Gothic", sans-serif'
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+function ProgressWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <Progress />
+    </ErrorBoundary>
   );
 }
 
-export default withPageAuthRequired(Progress);
+export default withPageAuthRequired(ProgressWithErrorBoundary);
