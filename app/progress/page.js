@@ -394,6 +394,18 @@ function ProgressPage() {
         </div>
       
         {/* Dashboard Section */}
+        <h2 style={{ 
+          color: '#0A1628', 
+          fontSize: '2.25rem', 
+          marginBottom: '24px',
+          marginTop: '32px', 
+          fontWeight: 'bold',
+          fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          Progress Dashboard
+        </h2>
+        
         <div style={{
           marginTop: '16px',
           backgroundColor: 'white',
