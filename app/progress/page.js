@@ -60,6 +60,20 @@ function ProgressPage() {
     localStorage.setItem('ganttDates', JSON.stringify(projectDates));
   }, [projectDates]);
 
+  // TEMPORARY: Log current Gantt chart data for hardcoding
+  // Remove this after capturing the data
+  useEffect(() => {
+    console.log('=== CURRENT GANTT CHART DATA ===');
+    console.log('Copy these and replace the sample data:');
+    console.log('--- TASKS ---');
+    console.log(JSON.stringify(tasks, null, 2));
+    console.log('--- PARENT TASKS ---');
+    console.log(JSON.stringify(parentTasks, null, 2));
+    console.log('--- PROJECT DATES ---');
+    console.log(JSON.stringify(projectDates, null, 2));
+    console.log('=== END GANTT CHART DATA ===');
+  }, [tasks, parentTasks, projectDates]);
+
   // Generate timeline periods
   const generateTimeline = () => {
     const periods = [];

@@ -1,7 +1,7 @@
 'use client';
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function RiskPage() {
   // State management
@@ -20,6 +20,15 @@ function RiskPage() {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [editingRisk, setEditingRisk] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+
+  // TEMPORARY: Log current risks data for hardcoding
+  // Remove this after capturing the data
+  useEffect(() => {
+    console.log('=== CURRENT RISKS DATA ===');
+    console.log('Copy this and replace initialRisks:');
+    console.log(JSON.stringify(risks, null, 2));
+    console.log('=== END RISKS DATA ===');
+  }, [risks]);
 
   // Calculate average risk score
   const averageScore = risks.reduce((sum, risk) => sum + risk.score, 0) / risks.length;
