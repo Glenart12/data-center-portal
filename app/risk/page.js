@@ -483,7 +483,7 @@ function RiskPage() {
                         position: 'absolute',
                         width: '180px',
                         height: '180px',
-                        top: '28px',
+                        top: '10px',
                         left: '50%',
                         transform: 'translateX(-50%)'
                       }}>
