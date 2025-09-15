@@ -187,6 +187,7 @@ function SopPage() {
   return (
     <div style={{
       padding: '40px 20px',
+      paddingTop: '100px',
       minHeight: '100vh',
       fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
     }}>

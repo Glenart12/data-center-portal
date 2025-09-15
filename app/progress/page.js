@@ -178,6 +178,7 @@ function ProgressPage() {
       {/* Main Content */}
       <div style={{
         padding: '32px',
+        paddingTop: '100px',
         fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
         position: 'relative',
         zIndex: 1,
