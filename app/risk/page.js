@@ -298,21 +298,21 @@ function RiskPage() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  minHeight: '400px'
+                  height: '190px'
                 }}>
                   <h3 style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
                     color: '#0A1628',
-                    marginBottom: '24px',
+                    marginBottom: '16px',
                     fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                   }}>
                     RISK AVERAGE SCORE
                   </h3>
 
                   {/* Speedometer */}
-                  <div style={{ position: 'relative', width: '200px', height: '120px' }}>
-                    <svg width="200" height="120" viewBox="0 0 200 120">
+                  <div style={{ position: 'relative', width: '140px', height: '80px' }}>
+                    <svg width="140" height="80" viewBox="0 0 140 80">
                       {/* Background arc - green to yellow to red */}
                       <defs>
                         <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -324,35 +324,35 @@ function RiskPage() {
 
                       {/* Background arc */}
                       <path
-                        d="M 20 100 A 80 80 0 0 1 180 100"
+                        d="M 15 70 A 55 55 0 0 1 125 70"
                         fill="none"
                         stroke="url(#gaugeGradient)"
-                        strokeWidth="20"
+                        strokeWidth="14"
                         strokeLinecap="round"
                       />
 
                       {/* Needle */}
                       <line
-                        x1="100"
-                        y1="100"
-                        x2={100 + 70 * Math.cos((Math.PI * (1 - averageScore / 10)))}
-                        y2={100 - 70 * Math.sin((Math.PI * (1 - averageScore / 10)))}
+                        x1="70"
+                        y1="70"
+                        x2={70 + 45 * Math.cos((Math.PI * (1 - averageScore / 10)))}
+                        y2={70 - 45 * Math.sin((Math.PI * (1 - averageScore / 10)))}
                         stroke="#0A1628"
-                        strokeWidth="3"
+                        strokeWidth="2.5"
                         strokeLinecap="round"
                       />
 
                       {/* Center circle */}
-                      <circle cx="100" cy="100" r="8" fill="#0A1628" />
+                      <circle cx="70" cy="70" r="6" fill="#0A1628" />
                     </svg>
 
                     {/* Score display */}
                     <div style={{
                       position: 'absolute',
-                      bottom: '10px',
+                      bottom: '0px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      fontSize: '24px',
+                      fontSize: '20px',
                       fontWeight: 'bold',
                       color: '#0A1628'
                     }}>
@@ -361,8 +361,8 @@ function RiskPage() {
                   </div>
 
                   <div style={{
-                    marginTop: '20px',
-                    fontSize: '14px',
+                    marginTop: '8px',
+                    fontSize: '12px',
                     color: '#6B7280',
                     textAlign: 'center'
                   }}>
@@ -427,6 +427,154 @@ function RiskPage() {
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+
+                  {/* RISK STATUS DONUT CHART */}
+                  <div style={{
+                    backgroundColor: '#F8F9FA',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    flex: 1
+                  }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      color: '#0A1628',
+                      marginBottom: '16px',
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                    }}>
+                      RISK STATUS
+                    </h3>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      {/* Donut Chart */}
+                      <div style={{ position: 'relative', width: '120px', height: '120px' }}>
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                          {(() => {
+                            const total = risks.length;
+                            const minor = risks.filter(r => r.score <= 3).length;
+                            const major = risks.filter(r => r.score > 3 && r.score <= 6).length;
+                            const severe = risks.filter(r => r.score > 6).length;
+
+                            const radius = 45;
+                            const innerRadius = 28;
+                            const centerX = 60;
+                            const centerY = 60;
+
+                            let currentAngle = -90; // Start at top
+                            const segments = [];
+
+                            // Minor segment (green)
+                            if (minor > 0) {
+                              const angle = (minor / total) * 360;
+                              const endAngle = currentAngle + angle;
+                              const largeArc = angle > 180 ? 1 : 0;
+
+                              const x1 = centerX + radius * Math.cos(currentAngle * Math.PI / 180);
+                              const y1 = centerY + radius * Math.sin(currentAngle * Math.PI / 180);
+                              const x2 = centerX + radius * Math.cos(endAngle * Math.PI / 180);
+                              const y2 = centerY + radius * Math.sin(endAngle * Math.PI / 180);
+                              const x3 = centerX + innerRadius * Math.cos(endAngle * Math.PI / 180);
+                              const y3 = centerY + innerRadius * Math.sin(endAngle * Math.PI / 180);
+                              const x4 = centerX + innerRadius * Math.cos(currentAngle * Math.PI / 180);
+                              const y4 = centerY + innerRadius * Math.sin(currentAngle * Math.PI / 180);
+
+                              segments.push(
+                                <path
+                                  key="minor"
+                                  d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4} Z`}
+                                  fill="#10B981"
+                                />
+                              );
+                              currentAngle = endAngle;
+                            }
+
+                            // Major segment (amber)
+                            if (major > 0) {
+                              const angle = (major / total) * 360;
+                              const endAngle = currentAngle + angle;
+                              const largeArc = angle > 180 ? 1 : 0;
+
+                              const x1 = centerX + radius * Math.cos(currentAngle * Math.PI / 180);
+                              const y1 = centerY + radius * Math.sin(currentAngle * Math.PI / 180);
+                              const x2 = centerX + radius * Math.cos(endAngle * Math.PI / 180);
+                              const y2 = centerY + radius * Math.sin(endAngle * Math.PI / 180);
+                              const x3 = centerX + innerRadius * Math.cos(endAngle * Math.PI / 180);
+                              const y3 = centerY + innerRadius * Math.sin(endAngle * Math.PI / 180);
+                              const x4 = centerX + innerRadius * Math.cos(currentAngle * Math.PI / 180);
+                              const y4 = centerY + innerRadius * Math.sin(currentAngle * Math.PI / 180);
+
+                              segments.push(
+                                <path
+                                  key="major"
+                                  d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4} Z`}
+                                  fill="#F59E0B"
+                                />
+                              );
+                              currentAngle = endAngle;
+                            }
+
+                            // Severe segment (red)
+                            if (severe > 0) {
+                              const angle = (severe / total) * 360;
+                              const endAngle = currentAngle + angle;
+                              const largeArc = angle > 180 ? 1 : 0;
+
+                              const x1 = centerX + radius * Math.cos(currentAngle * Math.PI / 180);
+                              const y1 = centerY + radius * Math.sin(currentAngle * Math.PI / 180);
+                              const x2 = centerX + radius * Math.cos(endAngle * Math.PI / 180);
+                              const y2 = centerY + radius * Math.sin(endAngle * Math.PI / 180);
+                              const x3 = centerX + innerRadius * Math.cos(endAngle * Math.PI / 180);
+                              const y3 = centerY + innerRadius * Math.sin(endAngle * Math.PI / 180);
+                              const x4 = centerX + innerRadius * Math.cos(currentAngle * Math.PI / 180);
+                              const y4 = centerY + innerRadius * Math.sin(currentAngle * Math.PI / 180);
+
+                              segments.push(
+                                <path
+                                  key="severe"
+                                  d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4} Z`}
+                                  fill="#EF4444"
+                                />
+                              );
+                            }
+
+                            return segments;
+                          })()}
+                        </svg>
+
+                        {/* Center text */}
+                        <div style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          textAlign: 'center'
+                        }}>
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#0A1628' }}>
+                            {risks.length}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#6B7280' }}>
+                            risks
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Legend */}
+                      <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                          <span style={{ fontSize: '12px', color: '#374151' }}>Minor</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
+                          <span style={{ fontSize: '12px', color: '#374151' }}>Major</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
+                          <span style={{ fontSize: '12px', color: '#374151' }}>Severe</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
