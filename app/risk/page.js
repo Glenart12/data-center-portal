@@ -143,7 +143,7 @@ function RiskPage() {
                     </h3>
                     <button
                       style={{
-                        backgroundColor: '#0070f3',
+                        backgroundColor: '#0A1628',
                         color: 'white',
                         border: 'none',
                         borderRadius: '50%',
@@ -157,11 +157,11 @@ function RiskPage() {
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#0051cc';
+                        e.currentTarget.style.backgroundColor = '#1E3A5F';
                         e.currentTarget.style.transform = 'scale(1.1)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#0070f3';
+                        e.currentTarget.style.backgroundColor = '#0A1628';
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
@@ -179,12 +179,12 @@ function RiskPage() {
                       <div
                         key={risk.id}
                         style={{
-                          backgroundColor: selectedRisk?.id === risk.id ? '#E3F2FD' : 'white',
+                          backgroundColor: selectedRisk?.id === risk.id ? 'rgba(10, 22, 40, 0.05)' : 'white',
                           padding: '12px',
                           borderRadius: '6px',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
-                          border: selectedRisk?.id === risk.id ? '2px solid #0070f3' : '1px solid #E5E7EB',
+                          border: selectedRisk?.id === risk.id ? '2px solid #0A1628' : '1px solid #E5E7EB',
                           position: 'relative'
                         }}
                         onClick={() => setSelectedRisk(risk)}
@@ -440,7 +440,7 @@ function RiskPage() {
                               <div style={{
                                 height: '100%',
                                 width: `${percentage}%`,
-                                backgroundColor: '#0070f3',
+                                backgroundColor: '#0A1628',
                                 transition: 'width 0.3s ease'
                               }} />
                             </div>
