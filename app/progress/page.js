@@ -289,7 +289,7 @@ function ProgressPage() {
             boxSizing: 'border-box',
             overflow: 'hidden'
           }}>
-            <div style={{ overflow: 'auto' }}>
+            <div style={{ overflow: 'visible' }}>
             {/* Timeline Header */}
             <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
               {timeline.map((period, index) => (
