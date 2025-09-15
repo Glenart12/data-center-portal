@@ -188,14 +188,15 @@ function ProgressPage() {
           maxWidth: '1400px',
           margin: '0 auto'
         }}>
-          <h1 style={{ 
-            color: '#0A1628', 
-            fontSize: '2.25rem', 
-            marginBottom: '32px', 
+          <h1 style={{
+            color: '#0A1628',
+            fontSize: '2.25rem',
+            marginBottom: '32px',
             fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+            textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+            textAlign: 'center'
           }}>
-            Project Timeline
+            PROJECT PROGRESS
           </h1>
 
           {/* Action Buttons */}
@@ -281,15 +282,28 @@ function ProgressPage() {
           </div>
 
           {/* Gantt Chart */}
-          <div style={{ 
-            backgroundColor: 'white', 
-            borderRadius: '8px', 
-            padding: '24px', 
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
             width: '100%',
             boxSizing: 'border-box',
             overflow: 'hidden'
           }}>
+            {/* Navy Header Bar */}
+            <div style={{
+              backgroundColor: '#0A1628',
+              padding: '16px 24px',
+              color: '#FFFFFF',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+            }}>
+              PROJECT TIMELINE
+            </div>
+
+            {/* Chart Content */}
+            <div style={{ padding: '24px' }}>
             <div style={{ overflow: 'visible' }}>
             {/* Timeline Header */}
             <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
@@ -400,6 +414,7 @@ function ProgressPage() {
               </div>
             ))}
             </div>
+          </div>
           </div>
           </div>
         </div>
