@@ -199,88 +199,6 @@ function ProgressPage() {
             PROJECT PROGRESS
           </h1>
 
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-            <button
-              onClick={() => setShowAddTask(true)}
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#0A1628',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '600',
-                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
-                cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#1A2738';
-                e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#0A1628';
-                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-              }}
-            >
-              Add Task
-            </button>
-          <button
-            onClick={() => setShowAddParent(true)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#0A1628',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '600',
-              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#1A2738';
-              e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#0A1628';
-              e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            Add Parent Task
-          </button>
-          <button
-            onClick={() => setShowTimeline(true)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#0A1628',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '600',
-              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#1A2738';
-              e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#0A1628';
-              e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            Timeline Settings
-          </button>
-          </div>
-
           {/* Gantt Chart */}
           <div style={{
             backgroundColor: 'white',
@@ -417,6 +335,89 @@ function ProgressPage() {
           </div>
           </div>
           </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '16px', marginTop: '32px' }}>
+            <button
+              onClick={() => setShowAddTask(true)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#0A1628',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#1A2738';
+                e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#0A1628';
+                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              Add Task
+            </button>
+            <button
+              onClick={() => setShowAddParent(true)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#0A1628',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#1A2738';
+                e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#0A1628';
+                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              Add Parent Task
+            </button>
+            <button
+              onClick={() => setShowTimeline(true)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#0A1628',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#1A2738';
+                e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#0A1628';
+                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              Timeline Settings
+            </button>
+          </div>
+
         </div>
     </div>
 
