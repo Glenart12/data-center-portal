@@ -192,7 +192,7 @@ function Dashboard() {
             fontWeight: 'bold',
             fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
           }}>
-            Progress Dashboard
+            PROGRESS DASHBOARD
           </div>
           
           {/* Card Content */}
@@ -200,8 +200,8 @@ function Dashboard() {
             padding: '32px'
           }}>
             {/* Percentage Complete Section */}
-            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px', textAlign: 'center' }}>
-              Percentage Complete
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px', textAlign: 'center' }}>
+              PERCENTAGE COMPLETE
             </h2>
           
           {/* Progress Bars */}
@@ -257,7 +257,7 @@ function Dashboard() {
             fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
             textAlign: 'center'
           }}>
-            Category Breakdown
+            CATEGORY BREAKDOWN
           </h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px', width: '100%', overflow: 'hidden' }}>
