@@ -112,7 +112,7 @@ function RiskPage() {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr',
-                gridTemplateRows: 'auto auto',
+                gridTemplateRows: '250px 250px',
                 gap: '24px',
                 marginBottom: '32px'
               }}>
@@ -121,8 +121,10 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  minHeight: '400px',
-                  gridRow: 'span 2'
+                  gridRow: 'span 2',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  flexDirection: 'column'
                 }}>
                   <div style={{
                     display: 'flex',
@@ -167,7 +169,13 @@ function RiskPage() {
                     </button>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    flex: 1,
+                    overflow: 'auto'
+                  }}>
                     {risks.map((risk) => (
                       <div
                         key={risk.id}
@@ -300,7 +308,8 @@ function RiskPage() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  height: '190px'
+                  height: '250px',
+                  boxSizing: 'border-box'
                 }}>
                   <h3 style={{
                     fontSize: '18px',
@@ -377,7 +386,10 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  height: '190px'
+                  height: '250px',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  flexDirection: 'column'
                   }}>
                     <h3 style={{
                       fontSize: '18px',
@@ -389,7 +401,13 @@ function RiskPage() {
                       IMPACT CATEGORY
                     </h3>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                      flex: 1,
+                      overflow: 'auto'
+                    }}>
                       {['Cost', 'Time', 'Quality', 'Scope'].map(category => {
                         const count = impactCategories[category] || 0;
                         const maxCount = Math.max(...Object.values(impactCategories));
@@ -408,7 +426,7 @@ function RiskPage() {
                               <span style={{ fontWeight: 'bold' }}>{count}</span>
                             </div>
                             <div style={{
-                              height: '24px',
+                              height: '20px',
                               backgroundColor: '#E5E7EB',
                               borderRadius: '4px',
                               overflow: 'hidden'
@@ -431,7 +449,10 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  height: '190px'
+                  height: '250px',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  flexDirection: 'column'
                   }}>
                     <h3 style={{
                       fontSize: '18px',
@@ -443,7 +464,13 @@ function RiskPage() {
                       RISK STATUS
                     </h3>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      flex: 1,
+                      justifyContent: 'center'
+                    }}>
                       {/* Donut Chart */}
                       <div style={{ position: 'relative', width: '120px', height: '120px' }}>
                         <svg width="120" height="120" viewBox="0 0 120 120">
@@ -579,7 +606,10 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  height: '190px'
+                  height: '250px',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  flexDirection: 'column'
                   }}>
                     <h3 style={{
                       fontSize: '18px',
@@ -591,7 +621,13 @@ function RiskPage() {
                       RISK OWNER
                     </h3>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                      flex: 1,
+                      overflow: 'auto'
+                    }}>
                       {Object.entries(riskOwners).map(([owner, count]) => {
                         const maxCount = Math.max(...Object.values(riskOwners));
                         const percentage = (count / maxCount) * 100;
