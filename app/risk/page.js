@@ -476,22 +476,22 @@ function RiskPage() {
                       flexDirection: 'column',
                       alignItems: 'center',
                       flex: 1,
-                      justifyContent: 'flex-start',
+                      justifyContent: 'space-between',
                       paddingTop: '10px'
                     }}>
                       {/* Donut Chart */}
-                      <div style={{ position: 'relative', width: '120px', height: '120px' }}>
-                        <svg width="120" height="120" viewBox="0 0 120 120">
+                      <div style={{ position: 'relative', width: '180px', height: '180px' }}>
+                        <svg width="180" height="180" viewBox="0 0 180 180">
                           {(() => {
                             const total = risks.length;
                             const minor = risks.filter(r => r.score <= 3).length;
                             const major = risks.filter(r => r.score > 3 && r.score <= 6).length;
                             const severe = risks.filter(r => r.score > 6).length;
 
-                            const radius = 45;
-                            const innerRadius = 28;
-                            const centerX = 60;
-                            const centerY = 60;
+                            const radius = 70;
+                            const innerRadius = 45;
+                            const centerX = 90;
+                            const centerY = 90;
 
                             let currentAngle = -90; // Start at top
                             const segments = [];
@@ -582,17 +582,17 @@ function RiskPage() {
                           transform: 'translate(-50%, -50%)',
                           textAlign: 'center'
                         }}>
-                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#0A1628' }}>
+                          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628' }}>
                             {risks.length}
                           </div>
-                          <div style={{ fontSize: '11px', color: '#6B7280' }}>
+                          <div style={{ fontSize: '14px', color: '#6B7280' }}>
                             risks
                           </div>
                         </div>
                       </div>
 
                       {/* Legend */}
-                      <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                      <div style={{ display: 'flex', gap: '16px', marginBottom: '5px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10B981' }} />
                           <span style={{ fontSize: '12px', color: '#374151' }}>Minor</span>
