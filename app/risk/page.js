@@ -204,8 +204,8 @@ function RiskPage() {
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{
-                              backgroundColor: risk.score >= 7 ? '#FEE2E2' : risk.score >= 4 ? '#FEF3C7' : '#D1FAE5',
-                              color: risk.score >= 7 ? '#DC2626' : risk.score >= 4 ? '#F59E0B' : '#10B981',
+                              backgroundColor: risk.score >= 5 ? '#FEE2E2' : risk.score >= 3 ? '#FEF3C7' : '#D1FAE5',
+                              color: risk.score >= 5 ? '#DC2626' : risk.score >= 3 ? '#F59E0B' : '#10B981',
                               padding: '4px 8px',
                               borderRadius: '4px',
                               fontSize: '12px',
@@ -490,9 +490,9 @@ function RiskPage() {
                         <svg width="180" height="180" viewBox="0 0 180 180">
                           {(() => {
                             const total = risks.length;
-                            const minor = risks.filter(r => r.score <= 3).length;
-                            const major = risks.filter(r => r.score > 3 && r.score <= 6).length;
-                            const severe = risks.filter(r => r.score > 6).length;
+                            const minor = risks.filter(r => r.score < 3).length;
+                            const major = risks.filter(r => r.score >= 3 && r.score < 5).length;
+                            const severe = risks.filter(r => r.score >= 5).length;
 
                             const radius = 70;
                             const innerRadius = 45;
@@ -719,8 +719,8 @@ function RiskPage() {
                         <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>Risk Score</div>
                         <div style={{
                           display: 'inline-block',
-                          backgroundColor: selectedRisk.score >= 7 ? '#FEE2E2' : selectedRisk.score >= 4 ? '#FEF3C7' : '#D1FAE5',
-                          color: selectedRisk.score >= 7 ? '#DC2626' : selectedRisk.score >= 4 ? '#F59E0B' : '#10B981',
+                          backgroundColor: selectedRisk.score >= 5 ? '#FEE2E2' : selectedRisk.score >= 3 ? '#FEF3C7' : '#D1FAE5',
+                          color: selectedRisk.score >= 5 ? '#DC2626' : selectedRisk.score >= 3 ? '#F59E0B' : '#10B981',
                           padding: '4px 12px',
                           borderRadius: '4px',
                           fontSize: '14px',
