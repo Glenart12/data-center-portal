@@ -185,7 +185,7 @@ function ProgressPage() {
         minHeight: '100vh'
       }}>
         <div style={{
-          maxWidth: '1400px',
+          maxWidth: '1200px',
           margin: '0 auto'
         }}>
           <h1 style={{
@@ -201,6 +201,7 @@ function ProgressPage() {
 
           {/* Gantt Chart */}
           <div style={{
+            marginTop: '32px',
             backgroundColor: 'white',
             borderRadius: '8px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
