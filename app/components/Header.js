@@ -52,7 +52,7 @@ export default function Header() {
               src="/Glenart (3).svg"
               alt="Glenart Group"
               style={{
-                height: '50px',
+                height: '80px',
                 width: 'auto',
                 filter: 'brightness(0) invert(1)'
               }}
