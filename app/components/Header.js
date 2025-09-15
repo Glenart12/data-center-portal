@@ -2,414 +2,181 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
 
 export default function Header() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
-  const [notificationCount, setNotificationCount] = useState(0);
-
-  useEffect(() => {
-    // Load initial notification count from localStorage
-    const loadNotificationCount = () => {
-      const stored = localStorage.getItem('notificationCount');
-      if (stored) {
-        setNotificationCount(parseInt(stored, 10));
-      }
-    };
-
-    loadNotificationCount();
-
-    // Listen for notification updates
-    const handleNotificationUpdate = (event) => {
-      setNotificationCount(event.detail.count);
-    };
-
-    window.addEventListener('notificationUpdate', handleNotificationUpdate);
-    
-    // Also listen for storage events (for cross-tab updates)
-    const handleStorageChange = (e) => {
-      if (e.key === 'notificationCount') {
-        setNotificationCount(parseInt(e.newValue || '0', 10));
-      }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('notificationUpdate', handleNotificationUpdate);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
 
   if (isLoading) return null;
-
-  // Don't show header if user is not logged in
   if (!user) return null;
 
-  // Helper function to check if current page is active
-  const isActivePage = (href) => {
-    if (href === '/') {
-      return pathname === '/';
-    }
-    return pathname === href;
-  };
+  const navLinks = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/progress', label: 'Progress' },
+    { href: '/mop', label: 'MOPs' },
+    { href: '/sop', label: 'SOPs' },
+    { href: '/eop', label: 'EOPs' },
+  ];
+
+  const isActive = (href) => pathname === href;
 
   return (
-    <header style={{
-      backgroundColor: '#0A1628',
-      backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      boxShadow: '0 8px 32px rgba(15, 52, 86, 0.3)',
-      transition: 'all 0.3s ease',
-      width: '100%',
-      boxSizing: 'border-box'
-    }}>
+    <nav
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        backgroundColor: 'rgba(10, 22, 40, 0.95)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+      }}
+    >
       <div style={{
-        maxWidth: '1400px',
+        maxWidth: '1280px',
         margin: '0 auto',
-        padding: '16px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        fontFamily: 'Century Gothic, CenturyGothic, AppleGothic, sans-serif',
-        gap: '20px'
+        padding: '0 16px'
       }}>
-        {/* Left side - Logo only */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          flex: '0 1 auto'
-        }}>
-          <img 
-            src="/Glenart (3).svg" 
-            alt="Glenart Group"
-            style={{
-              height: '60px',
-              width: 'auto',
-              filter: 'brightness(0) invert(1)',
-              marginTop: '-10px',
-              marginBottom: '-10px'
-            }}
-          />
-        </div>
-
-        {/* Center - Navigation */}
-        <nav style={{ 
-          display: 'flex', 
-          gap: '12px',
+        <div style={{
+          display: 'flex',
           alignItems: 'center',
-          flex: '1 1 auto',
-          justifyContent: 'center'
+          justifyContent: 'space-between',
+          height: '64px'
         }}>
-          {[
-            { href: '/', label: 'Dashboard' },
-            { href: '/progress', label: 'Progress' },
-            { href: '/mop', label: 'MOPs' },
-            { href: '/sop', label: 'SOPs' },
-            { href: '/eop', label: 'EOPs' }
-          ].map(({ href, label }) => (
-            <a 
-              key={href}
-              href={href}
+          {/* Logo/Company Info - Keep existing DOME branding */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <img
+              src="/logo.png"
+              alt="DOME Logo"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '12px 24px',
-                backgroundColor: isActivePage(href) ? 'white' : 'rgba(255, 255, 255, 0.9)',
-                color: isActivePage(href) ? '#0f3456' : '#2c3e50',
-                textDecoration: 'none',
-                borderRadius: '10px',
-                fontSize: '15px',
-                fontWeight: isActivePage(href) ? '700' : '600',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                minWidth: '90px',
-                boxShadow: isActivePage(href) 
-                  ? '0 4px 16px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1)' 
-                  : '0 2px 8px rgba(0, 0, 0, 0.1)',
-                border: isActivePage(href) ? '2px solid #0070f3' : '2px solid transparent',
-                transform: isActivePage(href) ? 'translateY(-1px)' : 'translateY(0)',
-                position: 'relative',
-                overflow: 'hidden'
+                height: '40px',
+                width: 'auto'
               }}
-              onMouseEnter={(e) => {
-                if (!isActivePage(href)) {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.color = '#0f3456';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15)';
-                  e.currentTarget.style.border = '2px solid rgba(0, 112, 243, 0.3)';
-                }
+              onError={(e) => {
+                e.target.style.display = 'none';
               }}
-              onMouseLeave={(e) => {
-                if (!isActivePage(href)) {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-                  e.currentTarget.style.color = '#2c3e50';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.border = '2px solid transparent';
-                }
-              }}
-            >
-              {label}
-              {/* Notification Badge for Progress */}
-              {href === '/progress' && notificationCount > 0 && (
-                <div style={{
-                  position: 'absolute',
-                  top: '-8px',
-                  right: '-8px',
-                  backgroundColor: '#DC2626',
-                  color: '#FFFFFF',
-                  borderRadius: '50%',
-                  width: '20px',
-                  height: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '11px',
-                  fontWeight: 'bold',
-                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.3)',
-                  border: '2px solid white'
-                }}>
-                  {notificationCount > 9 ? '9+' : notificationCount}
-                </div>
-              )}
-              {isActivePage(href) && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: '4px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '24px',
-                  height: '3px',
-                  background: 'linear-gradient(90deg, #00d4ff, #0070f3)',
-                  borderRadius: '2px'
-                }} />
-              )}
-            </a>
-          ))}
-        </nav>
+            />
+            <div>
+              <h2 style={{
+                margin: 0,
+                fontSize: '20px',
+                color: '#FFFFFF',
+                fontWeight: '600'
+              }}>
+                DOME
+              </h2>
+            </div>
+          </div>
 
-        {/* Right side - User info and Logout */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '16px',
-          flex: '0 1 auto'
-        }}>
-          {/* User Avatar & Info */}
+          {/* Center Navigation - All 5 buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  borderRadius: '8px',
+                  backgroundColor: isActive(link.href) ? '#FFFFFF' : 'transparent',
+                  color: isActive(link.href) ? '#0A1628' : '#9CA3AF',
+                  border: isActive(link.href) ? 'none' : '1px solid rgba(255, 255, 255, 0.2)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive(link.href)) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.color = '#FFFFFF';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(link.href)) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#9CA3AF';
+                  }
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          {/* Right side - Auth0 Profile and Logout */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            padding: '8px 12px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)'
+            gap: '16px'
           }}>
+            {/* Auth0 Profile Circle */}
             <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #00d4ff 0%, #0070f3 100%)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              boxShadow: '0 2px 8px rgba(0, 112, 243, 0.3)'
+              gap: '10px'
             }}>
-              {user.email ? user.email.charAt(0).toUpperCase() : 'U'}
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: '#3B82F6',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                {user.email ? user.email[0].toUpperCase() : 'U'}
+              </div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <span style={{
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  {user.name || user.email?.split('@')[0]}
+                </span>
+                <span style={{
+                  color: '#9CA3AF',
+                  fontSize: '12px'
+                }}>
+                  {user.email}
+                </span>
+              </div>
             </div>
-            <div>
-              <div style={{ 
-                color: 'white', 
+
+            {/* Logout Button */}
+            <a
+              href="/api/auth/logout"
+              style={{
+                padding: '8px 20px',
+                backgroundColor: '#EF4444',
+                color: '#FFFFFF',
+                textDecoration: 'none',
+                borderRadius: '8px',
                 fontSize: '14px',
                 fontWeight: '500',
-                lineHeight: '1.2'
-              }}>
-                {user.name || user.email?.split('@')[0] || 'User'}
-              </div>
-              <div style={{ 
-                color: 'rgba(255, 255, 255, 0.7)', 
-                fontSize: '12px',
-                lineHeight: '1.2'
-              }}>
-                {user.email}
-              </div>
-            </div>
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#DC2626';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#EF4444';
+              }}
+            >
+              Logout
+            </a>
           </div>
-          
-          {/* Logout Button */}
-          <a 
-            href="/api/auth/logout"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              background: 'linear-gradient(135deg, #dc3545 0%, #ff3742 100%)',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '10px',
-              fontSize: '15px',
-              fontWeight: '600',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 2px 8px rgba(220, 53, 69, 0.3)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #ff3742 0%, #ff2730 100%)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #dc3545 0%, #ff3742 100%)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.3)';
-            }}
-          >
-            🚪 Logout
-          </a>
         </div>
       </div>
-
-      {/* Add responsive styles */}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        
-        /* Large desktop */
-        @media (min-width: 1400px) {
-          header > div {
-            padding: 16px 40px !important;
-          }
-        }
-        
-        /* Tablet responsive design */
-        @media (max-width: 1024px) {
-          header > div {
-            padding: 14px 20px !important;
-          }
-          
-          nav a {
-            min-width: 70px !important;
-            padding: 10px 16px !important;
-            font-size: 14px !important;
-          }
-          
-          header > div > div:first-child h1 {
-            font-size: clamp(12px, 1.8vw, 20px) !important;
-          }
-        }
-        
-        /* Mobile responsive design */
-        @media (max-width: 768px) {
-          header > div {
-            flex-direction: column !important;
-            gap: 12px !important;
-            padding: 12px 16px !important;
-          }
-          
-          header > div > div:first-child {
-            width: 100% !important;
-            justify-content: center !important;
-            gap: 12px !important;
-            min-width: unset !important;
-          }
-          
-          header > div > div:first-child img {
-            height: 50px !important;
-            width: 50px !important;
-          }
-          
-          header > div > div:first-child > div:nth-child(2) {
-            display: none !important;
-          }
-          
-          header > div > div:first-child > div:last-child {
-            align-items: center !important;
-          }
-          
-          header > div > div:first-child h1 {
-            font-size: clamp(10px, 3.5vw, 16px) !important;
-            text-align: center !important;
-            letter-spacing: 0.5px !important;
-          }
-          
-          header > div > div:first-child h1 > div {
-            line-height: 1.1 !important;
-          }
-          
-          header > div > div:first-child > div:last-child > div:last-child {
-            display: none !important;
-          }
-          
-          nav {
-            width: 100% !important;
-            justify-content: center !important;
-            flex-wrap: wrap !important;
-            gap: 8px !important;
-          }
-          
-          nav a {
-            min-width: 60px !important;
-            padding: 8px 12px !important;
-            font-size: 13px !important;
-          }
-          
-          header > div > div:last-child {
-            width: 100% !important;
-            justify-content: center !important;
-            min-width: unset !important;
-          }
-          
-          header > div > div:last-child > div:first-child {
-            display: none !important;
-          }
-        }
-        
-        /* Small mobile responsive design */
-        @media (max-width: 480px) {
-          header > div {
-            padding: 10px 12px !important;
-          }
-          
-          header > div > div:first-child {
-            gap: 8px !important;
-          }
-          
-          header > div > div:first-child img {
-            height: 45px !important;
-            width: 45px !important;
-          }
-          
-          header > div > div:first-child h1 {
-            font-size: clamp(9px, 3vw, 14px) !important;
-            letter-spacing: 0.3px !important;
-          }
-          
-          header > div > div:first-child h1 > div {
-            line-height: 1.1 !important;
-          }
-          
-          nav a {
-            min-width: 50px !important;
-            padding: 6px 10px !important;
-            font-size: 12px !important;
-          }
-        }
-      `}</style>
-    </header>
+    </nav>
   );
 }
