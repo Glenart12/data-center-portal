@@ -3,59 +3,29 @@ import { useState, useEffect } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 function ProgressPage() {
-  const [tasks, setTasks] = useState([]);
-  const [parentTasks, setParentTasks] = useState([]);
-  const [projectDates, setProjectDates] = useState({
-    startDate: "2025-09-12",
-    endDate: "2025-12-11"
-  });
+  // Hardcoded data from localStorage as permanent default
+  const [tasks, setTasks] = useState([{"id":1,"name":"Mechanical Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-17","color":"#2563EB"},{"id":2,"name":"Electrical Generation","parentId":1,"startDate":"2025-09-17","endDate":"2025-09-21","color":"#2563EB"},{"id":3,"name":"Mechanical Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-05","color":"#10B981"},{"id":4,"name":"Electrical Generation","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-11","color":"#10B981"},{"id":5,"name":"Mechanical Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-27","color":"#EF4444"},{"id":6,"name":"Electrical Generation","parentId":3,"startDate":"2025-10-28","endDate":"2025-11-01","color":"#EF4444"},{"id":1757701444542,"name":"White Space Generation","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-27","color":"#3B82F6"},{"id":1757701600098,"name":"Document Review","parentId":1,"startDate":"2025-09-27","endDate":"2025-09-30","color":"#3B82F6"},{"id":1757701810695,"name":"White Space Generation","parentId":2,"startDate":"2025-10-12","endDate":"2025-10-17","color":"#10B981"},{"id":1757701844124,"name":"Document Review","parentId":2,"startDate":"2025-10-18","endDate":"2025-10-22","color":"#10B981"},{"id":1757702001687,"name":"White Space Generation","parentId":3,"startDate":"2025-11-02","endDate":"2025-11-07","color":"#EF4444"},{"id":1757702041103,"name":"Document Review","parentId":3,"startDate":"2025-11-08","endDate":"2025-11-12","color":"#EF4444"},{"id":1757702168699,"name":"Draft Review by CET 3","parentId":1757702125635,"startDate":"2025-11-13","endDate":"2025-11-17","color":"#F59E0B"},{"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-11-19","endDate":"2025-11-24","color":"#F59E0B"},{"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-11-26","endDate":"2025-11-30","color":"#F59E0B"},{"id":1757939647783,"name":"SOP Review","parentId":"","startDate":"2025-10-08","endDate":"2025-10-15","color":"#10B981"}]);
+  const [parentTasks, setParentTasks] = useState([{"id":1,"name":"MOP Development","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":2,"name":"SOP Procedures","startDate":"2025-10-01","endDate":"2025-10-22"},{"id":3,"name":"EOP Planning","startDate":"2025-10-23","endDate":"2025-11-12"},{"id":1757702125635,"name":"Engineering Review","startDate":"2025-11-13","endDate":"2025-11-30"}]);
+  const [projectDates, setProjectDates] = useState({"startDate":"2025-09-12","endDate":"2025-12-11"});
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddParent, setShowAddParent] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [editingParent, setEditingParent] = useState(null);
 
-  // Load data from localStorage
+  // COMMENTED OUT - Using hardcoded data as source of truth
+  // Load data from localStorage is disabled to use hardcoded defaults
+  /*
   useEffect(() => {
     const savedTasks = localStorage.getItem('ganttTasks');
     const savedParents = localStorage.getItem('ganttParents');
     const savedDates = localStorage.getItem('ganttDates');
-    
+
     if (savedTasks) setTasks(JSON.parse(savedTasks));
     if (savedParents) setParentTasks(JSON.parse(savedParents));
     if (savedDates) setProjectDates(JSON.parse(savedDates));
-    else {
-      // Initialize with hardcoded default data
-      const sampleParents = [
-        { id: 1, name: 'Phase 1: Initial Setup & MOP Development', startDate: '2025-09-12', endDate: '2025-10-10' },
-        { id: 2, name: 'Phase 2: SOP Development & Testing', startDate: '2025-10-01', endDate: '2025-10-30' },
-        { id: 3, name: 'Phase 3: EOP Development & Training', startDate: '2025-10-15', endDate: '2025-11-15' },
-        { id: 4, name: 'Phase 4: Final Review & Deployment', startDate: '2025-11-01', endDate: '2025-12-11' }
-      ];
-
-      const sampleTasks = [
-        { id: 1, name: 'Initial Site Assessment', parentId: 1, startDate: '2025-09-12', endDate: '2025-09-18', color: '#3B82F6' },
-        { id: 2, name: 'Equipment Inventory Documentation', parentId: 1, startDate: '2025-09-15', endDate: '2025-09-25', color: '#10B981' },
-        { id: 3, name: 'MOP Template Creation', parentId: 1, startDate: '2025-09-20', endDate: '2025-09-30', color: '#F59E0B' },
-        { id: 4, name: 'MOP Review & Approval', parentId: 1, startDate: '2025-10-01', endDate: '2025-10-10', color: '#EF4444' },
-        { id: 5, name: 'SOP Requirements Gathering', parentId: 2, startDate: '2025-10-01', endDate: '2025-10-08', color: '#8B5CF6' },
-        { id: 6, name: 'SOP Draft Development', parentId: 2, startDate: '2025-10-05', endDate: '2025-10-15', color: '#EC4899' },
-        { id: 7, name: 'SOP Testing & Validation', parentId: 2, startDate: '2025-10-12', endDate: '2025-10-22', color: '#3B82F6' },
-        { id: 8, name: 'SOP Finalization', parentId: 2, startDate: '2025-10-20', endDate: '2025-10-30', color: '#10B981' },
-        { id: 9, name: 'EOP Risk Assessment', parentId: 3, startDate: '2025-10-15', endDate: '2025-10-25', color: '#F59E0B' },
-        { id: 10, name: 'EOP Procedure Development', parentId: 3, startDate: '2025-10-22', endDate: '2025-11-01', color: '#EF4444' },
-        { id: 11, name: 'Emergency Response Training', parentId: 3, startDate: '2025-10-28', endDate: '2025-11-08', color: '#8B5CF6' },
-        { id: 12, name: 'EOP Drill Execution', parentId: 3, startDate: '2025-11-05', endDate: '2025-11-15', color: '#EC4899' },
-        { id: 13, name: 'Documentation Review', parentId: 4, startDate: '2025-11-01', endDate: '2025-11-12', color: '#3B82F6' },
-        { id: 14, name: 'Stakeholder Approval', parentId: 4, startDate: '2025-11-10', endDate: '2025-11-20', color: '#10B981' },
-        { id: 15, name: 'System Integration', parentId: 4, startDate: '2025-11-18', endDate: '2025-11-30', color: '#F59E0B' },
-        { id: 16, name: 'Final Deployment', parentId: 4, startDate: '2025-11-25', endDate: '2025-12-11', color: '#EF4444' }
-      ];
-      
-      setParentTasks(sampleParents);
-      setTasks(sampleTasks);
-    }
   }, []);
+  */
 
   // Save to localStorage whenever data changes
   useEffect(() => {
