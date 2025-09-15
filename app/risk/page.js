@@ -53,7 +53,33 @@ function RiskPage() {
             DELAY AND RISK MANAGEMENT
           </h1>
 
-          {/* Content area - empty for now */}
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            overflow: 'hidden',
+            marginTop: '32px'
+          }}>
+            {/* Blue header banner */}
+            <div style={{
+              backgroundColor: '#0070f3',
+              color: 'white',
+              padding: '16px 24px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              textAlign: 'center'
+            }}>
+              RISK DASHBOARD
+            </div>
+
+            {/* Empty card body */}
+            <div style={{
+              padding: '24px',
+              minHeight: '200px'
+            }}>
+              {/* Content will be added here later */}
+            </div>
+          </div>
         </div>
       </div>
     </>
