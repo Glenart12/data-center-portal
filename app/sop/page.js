@@ -228,17 +228,20 @@ function SopPage() {
         margin: '0 auto 40px auto'
       }}>
         <h1 style={{
-          fontSize: '2.5em',
-          color: '#28a745',
-          marginBottom: '10px',
-          fontWeight: 'bold'
+          color: '#0A1628',
+          fontSize: '2.25rem',
+          marginBottom: '16px',
+          fontWeight: 'bold',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+          textAlign: 'center'
         }}>
-          Standard Operating Procedures (SOPs)
+          STANDARD OPERATING PROCEDURES (SOPs)
         </h1>
         <p style={{
-          fontSize: '18px',
-          color: '#666',
-          margin: '0'
+          fontSize: '16px',
+          color: '#6B7280',
+          margin: '0',
+          textAlign: 'center'
         }}>
           Access and manage your standard operational procedures
         </p>
@@ -346,7 +349,7 @@ function SopPage() {
               minWidth: '180px',
               height: '48px',
               padding: '12px 24px',
-              backgroundColor: '#28a745',
+              backgroundColor: '#0A1628',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -362,17 +365,16 @@ function SopPage() {
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#218838';
+              e.currentTarget.style.backgroundColor = '#1E3A5F';
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#28a745';
+              e.currentTarget.style.backgroundColor = '#0A1628';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
             }}
           >
-            <span style={{ fontSize: '20px' }}>📋</span>
             Generate SOP
           </button>
         </div>
@@ -694,7 +696,7 @@ function SopPage() {
                     onClick={(e) => e.stopPropagation()}
                     style={{
                       padding: '10px 15px',
-                      backgroundColor: '#28a745',
+                      backgroundColor: '#0A1628',
                       color: 'white',
                       textDecoration: 'none',
                       borderRadius: '6px',
@@ -709,11 +711,11 @@ function SopPage() {
                       justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#218838';
+                      e.currentTarget.style.backgroundColor = '#1E3A5F';
                       e.currentTarget.style.transform = 'translateY(-1px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#28a745';
+                      e.currentTarget.style.backgroundColor = '#0A1628';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
@@ -726,7 +728,7 @@ function SopPage() {
                   position: 'absolute',
                   bottom: '30px',
                   left: '15px',
-                  backgroundColor: '#28a745',
+                  backgroundColor: '#0A1628',
                   color: 'white',
                   padding: '4px 10px',
                   borderRadius: '4px',

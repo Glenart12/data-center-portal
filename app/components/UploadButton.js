@@ -72,7 +72,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
           justifyContent: 'center',
           gap: '10px',
           padding: '12px 24px',
-          backgroundColor: '#28a745',
+          backgroundColor: '#0A1628',
           color: 'white',
           border: 'none',
           borderRadius: '8px',
@@ -86,15 +86,14 @@ export default function UploadButton({ type, onUploadSuccess }) {
           fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#218838';
+          e.currentTarget.style.backgroundColor = '#1E3A5F';
           e.currentTarget.style.transform = 'translateY(-2px)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#28a745';
+          e.currentTarget.style.backgroundColor = '#0A1628';
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        <span style={emojiStyle}>📁</span>
         <span>Upload PDF</span>
       </button>
 
@@ -230,7 +229,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
                 disabled={isUploading || !selectedFile}
                 style={{
                   padding: '12px 24px',
-                  backgroundColor: '#28a745',
+                  backgroundColor: '#0A1628',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -243,12 +242,12 @@ export default function UploadButton({ type, onUploadSuccess }) {
                 }}
                 onMouseEnter={(e) => {
                   if (!isUploading && selectedFile) {
-                    e.currentTarget.style.backgroundColor = '#218838';
+                    e.currentTarget.style.backgroundColor = '#1E3A5F';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isUploading && selectedFile) {
-                    e.currentTarget.style.backgroundColor = '#28a745';
+                    e.currentTarget.style.backgroundColor = '#0A1628';
                   }
                 }}
               >

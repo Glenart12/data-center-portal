@@ -268,17 +268,20 @@ function EopPage() {
         margin: '0 auto 40px auto'
       }}>
         <h1 style={{
-          fontSize: '2.5em',
-          color: '#dc3545',
-          marginBottom: '10px',
-          fontWeight: 'bold'
+          color: '#0A1628',
+          fontSize: '2.25rem',
+          marginBottom: '16px',
+          fontWeight: 'bold',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+          textAlign: 'center'
         }}>
-          Emergency Operating Procedures (EOPs)
+          EMERGENCY OPERATING PROCEDURES (EOPs)
         </h1>
         <p style={{
-          fontSize: '18px',
-          color: '#666',
-          margin: '0'
+          fontSize: '16px',
+          color: '#6B7280',
+          margin: '0',
+          textAlign: 'center'
         }}>
           Access and manage critical emergency response procedures
         </p>
@@ -381,20 +384,21 @@ function EopPage() {
             onClick={() => setIsGenerateModalOpen(true)}
             style={{
               ...buttonStyle,
-              backgroundColor: '#dc3545',
+              backgroundColor: '#0A1628',
               color: 'white',
-              boxShadow: '0 2px 10px rgba(220, 53, 69, 0.3)'
+              boxShadow: '0 2px 10px rgba(10, 22, 40, 0.3)'
             }}
             onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#1E3A5F';
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.4)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(10, 22, 40, 0.4)';
             }}
             onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#0A1628';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 10px rgba(220, 53, 69, 0.3)';
+              e.currentTarget.style.boxShadow = '0 2px 10px rgba(10, 22, 40, 0.3)';
             }}
           >
-            <span style={emojiStyle}>🚨</span>
             <span>Generate EOP</span>
           </button>
 
@@ -786,7 +790,7 @@ function EopPage() {
                     position: 'absolute',
                     bottom: '30px',
                     left: '15px',
-                    backgroundColor: '#dc3545',
+                    backgroundColor: '#0A1628',
                     color: 'white',
                     padding: '4px 10px',
                     borderRadius: '4px',
