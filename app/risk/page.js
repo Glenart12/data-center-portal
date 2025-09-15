@@ -18,6 +18,8 @@ function RiskPage() {
   const [selectedRisk, setSelectedRisk] = useState(initialRisks[0]);
   const [hoveredRisk, setHoveredRisk] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [editingRisk, setEditingRisk] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Calculate average risk score
   const averageScore = risks.reduce((sum, risk) => sum + risk.score, 0) / risks.length;
@@ -259,6 +261,12 @@ function RiskPage() {
                             }}
                           >
                             <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingRisk({...risk});
+                                setShowEditModal(true);
+                                setDropdownOpen(null);
+                              }}
                               style={{
                                 display: 'block',
                                 width: '100%',
@@ -762,6 +770,304 @@ function RiskPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && editingRisk && (
+        <>
+          {/* Dark Overlay */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 9998,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={() => {
+              setShowEditModal(false);
+              setEditingRisk(null);
+            }}
+          >
+            {/* Modal Box */}
+            <div
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                width: '90%',
+                maxWidth: '500px',
+                maxHeight: '90vh',
+                overflow: 'auto',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                zIndex: 9999
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '1px solid #E5E7EB'
+              }}>
+                <h2 style={{
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  color: '#0A1628',
+                  margin: 0,
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                }}>
+                  Edit Risk
+                </h2>
+              </div>
+
+              {/* Modal Body */}
+              <div style={{
+                padding: '24px'
+              }}>
+                {/* Risk Title */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Risk Title
+                  </label>
+                  <input
+                    type="text"
+                    value={editingRisk.title}
+                    onChange={(e) => setEditingRisk({...editingRisk, title: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      color: '#0A1628',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#0A1628'}
+                    onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                  />
+                </div>
+
+                {/* Risk Score */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Risk Score
+                  </label>
+                  <select
+                    value={editingRisk.score}
+                    onChange={(e) => setEditingRisk({...editingRisk, score: parseInt(e.target.value)})}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      color: '#0A1628',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#0A1628'}
+                    onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                  >
+                    <option value="6">6 - Critical</option>
+                    <option value="5">5 - High</option>
+                    <option value="4">4 - Medium-High</option>
+                    <option value="3">3 - Medium</option>
+                    <option value="2">2 - Low-Medium</option>
+                    <option value="1">1 - Low</option>
+                  </select>
+                </div>
+
+                {/* Owner */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Owner
+                  </label>
+                  <select
+                    value={editingRisk.owner}
+                    onChange={(e) => setEditingRisk({...editingRisk, owner: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      color: '#0A1628',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#0A1628'}
+                    onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                  >
+                    <option value="GFM">GFM</option>
+                    <option value="Client">Client</option>
+                  </select>
+                </div>
+
+                {/* Category */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Category
+                  </label>
+                  <select
+                    value={editingRisk.category}
+                    onChange={(e) => setEditingRisk({...editingRisk, category: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      color: '#0A1628',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#0A1628'}
+                    onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                  >
+                    <option value="Time">Time</option>
+                    <option value="Cost">Cost</option>
+                    <option value="Quality">Quality</option>
+                    <option value="Scope">Scope</option>
+                  </select>
+                </div>
+
+                {/* Full Description */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Full Description
+                  </label>
+                  <textarea
+                    value={editingRisk.description}
+                    onChange={(e) => setEditingRisk({...editingRisk, description: e.target.value})}
+                    rows={4}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      color: '#0A1628',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      resize: 'vertical',
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#0A1628'}
+                    onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
+                  />
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div style={{
+                padding: '24px',
+                borderTop: '1px solid #E5E7EB',
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: '12px'
+              }}>
+                {/* Cancel Button */}
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingRisk(null);
+                  }}
+                  style={{
+                    padding: '10px 24px',
+                    backgroundColor: '#6B7280',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4B5563'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6B7280'}
+                >
+                  Cancel
+                </button>
+
+                {/* Save Changes Button */}
+                <button
+                  onClick={() => {
+                    // Update the risks array
+                    const updatedRisks = risks.map(r =>
+                      r.id === editingRisk.id ? editingRisk : r
+                    );
+                    setRisks(updatedRisks);
+
+                    // Update selectedRisk if it's the one being edited
+                    if (selectedRisk && selectedRisk.id === editingRisk.id) {
+                      setSelectedRisk(editingRisk);
+                    }
+
+                    // Close modal
+                    setShowEditModal(false);
+                    setEditingRisk(null);
+                  }}
+                  style={{
+                    padding: '10px 24px',
+                    backgroundColor: '#0A1628',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E3A5F'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0A1628'}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
