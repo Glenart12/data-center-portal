@@ -10,29 +10,28 @@ function HalfCircleGauge({ percentage }) {
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  
+
   // Determine color based on percentage
-  const color = percentage <= 33 ? '#EF4444' : 
+  const color = percentage <= 33 ? '#EF4444' :
                 percentage <= 66 ? '#F59E0B' : '#10B981';
-  
+
   return (
-    <div style={{ position: 'relative', width: '120px', height: '60px', margin: '0 auto' }}>
+    <div style={{ position: 'relative', width: '120px', height: '70px', margin: '0 auto' }}>
       <svg
         width="120"
         height="70"
         viewBox="0 0 120 70"
-        style={{ transform: 'rotate(180deg)' }}
       >
-        {/* Background arc */}
+        {/* Background arc - draws from left to right across the top */}
         <path
-          d="M 10 60 A 50 50 0 0 1 110 60"
+          d="M 10 60 A 50 50 0 0 0 110 60"
           fill="none"
           stroke="#E5E7EB"
           strokeWidth={strokeWidth}
         />
-        {/* Filled arc */}
+        {/* Filled arc - draws from left to right across the top */}
         <path
-          d="M 10 60 A 50 50 0 0 1 110 60"
+          d="M 10 60 A 50 50 0 0 0 110 60"
           fill="none"
           stroke={color}
           strokeWidth={strokeWidth}
@@ -41,10 +40,10 @@ function HalfCircleGauge({ percentage }) {
           style={{ transition: 'stroke-dashoffset 0.5s ease' }}
         />
       </svg>
-      {/* Percentage text */}
+      {/* Percentage text - positioned below the arc */}
       <div style={{
         position: 'absolute',
-        top: '35px',
+        top: '25px',
         left: '50%',
         transform: 'translateX(-50%)',
         fontSize: '14px',
