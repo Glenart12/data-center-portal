@@ -112,7 +112,7 @@ function RiskPage() {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr',
-                gridTemplateRows: '250px 250px',
+                gridTemplateRows: '280px 280px',
                 gap: '24px',
                 marginBottom: '32px'
               }}>
@@ -173,8 +173,7 @@ function RiskPage() {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '12px',
-                    flex: 1,
-                    overflow: 'auto'
+                    flex: 1
                   }}>
                     {risks.map((risk) => (
                       <div
@@ -306,7 +305,7 @@ function RiskPage() {
                   padding: '20px',
                   display: 'flex',
                   flexDirection: 'column',
-                  height: '250px',
+                  height: '280px',
                   boxSizing: 'border-box'
                 }}>
                   <h3 style={{
@@ -393,7 +392,7 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  height: '250px',
+                  height: '280px',
                   boxSizing: 'border-box',
                   display: 'flex',
                   flexDirection: 'column'
@@ -413,8 +412,7 @@ function RiskPage() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '10px',
-                      flex: 1,
-                      overflow: 'auto'
+                      flex: 1
                     }}>
                       {['Cost', 'Time', 'Quality', 'Scope'].map(category => {
                         const count = impactCategories[category] || 0;
@@ -457,7 +455,7 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  height: '250px',
+                  height: '280px',
                   boxSizing: 'border-box',
                   display: 'flex',
                   flexDirection: 'column'
@@ -615,7 +613,7 @@ function RiskPage() {
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  height: '250px',
+                  height: '280px',
                   boxSizing: 'border-box',
                   display: 'flex',
                   flexDirection: 'column'
