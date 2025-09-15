@@ -49,7 +49,7 @@ function HalfCircleGauge({ percentage }) {
       {/* Percentage text - positioned below the arc */}
       <div style={{
         position: 'absolute',
-        bottom: '10px',
+        bottom: '25px',
         left: '50%',
         transform: 'translateX(-50%)',
         fontSize: '16px',
@@ -298,7 +298,7 @@ function Dashboard() {
                   {item.gauges.map(gauge => (
                     <div key={gauge.label} style={{ textAlign: 'center' }}>
                       <HalfCircleGauge percentage={gauge.value} />
-                      <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                      <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '-10px' }}>
                         {gauge.label}
                       </div>
                     </div>
