@@ -211,9 +211,7 @@ function EopPage() {
   };
 
   const getFileTypeColor = (filename) => {
-    if (filename.toLowerCase().endsWith('.pdf')) return '#dc3545';
-    if (filename.toLowerCase().endsWith('.html')) return '#dc3545';
-    return '#6c757d'; // Default for .txt and others
+    return '#0A1628'; // Navy blue for all file types
   };
 
   const getFileTypeLabel = (filename) => {
@@ -730,7 +728,7 @@ function EopPage() {
                       }}
                       style={{
                         padding: '10px 15px',
-                        backgroundColor: '#0070f3',
+                        backgroundColor: '#6B7280',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
@@ -742,15 +740,15 @@ function EopPage() {
                         flex: 1
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#0051cc';
+                        e.currentTarget.style.backgroundColor = '#4B5563';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#0070f3';
+                        e.currentTarget.style.backgroundColor = '#6B7280';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
-                      Preview
+                      <span style={{ fontWeight: 'bold' }}>Preview</span>
                     </button>
                     <a 
                       href={downloadUrl}
@@ -758,9 +756,10 @@ function EopPage() {
                       onClick={(e) => e.stopPropagation()}
                       style={{
                         padding: '10px 15px',
-                        backgroundColor: '#28a745',
+                        backgroundColor: '#0A1628',
                         color: 'white',
                         textDecoration: 'none',
+                        fontWeight: 'bold',
                         borderRadius: '6px',
                         fontSize: '14px',
                         transition: 'all 0.2s ease',
@@ -773,11 +772,11 @@ function EopPage() {
                         justifyContent: 'center'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#218838';
+                        e.currentTarget.style.backgroundColor = '#1E3A5F';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#28a745';
+                        e.currentTarget.style.backgroundColor = '#0A1628';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
