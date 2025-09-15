@@ -46,29 +46,20 @@ export default function Header() {
           justifyContent: 'space-between',
           height: '64px'
         }}>
-          {/* Logo/Company Info - Keep existing DOME branding */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {/* Logo - Glenart Group */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <img
-              src="/logo.png"
-              alt="DOME Logo"
+              src="/Glenart (3).svg"
+              alt="Glenart Group"
               style={{
-                height: '40px',
-                width: 'auto'
+                height: '50px',
+                width: 'auto',
+                filter: 'brightness(0) invert(1)'
               }}
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
             />
-            <div>
-              <h2 style={{
-                margin: 0,
-                fontSize: '20px',
-                color: '#FFFFFF',
-                fontWeight: '600'
-              }}>
-                DOME
-              </h2>
-            </div>
           </div>
 
           {/* Center Navigation - All 5 buttons */}
