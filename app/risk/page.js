@@ -108,19 +108,21 @@ function RiskPage() {
             <div style={{
               padding: '32px'
             }}>
-              {/* Top Section - Priority List, Speedometer, and Charts */}
+              {/* Two-row grid layout */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr',
+                gridTemplateRows: 'auto auto',
                 gap: '24px',
                 marginBottom: '32px'
               }}>
-                {/* TOP PRIORITY SECTION */}
+                {/* TOP PRIORITY SECTION - spans 2 rows */}
                 <div style={{
                   backgroundColor: '#F8F9FA',
                   borderRadius: '8px',
                   padding: '20px',
-                  minHeight: '400px'
+                  minHeight: '400px',
+                  gridRow: 'span 2'
                 }}>
                   <div style={{
                     display: 'flex',
@@ -370,18 +372,12 @@ function RiskPage() {
                   </div>
                 </div>
 
-                {/* RIGHT SIDE CHARTS */}
+                {/* IMPACT CATEGORY CHART - top right */}
                 <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '24px'
-                }}>
-                  {/* IMPACT CATEGORY CHART */}
-                  <div style={{
-                    backgroundColor: '#F8F9FA',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    flex: 1
+                  backgroundColor: '#F8F9FA',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  height: '190px'
                   }}>
                     <h3 style={{
                       fontSize: '18px',
@@ -428,14 +424,14 @@ function RiskPage() {
                         );
                       })}
                     </div>
-                  </div>
+                </div>
 
-                  {/* RISK STATUS DONUT CHART */}
-                  <div style={{
-                    backgroundColor: '#F8F9FA',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    flex: 1
+                {/* RISK STATUS DONUT CHART - center column, second row */}
+                <div style={{
+                  backgroundColor: '#F8F9FA',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  height: '190px'
                   }}>
                     <h3 style={{
                       fontSize: '18px',
@@ -576,14 +572,14 @@ function RiskPage() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                </div>
 
-                  {/* RISK OWNER CHART */}
-                  <div style={{
-                    backgroundColor: '#F8F9FA',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    flex: 1
+                {/* RISK OWNER CHART - right column, second row */}
+                <div style={{
+                  backgroundColor: '#F8F9FA',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  height: '190px'
                   }}>
                     <h3 style={{
                       fontSize: '18px',
@@ -630,7 +626,6 @@ function RiskPage() {
                       })}
                     </div>
                   </div>
-                </div>
               </div>
 
               {/* RISK DESCRIPTION SECTION */}
