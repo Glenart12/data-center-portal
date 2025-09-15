@@ -315,7 +315,8 @@ function RiskPage() {
                     fontSize: '18px',
                     fontWeight: 'bold',
                     color: '#0A1628',
-                    marginBottom: '16px',
+                    margin: 0,
+                    marginBottom: '20px',
                     fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                   }}>
                     RISK AVERAGE SCORE
@@ -395,7 +396,8 @@ function RiskPage() {
                       fontSize: '18px',
                       fontWeight: 'bold',
                       color: '#0A1628',
-                      marginBottom: '16px',
+                      margin: 0,
+                      marginBottom: '20px',
                       fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                     }}>
                       IMPACT CATEGORY
@@ -458,7 +460,8 @@ function RiskPage() {
                       fontSize: '18px',
                       fontWeight: 'bold',
                       color: '#0A1628',
-                      marginBottom: '16px',
+                      margin: 0,
+                      marginBottom: '20px',
                       fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                     }}>
                       RISK STATUS
@@ -615,7 +618,8 @@ function RiskPage() {
                       fontSize: '18px',
                       fontWeight: 'bold',
                       color: '#0A1628',
-                      marginBottom: '16px',
+                      margin: 0,
+                      marginBottom: '20px',
                       fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                     }}>
                       RISK OWNER
