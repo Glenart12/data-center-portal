@@ -476,7 +476,8 @@ function RiskPage() {
                       flexDirection: 'column',
                       alignItems: 'center',
                       flex: 1,
-                      justifyContent: 'center'
+                      justifyContent: 'flex-start',
+                      paddingTop: '10px'
                     }}>
                       {/* Donut Chart */}
                       <div style={{ position: 'relative', width: '120px', height: '120px' }}>
@@ -633,8 +634,7 @@ function RiskPage() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '12px',
-                      flex: 1,
-                      overflow: 'auto'
+                      flex: 1
                     }}>
                       {Object.entries(riskOwners).map(([owner, count]) => {
                         const maxCount = Math.max(...Object.values(riskOwners));
