@@ -674,7 +674,7 @@ function RiskPage() {
                               <div style={{
                                 height: '100%',
                                 width: `${percentage}%`,
-                                backgroundColor: owner === 'GFM' ? '#10B981' : '#F59E0B',
+                                backgroundColor: '#0A1628',
                                 transition: 'width 0.3s ease'
                               }} />
                             </div>
