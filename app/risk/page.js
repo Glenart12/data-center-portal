@@ -478,8 +478,15 @@ function RiskPage() {
                       flex: 1,
                       position: 'relative'
                     }}>
-                      {/* Donut Chart */}
-                      <div style={{ position: 'relative', width: '180px', height: '180px', marginTop: '5px' }}>
+                      {/* Donut Chart - centered between title and legend */}
+                      <div style={{
+                        position: 'absolute',
+                        width: '180px',
+                        height: '180px',
+                        top: '28px',
+                        left: '50%',
+                        transform: 'translateX(-50%)'
+                      }}>
                         <svg width="180" height="180" viewBox="0 0 180 180">
                           {(() => {
                             const total = risks.length;
