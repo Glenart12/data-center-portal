@@ -227,8 +227,7 @@ function Dashboard() {
                       <div style={{
                         height: '100%',
                         width: `${item.complete}%`,
-                        background: item.complete <= 33 ? '#EF4444' : 
-                                   item.complete <= 66 ? '#F59E0B' : '#10B981',
+                        backgroundColor: '#0A1628',
                         transition: 'width 0.3s ease',
                         display: 'flex',
                         alignItems: 'center',
