@@ -1,8 +1,37 @@
 'use client';
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { useState } from 'react';
 
 function RiskPage() {
+  // State management
+  const [risks, setRisks] = useState([
+    { id: 1, title: 'Need Chief Engineer sign off on MOP revisions', score: 8, owner: 'GFM', category: 'Time', description: 'Chief Engineer approval is required for MOP revisions before implementation. Delay in approval could impact project timeline.' },
+    { id: 2, title: 'Reviewal of SOP V1 Drafts needed by 9/22 to stay on schedule', score: 7, owner: 'Client', category: 'Time', description: 'SOP V1 drafts must be reviewed and approved by September 22 to maintain project schedule. Critical path item.' },
+    { id: 3, title: 'EOP generation slightly behind schedule', score: 6, owner: 'GFM', category: 'Scope', description: 'Emergency Operating Procedures generation is running 2 weeks behind schedule. Additional resources may be needed.' },
+    { id: 4, title: 'Resource allocation for Q4 maintenance pending', score: 5, owner: 'GFM', category: 'Cost', description: 'Q4 maintenance resource allocation not yet approved. Budget implications if not resolved by month end.' },
+    { id: 5, title: 'Vendor certification expiring next month', score: 4, owner: 'Client', category: 'Quality', description: 'Critical vendor certification expires next month. Renewal process must be initiated immediately to avoid service disruption.' },
+    { id: 6, title: 'Training completion rate below target', score: 3, owner: 'GFM', category: 'Cost', description: 'Current training completion rate is 65% vs 85% target. Additional training sessions may be required.' }
+  ]);
+
+  const [selectedRisk, setSelectedRisk] = useState(null);
+  const [hoveredRisk, setHoveredRisk] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+
+  // Calculate average risk score
+  const averageScore = risks.reduce((sum, risk) => sum + risk.score, 0) / risks.length;
+
+  // Calculate impact categories
+  const impactCategories = risks.reduce((acc, risk) => {
+    acc[risk.category] = (acc[risk.category] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Calculate risk owners
+  const riskOwners = risks.reduce((acc, risk) => {
+    acc[risk.owner] = (acc[risk.owner] || 0) + 1;
+    return acc;
+  }, {});
   return (
     <>
       {/* Background gradient */}
@@ -79,7 +108,454 @@ function RiskPage() {
             <div style={{
               padding: '32px'
             }}>
-              {/* Content will be added here later */}
+              {/* Top Section - Priority List, Speedometer, and Charts */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: '24px',
+                marginBottom: '32px'
+              }}>
+                {/* TOP PRIORITY SECTION */}
+                <div style={{
+                  backgroundColor: '#F8F9FA',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  minHeight: '400px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '20px'
+                  }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      color: '#0A1628',
+                      margin: 0,
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                    }}>
+                      TOP PRIORITY
+                    </h3>
+                    <button
+                      style={{
+                        backgroundColor: '#0070f3',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '28px',
+                        height: '28px',
+                        fontSize: '20px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0051cc';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0070f3';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {risks.map((risk) => (
+                      <div
+                        key={risk.id}
+                        style={{
+                          backgroundColor: selectedRisk?.id === risk.id ? '#E3F2FD' : 'white',
+                          padding: '12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          border: selectedRisk?.id === risk.id ? '2px solid #0070f3' : '1px solid #E5E7EB',
+                          position: 'relative'
+                        }}
+                        onClick={() => setSelectedRisk(risk)}
+                        onMouseEnter={() => setHoveredRisk(risk.id)}
+                        onMouseLeave={() => setHoveredRisk(null)}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ flex: 1, paddingRight: '10px' }}>
+                            <div style={{
+                              fontSize: '14px',
+                              color: '#374151',
+                              marginBottom: '4px',
+                              lineHeight: '1.4'
+                            }}>
+                              {risk.title}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{
+                              backgroundColor: risk.score >= 7 ? '#FEE2E2' : risk.score >= 4 ? '#FEF3C7' : '#D1FAE5',
+                              color: risk.score >= 7 ? '#DC2626' : risk.score >= 4 ? '#F59E0B' : '#10B981',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontWeight: 'bold',
+                              minWidth: '20px',
+                              textAlign: 'center'
+                            }}>
+                              {risk.score}
+                            </div>
+                            {hoveredRisk === risk.id && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDropdownOpen(dropdownOpen === risk.id ? null : risk.id);
+                                }}
+                                style={{
+                                  background: 'white',
+                                  border: '1px solid #E5E7EB',
+                                  borderRadius: '4px',
+                                  padding: '2px 4px',
+                                  cursor: 'pointer',
+                                  fontSize: '14px',
+                                  color: '#6B7280',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '24px',
+                                  height: '24px'
+                                }}
+                              >
+                                ⋮
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Dropdown menu */}
+                        {dropdownOpen === risk.id && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '40px',
+                              right: '8px',
+                              backgroundColor: 'white',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: '6px',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                              zIndex: 1000,
+                              minWidth: '100px'
+                            }}
+                          >
+                            <button
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                background: 'none',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                color: '#374151'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                background: 'none',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                color: '#DC2626'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FEE2E2'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* RISK AVERAGE SCORE SPEEDOMETER */}
+                <div style={{
+                  backgroundColor: '#F8F9FA',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '400px'
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: '#0A1628',
+                    marginBottom: '24px',
+                    fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                  }}>
+                    RISK AVERAGE SCORE
+                  </h3>
+
+                  {/* Speedometer */}
+                  <div style={{ position: 'relative', width: '200px', height: '120px' }}>
+                    <svg width="200" height="120" viewBox="0 0 200 120">
+                      {/* Background arc - green to yellow to red */}
+                      <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="50%" stopColor="#F59E0B" />
+                          <stop offset="100%" stopColor="#EF4444" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Background arc */}
+                      <path
+                        d="M 20 100 A 80 80 0 0 1 180 100"
+                        fill="none"
+                        stroke="url(#gaugeGradient)"
+                        strokeWidth="20"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Needle */}
+                      <line
+                        x1="100"
+                        y1="100"
+                        x2={100 + 70 * Math.cos((Math.PI * (1 - averageScore / 10)))}
+                        y2={100 - 70 * Math.sin((Math.PI * (1 - averageScore / 10)))}
+                        stroke="#0A1628"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Center circle */}
+                      <circle cx="100" cy="100" r="8" fill="#0A1628" />
+                    </svg>
+
+                    {/* Score display */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '10px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      fontSize: '24px',
+                      fontWeight: 'bold',
+                      color: '#0A1628'
+                    }}>
+                      {averageScore.toFixed(1)}
+                    </div>
+                  </div>
+
+                  <div style={{
+                    marginTop: '20px',
+                    fontSize: '14px',
+                    color: '#6B7280',
+                    textAlign: 'center'
+                  }}>
+                    Average Risk Score
+                  </div>
+                </div>
+
+                {/* RIGHT SIDE CHARTS */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '24px'
+                }}>
+                  {/* IMPACT CATEGORY CHART */}
+                  <div style={{
+                    backgroundColor: '#F8F9FA',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    flex: 1
+                  }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      color: '#0A1628',
+                      marginBottom: '16px',
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                    }}>
+                      IMPACT CATEGORY
+                    </h3>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {['Cost', 'Time', 'Quality', 'Scope'].map(category => {
+                        const count = impactCategories[category] || 0;
+                        const maxCount = Math.max(...Object.values(impactCategories));
+                        const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                        return (
+                          <div key={category}>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              marginBottom: '4px',
+                              fontSize: '14px',
+                              color: '#374151'
+                            }}>
+                              <span>{category}</span>
+                              <span style={{ fontWeight: 'bold' }}>{count}</span>
+                            </div>
+                            <div style={{
+                              height: '24px',
+                              backgroundColor: '#E5E7EB',
+                              borderRadius: '4px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                height: '100%',
+                                width: `${percentage}%`,
+                                backgroundColor: '#0070f3',
+                                transition: 'width 0.3s ease'
+                              }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* RISK OWNER CHART */}
+                  <div style={{
+                    backgroundColor: '#F8F9FA',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    flex: 1
+                  }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      color: '#0A1628',
+                      marginBottom: '16px',
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                    }}>
+                      RISK OWNER
+                    </h3>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {Object.entries(riskOwners).map(([owner, count]) => {
+                        const maxCount = Math.max(...Object.values(riskOwners));
+                        const percentage = (count / maxCount) * 100;
+
+                        return (
+                          <div key={owner}>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              marginBottom: '4px',
+                              fontSize: '14px',
+                              color: '#374151'
+                            }}>
+                              <span>{owner}</span>
+                              <span style={{ fontWeight: 'bold' }}>{count} risks</span>
+                            </div>
+                            <div style={{
+                              height: '24px',
+                              backgroundColor: '#E5E7EB',
+                              borderRadius: '4px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                height: '100%',
+                                width: `${percentage}%`,
+                                backgroundColor: owner === 'GFM' ? '#10B981' : '#F59E0B',
+                                transition: 'width 0.3s ease'
+                              }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RISK DESCRIPTION SECTION */}
+              <div style={{
+                backgroundColor: '#F8F9FA',
+                borderRadius: '8px',
+                padding: '24px',
+                minHeight: '150px'
+              }}>
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  color: '#0A1628',
+                  marginBottom: '16px',
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+                }}>
+                  RISK DESCRIPTION
+                </h3>
+
+                {selectedRisk ? (
+                  <div>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(4, 1fr)',
+                      gap: '16px',
+                      marginBottom: '16px'
+                    }}>
+                      <div>
+                        <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>Risk Title</div>
+                        <div style={{ fontSize: '14px', color: '#0A1628', fontWeight: '600' }}>{selectedRisk.title}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>Risk Score</div>
+                        <div style={{
+                          display: 'inline-block',
+                          backgroundColor: selectedRisk.score >= 7 ? '#FEE2E2' : selectedRisk.score >= 4 ? '#FEF3C7' : '#D1FAE5',
+                          color: selectedRisk.score >= 7 ? '#DC2626' : selectedRisk.score >= 4 ? '#F59E0B' : '#10B981',
+                          padding: '4px 12px',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          fontWeight: 'bold'
+                        }}>
+                          {selectedRisk.score}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>Owner</div>
+                        <div style={{ fontSize: '14px', color: '#0A1628', fontWeight: '600' }}>{selectedRisk.owner}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>Category</div>
+                        <div style={{ fontSize: '14px', color: '#0A1628', fontWeight: '600' }}>{selectedRisk.category}</div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>Full Description</div>
+                      <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6' }}>
+                        {selectedRisk.description}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    color: '#6B7280',
+                    fontSize: '14px',
+                    padding: '40px'
+                  }}>
+                    Select a risk to view details
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
