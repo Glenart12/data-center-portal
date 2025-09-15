@@ -25,7 +25,7 @@ function HalfCircleGauge({ percentage }) {
       >
         {/* Background arc - full grey semi-circle */}
         <path
-          d="M 10 60 A 50 50 0 0 0 110 60"
+          d="M 10 60 A 50 50 0 0 1 110 60"
           fill="none"
           stroke="#E5E7EB"
           strokeWidth={strokeWidth}
@@ -33,7 +33,7 @@ function HalfCircleGauge({ percentage }) {
         />
         {/* Colored arc - fills from left to right based on percentage */}
         <path
-          d="M 10 60 A 50 50 0 0 0 110 60"
+          d="M 10 60 A 50 50 0 0 1 110 60"
           fill="none"
           stroke={color}
           strokeWidth={strokeWidth}
