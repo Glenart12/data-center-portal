@@ -208,9 +208,9 @@ function Dashboard() {
           {/* Progress Bars */}
           <div style={{ marginBottom: '32px', maxWidth: '100%' }}>
             {[
-              { type: 'MOP', complete: 85, current: 137, total: 162 },
-              { type: 'SOP', complete: 58, current: 87, total: 151 },
-              { type: 'EOP', complete: 25, current: 41, total: 164 }
+              { type: 'MOP', complete: 83, current: 134, total: 162 },
+              { type: 'SOP', complete: 39, current: 59, total: 151 },
+              { type: 'EOP', complete: 31, current: 51, total: 164 }
             ].map(item => (
               <div key={item.type} style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -263,31 +263,31 @@ function Dashboard() {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px', width: '100%', overflow: 'hidden' }}>
             {[
-              { 
+              {
                 category: 'MOP',
                 gauges: [
-                  { label: 'Mechanical', value: 88 },
-                  { label: 'Electrical', value: 85 },
+                  { label: 'Mechanical', value: 100 },
+                  { label: 'Electrical', value: 100 },
                   { label: 'White Space', value: 84 },
-                  { label: 'Misc.', value: 79 }
+                  { label: 'Misc.', value: 49 }
                 ]
               },
               {
                 category: 'SOP',
                 gauges: [
-                  { label: 'Mechanical', value: 60 },
+                  { label: 'Mechanical', value: 76 },
                   { label: 'Electrical', value: 58 },
-                  { label: 'White Space', value: 57 },
-                  { label: 'Misc.', value: 56 }
+                  { label: 'White Space', value: 18 },
+                  { label: 'Misc.', value: 3 }
                 ]
               },
               {
                 category: 'EOP',
                 gauges: [
-                  { label: 'Mechanical', value: 27 },
-                  { label: 'Electrical', value: 24 },
-                  { label: 'White Space', value: 23 },
-                  { label: 'Misc.', value: 26 }
+                  { label: 'Mechanical', value: 57 },
+                  { label: 'Electrical', value: 56 },
+                  { label: 'White Space', value: 3 },
+                  { label: 'Misc.', value: 6 }
                 ]
               }
             ].map(item => (
