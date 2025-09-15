@@ -169,32 +169,35 @@ function Dashboard() {
         </h1>
 
         {/* Progress Dashboard Section */}
-        <h2 style={{ 
-          color: '#0A1628', 
-          fontSize: '2.25rem', 
-          marginBottom: '24px',
-          marginTop: '32px', 
-          fontWeight: 'bold',
-          fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          Progress Dashboard
-        </h2>
-        
         <div style={{
-          marginTop: '16px',
+          marginTop: '32px',
           backgroundColor: 'white',
           borderRadius: '8px',
-          padding: '24px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           width: '100%',
           boxSizing: 'border-box',
           overflow: 'hidden'
         }}>
-          {/* Percentage Complete Section */}
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px' }}>
-            Percentage Complete
-          </h2>
+          {/* Navy Header Bar */}
+          <div style={{
+            backgroundColor: '#0A1628',
+            padding: '16px 24px',
+            color: '#FFFFFF',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+          }}>
+            Progress Dashboard
+          </div>
+          
+          {/* Card Content */}
+          <div style={{
+            padding: '32px'
+          }}>
+            {/* Percentage Complete Section */}
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px', textAlign: 'center' }}>
+              Percentage Complete
+            </h2>
           
           {/* Progress Bars */}
           <div style={{ marginBottom: '32px', maxWidth: '100%' }}>
@@ -245,8 +248,9 @@ function Dashboard() {
             fontWeight: 'bold',
             color: '#0A1628',
             marginBottom: '24px',
-            marginTop: '32px',
-            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+            marginTop: '48px',
+            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+            textAlign: 'center'
           }}>
             Category Breakdown
           </h3>
@@ -297,6 +301,7 @@ function Dashboard() {
                 </div>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </div>
