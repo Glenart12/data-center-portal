@@ -306,8 +306,6 @@ function RiskPage() {
                   padding: '20px',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                   height: '250px',
                   boxSizing: 'border-box'
                 }}>
@@ -322,8 +320,15 @@ function RiskPage() {
                     RISK AVERAGE SCORE
                   </h3>
 
-                  {/* Speedometer */}
-                  <div style={{ position: 'relative', width: '140px', height: '80px' }}>
+                  {/* Speedometer Container */}
+                  <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <div style={{ position: 'relative', width: '140px', height: '80px' }}>
                     <svg width="140" height="80" viewBox="0 0 140 80">
                       {/* Background arc - green to yellow to red */}
                       <defs>
@@ -379,6 +384,7 @@ function RiskPage() {
                     textAlign: 'center'
                   }}>
                     Average Risk Score
+                  </div>
                   </div>
                 </div>
 
@@ -672,14 +678,15 @@ function RiskPage() {
               <div style={{
                 backgroundColor: '#F8F9FA',
                 borderRadius: '8px',
-                padding: '24px',
+                padding: '20px',
                 minHeight: '150px'
               }}>
                 <h3 style={{
                   fontSize: '18px',
                   fontWeight: 'bold',
                   color: '#0A1628',
-                  marginBottom: '16px',
+                  margin: 0,
+                  marginBottom: '20px',
                   fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                 }}>
                   RISK DESCRIPTION
