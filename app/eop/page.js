@@ -728,7 +728,7 @@ function EopPage() {
                       }}
                       style={{
                         padding: '10px 15px',
-                        backgroundColor: '#6B7280',
+                        backgroundColor: '#3B82F6',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
@@ -740,11 +740,11 @@ function EopPage() {
                         flex: 1
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#4B5563';
+                        e.currentTarget.style.backgroundColor = '#2563EB';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#6B7280';
+                        e.currentTarget.style.backgroundColor = '#3B82F6';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
@@ -780,7 +780,7 @@ function EopPage() {
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
-                      Download
+                      <span style={{ fontWeight: 'bold' }}>Download</span>
                     </a>
                   </div>
 
