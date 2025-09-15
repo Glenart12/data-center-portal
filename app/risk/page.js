@@ -5,16 +5,17 @@ import { useState } from 'react';
 
 function RiskPage() {
   // State management
-  const [risks, setRisks] = useState([
+  const initialRisks = [
     { id: 1, title: 'Need Chief Engineer sign off on MOP revisions', score: 6, owner: 'GFM', category: 'Time', description: 'Chief Engineer approval is required for MOP revisions before implementation. Delay in approval could impact project timeline.' },
     { id: 2, title: 'Reviewal of SOP V1 Drafts needed by 9/22 to stay on schedule', score: 5, owner: 'Client', category: 'Time', description: 'SOP V1 drafts must be reviewed and approved by September 22 to maintain project schedule. Critical path item.' },
     { id: 3, title: 'EOP generation slightly behind schedule', score: 4, owner: 'GFM', category: 'Scope', description: 'Emergency Operating Procedures generation is running 2 weeks behind schedule. Additional resources may be needed.' },
     { id: 4, title: 'Resource allocation for Q4 maintenance pending', score: 3, owner: 'GFM', category: 'Cost', description: 'Q4 maintenance resource allocation not yet approved. Budget implications if not resolved by month end.' },
     { id: 5, title: 'Vendor certification expiring next month', score: 2, owner: 'Client', category: 'Quality', description: 'Critical vendor certification expires next month. Renewal process must be initiated immediately to avoid service disruption.' },
     { id: 6, title: 'Training completion rate below target', score: 1, owner: 'GFM', category: 'Cost', description: 'Current training completion rate is 65% vs 85% target. Additional training sessions may be required.' }
-  ]);
+  ];
 
-  const [selectedRisk, setSelectedRisk] = useState(null);
+  const [risks, setRisks] = useState(initialRisks);
+  const [selectedRisk, setSelectedRisk] = useState(initialRisks[0]);
   const [hoveredRisk, setHoveredRisk] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
 
