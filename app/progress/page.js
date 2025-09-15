@@ -6,8 +6,8 @@ function ProgressPage() {
   const [tasks, setTasks] = useState([]);
   const [parentTasks, setParentTasks] = useState([]);
   const [projectDates, setProjectDates] = useState({
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    startDate: "2025-09-12",
+    endDate: "2025-12-11"
   });
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddParent, setShowAddParent] = useState(false);
@@ -25,21 +25,31 @@ function ProgressPage() {
     if (savedParents) setParentTasks(JSON.parse(savedParents));
     if (savedDates) setProjectDates(JSON.parse(savedDates));
     else {
-      // Initialize with sample data
-      const today = new Date();
+      // Initialize with hardcoded default data
       const sampleParents = [
-        { id: 1, name: 'MOP Development', startDate: today.toISOString().split('T')[0], endDate: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
-        { id: 2, name: 'SOP Procedures', startDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
-        { id: 3, name: 'EOP Planning', startDate: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 35 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }
+        { id: 1, name: 'Phase 1: Initial Setup & MOP Development', startDate: '2025-09-12', endDate: '2025-10-10' },
+        { id: 2, name: 'Phase 2: SOP Development & Testing', startDate: '2025-10-01', endDate: '2025-10-30' },
+        { id: 3, name: 'Phase 3: EOP Development & Training', startDate: '2025-10-15', endDate: '2025-11-15' },
+        { id: 4, name: 'Phase 4: Final Review & Deployment', startDate: '2025-11-01', endDate: '2025-12-11' }
       ];
-      
+
       const sampleTasks = [
-        { id: 1, name: 'HVAC System Maintenance', parentId: 1, startDate: today.toISOString().split('T')[0], endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#3B82F6' },
-        { id: 2, name: 'Generator Testing', parentId: 1, startDate: new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#10B981' },
-        { id: 3, name: 'Daily Checklist', parentId: 2, startDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#F59E0B' },
-        { id: 4, name: 'Equipment Inventory', parentId: 2, startDate: new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 17 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#EF4444' },
-        { id: 5, name: 'Power Failure Response', parentId: 3, startDate: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#8B5CF6' },
-        { id: 6, name: 'Cooling System Failure', parentId: 3, startDate: new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date(today.getTime() + 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], color: '#EC4899' }
+        { id: 1, name: 'Initial Site Assessment', parentId: 1, startDate: '2025-09-12', endDate: '2025-09-18', color: '#3B82F6' },
+        { id: 2, name: 'Equipment Inventory Documentation', parentId: 1, startDate: '2025-09-15', endDate: '2025-09-25', color: '#10B981' },
+        { id: 3, name: 'MOP Template Creation', parentId: 1, startDate: '2025-09-20', endDate: '2025-09-30', color: '#F59E0B' },
+        { id: 4, name: 'MOP Review & Approval', parentId: 1, startDate: '2025-10-01', endDate: '2025-10-10', color: '#EF4444' },
+        { id: 5, name: 'SOP Requirements Gathering', parentId: 2, startDate: '2025-10-01', endDate: '2025-10-08', color: '#8B5CF6' },
+        { id: 6, name: 'SOP Draft Development', parentId: 2, startDate: '2025-10-05', endDate: '2025-10-15', color: '#EC4899' },
+        { id: 7, name: 'SOP Testing & Validation', parentId: 2, startDate: '2025-10-12', endDate: '2025-10-22', color: '#3B82F6' },
+        { id: 8, name: 'SOP Finalization', parentId: 2, startDate: '2025-10-20', endDate: '2025-10-30', color: '#10B981' },
+        { id: 9, name: 'EOP Risk Assessment', parentId: 3, startDate: '2025-10-15', endDate: '2025-10-25', color: '#F59E0B' },
+        { id: 10, name: 'EOP Procedure Development', parentId: 3, startDate: '2025-10-22', endDate: '2025-11-01', color: '#EF4444' },
+        { id: 11, name: 'Emergency Response Training', parentId: 3, startDate: '2025-10-28', endDate: '2025-11-08', color: '#8B5CF6' },
+        { id: 12, name: 'EOP Drill Execution', parentId: 3, startDate: '2025-11-05', endDate: '2025-11-15', color: '#EC4899' },
+        { id: 13, name: 'Documentation Review', parentId: 4, startDate: '2025-11-01', endDate: '2025-11-12', color: '#3B82F6' },
+        { id: 14, name: 'Stakeholder Approval', parentId: 4, startDate: '2025-11-10', endDate: '2025-11-20', color: '#10B981' },
+        { id: 15, name: 'System Integration', parentId: 4, startDate: '2025-11-18', endDate: '2025-11-30', color: '#F59E0B' },
+        { id: 16, name: 'Final Deployment', parentId: 4, startDate: '2025-11-25', endDate: '2025-12-11', color: '#EF4444' }
       ];
       
       setParentTasks(sampleParents);
@@ -59,20 +69,6 @@ function ProgressPage() {
   useEffect(() => {
     localStorage.setItem('ganttDates', JSON.stringify(projectDates));
   }, [projectDates]);
-
-  // TEMPORARY: Log current Gantt chart data for hardcoding
-  // Remove this after capturing the data
-  useEffect(() => {
-    console.log('=== CURRENT GANTT CHART DATA ===');
-    console.log('Copy these and replace the sample data:');
-    console.log('--- TASKS ---');
-    console.log(JSON.stringify(tasks, null, 2));
-    console.log('--- PARENT TASKS ---');
-    console.log(JSON.stringify(parentTasks, null, 2));
-    console.log('--- PROJECT DATES ---');
-    console.log(JSON.stringify(projectDates, null, 2));
-    console.log('=== END GANTT CHART DATA ===');
-  }, [tasks, parentTasks, projectDates]);
 
   // Generate timeline periods
   const generateTimeline = () => {
