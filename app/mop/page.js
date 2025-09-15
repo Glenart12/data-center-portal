@@ -200,7 +200,7 @@ function MopPage() {
     transition: 'all 0.3s ease',
     minWidth: '180px',
     height: '48px',
-    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+    fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
   };
 
   const emojiStyle = {
@@ -273,7 +273,7 @@ function MopPage() {
         padding: '40px 20px',
         paddingTop: '100px',
         minHeight: '100vh',
-        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+        fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
         position: 'relative',
         zIndex: 1
       }}>
@@ -650,7 +650,7 @@ function MopPage() {
                         fontSize: '14px',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                        fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                         fontWeight: '500',
                         flex: 1
                       }}
@@ -678,7 +678,7 @@ function MopPage() {
                         borderRadius: '6px',
                         fontSize: '14px',
                         transition: 'all 0.2s ease',
-                        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                        fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                         fontWeight: '500',
                         flex: 1,
                         textAlign: 'center',
@@ -752,7 +752,7 @@ function MopPage() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                 boxShadow: '0 2px 8px rgba(108, 117, 125, 0.2)'
               }}
               onMouseEnter={(e) => {

@@ -13,7 +13,7 @@ export default async function Home() {
   const mainStyles = {
     textAlign: 'center',
     marginTop: '100px',
-    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+    fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
     padding: '0 20px'
   };
 

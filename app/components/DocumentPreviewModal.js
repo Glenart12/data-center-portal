@@ -116,7 +116,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
               margin: 0,
               color: '#0f3456',
               fontSize: '1.4em',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               lineHeight: '1.2'
             }}>
               {displayName}
@@ -125,7 +125,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
               margin: '5px 0 0 0',
               color: '#666',
               fontSize: '0.9em',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
             }}>
               {isHtml ? 'HTML Document' : isPdf ? 'PDF Document' : isTxt ? 'Text Document' : 'Document'}
             </p>
@@ -144,7 +144,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
               padding: '6px 10px',
               borderRadius: '6px',
               transition: 'all 0.2s ease',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               fontWeight: 'bold'
             }}
             onMouseEnter={(e) => {
@@ -177,7 +177,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
                   textAlign: 'center',
                   color: '#666',
                   fontSize: '18px',
-                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                 }}>
                   <div style={{
                     width: '40px',
@@ -218,7 +218,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
               textAlign: 'center',
               color: '#666',
               fontSize: '18px',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
             }}>
               <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>{getFileIcon()}</span>
               <p style={{ margin: 0 }}>No document selected for preview</p>
@@ -288,7 +288,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
@@ -318,7 +318,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, pdfUrl, pdfName,
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',

@@ -379,7 +379,7 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
     fontSize: '14px',
     border: '1px solid #ddd',
     borderRadius: '6px',
-    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+    fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
     marginBottom: '15px',
     boxSizing: 'border-box'
   };
@@ -504,7 +504,7 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
             margin: 0,
             color: '#0f3456',
             fontSize: '1.6em',
-            fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
           }}>
             MOP Template Generator
           </h2>
@@ -1108,7 +1108,7 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               transition: 'background-color 0.2s ease'
             }}
             disabled={isSaving}
@@ -1132,7 +1132,7 @@ export default function MOPTemplateModal({ isOpen, onClose }) {
               cursor: 'pointer',
               boxShadow: '0 3px 15px rgba(111, 66, 193, 0.3)',
               opacity: isSaving || !formData.mopTitle.trim() ? 0.6 : 1,
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               transition: 'transform 0.2s ease'
             }}
             onMouseEnter={(e) => {

@@ -59,7 +59,7 @@ export default function EditTaskModal({
               borderRadius: '4px',
               border: '1px solid #E2E8F0',
               fontSize: '14px',
-              fontFamily: '"Century Gothic", sans-serif'
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
             }}
           />
         </div>
@@ -95,7 +95,7 @@ export default function EditTaskModal({
                 borderRadius: '4px',
                 border: '1px solid #E2E8F0',
                 fontSize: '14px',
-                fontFamily: '"Century Gothic", sans-serif'
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
               }}
             />
           </div>
@@ -125,7 +125,7 @@ export default function EditTaskModal({
                 borderRadius: '4px',
                 border: '1px solid #E2E8F0',
                 fontSize: '14px',
-                fontFamily: '"Century Gothic", sans-serif'
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
               }}
             />
           </div>
@@ -180,7 +180,7 @@ export default function EditTaskModal({
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: '"Century Gothic", sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
@@ -212,7 +212,7 @@ export default function EditTaskModal({
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontFamily: '"Century Gothic", sans-serif',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
@@ -235,7 +235,7 @@ export default function EditTaskModal({
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontFamily: '"Century Gothic", sans-serif',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {

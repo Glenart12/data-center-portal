@@ -83,7 +83,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
           boxShadow: '0 2px 10px rgba(40, 167, 69, 0.3)',
           width: '100%',
           height: '48px',
-          fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+          fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = '#1E3A5F';
@@ -128,7 +128,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
               marginBottom: '30px',
               color: '#0f3456',
               fontSize: '1.5em',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               textAlign: 'center'
             }}>
               Upload PDF to {type.toUpperCase()}
@@ -157,14 +157,14 @@ export default function UploadButton({ type, onUploadSuccess }) {
                     borderRadius: '8px',
                     cursor: 'pointer',
                     fontSize: '14px',
-                    fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+                    fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                   }}
                 />
                 <p style={{
                   margin: '15px 0 0 0',
                   fontSize: '14px',
                   color: '#666',
-                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif'
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
                 }}>
                   Select a PDF file to upload to {type.toUpperCase()}
                 </p>
@@ -215,7 +215,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
                   fontSize: '14px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                   transition: 'background-color 0.2s ease'
                 }}
                 disabled={isUploading}
@@ -237,7 +237,7 @@ export default function UploadButton({ type, onUploadSuccess }) {
                   fontWeight: '600',
                   cursor: 'pointer',
                   opacity: isUploading || !selectedFile ? 0.6 : 1,
-                  fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                   transition: 'background-color 0.2s ease'
                 }}
                 onMouseEnter={(e) => {

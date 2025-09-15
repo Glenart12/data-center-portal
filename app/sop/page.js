@@ -214,7 +214,7 @@ function SopPage() {
         padding: '40px 20px',
         paddingTop: '100px',
         minHeight: '100vh',
-        fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+        fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
         position: 'relative',
         zIndex: 1
       }}>
@@ -359,7 +359,7 @@ function SopPage() {
               justifyContent: 'center',
               gap: '8px',
               transition: 'all 0.3s ease',
-              fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
             onMouseEnter={(e) => {
@@ -673,7 +673,7 @@ function SopPage() {
                       fontSize: '14px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                       fontWeight: '500',
                       flex: 1
                     }}
@@ -701,7 +701,7 @@ function SopPage() {
                       borderRadius: '6px',
                       fontSize: '14px',
                       transition: 'all 0.2s ease',
-                      fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                      fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                       fontWeight: '500',
                       flex: 1,
                       textAlign: 'center',
@@ -775,7 +775,7 @@ function SopPage() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontFamily: '"Century Gothic", CenturyGothic, AppleGothic, sans-serif',
+                fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                 boxShadow: '0 2px 8px rgba(108, 117, 125, 0.2)'
               }}
               onMouseEnter={(e) => {

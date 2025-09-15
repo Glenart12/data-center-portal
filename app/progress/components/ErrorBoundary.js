@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
                   fontSize: '14px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  fontFamily: '"Century Gothic", sans-serif',
+                  fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
@@ -111,7 +111,7 @@ class ErrorBoundary extends React.Component {
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    fontFamily: '"Century Gothic", sans-serif',
+                    fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
