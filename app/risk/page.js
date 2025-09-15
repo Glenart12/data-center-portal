@@ -327,8 +327,8 @@ function RiskPage() {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <div style={{ position: 'relative', width: '140px', height: '80px' }}>
-                    <svg width="140" height="80" viewBox="0 0 140 80">
+                    <div style={{ position: 'relative', width: '200px', height: '110px' }}>
+                    <svg width="200" height="110" viewBox="0 0 200 110">
                       {/* Background arc - green to yellow to red */}
                       <defs>
                         <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -340,35 +340,35 @@ function RiskPage() {
 
                       {/* Background arc */}
                       <path
-                        d="M 15 70 A 55 55 0 0 1 125 70"
+                        d="M 20 100 A 80 80 0 0 1 180 100"
                         fill="none"
                         stroke="url(#gaugeGradient)"
-                        strokeWidth="14"
+                        strokeWidth="18"
                         strokeLinecap="round"
                       />
 
                       {/* Needle */}
                       <line
-                        x1="70"
-                        y1="70"
-                        x2={70 + 45 * Math.cos((Math.PI * (1 - averageScore / 10)))}
-                        y2={70 - 45 * Math.sin((Math.PI * (1 - averageScore / 10)))}
+                        x1="100"
+                        y1="100"
+                        x2={100 + 65 * Math.cos((Math.PI * (1 - averageScore / 10)))}
+                        y2={100 - 65 * Math.sin((Math.PI * (1 - averageScore / 10)))}
                         stroke="#0A1628"
-                        strokeWidth="2.5"
+                        strokeWidth="3"
                         strokeLinecap="round"
                       />
 
                       {/* Center circle */}
-                      <circle cx="70" cy="70" r="6" fill="#0A1628" />
+                      <circle cx="100" cy="100" r="8" fill="#0A1628" />
                     </svg>
 
                     {/* Score display */}
                     <div style={{
                       position: 'absolute',
-                      bottom: '0px',
+                      bottom: '-30px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      fontSize: '20px',
+                      fontSize: '24px',
                       fontWeight: 'bold',
                       color: '#0A1628'
                     }}>
@@ -377,8 +377,8 @@ function RiskPage() {
                   </div>
 
                   <div style={{
-                    marginTop: '8px',
-                    fontSize: '12px',
+                    marginTop: '35px',
+                    fontSize: '14px',
                     color: '#6B7280',
                     textAlign: 'center'
                   }}>
