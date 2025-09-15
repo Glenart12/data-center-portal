@@ -170,7 +170,7 @@ function Dashboard() {
           marginBottom: '32px',
           textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
         }}>
-          Welcome to the Operations Portal
+          WELCOME TO THE OPERATIONS PORTAL
         </h1>
 
         {/* Progress Dashboard Section */}

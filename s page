@@ -1,0 +1,10 @@
+[33m333f1bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: Add comment to force fresh build
+[33m11f5e6f[m fix: Add missing closing fragment tag
+[33m049f3b2[m fix: Remove extra closing fragment tag
+[33m6e7b648[m fix: Apply same max width constraint to dashboard as Gantt
+[33m33169d7[m fix: Force identical width behavior for both sections
+[33mdc1b06c[m style: Match Category Breakdown font size with Percentage Complete
+[33m7e1a65f[m fix: Constrain dashboard content to prevent width overflow
+[33m904f0b0[m feat: Add Progress Dashboard title and fix section width
+[33mac6de23[m style: Optimize logo size within header constraints
+[33me069c2e[m style: Increase header logo size
