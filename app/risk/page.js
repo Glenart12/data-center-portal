@@ -476,11 +476,10 @@ function RiskPage() {
                       flexDirection: 'column',
                       alignItems: 'center',
                       flex: 1,
-                      justifyContent: 'space-between',
-                      paddingTop: '10px'
+                      position: 'relative'
                     }}>
                       {/* Donut Chart */}
-                      <div style={{ position: 'relative', width: '180px', height: '180px' }}>
+                      <div style={{ position: 'relative', width: '180px', height: '180px', marginTop: '5px' }}>
                         <svg width="180" height="180" viewBox="0 0 180 180">
                           {(() => {
                             const total = risks.length;
@@ -591,8 +590,15 @@ function RiskPage() {
                         </div>
                       </div>
 
-                      {/* Legend */}
-                      <div style={{ display: 'flex', gap: '16px', marginBottom: '5px' }}>
+                      {/* Legend - positioned to align with 6th risk card bottom */}
+                      <div style={{
+                        display: 'flex',
+                        gap: '16px',
+                        position: 'absolute',
+                        bottom: '25px',
+                        left: '50%',
+                        transform: 'translateX(-50%)'
+                      }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10B981' }} />
                           <span style={{ fontSize: '12px', color: '#374151' }}>Minor</span>
