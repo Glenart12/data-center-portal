@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 // Half Circle Gauge Component
 function HalfCircleGauge({ percentage }) {
   const radius = 50;
-  const strokeWidth = 8;
+  const strokeWidth = 10;
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -16,37 +16,43 @@ function HalfCircleGauge({ percentage }) {
                 percentage <= 66 ? '#F59E0B' : '#10B981';
 
   return (
-    <div style={{ position: 'relative', width: '120px', height: '70px', margin: '0 auto' }}>
+    <div style={{ position: 'relative', width: '120px', height: '90px', margin: '0 auto' }}>
       <svg
         width="120"
         height="70"
         viewBox="0 0 120 70"
+        style={{ overflow: 'visible' }}
       >
-        {/* Background arc - draws from left to right across the top */}
+        {/* Background arc - full grey semi-circle */}
         <path
           d="M 10 60 A 50 50 0 0 0 110 60"
           fill="none"
           stroke="#E5E7EB"
           strokeWidth={strokeWidth}
+          strokeLinecap="round"
         />
-        {/* Filled arc - draws from left to right across the top */}
+        {/* Colored arc - fills from left to right based on percentage */}
         <path
           d="M 10 60 A 50 50 0 0 0 110 60"
           fill="none"
           stroke={color}
           strokeWidth={strokeWidth}
+          strokeLinecap="round"
           strokeDasharray={`${circumference} ${circumference}`}
           strokeDashoffset={strokeDashoffset}
-          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+          style={{
+            transition: 'stroke-dashoffset 0.5s ease',
+            transformOrigin: 'center',
+          }}
         />
       </svg>
       {/* Percentage text - positioned below the arc */}
       <div style={{
         position: 'absolute',
-        top: '25px',
+        bottom: '10px',
         left: '50%',
         transform: 'translateX(-50%)',
-        fontSize: '14px',
+        fontSize: '16px',
         fontWeight: 'bold',
         color: '#0A1628'
       }}>
