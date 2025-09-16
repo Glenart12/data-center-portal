@@ -89,11 +89,12 @@ function ProgressPage() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [editingParent, setEditingParent] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(2.75); // Default 275% zoom
+  const [zoomLevel, setZoomLevel] = useState(1); // Default 100% zoom
   const [timelineOffset, setTimelineOffset] = useState(0); // for panning
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
   const scrollContainerRef = useRef(null);
+  const [selectedTaskDetails, setSelectedTaskDetails] = useState(null);
 
   // COMMENTED OUT - Using hardcoded data as source of truth
   // Load data from localStorage is disabled to use hardcoded defaults
@@ -256,6 +257,40 @@ function ProgressPage() {
     setIsDragging(false);
   };
 
+  // Helper function to abbreviate task names
+  const abbreviateTaskName = (name) => {
+    return name
+      .replace('Mechanical', 'Mech')
+      .replace('Electrical', 'Elec')
+      .replace('White Space', 'WS')
+      .replace('Draft Generation', 'Draft')
+      .replace('Peer Review', 'Review')
+      .replace('Tabletop/Dry Run', 'Dry Run')
+      .replace('Wet Run', 'Wet')
+      .replace('Chief Engineer Sign-Off', 'Chief Sign')
+      .replace('SME Sign-Off', 'SME Sign');
+  };
+
+  // Get status based on progress
+  const getTaskStatus = (progress) => {
+    if (progress === 100) return 'Complete';
+    if (progress > 0) return 'In Progress';
+    return 'Not Started';
+  };
+
+  // Handle task selection
+  const handleTaskClick = (task) => {
+    const parentTask = parentTasks.find(p => p.id === task.parentId);
+    const duration = Math.ceil((new Date(task.endDate) - new Date(task.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+
+    setSelectedTaskDetails({
+      ...task,
+      parentName: parentTask?.name || 'Unknown',
+      duration,
+      status: getTaskStatus(task.progress)
+    });
+  };
+
   return (
     <>
       {/* Background gradient */}
@@ -329,8 +364,9 @@ function ProgressPage() {
               PROJECT TIMELINE
             </div>
 
-            {/* Chart Content */}
-            <div style={{ padding: '24px' }}>
+            {/* Chart Content with Side Panel */}
+            <div style={{ display: 'flex', padding: '24px', gap: '20px' }}>
+            <div style={{ flex: selectedTaskDetails ? '1 1 0' : '1', transition: 'flex 0.3s ease', minWidth: 0 }}>
             {/* Zoom Controls */}
             <div
               data-testid="zoom-controls"
@@ -511,7 +547,7 @@ function ProgressPage() {
               {parentTasks.map((parent, parentIndex) => (
                 <div key={parent.id}>
                 {/* Parent Task */}
-                <div style={{ position: 'relative', marginBottom: '4px', minHeight: '40px', height: 'auto' }}>
+                <div style={{ position: 'relative', marginBottom: '12px', minHeight: '40px', height: 'auto' }}>
                   {/* Grid lines */}
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex' }}>
                       {timeline.map((_, index) => (
@@ -553,7 +589,7 @@ function ProgressPage() {
 
                 {/* Child Tasks */}
                 {tasks.filter(t => t.parentId === parent.id).map(task => (
-                  <div key={task.id} style={{ position: 'relative', marginBottom: '4px', minHeight: '36px', height: 'auto', paddingLeft: '24px' }}>
+                  <div key={task.id} style={{ position: 'relative', marginBottom: '8px', minHeight: '36px', height: 'auto', paddingLeft: '24px' }}>
                     {/* Grid lines */}
                     <div style={{ position: 'absolute', top: 0, left: '-24px', right: 0, bottom: 0, display: 'flex' }}>
                       {timeline.map((_, index) => (
@@ -568,7 +604,7 @@ function ProgressPage() {
                     </div>
                     {/* Task bar with progress */}
                     <div
-                      onClick={() => setEditingTask(task)}
+                      onClick={() => handleTaskClick(task)}
                       style={{
                         position: 'absolute',
                         top: '8px',
@@ -600,12 +636,13 @@ function ProgressPage() {
                         justifyContent: 'space-between',
                         padding: '4px 8px',
                         color: task.progress > 50 ? 'white' : '#374151',
-                        fontSize: '11px',
-                        whiteSpace: 'normal',
-                        wordWrap: 'break-word',
+                        fontSize: '10px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                         zIndex: 2
                       }}>
-                        <span>{task.name}</span>
+                        <span>{abbreviateTaskName(task.name)}</span>
                         {task.progress !== undefined && (
                           <span style={{
                             marginLeft: '8px',
@@ -624,7 +661,176 @@ function ProgressPage() {
             </div>
             </div>
             </div>
-          </div>
+            </div>
+            {/* Task Details Side Panel */}
+            {selectedTaskDetails && (
+              <div style={{
+                width: '300px',
+                flexShrink: 0,
+                borderLeft: '1px solid #E5E7EB',
+                padding: '20px',
+                backgroundColor: '#FFFFFF',
+                boxShadow: '-2px 0 10px rgba(0,0,0,0.05)',
+                position: 'relative',
+                animation: 'slideInRight 0.3s ease'
+              }}>
+                <style jsx>{`
+                  @keyframes slideInRight {
+                    from {
+                      transform: translateX(100%);
+                      opacity: 0;
+                    }
+                    to {
+                      transform: translateX(0);
+                      opacity: 1;
+                    }
+                  }
+                `}</style>
+                {/* Close button */}
+                <button
+                  onClick={() => setSelectedTaskDetails(null)}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#6B7280',
+                    padding: '4px'
+                  }}
+                  onMouseEnter={(e) => e.target.style.color = '#374151'}
+                  onMouseLeave={(e) => e.target.style.color = '#6B7280'}
+                >
+                  ×
+                </button>
+
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  color: '#0A1628',
+                  marginBottom: '20px',
+                  paddingRight: '30px'
+                }}>
+                  Task Details
+                </h3>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px' }}>
+                    Full Name
+                  </label>
+                  <div style={{ fontSize: '14px', color: '#374151', fontWeight: '600' }}>
+                    {selectedTaskDetails.name}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '8px' }}>
+                    Progress
+                  </label>
+                  <div style={{ marginBottom: '8px' }}>
+                    <div style={{
+                      height: '8px',
+                      backgroundColor: '#E5E7EB',
+                      borderRadius: '4px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${selectedTaskDetails.progress || 0}%`,
+                        backgroundColor: selectedTaskDetails.color || '#3B82F6',
+                        transition: 'width 0.3s ease'
+                      }} />
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#374151', fontWeight: 'bold' }}>
+                    {selectedTaskDetails.progress || 0}%
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                  <div>
+                    <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px' }}>
+                      Start Date
+                    </label>
+                    <div style={{ fontSize: '14px', color: '#374151' }}>
+                      {new Date(selectedTaskDetails.startDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px' }}>
+                      End Date
+                    </label>
+                    <div style={{ fontSize: '14px', color: '#374151' }}>
+                      {new Date(selectedTaskDetails.endDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                  <div>
+                    <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px' }}>
+                      Duration
+                    </label>
+                    <div style={{ fontSize: '14px', color: '#374151' }}>
+                      {selectedTaskDetails.duration} days
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px' }}>
+                      Phase
+                    </label>
+                    <div style={{ fontSize: '14px', color: '#374151' }}>
+                      {selectedTaskDetails.parentName}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px' }}>
+                    Status
+                  </label>
+                  <div style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    backgroundColor: selectedTaskDetails.status === 'Complete' ? '#D1FAE5' :
+                                   selectedTaskDetails.status === 'In Progress' ? '#FEF3C7' : '#F3F4F6',
+                    color: selectedTaskDetails.status === 'Complete' ? '#065F46' :
+                          selectedTaskDetails.status === 'In Progress' ? '#92400E' : '#6B7280'
+                  }}>
+                    {selectedTaskDetails.status}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setEditingTask(selectedTaskDetails);
+                    setSelectedTaskDetails(null);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#0A1628',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2738'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#0A1628'}
+                >
+                  Edit Task
+                </button>
+              </div>
+            )}
+            </div>
           </div>
 
           {/* Action Buttons */}
