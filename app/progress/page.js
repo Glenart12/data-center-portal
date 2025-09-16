@@ -306,8 +306,8 @@ function ProgressPage() {
               {/* Today Line */}
               {(() => {
                 const today = new Date();
-                const projectStart = new Date(projectStartDate);
-                const projectEnd = new Date(projectEndDate);
+                const projectStart = new Date(projectDates.startDate);
+                const projectEnd = new Date(projectDates.endDate);
                 const totalDays = (projectEnd - projectStart) / (1000 * 60 * 60 * 24);
                 const daysFromStart = (today - projectStart) / (1000 * 60 * 60 * 24);
                 const todayPosition = (daysFromStart / totalDays) * 100;
