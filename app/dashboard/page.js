@@ -9,7 +9,9 @@ function HalfCircleGauge({ percentage }) {
   const strokeWidth = 10;
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * Math.PI;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  // Calculate the length of the colored portion (from left to percentage point)
+  const filledLength = (percentage / 100) * circumference;
 
   // Determine color based on percentage
   const color = percentage <= 33 ? '#EF4444' :
@@ -38,10 +40,10 @@ function HalfCircleGauge({ percentage }) {
           stroke={color}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={strokeDashoffset}
+          strokeDasharray={`${filledLength} ${circumference}`}
+          strokeDashoffset={0}
           style={{
-            transition: 'stroke-dashoffset 0.5s ease',
+            transition: 'stroke-dasharray 0.5s ease',
             transformOrigin: 'center',
           }}
         />
