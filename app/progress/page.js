@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 function ProgressPage() {
@@ -89,8 +89,11 @@ function ProgressPage() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [editingParent, setEditingParent] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1); // 1 = normal, 2 = 2x zoom, etc.
+  const [zoomLevel, setZoomLevel] = useState(2.75); // Default 275% zoom
   const [timelineOffset, setTimelineOffset] = useState(0); // for panning
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+  const scrollContainerRef = useRef(null);
 
   // COMMENTED OUT - Using hardcoded data as source of truth
   // Load data from localStorage is disabled to use hardcoded defaults
@@ -207,6 +210,52 @@ function ProgressPage() {
 
   const timeline = generateTimeline();
 
+  // Drag handlers for pan functionality
+  const handleDragStart = (e) => {
+    if (e.type.includes('touch')) {
+      const touch = e.touches[0];
+      setDragStart({
+        x: touch.clientX,
+        y: touch.clientY,
+        scrollLeft: scrollContainerRef.current?.scrollLeft || 0,
+        scrollTop: scrollContainerRef.current?.scrollTop || 0
+      });
+    } else {
+      setDragStart({
+        x: e.clientX,
+        y: e.clientY,
+        scrollLeft: scrollContainerRef.current?.scrollLeft || 0,
+        scrollTop: scrollContainerRef.current?.scrollTop || 0
+      });
+    }
+    setIsDragging(true);
+  };
+
+  const handleDragMove = (e) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+
+    let clientX, clientY;
+    if (e.type.includes('touch')) {
+      const touch = e.touches[0];
+      clientX = touch.clientX;
+      clientY = touch.clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    const deltaX = dragStart.x - clientX;
+    const deltaY = dragStart.y - clientY;
+
+    scrollContainerRef.current.scrollLeft = dragStart.scrollLeft + deltaX;
+    scrollContainerRef.current.scrollTop = dragStart.scrollTop + deltaY;
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   return (
     <>
       {/* Background gradient */}
@@ -283,7 +332,9 @@ function ProgressPage() {
             {/* Chart Content */}
             <div style={{ padding: '24px' }}>
             {/* Zoom Controls */}
-            <div style={{
+            <div
+              data-testid="zoom-controls"
+              style={{
               display: 'flex',
               gap: '10px',
               marginBottom: '16px',
@@ -354,17 +405,47 @@ function ProgressPage() {
                 Reset
               </button>
             </div>
-            <div style={{
-              overflowX: zoomLevel > 1 ? 'auto' : 'visible',
-              overflowY: 'visible',
-              position: 'relative'
-            }}>
+            {/* Fixed viewport container */}
+            <div
+              ref={scrollContainerRef}
+              data-testid="gantt-container"
+              style={{
+              height: '600px',
+              width: '100%',
+              overflow: 'auto',
+              position: 'relative',
+              border: '1px solid #E5E7EB',
+              borderRadius: '8px',
+              backgroundColor: '#FFFFFF',
+              touchAction: isDragging ? 'none' : 'pan-x pan-y',
+              cursor: isDragging ? 'grabbing' : (zoomLevel > 1 ? 'grab' : 'default')
+            }}
+            onMouseDown={zoomLevel > 1 ? handleDragStart : undefined}
+            onTouchStart={handleDragStart}
+            onMouseMove={isDragging ? handleDragMove : undefined}
+            onTouchMove={handleDragMove}
+            onMouseUp={isDragging ? handleDragEnd : undefined}
+            onTouchEnd={handleDragEnd}
+            onMouseLeave={isDragging ? handleDragEnd : undefined}
+            >
             <div style={{
               width: `${100 * zoomLevel}%`,
-              minWidth: '100%'
+              minWidth: '100%',
+              position: 'relative'
             }}>
-            {/* Timeline Header */}
-            <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
+            {/* Sticky Timeline Header */}
+            <div
+              data-testid="timeline-header"
+              style={{
+              display: 'flex',
+              borderBottom: '2px solid #E5E7EB',
+              paddingBottom: '16px',
+              paddingTop: '16px',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: '#FFFFFF',
+              zIndex: 20
+            }}>
               {timeline.map((period, index) => (
                 <div
                   key={index}
