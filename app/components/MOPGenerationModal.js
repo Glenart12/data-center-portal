@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { upload } from '@vercel/blob/client';
 
 export default function MOPGenerationModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -140,35 +141,63 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
       const pdfDoc = supportingDocs.find(doc => doc.type === 'application/pdf');
 
       if (pdfDoc) {
-        setUploadProgress('Uploading one-line diagram...');
+        setUploadProgress('Uploading one-line diagram (direct to storage)...');
 
-        // Convert base64 back to File object
-        const base64Data = pdfDoc.content.split(',')[1];
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        try {
+          // Convert base64 back to File object
+          const base64Data = pdfDoc.content.split(',')[1];
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const file = new File([byteArray], pdfDoc.name, { type: 'application/pdf' });
+
+          // Generate filename with timestamp
+          const timestamp = new Date().toISOString().split('T')[0];
+          const sanitizedName = pdfDoc.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const filename = `one-line-diagrams/${timestamp}_${sanitizedName}`;
+
+          // Upload directly to Vercel Blob from client
+          // This bypasses the serverless function entirely
+          const blob = await upload(filename, file, {
+            access: 'public',
+            handleUploadUrl: '/api/upload-one-line', // Fallback to server upload if client upload fails
+          });
+
+          oneLineDiagramUrl = blob.url;
+          console.log('One-line diagram uploaded directly:', oneLineDiagramUrl);
+        } catch (uploadError) {
+          console.error('Direct upload failed, trying server upload:', uploadError);
+
+          // Fallback to server upload for smaller files
+          const base64Data = pdfDoc.content.split(',')[1];
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const file = new File([byteArray], pdfDoc.name, { type: 'application/pdf' });
+
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', file);
+
+          const uploadResponse = await fetch('/api/upload-one-line', {
+            method: 'POST',
+            body: uploadFormData
+          });
+
+          if (!uploadResponse.ok) {
+            const uploadError = await uploadResponse.json();
+            throw new Error(uploadError.error || 'Failed to upload one-line diagram');
+          }
+
+          const uploadResult = await uploadResponse.json();
+          oneLineDiagramUrl = uploadResult.url;
+          console.log('One-line diagram uploaded via server:', oneLineDiagramUrl);
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const file = new File([byteArray], pdfDoc.name, { type: 'application/pdf' });
-
-        // Create FormData and upload
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', file);
-
-        const uploadResponse = await fetch('/api/upload-one-line', {
-          method: 'POST',
-          body: uploadFormData
-        });
-
-        if (!uploadResponse.ok) {
-          const uploadError = await uploadResponse.json();
-          throw new Error(uploadError.error || 'Failed to upload one-line diagram');
-        }
-
-        const uploadResult = await uploadResponse.json();
-        oneLineDiagramUrl = uploadResult.url;
-        console.log('One-line diagram uploaded:', oneLineDiagramUrl);
       }
 
       setUploadProgress('Connecting to AI service...');
@@ -773,7 +802,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
             marginTop: '5px',
             marginBottom: '10px'
           }}>
-            Maximum file size: 4MB. Larger files will need to be linked separately.
+            Maximum file size: 50MB for PDFs (direct upload). Other file types limited to 4MB.
           </p>
 
           {supportingDocs.length > 0 && (
