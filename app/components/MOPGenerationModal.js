@@ -690,9 +690,9 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
 
         {/* Supporting Documents */}
         <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#333' }}>Supporting Documents</h3>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>One-Line Diagram</h3>
           <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
-            Upload equipment manuals, specifications, or reference documents to help the AI generate a more accurate MOP
+            Upload facility one-line diagram to help the AI generate a more accurate MOP
           </p>
           
           <input

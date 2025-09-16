@@ -227,7 +227,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
 </html>`;
 
 // Export the compile function for direct use
-export async function compileMOP(formData) {
+export async function compileMOP(formData, supportingDocs = []) {
   try {
     const globalSourceManager = new SourceManager();
     

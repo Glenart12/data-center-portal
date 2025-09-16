@@ -1317,6 +1317,21 @@ export async function generateSection07(formData) {
     // Clean up any markdown code blocks from AI output
     procedures = procedures.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
 
+    // Build the one-line diagram section if a PDF URL is provided
+    const oneLineDiagramSection = formData.oneLineDiagramUrl ? `
+<!-- One-Line Diagram Section -->
+<div class="one-line-diagram-section" style="margin: 30px 0; page-break-inside: avoid;">
+  <h4 style="color: #333; margin-bottom: 15px; font-size: 16px; font-weight: bold;">One-Line Diagram</h4>
+  <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
+    <iframe
+      src="${formData.oneLineDiagramUrl}"
+      style="width: 100%; height: 600px; border: none; display: block;"
+      title="One-Line Diagram">
+      <p>Your browser does not support embedded PDFs. <a href="${formData.oneLineDiagramUrl}" target="_blank">Click here to view the diagram.</a></p>
+    </iframe>
+  </div>
+</div>` : '';
+
     const html = `<h2>Section 07: MOP Details</h2>
 <table class="info-table">
     <tr>
@@ -1336,6 +1351,8 @@ export async function generateSection07(formData) {
         <td colspan="4"><input type="text" class="contractor-input" placeholder="If subcontractor selected in Section 3, reference that company name" /></td>
     </tr>
 </table>
+
+${oneLineDiagramSection}
 
 ${operationalDataTable}
 
