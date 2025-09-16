@@ -5,29 +5,29 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 function ProgressPage() {
   // New structured task data with concurrent disciplines and 6-step cascade
   const [tasks, setTasks] = useState([
-    // MOP Development - Mechanical (Blue #2563EB)
-    {"id":101,"name":"Mechanical - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#2563EB","progress":100},
-    {"id":102,"name":"Mechanical - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#2563EB","progress":100},
-    {"id":103,"name":"Mechanical - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#2563EB","progress":75},
-    {"id":104,"name":"Mechanical - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#2563EB","progress":50},
-    {"id":105,"name":"Mechanical - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#2563EB","progress":25},
-    {"id":106,"name":"Mechanical - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
+    // MOP Development - Mechanical (Blue #0070f3)
+    {"id":101,"name":"Mechanical - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#0070f3","progress":100},
+    {"id":102,"name":"Mechanical - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#0070f3","progress":100},
+    {"id":103,"name":"Mechanical - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#0070f3","progress":75},
+    {"id":104,"name":"Mechanical - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#0070f3","progress":50},
+    {"id":105,"name":"Mechanical - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#0070f3","progress":25},
+    {"id":106,"name":"Mechanical - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#0070f3","progress":0},
 
-    // MOP Development - Electrical (Blue #2563EB)
-    {"id":111,"name":"Electrical - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#2563EB","progress":100},
-    {"id":112,"name":"Electrical - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#2563EB","progress":100},
-    {"id":113,"name":"Electrical - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#2563EB","progress":60},
-    {"id":114,"name":"Electrical - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#2563EB","progress":30},
-    {"id":115,"name":"Electrical - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#2563EB","progress":0},
-    {"id":116,"name":"Electrical - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
+    // MOP Development - Electrical (Blue #0070f3)
+    {"id":111,"name":"Electrical - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#0070f3","progress":100},
+    {"id":112,"name":"Electrical - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#0070f3","progress":100},
+    {"id":113,"name":"Electrical - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#0070f3","progress":60},
+    {"id":114,"name":"Electrical - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#0070f3","progress":30},
+    {"id":115,"name":"Electrical - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#0070f3","progress":0},
+    {"id":116,"name":"Electrical - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#0070f3","progress":0},
 
-    // MOP Development - White Space (Blue #2563EB)
-    {"id":121,"name":"White Space - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#2563EB","progress":100},
-    {"id":122,"name":"White Space - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#2563EB","progress":90},
-    {"id":123,"name":"White Space - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#2563EB","progress":45},
-    {"id":124,"name":"White Space - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#2563EB","progress":20},
-    {"id":125,"name":"White Space - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#2563EB","progress":0},
-    {"id":126,"name":"White Space - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
+    // MOP Development - White Space (Blue #0070f3)
+    {"id":121,"name":"White Space - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#0070f3","progress":100},
+    {"id":122,"name":"White Space - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#0070f3","progress":90},
+    {"id":123,"name":"White Space - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#0070f3","progress":45},
+    {"id":124,"name":"White Space - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#0070f3","progress":20},
+    {"id":125,"name":"White Space - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#0070f3","progress":0},
+    {"id":126,"name":"White Space - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#0070f3","progress":0},
 
     // SOP Procedures - Mechanical (Green #10B981)
     {"id":201,"name":"Mechanical - Draft Generation","parentId":2,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#10B981","progress":100},
@@ -442,7 +442,32 @@ function ProgressPage() {
               </button>
             </div>
             {/* Fixed viewport container */}
+            <style jsx>{`
+              .gantt-scroll-container {
+                scrollbar-width: thin;
+                scrollbar-color: #0A1628 #E5E7EB;
+              }
+              .gantt-scroll-container::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+              }
+              .gantt-scroll-container::-webkit-scrollbar-track {
+                background-color: #E5E7EB;
+                border-radius: 4px;
+              }
+              .gantt-scroll-container::-webkit-scrollbar-thumb {
+                background-color: #0A1628;
+                border-radius: 4px;
+              }
+              .gantt-scroll-container::-webkit-scrollbar-thumb:hover {
+                background-color: #1A2738;
+              }
+              .gantt-scroll-container::-webkit-scrollbar-corner {
+                background-color: #E5E7EB;
+              }
+            `}</style>
             <div
+              className="gantt-scroll-container"
               ref={scrollContainerRef}
               data-testid="gantt-container"
               style={{
