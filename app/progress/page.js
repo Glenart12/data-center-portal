@@ -636,23 +636,15 @@ function ProgressPage() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         padding: '4px 8px',
-                        color: task.progress > 50 ? 'white' : '#374151',
+                        color: '#374151',
                         fontSize: '10px',
+                        fontWeight: 'bold',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         zIndex: 2
                       }}>
                         <span>{abbreviateTaskName(task.name)}</span>
-                        {task.progress !== undefined && (
-                          <span style={{
-                            marginLeft: '8px',
-                            fontWeight: 'bold',
-                            fontSize: '10px'
-                          }}>
-                            {task.progress}%
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
