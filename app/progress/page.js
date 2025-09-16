@@ -89,6 +89,8 @@ function ProgressPage() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [editingParent, setEditingParent] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1); // 1 = normal, 2 = 2x zoom, etc.
+  const [timelineOffset, setTimelineOffset] = useState(0); // for panning
 
   // COMMENTED OUT - Using hardcoded data as source of truth
   // Load data from localStorage is disabled to use hardcoded defaults
@@ -140,21 +142,21 @@ function ProgressPage() {
     return periods;
   };
 
-  // Calculate bar position and width
+  // Calculate bar position and width with zoom support
   const calculateBarPosition = (startDate, endDate) => {
     const projectStart = new Date(projectDates.startDate);
     const projectEnd = new Date(projectDates.endDate);
     const projectDuration = (projectEnd - projectStart) / (1000 * 60 * 60 * 24);
-    
+
     const taskStart = new Date(startDate);
     const taskEnd = new Date(endDate);
-    
+
     const startOffset = (taskStart - projectStart) / (1000 * 60 * 60 * 24);
     const duration = (taskEnd - taskStart) / (1000 * 60 * 60 * 24) + 1;
-    
-    const left = (startOffset / projectDuration) * 100;
-    const width = (duration / projectDuration) * 100;
-    
+
+    const left = (startOffset / projectDuration) * 100 * zoomLevel;
+    const width = (duration / projectDuration) * 100 * zoomLevel;
+
     return { left: `${left}%`, width: `${width}%` };
   };
 
@@ -280,7 +282,87 @@ function ProgressPage() {
 
             {/* Chart Content */}
             <div style={{ padding: '24px' }}>
-            <div style={{ overflow: 'visible' }}>
+            {/* Zoom Controls */}
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              marginBottom: '16px',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.25))}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#F3F4F6',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#374151'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#F3F4F6'}
+              >
+                −
+              </button>
+              <span style={{
+                minWidth: '60px',
+                textAlign: 'center',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#374151'
+              }}>
+                {Math.round(zoomLevel * 100)}%
+              </span>
+              <button
+                onClick={() => setZoomLevel(Math.min(3, zoomLevel + 0.25))}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#F3F4F6',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#374151'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#F3F4F6'}
+              >
+                +
+              </button>
+              <button
+                onClick={() => {
+                  setZoomLevel(1);
+                  setTimelineOffset(0);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: zoomLevel === 1 ? '#E5E7EB' : '#F3F4F6',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  color: '#374151',
+                  marginLeft: '10px'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#E5E7EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = zoomLevel === 1 ? '#E5E7EB' : '#F3F4F6'}
+              >
+                Reset
+              </button>
+            </div>
+            <div style={{
+              overflowX: zoomLevel > 1 ? 'auto' : 'visible',
+              overflowY: 'visible',
+              position: 'relative'
+            }}>
+            <div style={{
+              width: `${100 * zoomLevel}%`,
+              minWidth: '100%'
+            }}>
             {/* Timeline Header */}
             <div style={{ display: 'flex', borderBottom: '2px solid #E5E7EB', paddingBottom: '16px', marginBottom: '24px' }}>
               {timeline.map((period, index) => (
@@ -289,11 +371,12 @@ function ProgressPage() {
                   style={{
                     flex: 1,
                     textAlign: 'center',
-                    fontSize: '12px',
+                    fontSize: zoomLevel > 1.5 ? '13px' : '12px',
                     color: '#6B7280',
                     fontWeight: 'bold',
                     borderLeft: index > 0 ? '1px solid #E5E7EB' : 'none',
-                    paddingLeft: '4px'
+                    paddingLeft: '4px',
+                    minWidth: zoomLevel > 1 ? '80px' : 'auto'
                   }}
                 >
                   {period.label}
@@ -346,29 +429,6 @@ function ProgressPage() {
               })()}
               {parentTasks.map((parent, parentIndex) => (
                 <div key={parent.id}>
-                {/* Discipline Separator for groups of 3 */}
-                {parentIndex > 0 && parentIndex % 3 === 0 && (
-                  <div style={{
-                    height: '2px',
-                    backgroundColor: '#E5E7EB',
-                    margin: '16px 0',
-                    position: 'relative'
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      backgroundColor: 'white',
-                      padding: '0 12px',
-                      fontSize: '11px',
-                      color: '#6B7280',
-                      fontWeight: 'bold'
-                    }}>
-                      {parentIndex === 3 ? 'SOP Phase' : parentIndex === 6 ? 'EOP Phase' : ''}
-                    </div>
-                  </div>
-                )}
                 {/* Parent Task */}
                 <div style={{ position: 'relative', marginBottom: '4px', minHeight: '40px', height: 'auto' }}>
                   {/* Grid lines */}
@@ -481,7 +541,8 @@ function ProgressPage() {
               </div>
             ))}
             </div>
-          </div>
+            </div>
+            </div>
           </div>
           </div>
 
