@@ -158,8 +158,8 @@ function ProgressPage() {
     const startOffset = (taskStart - projectStart) / (1000 * 60 * 60 * 24);
     const duration = (taskEnd - taskStart) / (1000 * 60 * 60 * 24) + 1;
 
-    const left = (startOffset / projectDuration) * 100 * zoomLevel;
-    const width = (duration / projectDuration) * 100 * zoomLevel;
+    const left = (startOffset / projectDuration) * 100 * 1.15 * zoomLevel;
+    const width = (duration / projectDuration) * 100 * 1.15 * zoomLevel;
 
     return { left: `${left}%`, width: `${width}%` };
   };
@@ -465,8 +465,8 @@ function ProgressPage() {
             onMouseLeave={isDragging ? handleDragEnd : undefined}
             >
             <div style={{
-              width: `${100 * zoomLevel}%`,
-              minWidth: '100%',
+              width: `${100 * 1.15 * zoomLevel}%`,
+              minWidth: '115%',
               position: 'relative'
             }}>
             {/* Sticky Timeline Header */}
