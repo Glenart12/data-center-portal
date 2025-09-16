@@ -79,10 +79,10 @@ function ProgressPage() {
 
     // Engineering Review - Keep existing tasks (Orange #F59E0B)
     {"id":1757702168699,"name":"Draft Review by CET 3","parentId":1757702125635,"startDate":"2025-10-01","endDate":"2025-10-05","color":"#F59E0B","progress":100},
-    {"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-10-07","endDate":"2025-10-12","color":"#F59E0B","progress":65},
-    {"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-10-14","endDate":"2025-10-18","color":"#F59E0B","progress":30}
+    {"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-10-06","endDate":"2025-10-10","color":"#F59E0B","progress":65},
+    {"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-10-11","endDate":"2025-10-15","color":"#F59E0B","progress":30}
   ]);
-  const [parentTasks, setParentTasks] = useState([{"id":1,"name":"MOP Development","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":2,"name":"SOP Procedures","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":3,"name":"EOP Planning","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":1757702125635,"name":"Engineering Review","startDate":"2025-10-01","endDate":"2025-10-18"}]);
+  const [parentTasks, setParentTasks] = useState([{"id":1,"name":"MOP Development","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":2,"name":"SOP Procedures","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":3,"name":"EOP Planning","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":1757702125635,"name":"Engineering Review","startDate":"2025-10-01","endDate":"2025-10-15"}]);
   const [projectDates, setProjectDates] = useState({"startDate":"2025-09-12","endDate":"2025-10-31"});
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddParent, setShowAddParent] = useState(false);
