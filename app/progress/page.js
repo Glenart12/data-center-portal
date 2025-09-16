@@ -30,60 +30,60 @@ function ProgressPage() {
     {"id":126,"name":"White Space - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
 
     // SOP Procedures - Mechanical (Green #10B981)
-    {"id":201,"name":"Mechanical - Draft Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-03","color":"#10B981","progress":100},
-    {"id":202,"name":"Mechanical - Peer Review","parentId":2,"startDate":"2025-10-03","endDate":"2025-10-05","color":"#10B981","progress":80},
-    {"id":203,"name":"Mechanical - Tabletop/Dry Run","parentId":2,"startDate":"2025-10-05","endDate":"2025-10-07","color":"#10B981","progress":50},
-    {"id":204,"name":"Mechanical - Wet Run","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-09","color":"#10B981","progress":25},
-    {"id":205,"name":"Mechanical - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-10-09","endDate":"2025-10-10","color":"#10B981","progress":0},
-    {"id":206,"name":"Mechanical - SME Sign-Off","parentId":2,"startDate":"2025-10-10","endDate":"2025-10-11","color":"#10B981","progress":0},
+    {"id":201,"name":"Mechanical - Draft Generation","parentId":2,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#10B981","progress":100},
+    {"id":202,"name":"Mechanical - Peer Review","parentId":2,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#10B981","progress":80},
+    {"id":203,"name":"Mechanical - Tabletop/Dry Run","parentId":2,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#10B981","progress":50},
+    {"id":204,"name":"Mechanical - Wet Run","parentId":2,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#10B981","progress":25},
+    {"id":205,"name":"Mechanical - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#10B981","progress":0},
+    {"id":206,"name":"Mechanical - SME Sign-Off","parentId":2,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#10B981","progress":0},
 
     // SOP Procedures - Electrical (Green #10B981)
-    {"id":211,"name":"Electrical - Draft Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-03","color":"#10B981","progress":100},
-    {"id":212,"name":"Electrical - Peer Review","parentId":2,"startDate":"2025-10-03","endDate":"2025-10-05","color":"#10B981","progress":70},
-    {"id":213,"name":"Electrical - Tabletop/Dry Run","parentId":2,"startDate":"2025-10-05","endDate":"2025-10-07","color":"#10B981","progress":40},
-    {"id":214,"name":"Electrical - Wet Run","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-09","color":"#10B981","progress":10},
-    {"id":215,"name":"Electrical - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-10-09","endDate":"2025-10-10","color":"#10B981","progress":0},
-    {"id":216,"name":"Electrical - SME Sign-Off","parentId":2,"startDate":"2025-10-10","endDate":"2025-10-11","color":"#10B981","progress":0},
+    {"id":211,"name":"Electrical - Draft Generation","parentId":2,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#10B981","progress":100},
+    {"id":212,"name":"Electrical - Peer Review","parentId":2,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#10B981","progress":70},
+    {"id":213,"name":"Electrical - Tabletop/Dry Run","parentId":2,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#10B981","progress":40},
+    {"id":214,"name":"Electrical - Wet Run","parentId":2,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#10B981","progress":10},
+    {"id":215,"name":"Electrical - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#10B981","progress":0},
+    {"id":216,"name":"Electrical - SME Sign-Off","parentId":2,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#10B981","progress":0},
 
     // SOP Procedures - White Space (Green #10B981)
-    {"id":221,"name":"White Space - Draft Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-03","color":"#10B981","progress":95},
-    {"id":222,"name":"White Space - Peer Review","parentId":2,"startDate":"2025-10-03","endDate":"2025-10-05","color":"#10B981","progress":65},
-    {"id":223,"name":"White Space - Tabletop/Dry Run","parentId":2,"startDate":"2025-10-05","endDate":"2025-10-07","color":"#10B981","progress":30},
-    {"id":224,"name":"White Space - Wet Run","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-09","color":"#10B981","progress":5},
-    {"id":225,"name":"White Space - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-10-09","endDate":"2025-10-10","color":"#10B981","progress":0},
-    {"id":226,"name":"White Space - SME Sign-Off","parentId":2,"startDate":"2025-10-10","endDate":"2025-10-11","color":"#10B981","progress":0},
+    {"id":221,"name":"White Space - Draft Generation","parentId":2,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#10B981","progress":95},
+    {"id":222,"name":"White Space - Peer Review","parentId":2,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#10B981","progress":65},
+    {"id":223,"name":"White Space - Tabletop/Dry Run","parentId":2,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#10B981","progress":30},
+    {"id":224,"name":"White Space - Wet Run","parentId":2,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#10B981","progress":5},
+    {"id":225,"name":"White Space - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#10B981","progress":0},
+    {"id":226,"name":"White Space - SME Sign-Off","parentId":2,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#10B981","progress":0},
 
     // EOP Planning - Mechanical (Red #EF4444)
-    {"id":301,"name":"Mechanical - Draft Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-25","color":"#EF4444","progress":85},
-    {"id":302,"name":"Mechanical - Peer Review","parentId":3,"startDate":"2025-10-25","endDate":"2025-10-27","color":"#EF4444","progress":60},
-    {"id":303,"name":"Mechanical - Tabletop/Dry Run","parentId":3,"startDate":"2025-10-27","endDate":"2025-10-29","color":"#EF4444","progress":30},
-    {"id":304,"name":"Mechanical - Wet Run","parentId":3,"startDate":"2025-10-29","endDate":"2025-10-31","color":"#EF4444","progress":10},
-    {"id":305,"name":"Mechanical - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-10-31","endDate":"2025-11-01","color":"#EF4444","progress":0},
-    {"id":306,"name":"Mechanical - SME Sign-Off","parentId":3,"startDate":"2025-11-01","endDate":"2025-11-02","color":"#EF4444","progress":0},
+    {"id":301,"name":"Mechanical - Draft Generation","parentId":3,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#EF4444","progress":85},
+    {"id":302,"name":"Mechanical - Peer Review","parentId":3,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#EF4444","progress":60},
+    {"id":303,"name":"Mechanical - Tabletop/Dry Run","parentId":3,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#EF4444","progress":30},
+    {"id":304,"name":"Mechanical - Wet Run","parentId":3,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#EF4444","progress":10},
+    {"id":305,"name":"Mechanical - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#EF4444","progress":0},
+    {"id":306,"name":"Mechanical - SME Sign-Off","parentId":3,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#EF4444","progress":0},
 
     // EOP Planning - Electrical (Red #EF4444)
-    {"id":311,"name":"Electrical - Draft Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-25","color":"#EF4444","progress":80},
-    {"id":312,"name":"Electrical - Peer Review","parentId":3,"startDate":"2025-10-25","endDate":"2025-10-27","color":"#EF4444","progress":55},
-    {"id":313,"name":"Electrical - Tabletop/Dry Run","parentId":3,"startDate":"2025-10-27","endDate":"2025-10-29","color":"#EF4444","progress":25},
-    {"id":314,"name":"Electrical - Wet Run","parentId":3,"startDate":"2025-10-29","endDate":"2025-10-31","color":"#EF4444","progress":5},
-    {"id":315,"name":"Electrical - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-10-31","endDate":"2025-11-01","color":"#EF4444","progress":0},
-    {"id":316,"name":"Electrical - SME Sign-Off","parentId":3,"startDate":"2025-11-01","endDate":"2025-11-02","color":"#EF4444","progress":0},
+    {"id":311,"name":"Electrical - Draft Generation","parentId":3,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#EF4444","progress":80},
+    {"id":312,"name":"Electrical - Peer Review","parentId":3,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#EF4444","progress":55},
+    {"id":313,"name":"Electrical - Tabletop/Dry Run","parentId":3,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#EF4444","progress":25},
+    {"id":314,"name":"Electrical - Wet Run","parentId":3,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#EF4444","progress":5},
+    {"id":315,"name":"Electrical - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#EF4444","progress":0},
+    {"id":316,"name":"Electrical - SME Sign-Off","parentId":3,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#EF4444","progress":0},
 
     // EOP Planning - White Space (Red #EF4444)
-    {"id":321,"name":"White Space - Draft Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-25","color":"#EF4444","progress":75},
-    {"id":322,"name":"White Space - Peer Review","parentId":3,"startDate":"2025-10-25","endDate":"2025-10-27","color":"#EF4444","progress":50},
-    {"id":323,"name":"White Space - Tabletop/Dry Run","parentId":3,"startDate":"2025-10-27","endDate":"2025-10-29","color":"#EF4444","progress":20},
-    {"id":324,"name":"White Space - Wet Run","parentId":3,"startDate":"2025-10-29","endDate":"2025-10-31","color":"#EF4444","progress":0},
-    {"id":325,"name":"White Space - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-10-31","endDate":"2025-11-01","color":"#EF4444","progress":0},
-    {"id":326,"name":"White Space - SME Sign-Off","parentId":3,"startDate":"2025-11-01","endDate":"2025-11-02","color":"#EF4444","progress":0},
+    {"id":321,"name":"White Space - Draft Generation","parentId":3,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#EF4444","progress":75},
+    {"id":322,"name":"White Space - Peer Review","parentId":3,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#EF4444","progress":50},
+    {"id":323,"name":"White Space - Tabletop/Dry Run","parentId":3,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#EF4444","progress":20},
+    {"id":324,"name":"White Space - Wet Run","parentId":3,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#EF4444","progress":0},
+    {"id":325,"name":"White Space - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#EF4444","progress":0},
+    {"id":326,"name":"White Space - SME Sign-Off","parentId":3,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#EF4444","progress":0},
 
     // Engineering Review - Keep existing tasks (Orange #F59E0B)
-    {"id":1757702168699,"name":"Draft Review by CET 3","parentId":1757702125635,"startDate":"2025-11-13","endDate":"2025-11-17","color":"#F59E0B","progress":100},
-    {"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-11-19","endDate":"2025-11-24","color":"#F59E0B","progress":65},
-    {"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-11-26","endDate":"2025-11-30","color":"#F59E0B","progress":30}
+    {"id":1757702168699,"name":"Draft Review by CET 3","parentId":1757702125635,"startDate":"2025-10-01","endDate":"2025-10-05","color":"#F59E0B","progress":100},
+    {"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-10-07","endDate":"2025-10-12","color":"#F59E0B","progress":65},
+    {"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-10-14","endDate":"2025-10-18","color":"#F59E0B","progress":30}
   ]);
-  const [parentTasks, setParentTasks] = useState([{"id":1,"name":"MOP Development","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":2,"name":"SOP Procedures","startDate":"2025-10-01","endDate":"2025-10-22"},{"id":3,"name":"EOP Planning","startDate":"2025-10-23","endDate":"2025-11-12"},{"id":1757702125635,"name":"Engineering Review","startDate":"2025-11-13","endDate":"2025-11-30"}]);
-  const [projectDates, setProjectDates] = useState({"startDate":"2025-09-12","endDate":"2025-12-11"});
+  const [parentTasks, setParentTasks] = useState([{"id":1,"name":"MOP Development","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":2,"name":"SOP Procedures","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":3,"name":"EOP Planning","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":1757702125635,"name":"Engineering Review","startDate":"2025-10-01","endDate":"2025-10-18"}]);
+  const [projectDates, setProjectDates] = useState({"startDate":"2025-09-12","endDate":"2025-10-31"});
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddParent, setShowAddParent] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
