@@ -132,9 +132,56 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     }
 
     setIsGenerating(true);
-    setUploadProgress('Connecting to AI service...');
 
     try {
+      let oneLineDiagramUrl = null;
+
+      // Check if there's a PDF in supporting docs (one-line diagram)
+      const pdfDoc = supportingDocs.find(doc => doc.type === 'application/pdf');
+
+      if (pdfDoc) {
+        setUploadProgress('Uploading one-line diagram...');
+
+        // Convert base64 back to File object
+        const base64Data = pdfDoc.content.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const file = new File([byteArray], pdfDoc.name, { type: 'application/pdf' });
+
+        // Create FormData and upload
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+
+        const uploadResponse = await fetch('/api/upload-one-line', {
+          method: 'POST',
+          body: uploadFormData
+        });
+
+        if (!uploadResponse.ok) {
+          const uploadError = await uploadResponse.json();
+          throw new Error(uploadError.error || 'Failed to upload one-line diagram');
+        }
+
+        const uploadResult = await uploadResponse.json();
+        oneLineDiagramUrl = uploadResult.url;
+        console.log('One-line diagram uploaded:', oneLineDiagramUrl);
+      }
+
+      setUploadProgress('Connecting to AI service...');
+
+      // Filter out PDF from supportingDocs and truncate content for non-PDFs
+      const filteredDocs = supportingDocs
+        .filter(doc => doc.type !== 'application/pdf')
+        .map(doc => ({
+          name: doc.name,
+          type: doc.type,
+          content: doc.content.substring(0, 1000) // Only send first 1000 chars for AI context
+        }));
+
       const response = await fetch('/api/generate-mop-ai', {
         method: 'POST',
         headers: {
@@ -143,13 +190,10 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         body: JSON.stringify({
           formData: {
             ...formData,
-            workDescription: formData.description // Ensure workDescription is available
+            workDescription: formData.description, // Ensure workDescription is available
+            oneLineDiagramUrl: oneLineDiagramUrl // Add the uploaded PDF URL
           },
-          supportingDocs: supportingDocs.map(doc => ({
-            name: doc.name,
-            type: doc.type,
-            content: doc.content
-          }))
+          supportingDocs: filteredDocs
         })
       });
 
