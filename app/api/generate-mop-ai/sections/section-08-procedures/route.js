@@ -1324,8 +1324,8 @@ export async function generateSection07(formData) {
   <h4 style="color: #333; margin-bottom: 15px; font-size: 16px; font-weight: bold;">One-Line Diagram</h4>
   <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
     <iframe
-      src="${formData.oneLineDiagramUrl}"
-      style="width: 100%; height: 600px; border: none; display: block;"
+      src="${formData.oneLineDiagramUrl}#view=FitH&pagemode=none&navpanes=0&statusbar=0&messages=0&scrollbar=1"
+      style="width: 100%; height: 800px; border: none; display: block; min-height: 600px; max-height: 1000px;"
       title="One-Line Diagram">
       <p>Your browser does not support embedded PDFs. <a href="${formData.oneLineDiagramUrl}" target="_blank">Click here to view the diagram.</a></p>
     </iframe>
