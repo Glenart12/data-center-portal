@@ -163,7 +163,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           // This bypasses the serverless function entirely
           const blob = await upload(filename, file, {
             access: 'public',
-            handleUploadUrl: '/api/upload-one-line', // Fallback to server upload if client upload fails
+            handleUploadUrl: '/api/upload', // Use the correct endpoint for client uploads
           });
 
           oneLineDiagramUrl = blob.url;
