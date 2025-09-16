@@ -211,8 +211,8 @@ function Dashboard() {
           <div style={{ marginBottom: '32px', maxWidth: '100%' }}>
             {[
               { type: 'MOP', complete: 83, current: 134, total: 162 },
-              { type: 'SOP', complete: 39, current: 59, total: 151 },
-              { type: 'EOP', complete: 31, current: 51, total: 164 }
+              { type: 'SOP', complete: 41, current: 62, total: 151 },
+              { type: 'EOP', complete: 35, current: 57, total: 164 }
             ].map(item => (
               <div key={item.type} style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -279,7 +279,7 @@ function Dashboard() {
                   { label: 'Mechanical', value: 76 },
                   { label: 'Electrical', value: 58 },
                   { label: 'White Space', value: 18 },
-                  { label: 'Misc.', value: 3 }
+                  { label: 'Misc.', value: 13 }
                 ]
               },
               {
@@ -287,8 +287,8 @@ function Dashboard() {
                 gauges: [
                   { label: 'Mechanical', value: 57 },
                   { label: 'Electrical', value: 56 },
-                  { label: 'White Space', value: 3 },
-                  { label: 'Misc.', value: 6 }
+                  { label: 'White Space', value: 11 },
+                  { label: 'Misc.', value: 14 }
                 ]
               }
             ].map(item => (
