@@ -766,6 +766,16 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
             📎 Add Documents
           </label>
 
+          <p style={{
+            fontSize: '12px',
+            fontStyle: 'italic',
+            color: '#999',
+            marginTop: '5px',
+            marginBottom: '10px'
+          }}>
+            Maximum file size: 4MB. Larger files will need to be linked separately.
+          </p>
+
           {supportingDocs.length > 0 && (
             <div style={{ marginTop: '15px' }}>
               {supportingDocs.map((doc, index) => (
