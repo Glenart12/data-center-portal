@@ -1322,13 +1322,13 @@ export async function generateSection07(formData) {
 <!-- One-Line Diagram Section -->
 <div class="one-line-diagram-section" style="margin: 30px 0; page-break-inside: avoid;">
   <h4 style="color: #333; margin-bottom: 15px; font-size: 16px; font-weight: bold;">One-Line Diagram</h4>
-  <div style="border: 1px solid #ddd; border-radius: 4px; padding: 20px; background-color: #f9f9f9; text-align: center;">
-    <p style="margin-bottom: 15px; color: #666;">One-line diagram has been uploaded for this MOP.</p>
-    <a href="${formData.oneLineDiagramUrl}"
-       target="_blank"
-       style="display: inline-block; padding: 12px 24px; background-color: #0f3456; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
-      📊 View One-Line Diagram (PDF)
-    </a>
+  <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
+    <iframe
+      src="${formData.oneLineDiagramUrl}"
+      style="width: 100%; height: 600px; border: none; display: block;"
+      title="One-Line Diagram">
+      <p>Your browser does not support embedded PDFs. <a href="${formData.oneLineDiagramUrl}" target="_blank">Click here to view the diagram.</a></p>
+    </iframe>
   </div>
 </div>` : '';
 

@@ -802,7 +802,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
             marginTop: '5px',
             marginBottom: '10px'
           }}>
-            Maximum file size: 50MB for PDFs (direct upload). Other file types limited to 4MB.
+            Maximum file size: 3.5MB for PDFs. Please keep files under this size for best results.
           </p>
 
           {supportingDocs.length > 0 && (
