@@ -3,8 +3,85 @@ import { useState, useEffect } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 function ProgressPage() {
-  // Hardcoded data from localStorage as permanent default
-  const [tasks, setTasks] = useState([{"id":1,"name":"Mechanical Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-17","color":"#2563EB"},{"id":2,"name":"Electrical Generation","parentId":1,"startDate":"2025-09-17","endDate":"2025-09-21","color":"#2563EB"},{"id":3,"name":"Mechanical Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-05","color":"#10B981"},{"id":4,"name":"Electrical Generation","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-11","color":"#10B981"},{"id":5,"name":"Mechanical Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-27","color":"#EF4444"},{"id":6,"name":"Electrical Generation","parentId":3,"startDate":"2025-10-28","endDate":"2025-11-01","color":"#EF4444"},{"id":1757701444542,"name":"White Space Generation","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-27","color":"#3B82F6"},{"id":1757701600098,"name":"Document Review","parentId":1,"startDate":"2025-09-27","endDate":"2025-09-30","color":"#3B82F6"},{"id":1757701810695,"name":"White Space Generation","parentId":2,"startDate":"2025-10-12","endDate":"2025-10-17","color":"#10B981"},{"id":1757701844124,"name":"Document Review","parentId":2,"startDate":"2025-10-18","endDate":"2025-10-22","color":"#10B981"},{"id":1757702001687,"name":"White Space Generation","parentId":3,"startDate":"2025-11-02","endDate":"2025-11-07","color":"#EF4444"},{"id":1757702041103,"name":"Document Review","parentId":3,"startDate":"2025-11-08","endDate":"2025-11-12","color":"#EF4444"},{"id":1757702168699,"name":"Draft Review by CET 3","parentId":1757702125635,"startDate":"2025-11-13","endDate":"2025-11-17","color":"#F59E0B"},{"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-11-19","endDate":"2025-11-24","color":"#F59E0B"},{"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-11-26","endDate":"2025-11-30","color":"#F59E0B"},{"id":1757939647783,"name":"SOP Review","parentId":"","startDate":"2025-10-08","endDate":"2025-10-15","color":"#10B981"}]);
+  // New structured task data with concurrent disciplines and 6-step cascade
+  const [tasks, setTasks] = useState([
+    // MOP Development - Mechanical (Blue #2563EB)
+    {"id":101,"name":"Mechanical - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#2563EB","progress":100},
+    {"id":102,"name":"Mechanical - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#2563EB","progress":100},
+    {"id":103,"name":"Mechanical - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#2563EB","progress":75},
+    {"id":104,"name":"Mechanical - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#2563EB","progress":50},
+    {"id":105,"name":"Mechanical - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#2563EB","progress":25},
+    {"id":106,"name":"Mechanical - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
+
+    // MOP Development - Electrical (Blue #2563EB)
+    {"id":111,"name":"Electrical - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#2563EB","progress":100},
+    {"id":112,"name":"Electrical - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#2563EB","progress":100},
+    {"id":113,"name":"Electrical - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#2563EB","progress":60},
+    {"id":114,"name":"Electrical - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#2563EB","progress":30},
+    {"id":115,"name":"Electrical - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#2563EB","progress":0},
+    {"id":116,"name":"Electrical - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
+
+    // MOP Development - White Space (Blue #2563EB)
+    {"id":121,"name":"White Space - Draft Generation","parentId":1,"startDate":"2025-09-12","endDate":"2025-09-14","color":"#2563EB","progress":100},
+    {"id":122,"name":"White Space - Peer Review","parentId":1,"startDate":"2025-09-14","endDate":"2025-09-16","color":"#2563EB","progress":90},
+    {"id":123,"name":"White Space - Tabletop/Dry Run","parentId":1,"startDate":"2025-09-16","endDate":"2025-09-18","color":"#2563EB","progress":45},
+    {"id":124,"name":"White Space - Wet Run","parentId":1,"startDate":"2025-09-18","endDate":"2025-09-20","color":"#2563EB","progress":20},
+    {"id":125,"name":"White Space - Chief Engineer Sign-Off","parentId":1,"startDate":"2025-09-20","endDate":"2025-09-21","color":"#2563EB","progress":0},
+    {"id":126,"name":"White Space - SME Sign-Off","parentId":1,"startDate":"2025-09-21","endDate":"2025-09-22","color":"#2563EB","progress":0},
+
+    // SOP Procedures - Mechanical (Green #10B981)
+    {"id":201,"name":"Mechanical - Draft Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-03","color":"#10B981","progress":100},
+    {"id":202,"name":"Mechanical - Peer Review","parentId":2,"startDate":"2025-10-03","endDate":"2025-10-05","color":"#10B981","progress":80},
+    {"id":203,"name":"Mechanical - Tabletop/Dry Run","parentId":2,"startDate":"2025-10-05","endDate":"2025-10-07","color":"#10B981","progress":50},
+    {"id":204,"name":"Mechanical - Wet Run","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-09","color":"#10B981","progress":25},
+    {"id":205,"name":"Mechanical - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-10-09","endDate":"2025-10-10","color":"#10B981","progress":0},
+    {"id":206,"name":"Mechanical - SME Sign-Off","parentId":2,"startDate":"2025-10-10","endDate":"2025-10-11","color":"#10B981","progress":0},
+
+    // SOP Procedures - Electrical (Green #10B981)
+    {"id":211,"name":"Electrical - Draft Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-03","color":"#10B981","progress":100},
+    {"id":212,"name":"Electrical - Peer Review","parentId":2,"startDate":"2025-10-03","endDate":"2025-10-05","color":"#10B981","progress":70},
+    {"id":213,"name":"Electrical - Tabletop/Dry Run","parentId":2,"startDate":"2025-10-05","endDate":"2025-10-07","color":"#10B981","progress":40},
+    {"id":214,"name":"Electrical - Wet Run","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-09","color":"#10B981","progress":10},
+    {"id":215,"name":"Electrical - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-10-09","endDate":"2025-10-10","color":"#10B981","progress":0},
+    {"id":216,"name":"Electrical - SME Sign-Off","parentId":2,"startDate":"2025-10-10","endDate":"2025-10-11","color":"#10B981","progress":0},
+
+    // SOP Procedures - White Space (Green #10B981)
+    {"id":221,"name":"White Space - Draft Generation","parentId":2,"startDate":"2025-10-01","endDate":"2025-10-03","color":"#10B981","progress":95},
+    {"id":222,"name":"White Space - Peer Review","parentId":2,"startDate":"2025-10-03","endDate":"2025-10-05","color":"#10B981","progress":65},
+    {"id":223,"name":"White Space - Tabletop/Dry Run","parentId":2,"startDate":"2025-10-05","endDate":"2025-10-07","color":"#10B981","progress":30},
+    {"id":224,"name":"White Space - Wet Run","parentId":2,"startDate":"2025-10-07","endDate":"2025-10-09","color":"#10B981","progress":5},
+    {"id":225,"name":"White Space - Chief Engineer Sign-Off","parentId":2,"startDate":"2025-10-09","endDate":"2025-10-10","color":"#10B981","progress":0},
+    {"id":226,"name":"White Space - SME Sign-Off","parentId":2,"startDate":"2025-10-10","endDate":"2025-10-11","color":"#10B981","progress":0},
+
+    // EOP Planning - Mechanical (Red #EF4444)
+    {"id":301,"name":"Mechanical - Draft Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-25","color":"#EF4444","progress":85},
+    {"id":302,"name":"Mechanical - Peer Review","parentId":3,"startDate":"2025-10-25","endDate":"2025-10-27","color":"#EF4444","progress":60},
+    {"id":303,"name":"Mechanical - Tabletop/Dry Run","parentId":3,"startDate":"2025-10-27","endDate":"2025-10-29","color":"#EF4444","progress":30},
+    {"id":304,"name":"Mechanical - Wet Run","parentId":3,"startDate":"2025-10-29","endDate":"2025-10-31","color":"#EF4444","progress":10},
+    {"id":305,"name":"Mechanical - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-10-31","endDate":"2025-11-01","color":"#EF4444","progress":0},
+    {"id":306,"name":"Mechanical - SME Sign-Off","parentId":3,"startDate":"2025-11-01","endDate":"2025-11-02","color":"#EF4444","progress":0},
+
+    // EOP Planning - Electrical (Red #EF4444)
+    {"id":311,"name":"Electrical - Draft Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-25","color":"#EF4444","progress":80},
+    {"id":312,"name":"Electrical - Peer Review","parentId":3,"startDate":"2025-10-25","endDate":"2025-10-27","color":"#EF4444","progress":55},
+    {"id":313,"name":"Electrical - Tabletop/Dry Run","parentId":3,"startDate":"2025-10-27","endDate":"2025-10-29","color":"#EF4444","progress":25},
+    {"id":314,"name":"Electrical - Wet Run","parentId":3,"startDate":"2025-10-29","endDate":"2025-10-31","color":"#EF4444","progress":5},
+    {"id":315,"name":"Electrical - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-10-31","endDate":"2025-11-01","color":"#EF4444","progress":0},
+    {"id":316,"name":"Electrical - SME Sign-Off","parentId":3,"startDate":"2025-11-01","endDate":"2025-11-02","color":"#EF4444","progress":0},
+
+    // EOP Planning - White Space (Red #EF4444)
+    {"id":321,"name":"White Space - Draft Generation","parentId":3,"startDate":"2025-10-23","endDate":"2025-10-25","color":"#EF4444","progress":75},
+    {"id":322,"name":"White Space - Peer Review","parentId":3,"startDate":"2025-10-25","endDate":"2025-10-27","color":"#EF4444","progress":50},
+    {"id":323,"name":"White Space - Tabletop/Dry Run","parentId":3,"startDate":"2025-10-27","endDate":"2025-10-29","color":"#EF4444","progress":20},
+    {"id":324,"name":"White Space - Wet Run","parentId":3,"startDate":"2025-10-29","endDate":"2025-10-31","color":"#EF4444","progress":0},
+    {"id":325,"name":"White Space - Chief Engineer Sign-Off","parentId":3,"startDate":"2025-10-31","endDate":"2025-11-01","color":"#EF4444","progress":0},
+    {"id":326,"name":"White Space - SME Sign-Off","parentId":3,"startDate":"2025-11-01","endDate":"2025-11-02","color":"#EF4444","progress":0},
+
+    // Engineering Review - Keep existing tasks (Orange #F59E0B)
+    {"id":1757702168699,"name":"Draft Review by CET 3","parentId":1757702125635,"startDate":"2025-11-13","endDate":"2025-11-17","color":"#F59E0B","progress":100},
+    {"id":1757702195961,"name":"On Site Review","parentId":1757702125635,"startDate":"2025-11-19","endDate":"2025-11-24","color":"#F59E0B","progress":65},
+    {"id":1757702244718,"name":"V2 Documents Generation","parentId":1757702125635,"startDate":"2025-11-26","endDate":"2025-11-30","color":"#F59E0B","progress":30}
+  ]);
   const [parentTasks, setParentTasks] = useState([{"id":1,"name":"MOP Development","startDate":"2025-09-12","endDate":"2025-09-30"},{"id":2,"name":"SOP Procedures","startDate":"2025-10-01","endDate":"2025-10-22"},{"id":3,"name":"EOP Planning","startDate":"2025-10-23","endDate":"2025-11-12"},{"id":1757702125635,"name":"Engineering Review","startDate":"2025-11-13","endDate":"2025-11-30"}]);
   const [projectDates, setProjectDates] = useState({"startDate":"2025-09-12","endDate":"2025-12-11"});
   const [showAddTask, setShowAddTask] = useState(false);
@@ -226,8 +303,72 @@ function ProgressPage() {
 
             {/* Tasks */}
             <div style={{ position: 'relative' }}>
-              {parentTasks.map(parent => (
+              {/* Today Line */}
+              {(() => {
+                const today = new Date();
+                const projectStart = new Date(projectStartDate);
+                const projectEnd = new Date(projectEndDate);
+                const totalDays = (projectEnd - projectStart) / (1000 * 60 * 60 * 24);
+                const daysFromStart = (today - projectStart) / (1000 * 60 * 60 * 24);
+                const todayPosition = (daysFromStart / totalDays) * 100;
+
+                if (todayPosition >= 0 && todayPosition <= 100) {
+                  return (
+                    <div style={{
+                      position: 'absolute',
+                      left: `${todayPosition}%`,
+                      top: 0,
+                      bottom: 0,
+                      width: '2px',
+                      backgroundColor: '#EF4444',
+                      zIndex: 10,
+                      pointerEvents: 'none'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '-20px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        backgroundColor: '#EF4444',
+                        color: 'white',
+                        padding: '2px 6px',
+                        borderRadius: '3px',
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        TODAY
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+              {parentTasks.map((parent, parentIndex) => (
                 <div key={parent.id}>
+                {/* Discipline Separator for groups of 3 */}
+                {parentIndex > 0 && parentIndex % 3 === 0 && (
+                  <div style={{
+                    height: '2px',
+                    backgroundColor: '#E5E7EB',
+                    margin: '16px 0',
+                    position: 'relative'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      backgroundColor: 'white',
+                      padding: '0 12px',
+                      fontSize: '11px',
+                      color: '#6B7280',
+                      fontWeight: 'bold'
+                    }}>
+                      {parentIndex === 3 ? 'SOP Phase' : parentIndex === 6 ? 'EOP Phase' : ''}
+                    </div>
+                  </div>
+                )}
                 {/* Parent Task */}
                 <div style={{ position: 'relative', marginBottom: '4px', minHeight: '40px', height: 'auto' }}>
                   {/* Grid lines */}
@@ -284,7 +425,7 @@ function ProgressPage() {
                         />
                       ))}
                     </div>
-                    {/* Task bar */}
+                    {/* Task bar with progress */}
                     <div
                       onClick={() => setEditingTask(task)}
                       style={{
@@ -292,21 +433,48 @@ function ProgressPage() {
                         top: '8px',
                           minHeight: '24px',
                           height: 'auto',
-                          backgroundColor: task.color || '#3B82F6',
+                          backgroundColor: '#E5E7EB',
                           borderRadius: '4px',
                           cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '4px 8px',
-                          color: 'white',
-                          fontSize: '11px',
-                          whiteSpace: 'normal',
-                          wordWrap: 'break-word',
+                          overflow: 'hidden',
                           zIndex: 1,
                           ...calculateBarPosition(task.startDate, task.endDate)
-                        }}
-                      >
-                        {task.name}
+                      }}
+                    >
+                      {/* Progress fill */}
+                      <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        width: `${task.progress || 0}%`,
+                        backgroundColor: task.color || '#3B82F6',
+                        transition: 'width 0.3s ease'
+                      }} />
+                      {/* Task text */}
+                      <div style={{
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '4px 8px',
+                        color: task.progress > 50 ? 'white' : '#374151',
+                        fontSize: '11px',
+                        whiteSpace: 'normal',
+                        wordWrap: 'break-word',
+                        zIndex: 2
+                      }}>
+                        <span>{task.name}</span>
+                        {task.progress !== undefined && (
+                          <span style={{
+                            marginLeft: '8px',
+                            fontWeight: 'bold',
+                            fontSize: '10px'
+                          }}>
+                            {task.progress}%
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
