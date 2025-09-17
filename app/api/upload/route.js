@@ -22,7 +22,16 @@ export async function POST(request) {
           console.log('Preparing client upload for:', pathname);
 
           return {
-            allowedContentTypes: ['application/pdf', 'text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+            allowedContentTypes: [
+              'application/pdf',
+              'text/plain',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'image/jpeg',
+              'image/jpg',
+              'image/png',
+              'image/gif',
+              'image/webp'
+            ],
             maximumSizeInBytes: 50 * 1024 * 1024, // 50MB limit
             tokenPayload: JSON.stringify({
               uploadedAt: new Date().toISOString(),

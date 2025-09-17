@@ -163,6 +163,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           const blob = await upload(filename, namePlatePhoto, {
             access: 'public',
             handleUploadUrl: '/api/upload',
+            addRandomSuffix: true
           });
 
           namePlatePhotoUrl = blob.url;
@@ -183,6 +184,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           const blob = await upload(filename, equipmentPhoto, {
             access: 'public',
             handleUploadUrl: '/api/upload',
+            addRandomSuffix: true
           });
 
           equipmentPhotoUrl = blob.url;
@@ -219,6 +221,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           const blob = await upload(filename, file, {
             access: 'public',
             handleUploadUrl: '/api/upload', // Use the correct endpoint for client uploads
+            addRandomSuffix: true
           });
 
           oneLineDiagramUrl = blob.url;
@@ -828,7 +831,7 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           <input
             type="file"
             multiple
-            accept=".pdf,.txt,.doc,.docx"
+            accept=".pdf,application/pdf"
             onChange={handleFileSelect}
             style={{ display: 'none' }}
             id="doc-upload"
