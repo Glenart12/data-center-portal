@@ -126,6 +126,30 @@ export async function generateSection01(formData) {
         <td>Component Type:</td>
         <td>${componentType || 'UPDATE NEEDED'}</td>
     </tr>
+    ${formData.namePlatePhotoUrl || formData.equipmentPhotoUrl ? `
+      ${formData.namePlatePhotoUrl ? `
+        <tr>
+          <td>Name Plate:</td>
+          <td>
+            <img src="${formData.namePlatePhotoUrl}"
+                 style="width: 200px; height: auto; cursor: pointer;"
+                 alt="Equipment Name Plate"
+                 onclick="window.open('${formData.namePlatePhotoUrl}', '_blank')" />
+          </td>
+        </tr>
+      ` : ''}
+      ${formData.equipmentPhotoUrl ? `
+        <tr>
+          <td>Equipment:</td>
+          <td>
+            <img src="${formData.equipmentPhotoUrl}"
+                 style="width: 200px; height: auto; cursor: pointer;"
+                 alt="Equipment Photo"
+                 onclick="window.open('${formData.equipmentPhotoUrl}', '_blank')" />
+          </td>
+        </tr>
+      ` : ''}
+    ` : ''}
     <tr>
         <td>Manufacturer:</td>
         <td>${manufacturer || 'UPDATE NEEDED'}</td>

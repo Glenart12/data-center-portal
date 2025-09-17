@@ -37,6 +37,8 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
   const [uploadProgress, setUploadProgress] = useState('');
   const [lastGenerationTime, setLastGenerationTime] = useState(0);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const [namePlatePhoto, setNamePlatePhoto] = useState(null);
+  const [equipmentPhoto, setEquipmentPhoto] = useState(null);
 
   // Check for cooldown on component mount and when modal opens
   useEffect(() => {
@@ -118,6 +120,17 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
     setSupportingDocs(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handlePhotoSelection = (e, type) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      if (type === 'nameplate') {
+        setNamePlatePhoto(file);
+      } else {
+        setEquipmentPhoto(file);
+      }
+    }
+  };
+
   const handleGenerate = async () => {
     // Check cooldown
     if (cooldownRemaining > 0) {
@@ -136,6 +149,48 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
 
     try {
       let oneLineDiagramUrl = null;
+      let namePlatePhotoUrl = null;
+      let equipmentPhotoUrl = null;
+
+      // Upload equipment name plate photo if exists
+      if (namePlatePhoto) {
+        setUploadProgress('Uploading equipment name plate photo...');
+        try {
+          const timestamp = new Date().toISOString().split('T')[0];
+          const sanitizedName = namePlatePhoto.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const filename = `equipment-photos/nameplate/${timestamp}_${sanitizedName}`;
+
+          const blob = await upload(filename, namePlatePhoto, {
+            access: 'public',
+            handleUploadUrl: '/api/upload',
+          });
+
+          namePlatePhotoUrl = blob.url;
+          console.log('Name plate photo uploaded:', namePlatePhotoUrl);
+        } catch (uploadError) {
+          console.error('Failed to upload name plate photo:', uploadError);
+        }
+      }
+
+      // Upload equipment photo if exists
+      if (equipmentPhoto) {
+        setUploadProgress('Uploading equipment photo...');
+        try {
+          const timestamp = new Date().toISOString().split('T')[0];
+          const sanitizedName = equipmentPhoto.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const filename = `equipment-photos/equipment/${timestamp}_${sanitizedName}`;
+
+          const blob = await upload(filename, equipmentPhoto, {
+            access: 'public',
+            handleUploadUrl: '/api/upload',
+          });
+
+          equipmentPhotoUrl = blob.url;
+          console.log('Equipment photo uploaded:', equipmentPhotoUrl);
+        } catch (uploadError) {
+          console.error('Failed to upload equipment photo:', uploadError);
+        }
+      }
 
       // Check if there's a PDF in supporting docs (one-line diagram)
       const pdfDoc = supportingDocs.find(doc => doc.type === 'application/pdf');
@@ -220,7 +275,9 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
           formData: {
             ...formData,
             workDescription: formData.description, // Ensure workDescription is available
-            oneLineDiagramUrl: oneLineDiagramUrl // Add the uploaded PDF URL
+            oneLineDiagramUrl: oneLineDiagramUrl, // Add the uploaded PDF URL
+            namePlatePhotoUrl: namePlatePhotoUrl, // Add nameplate photo URL
+            equipmentPhotoUrl: equipmentPhotoUrl // Add equipment photo URL
           },
           supportingDocs: filteredDocs
         })
@@ -836,6 +893,80 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+
+        {/* Equipment Name Plate Photo */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment Name Plate Photo</h3>
+          <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
+            Upload equipment name plate photo to document specifications
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handlePhotoSelection(e, 'nameplate')}
+            style={{ display: 'none' }}
+            id="nameplate-photo-upload"
+          />
+          <label
+            htmlFor="nameplate-photo-upload"
+            style={{
+              display: 'inline-block',
+              padding: '10px 20px',
+              backgroundColor: '#0070f3',
+              color: 'white',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginBottom: '15px',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0051cc'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0070f3'}
+          >
+            📎 Add Photo
+          </label>
+
+          {namePlatePhoto && (
+            <div style={{ color: '#666', fontSize: '14px' }}>Photo selected: {namePlatePhoto.name}</div>
+          )}
+        </div>
+
+        {/* Equipment Photo */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#333' }}>Equipment Photo</h3>
+          <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
+            Upload equipment photo for visual documentation
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handlePhotoSelection(e, 'equipment')}
+            style={{ display: 'none' }}
+            id="equipment-photo-upload"
+          />
+          <label
+            htmlFor="equipment-photo-upload"
+            style={{
+              display: 'inline-block',
+              padding: '10px 20px',
+              backgroundColor: '#0070f3',
+              color: 'white',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginBottom: '15px',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0051cc'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0070f3'}
+          >
+            📎 Add Photo
+          </label>
+
+          {equipmentPhoto && (
+            <div style={{ color: '#666', fontSize: '14px' }}>Photo selected: {equipmentPhoto.name}</div>
           )}
         </div>
 
