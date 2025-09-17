@@ -24,10 +24,11 @@ export async function POST(request) {
 
     console.log('Uploading one-line diagram PDF:', file.name, 'Size:', file.size);
 
-    // Generate filename with timestamp
+    // Generate filename with timestamp and random suffix
     const timestamp = new Date().toISOString().split('T')[0];
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `one-line-diagrams/${timestamp}_${sanitizedName}`;
+    const filename = `one-line-diagrams/${timestamp}_${randomSuffix}_${sanitizedName}`;
 
     // Convert file to buffer
     const bytes = await file.arrayBuffer();

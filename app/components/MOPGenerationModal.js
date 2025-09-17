@@ -157,13 +157,13 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         setUploadProgress('Uploading equipment name plate photo...');
         try {
           const timestamp = new Date().toISOString().split('T')[0];
+          const randomSuffix = Math.random().toString(36).substring(2, 8);
           const sanitizedName = namePlatePhoto.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-          const filename = `equipment-photos/nameplate/${timestamp}_${sanitizedName}`;
+          const filename = `equipment-photos/nameplate/${timestamp}_${randomSuffix}_${sanitizedName}`;
 
           const blob = await upload(filename, namePlatePhoto, {
             access: 'public',
-            handleUploadUrl: '/api/upload',
-            addRandomSuffix: true
+            handleUploadUrl: '/api/upload'
           });
 
           namePlatePhotoUrl = blob.url;
@@ -178,13 +178,13 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
         setUploadProgress('Uploading equipment photo...');
         try {
           const timestamp = new Date().toISOString().split('T')[0];
+          const randomSuffix = Math.random().toString(36).substring(2, 8);
           const sanitizedName = equipmentPhoto.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-          const filename = `equipment-photos/equipment/${timestamp}_${sanitizedName}`;
+          const filename = `equipment-photos/equipment/${timestamp}_${randomSuffix}_${sanitizedName}`;
 
           const blob = await upload(filename, equipmentPhoto, {
             access: 'public',
-            handleUploadUrl: '/api/upload',
-            addRandomSuffix: true
+            handleUploadUrl: '/api/upload'
           });
 
           equipmentPhotoUrl = blob.url;
@@ -213,15 +213,15 @@ export default function MOPGenerationModal({ isOpen, onClose }) {
 
           // Generate filename with timestamp
           const timestamp = new Date().toISOString().split('T')[0];
+          const randomSuffix = Math.random().toString(36).substring(2, 8);
           const sanitizedName = pdfDoc.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-          const filename = `one-line-diagrams/${timestamp}_${sanitizedName}`;
+          const filename = `one-line-diagrams/${timestamp}_${randomSuffix}_${sanitizedName}`;
 
           // Upload directly to Vercel Blob from client
           // This bypasses the serverless function entirely
           const blob = await upload(filename, file, {
             access: 'public',
-            handleUploadUrl: '/api/upload', // Use the correct endpoint for client uploads
-            addRandomSuffix: true
+            handleUploadUrl: '/api/upload' // Use the correct endpoint for client uploads
           });
 
           oneLineDiagramUrl = blob.url;
