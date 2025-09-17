@@ -72,6 +72,7 @@ async function saveSitesToBlob(sites) {
       access: 'public',
       contentType: 'application/json',
       addRandomSuffix: false, // Keep the exact filename
+      allowOverwrite: true // Add this to allow updating existing file
     });
 
     console.log('[saveSitesToBlob] Successfully saved sites to blob:', blob.url);
