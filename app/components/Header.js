@@ -17,6 +17,7 @@ export default function Header() {
     { href: '/mop', label: 'MOPs' },
     { href: '/sop', label: 'SOPs' },
     { href: '/eop', label: 'EOPs' },
+    { href: '/documents', label: 'Documents' },
   ];
 
   const isActive = (href) => pathname === href;
