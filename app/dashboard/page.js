@@ -59,7 +59,7 @@ function Dashboard() {
         <div style={{
           display: 'flex',
           justifyContent: 'center',
-          marginBottom: '48px'
+          marginBottom: '64px'
         }}>
           <img
             src="/element-main-logo-gray.svg"
@@ -76,15 +76,14 @@ function Dashboard() {
           color: '#0A1628',
           fontSize: '2.25rem',
           textAlign: 'center',
-          marginBottom: '32px',
+          marginBottom: '64px',
           textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
         }}>
           WELCOME TO THE OPERATIONS PORTAL
         </h1>
 
-        {/* Image Card */}
+        {/* Image Card - Navy Background, No Header */}
         <div style={{
-          marginTop: '32px',
           backgroundColor: 'white',
           borderRadius: '8px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
@@ -92,34 +91,23 @@ function Dashboard() {
           boxSizing: 'border-box',
           overflow: 'hidden'
         }}>
-          {/* Navy Header Bar */}
+          {/* Image Content with Navy Background */}
           <div style={{
-            backgroundColor: '#0A1628',
-            padding: '16px 24px',
-            color: '#FFFFFF',
-            fontSize: '20px',
-            fontWeight: 'bold',
-            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
-          }}>
-            DATA CENTER OPERATIONS
-          </div>
-
-          {/* Image Content */}
-          <div style={{
-            padding: '24px',
+            padding: '16px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'white'
+            backgroundColor: '#0A1628'
           }}>
             <img
               src="/YLO_DC.jpg"
               alt="Data Center Operations"
               style={{
                 width: '100%',
-                maxWidth: '1000px',
+                maxWidth: '900px',
+                maxHeight: '400px',
                 height: 'auto',
-                borderRadius: '8px',
+                borderRadius: '6px',
                 objectFit: 'cover'
               }}
             />
