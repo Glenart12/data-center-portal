@@ -342,6 +342,142 @@ function ProgressPage() {
             PROJECT PROGRESS
           </h1>
 
+          {/* Progress Dashboard Section */}
+          <div style={{
+            marginTop: '32px',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            width: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            {/* Navy Header Bar */}
+            <div style={{
+              backgroundColor: '#0A1628',
+              padding: '16px 24px',
+              color: '#FFFFFF',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+            }}>
+              PROGRESS DASHBOARD
+            </div>
+
+            {/* Card Content */}
+            <div style={{
+              padding: '32px'
+            }}>
+              {/* Percentage Complete Section */}
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0A1628', marginBottom: '24px', textAlign: 'center' }}>
+                PERCENTAGE COMPLETE
+              </h2>
+
+            {/* Progress Bars */}
+            <div style={{ marginBottom: '32px', maxWidth: '100%' }}>
+              {[
+                { type: 'MOP', complete: 83, current: 134, total: 162 },
+                { type: 'SOP', complete: 41, current: 62, total: 151 },
+                { type: 'EOP', complete: 35, current: 57, total: 164 }
+              ].map(item => (
+                <div key={item.type} style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ width: '60px', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                      {item.type}
+                    </div>
+                    <div style={{ flex: 1, position: 'relative', maxWidth: '100%' }}>
+                      <div style={{
+                        height: '24px',
+                        backgroundColor: '#E5E7EB',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          height: '100%',
+                          width: `${item.complete}%`,
+                          backgroundColor: '#0A1628',
+                          transition: 'width 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          paddingLeft: '8px'
+                        }}>
+                          <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                            {item.complete}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#6B7280' }}>
+                      {item.current}/{item.total} Documents
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Category Dials Section */}
+            <h3 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              color: '#0A1628',
+              marginBottom: '24px',
+              marginTop: '48px',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif',
+              textAlign: 'center'
+            }}>
+              CATEGORY BREAKDOWN
+            </h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px', width: '100%', overflow: 'hidden' }}>
+              {[
+                {
+                  category: 'MOP',
+                  gauges: [
+                    { label: 'Mechanical', value: 100 },
+                    { label: 'Electrical', value: 100 },
+                    { label: 'White Space', value: 84 },
+                    { label: 'Misc.', value: 49 }
+                  ]
+                },
+                {
+                  category: 'SOP',
+                  gauges: [
+                    { label: 'Mechanical', value: 76 },
+                    { label: 'Electrical', value: 58 },
+                    { label: 'White Space', value: 18 },
+                    { label: 'Misc.', value: 13 }
+                  ]
+                },
+                {
+                  category: 'EOP',
+                  gauges: [
+                    { label: 'Mechanical', value: 57 },
+                    { label: 'Electrical', value: 56 },
+                    { label: 'White Space', value: 11 },
+                    { label: 'Misc.', value: 14 }
+                  ]
+                }
+              ].map(item => (
+                <div key={item.category}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0A1628', marginBottom: '16px', textAlign: 'center' }}>
+                    {item.category}
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', width: '100%' }}>
+                    {item.gauges.map(gauge => (
+                      <div key={gauge.label} style={{ textAlign: 'center' }}>
+                        <HalfCircleGauge percentage={gauge.value} />
+                        <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '-10px' }}>
+                          {gauge.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            </div>
+          </div>
+
           {/* Gantt Chart */}
           <div style={{
             marginTop: '32px',
