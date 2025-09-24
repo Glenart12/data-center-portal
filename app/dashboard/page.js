@@ -152,7 +152,7 @@ function Dashboard() {
 
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Site Name:</span>
-                <span>LMNT-01</span>
+                <span>GFM-01</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
