@@ -1134,48 +1134,55 @@ function ProgressPage() {
 // Half Circle Gauge Component
 function HalfCircleGauge({ percentage }) {
   const radius = 50;
-  const strokeWidth = 8;
+  const strokeWidth = 10;
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * Math.PI;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  
+
+  // Calculate the length of the colored portion (from left to percentage point)
+  const filledLength = (percentage / 100) * circumference;
+
   // Determine color based on percentage
-  const color = percentage <= 33 ? '#EF4444' : 
+  const color = percentage <= 33 ? '#EF4444' :
                 percentage <= 66 ? '#F59E0B' : '#10B981';
-  
+
   return (
-    <div style={{ position: 'relative', width: '120px', height: '60px', margin: '0 auto' }}>
+    <div style={{ position: 'relative', width: '120px', height: '90px', margin: '0 auto' }}>
       <svg
         width="120"
         height="70"
         viewBox="0 0 120 70"
-        style={{ transform: 'rotate(180deg)' }}
+        style={{ overflow: 'visible' }}
       >
-        {/* Background arc */}
+        {/* Background arc - full grey semi-circle */}
         <path
-          d="M 10 60 A 50 50 0 0 1 110 60"
+          d="M 10 60 A 50 50 0 1 1 110 60"
           fill="none"
           stroke="#E5E7EB"
           strokeWidth={strokeWidth}
+          strokeLinecap="round"
         />
-        {/* Filled arc */}
+        {/* Colored arc - fills from left to right based on percentage */}
         <path
-          d="M 10 60 A 50 50 0 0 1 110 60"
+          d="M 10 60 A 50 50 0 1 1 110 60"
           fill="none"
           stroke={color}
           strokeWidth={strokeWidth}
-          strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={strokeDashoffset}
-          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+          strokeLinecap="round"
+          strokeDasharray={`${filledLength} ${circumference}`}
+          strokeDashoffset={0}
+          style={{
+            transition: 'stroke-dasharray 0.5s ease',
+            transformOrigin: 'center',
+          }}
         />
       </svg>
-      {/* Percentage text */}
+      {/* Percentage text - positioned below the arc */}
       <div style={{
         position: 'absolute',
-        top: '35px',
+        bottom: '25px',
         left: '50%',
         transform: 'translateX(-50%)',
-        fontSize: '14px',
+        fontSize: '16px',
         fontWeight: 'bold',
         color: '#0A1628'
       }}>
