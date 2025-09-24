@@ -59,7 +59,7 @@ function Dashboard() {
         <div style={{
           display: 'flex',
           justifyContent: 'center',
-          marginBottom: '64px'
+          marginBottom: '40px'
         }}>
           <img
             src="/element-main-logo-gray.svg"
@@ -76,7 +76,7 @@ function Dashboard() {
           color: '#0A1628',
           fontSize: '2.25rem',
           textAlign: 'center',
-          marginBottom: '64px',
+          marginBottom: '40px',
           textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
         }}>
           WELCOME TO THE OPERATIONS PORTAL
@@ -93,7 +93,6 @@ function Dashboard() {
         }}>
           {/* Image Content with Navy Background */}
           <div style={{
-            padding: '16px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -104,10 +103,8 @@ function Dashboard() {
               alt="Data Center Operations"
               style={{
                 width: '100%',
-                maxWidth: '900px',
                 maxHeight: '400px',
                 height: 'auto',
-                borderRadius: '6px',
                 objectFit: 'cover'
               }}
             />
