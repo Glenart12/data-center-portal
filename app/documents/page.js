@@ -140,21 +140,6 @@ function Documents() {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '24px'
-          }}>
-            <img
-              src="/element-main-logo-gray.svg"
-              alt="Element Critical"
-              style={{
-                height: '40px',
-                width: 'auto',
-                objectFit: 'contain'
-              }}
-            />
-          </div>
           <h1 style={{
             color: '#0A1628',
             fontSize: '2.25rem',
