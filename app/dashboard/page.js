@@ -4,6 +4,17 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 
 function Dashboard() {
+  const [currentWeek, setCurrentWeek] = useState(0);
+
+  useEffect(() => {
+    // Calculate weeks from September 1, 2025
+    const startDate = new Date('2025-09-01');
+    const today = new Date();
+    const diffTime = Math.abs(today - startDate);
+    const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+    setCurrentWeek(diffWeeks);
+  }, []);
+
   return (
     <>
       {/* Background gradient */}
@@ -44,6 +55,23 @@ function Dashboard() {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
+        {/* Element Critical Logo */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '48px'
+        }}>
+          <img
+            src="/element-main-logo-gray.svg"
+            alt="Element Critical"
+            style={{
+              height: '80px',
+              width: 'auto',
+              objectFit: 'contain'
+            }}
+          />
+        </div>
+
         <h1 style={{
           color: '#0A1628',
           fontSize: '2.25rem',
@@ -53,6 +81,112 @@ function Dashboard() {
         }}>
           WELCOME TO THE OPERATIONS PORTAL
         </h1>
+
+        {/* Image Card */}
+        <div style={{
+          marginTop: '32px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          width: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden'
+        }}>
+          {/* Navy Header Bar */}
+          <div style={{
+            backgroundColor: '#0A1628',
+            padding: '16px 24px',
+            color: '#FFFFFF',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+          }}>
+            DATA CENTER OPERATIONS
+          </div>
+
+          {/* Image Content */}
+          <div style={{
+            padding: '24px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white'
+          }}>
+            <img
+              src="/YLO_DC.jpg"
+              alt="Data Center Operations"
+              style={{
+                width: '100%',
+                maxWidth: '1000px',
+                height: 'auto',
+                borderRadius: '8px',
+                objectFit: 'cover'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Client Information Card */}
+        <div style={{
+          marginTop: '32px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          width: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden'
+        }}>
+          {/* Navy Header Bar */}
+          <div style={{
+            backgroundColor: '#0A1628',
+            padding: '16px 24px',
+            color: '#FFFFFF',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+          }}>
+            CLIENT INFORMATION
+          </div>
+
+          {/* Client Information Content */}
+          <div style={{
+            padding: '32px',
+            backgroundColor: 'white'
+          }}>
+            <div style={{
+              display: 'grid',
+              gap: '20px',
+              fontSize: '16px',
+              color: '#374151',
+              fontFamily: '"Century Gothic", "Questrial", -apple-system, sans-serif'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Client Name:</span>
+                <span>Element Critical</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Site Name:</span>
+                <span>LMNT-01</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Site Address:</span>
+                <span>2300 US-34, Oswego, IL 60543</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Start Date:</span>
+                <span>September 1, 2025</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Current Period:</span>
+                <span>Week {currentWeek} of 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     </>
