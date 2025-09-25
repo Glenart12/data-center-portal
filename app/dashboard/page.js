@@ -152,12 +152,12 @@ function Dashboard() {
 
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Site Name:</span>
-                <span>GFM-01</span>
+                <span>Austin One</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Site Address:</span>
-                <span>2300 US-34, Oswego, IL 60543</span>
+                <span>8025 North Interstate Hwy 35, Austin, TX 78753</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
