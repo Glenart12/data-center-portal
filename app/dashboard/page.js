@@ -62,8 +62,8 @@ function Dashboard() {
           marginBottom: '40px'
         }}>
           <img
-            src="/element-main-logo-gray.svg"
-            alt="Element Critical"
+            src="/T5-Logo-RGB-Dev-Horiz-Color.png"
+            alt="T5 Data Centers"
             style={{
               height: '80px',
               width: 'auto',
@@ -147,7 +147,7 @@ function Dashboard() {
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ fontWeight: 'bold', minWidth: '150px', color: '#0A1628' }}>Client Name:</span>
-                <span>Element Critical</span>
+                <span>T5 Data Centers</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
