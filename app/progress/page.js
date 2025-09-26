@@ -89,7 +89,7 @@ function ProgressPage() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [editingParent, setEditingParent] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1); // Default 100% zoom
+  const [zoomLevel, setZoomLevel] = useState(1.75); // Default 175% zoom
   const [timelineOffset, setTimelineOffset] = useState(0); // for panning
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
