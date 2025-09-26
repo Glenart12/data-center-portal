@@ -99,7 +99,7 @@ function Dashboard() {
             backgroundColor: '#0A1628'
           }}>
             <img
-              src="/YLO_DC.jpg"
+              src="/T5ChicagoII-header.jpg"
               alt="Data Center Operations"
               style={{
                 width: '100%',
